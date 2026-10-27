@@ -49,8 +49,25 @@ echo "Compare with the PCI addresses below (1002 = AMD, 10de = NVIDIA):"
 lspci -nn -d ::03xx
 ls -l /dev/dri/by-path/ | grep -- '-card'
 
+step "Early KMS (amdgpu in the initramfs)"
+# Loads the AMD driver before any services start, so its takeover of the screen can't race
+# greetd at boot. Only rebuilds the initramfs when the drop-in changed.
+kms=system/etc/mkinitcpio.conf.d/20-early-amdgpu.conf
+if ! cmp -s "$kms" "/etc/mkinitcpio.conf.d/$(basename "$kms")"; then
+    sudo install -Dm644 "$kms" "/etc/mkinitcpio.conf.d/$(basename "$kms")"
+    # On CachyOS with Limine, limine-mkinitcpio rebuilds and copies the images to the boot entries.
+    if command -v limine-mkinitcpio >/dev/null; then
+        sudo limine-mkinitcpio
+    else
+        sudo mkinitcpio -P
+    fi
+fi
+
 step "Login manager (greetd)"
 sudo install -Dm644 system/etc/greetd/config.toml /etc/greetd/config.toml
+sudo install -Dm644 system/etc/systemd/system/greetd.service.d/after-plymouth.conf \
+    /etc/systemd/system/greetd.service.d/after-plymouth.conf
+sudo systemctl daemon-reload
 # Enable only, don't start: starting it now would take over tty1 under the running session.
 # It takes effect on the next boot.
 sudo systemctl enable greetd.service
