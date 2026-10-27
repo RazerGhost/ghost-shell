@@ -29,6 +29,11 @@ Singleton {
             sink.audio.muted = !sink.audio.muted;
     }
 
+    function toggleMicMute(): void {
+        if (source?.audio)
+            source.audio.muted = !source.audio.muted;
+    }
+
     // PipeWire only fills in a node's audio properties (volume, mute) while something
     // tracks it, so bind both default nodes here.
     PwObjectTracker {

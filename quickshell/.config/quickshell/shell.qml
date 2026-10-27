@@ -7,7 +7,7 @@ import qs.launcher
 import qs.osd
 
 ShellRoot {
-    Bar {}
+    Island {}
     Launcher {}
     Osd {}
 }

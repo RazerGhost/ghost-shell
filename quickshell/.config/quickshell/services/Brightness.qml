@@ -20,6 +20,33 @@ Singleton {
 
     property bool emitOnRead: false
 
+    // Set from the quick settings slider; level is 0-1. Doesn't show the OSD.
+    // A drag sends many values while brightnessctl is still running; only the latest is
+    // applied once the current run exits.
+    function set(level: real): void {
+        root.level = level; // move the slider now instead of after brightnessctl finishes
+        pending = Math.round(Math.max(0.01, Math.min(1, level)) * 100);
+        if (!write.running)
+            apply();
+    }
+
+    property int pending: -1
+    property int applied: -1
+
+    function apply(): void {
+        applied = pending;
+        write.command = ["brightnessctl", "-q", "set", pending + "%"];
+        write.running = true;
+    }
+
+    Process {
+        id: write
+        onExited: {
+            if (root.pending !== root.applied)
+                root.apply();
+        }
+    }
+
     Process {
         id: read
         // -m prints machine-readable output: "amdgpu_bl1,backlight,128,50%,255"

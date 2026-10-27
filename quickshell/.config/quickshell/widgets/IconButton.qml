@@ -1,26 +1,23 @@
 import QtQuick
 import qs.theme
-import qs.widgets
 
-// A status icon in a bar pill. Set `interactive` and handle onClicked / onScrolled to make
-// it a button; `label` is what screen readers announce.
+// A round icon button with a hover highlight. `label` is what screen readers announce.
 Item {
     id: root
 
     property alias icon: glyph.icon
     property alias color: glyph.color
+    property alias iconSize: glyph.font.pixelSize
     property string label
-    property bool interactive: false
 
     signal clicked(int button)
     // Wheel notches, positive = up. Touchpads send fractions of a notch.
     signal scrolled(real steps)
 
-    anchors.verticalCenter: parent.verticalCenter
-    implicitWidth: Theme.icon.bar + Theme.spacing.xs * 2
+    implicitWidth: glyph.font.pixelSize + Theme.spacing.s * 2
     implicitHeight: implicitWidth
 
-    Accessible.role: interactive ? Accessible.Button : Accessible.StaticText
+    Accessible.role: Accessible.Button
     Accessible.name: label
     Accessible.onPressAction: root.clicked(Qt.LeftButton)
 
@@ -28,7 +25,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         radius: Theme.radius.full
-        color: Colors.m3onSurface
+        color: glyph.color
         opacity: mouse.containsMouse ? 0.12 : 0
 
         Behavior on opacity {
@@ -44,7 +41,6 @@ Item {
     MouseArea {
         id: mouse
         anchors.fill: parent
-        enabled: root.interactive
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton

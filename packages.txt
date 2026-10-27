@@ -10,6 +10,7 @@ upower
 power-profiles-daemon
 networkmanager
 bluez
+bluez-tools
 quickshell
 qt6-svg
 qt6-imageformats

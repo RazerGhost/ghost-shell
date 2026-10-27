@@ -16,6 +16,8 @@ hl.bind(mainMod .. " + Y", hl.dsp.exec_cmd(terminal .. " -e yazi"))
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("qs ipc call launcher toggle"))
+hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("qs ipc call island toggle settings")) -- quick settings
+hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("qs ipc call island toggle today"))    -- calendar and media
 
 -- Windows
 hl.bind(mainMod .. " + C", hl.dsp.window.close())

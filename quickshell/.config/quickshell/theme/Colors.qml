@@ -22,6 +22,10 @@ Singleton {
     readonly property color m3outlineVariant:          json.outline_variant
     readonly property color m3error:                   json.error
 
+    // Background of the island, launcher and OSD: translucent so Hyprland's blur shows through.
+    readonly property color surfaceTranslucent: Qt.rgba(m3surfaceContainer.r, m3surfaceContainer.g,
+                                                         m3surfaceContainer.b, Theme.surfaceOpacity)
+
     // Written by matugen (templates/quickshell-colors.json). watchChanges + reload() picks up
     // a new wallpaper's colors live, without restarting the shell.
     FileView {

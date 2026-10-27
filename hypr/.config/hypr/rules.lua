@@ -39,11 +39,11 @@ hl.window_rule({
 -- Quickshell panels are layer surfaces; each sets a namespace starting with "qs-"
 -- (check with: hyprctl layers).
 
--- Bar: blur behind the translucent pills. ignore_alpha skips the fully transparent
--- parts of the surface (rounded corners), so only the pills themselves get blurred.
+-- Island (the bar): blur behind it. ignore_alpha skips the fully transparent parts of its
+-- surface (the window is as big as the open menu), so only the island itself gets blurred.
 hl.layer_rule({
-    name  = "qs-bar",
-    match = { namespace = "^qs-bar$" },
+    name  = "qs-island",
+    match = { namespace = "^qs-island$" },
     blur         = true,
     ignore_alpha = 0.3,
     animation    = "slide top",

@@ -71,7 +71,7 @@ Scope {
             width: parent.width
             implicitHeight: column.implicitHeight + Theme.spacing.m * 2
             radius: Theme.radius.m * 2
-            color: Qt.rgba(Colors.m3surfaceContainer.r, Colors.m3surfaceContainer.g, Colors.m3surfaceContainer.b, Theme.bar.opacity)
+            color: Colors.surfaceTranslucent
 
             Column {
                 id: column
@@ -83,7 +83,7 @@ Scope {
                 // Search field
                 Rectangle {
                     width: parent.width
-                    implicitHeight: Theme.bar.height + Theme.spacing.s
+                    implicitHeight: Theme.island.height + Theme.spacing.s
                     radius: Theme.radius.full
                     color: Colors.m3surfaceContainerHighest
 

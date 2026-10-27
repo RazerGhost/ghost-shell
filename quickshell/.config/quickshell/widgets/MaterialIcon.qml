@@ -11,7 +11,7 @@ Text {
     text: icon
     color: Colors.m3onSurface
     font.family: Theme.font.icon
-    font.pixelSize: Theme.icon.bar
+    font.pixelSize: Theme.icon.normal
     font.variableAxes: { "FILL": filled ? 1 : 0 }
     verticalAlignment: Text.AlignVCenter
     horizontalAlignment: Text.AlignHCenter

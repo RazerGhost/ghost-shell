@@ -7,7 +7,6 @@ import qs.theme
 // System tray (StatusNotifierItem): left click activates, middle click is the secondary
 // action, right click opens the app's menu.
 Row {
-    anchors.verticalCenter: parent.verticalCenter
     spacing: Theme.spacing.s
 
     Repeater {

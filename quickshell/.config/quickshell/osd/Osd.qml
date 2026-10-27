@@ -92,7 +92,7 @@ Scope {
         Rectangle {
             anchors.fill: parent
             radius: Theme.radius.full
-            color: Qt.rgba(Colors.m3surfaceContainer.r, Colors.m3surfaceContainer.g, Colors.m3surfaceContainer.b, Theme.bar.opacity)
+            color: Colors.surfaceTranslucent
 
             Accessible.role: Accessible.Indicator
             Accessible.name: root.level < 0 ? root.label : root.label + " " + Math.round(root.level * 100) + "%"

@@ -26,16 +26,19 @@ new setup step.
 
 ## Look and architecture
 
-- **Bar:** top, floating, centered, not full width. A center pill (workspaces + clock) with flanking
-  pills that grow outward: left (tray), right (status icons). Content-sized, rounded, gap from the edge.
+- **Bar = the island** (user's choice, replacing the floating pills): a small shape attached to the
+  top edge, with concave curves into the screen edge, showing workspaces, the time (no date) and tiny
+  status icons. Clicking the time or the status icons morphs it (Android-style) into a menu: "today"
+  (date, calendar, media; notifications in Phase 3) or quick settings (tiles, sliders, battery, tray;
+  Wi-Fi and Bluetooth tiles slide in their own page). Categorized pages, not one crowded panel.
   Aesthetic reference: saneAspect's Hyprland/Quickshell builds (clean, rounded, Material-ish, subtle
   animations).
 - **Colors:** matugen from the wallpaper is the single source of truth for Quickshell, Hyprland borders,
   Ghostty, GTK and Yazi. Dark mode by default.
 - **Icons:** Material Symbols (`Material Symbols Rounded`). **UI font:** Inter. **Mono:** MesloLGS Nerd Font.
 - **QML:** `shell.qml` entry, one folder per area (`bar/`, `launcher/`, `notifications/`, `osd/`,
-  `controlcenter/`, `services/`, `theme/`, `widgets/` for shared components). Singletons for shared state, services and theme. No
-  hardcoded colors or sizes in components: use `Colors` and `Theme`. Comment the non-obvious parts
+  `controlcenter/`, `services/`, `theme/`, `widgets/` for shared components). Singletons for shared
+  state, services and theme. No hardcoded colors or sizes in components: use `Colors` and `Theme`. Comment the non-obvious parts
   briefly; the user is learning Quickshell through this.
 - **Panels** are toggled from Hyprland binds through Quickshell IPC (`qs ipc call <target> <fn>`).
 - **Layer rules:** every Quickshell surface sets `WlrLayershell.namespace: "qs-<name>"`; add blur and
@@ -61,19 +64,28 @@ new setup step.
 - greetd + tuigreet as the login screen (a stopgap until Phase 5).
 - Ghostty window padding. Zen browser (`zen-browser-bin`) instead of Firefox.
 
-### Phase 2: Bar complete + launcher + OSD (built; waiting on the user's test results)
-- Bar: left pill `Tray` (hidden when empty), right pill `Network`, `BluetoothStatus` (click toggles
-  the adapter), `Volume` (click mutes, scroll changes), `PowerMode` (click cycles), `Battery`.
-  Shared `bar/BarIcon.qml`, `widgets/MaterialIcon.qml`; services `Audio` and `Brightness`.
+### Phase 2: Island + control center + launcher + OSD (done, verified on the laptop 2026-10-28,
+  except the media card: untested until Spotify is installed)
+- Island (`bar/Island.qml`, `IslandShape.qml`): closed = workspaces, clock, `StatusIcons`; the
+  clock sits in the exact middle (both sides get the same width). Workspace dots always show at
+  least 5 (`WorkspaceSlots.js`, tested in `tests/tst_workspaces.qml`): click one to go there, even
+  if it's empty; scroll over them to step through. Status icons: Wi-Fi as three arcs with the
+  unlit ones dimmed (`widgets/WifiIcon.qml`), battery as an Android 16-style pill with the
+  percentage inside (`bar/BatteryPill.qml`). Opens
+  `controlcenter/TodayPanel.qml` (calendar, `MediaCard`) or `QuickSettings.qml` (tiles for Wi-Fi,
+  Bluetooth, power mode, microphone; volume and brightness `LevelSlider`s; battery; `Tray`), with
+  `WifiPage` (scan, connect, password prompt) and `BluetoothPage` (scan, pair, connect). Super+A /
+  Super+D or `qs ipc call island toggle settings|today`.
+- Services: `Audio`, `Brightness`, `NetworkStatus`, `BluetoothStatus`, `Battery`. Widgets:
+  `MaterialIcon`, `IconButton`, `Switch`, `LevelSlider`, `TextButton`.
 - Launcher (`launcher/`, Super+R): `Fuzzy.js` scoring, tested in `tests/tst_fuzzy.qml`. Terminal apps
   open in Ghostty.
 - OSD (`osd/Osd.qml`) for volume, mute, mic mute and brightness, on the focused monitor.
 - Windows open floating and centered by default (user's request); Super+V tiles one.
 
-### Phase 3: Notifications + control center + session menu
-- Quickshell as the notification server: popups plus a history / notification center.
-- Control center: quick toggles (Wi-Fi, Bluetooth, DND, power profile, night light through hyprsunset),
-  volume and brightness sliders, media player (MPRIS).
+### Phase 3: Notifications + rest of the control center + session menu
+- Quickshell as the notification server: popups (from the island?) plus history in the "today" menu.
+- Quick settings tiles still missing: DND, night light (hyprsunset).
 - Session/power menu: lock, logout, suspend, reboot, shutdown.
 
 ### Phase 4: Clipboard + wallpaper
@@ -91,6 +103,24 @@ new setup step.
 - Quickshell greeter (`Quickshell.Services.Greetd`) to replace tuigreet, sharing parts with the lock
   screen. It runs inside a small Hyprland instance started by greetd; switching over is a change to
   `command` in `system/etc/greetd/config.toml`.
+
+### Phase 6: Window switching + snap layouts
+Added at the user's request after researching Windows/macOS features (2026-10-28). The phase number
+isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
+- **Alt+Tab switcher** (Windows/macOS style): an overlay with a live thumbnail of every window
+  (`ScreencopyView` capturing `HyprlandToplevel.wayland`), most recently used first. Hold Alt, tap
+  Tab / Shift+Tab to move, release Alt to focus the selected window; Escape cancels. The overlay
+  takes the keyboard (`Exclusive`) while open so it sees the Alt release. Check before building:
+  whether Hyprland exposes focus order (`focusHistoryID` or similar) for MRU sorting, and how much
+  live capture of many windows costs on battery (fall back to still frames if it's heavy).
+- **Snap layouts** (Windows 11 style): a small picker for the focused window with halves, quarters
+  and thirds; picking one moves and resizes the (floating) window into that area of the monitor,
+  minus the island's reserved zone and gaps. Check the Lua dispatchers for moving/resizing a window
+  (exact names, and pixels vs. percent) on wiki.hypr.land. Ask the user which key opens it (and
+  whether hovering a window's maximize area should too; Hyprland has no title bars, so probably not).
+- Later candidates from the same research, not planned yet: a macOS-style dock, an Exposé overview
+  (3-finger swipe up / hot corner, reusing the switcher's thumbnails), an emoji picker, a snipping
+  overlay. Not possible on Wayland: a global app menu. Hard: real minimize, Stage Manager.
 
 ## Decisions made
 
@@ -115,8 +145,20 @@ new setup step.
 - **Brightness OSD through IPC:** sysfs backlight files send no inotify events, so the brightness
   binds run `qs ipc call brightness refresh` after `brightnessctl`. Volume and mic need nothing:
   the OSD watches PipeWire.
-- **Bar layout:** the window is as wide as the center pill plus twice the wider side pill, so the
-  center pill stays centered; `mask` limits input to the pills.
+- **Island window:** fixed at the open menu's maximum size (resizing a layer surface every frame
+  would stutter); `mask: Region { item: island }` limits input to the shape and `exclusiveZone`
+  reserves only the closed height. The shape is one `ShapePath` (no seams between body and curves).
+- **Island keyboard focus is always `OnDemand`.** Switching it between `None` and `Exclusive` while
+  the surface was mapped made Hyprland clear the `HyprlandFocusGrab` right after it started, so the
+  menu closed immediately. (The launcher maps a new surface with `Exclusive`, which works.)
+- **Bluetooth pairing agent:** Quickshell can't register a BlueZ agent, and devices like the
+  Keychron M6 ask the host to confirm pairing (journal: "No agent available for request type 2").
+  `bt-agent` (`bluez-tools`, user-approved) runs from `autostart.lua` as
+  `yes | bt-agent -c NoInputNoOutput`: without `--daemon` it reads answers from stdin, and in
+  `--daemon` mode it rejects confirmations unless a PIN file matches. The Bluetooth page also sets
+  the adapter `pairable` and the device `trusted` before `pair()`, and connects once paired.
+- **Calendar locale:** `Qt.locale(Qt.uiLanguage)` (en_GB): the user has English UI with Dutch
+  regional formats, and plain `Qt.locale()` gave Dutch day names next to English dates.
 - **No wallpaper yet:** `install.sh` with no argument generates colors from seed `#6750a4`, the same
   scheme as the fallbacks in `Colors.qml`. `./install.sh "#rrggbb"` or `./install.sh <image>` overrides it.
 
@@ -193,6 +235,20 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - `HyprlandFocusGrab { windows: [...]; active; onCleared }`. `mask: Region { Region { item } }`;
   an empty `Region {}` makes a surface click-through. A layer surface with no anchors is centered.
 - `font.variableAxes: { "FILL": 1 }` fills Material Symbols (Qt 6.12).
+- `Quickshell.Services.Mpris`: `Mpris.players` of `MprisPlayer` (`trackTitle`, `trackArtist`,
+  `trackArtUrl`, `isPlaying`, `canTogglePlaying`, `canGoNext/Previous`, `togglePlaying()`, `next()`,
+  `previous()`).
+- Networking: `Networking.wifiEnabled` and `WifiDevice.scannerEnabled` are writable;
+  `Network.connect()`, `disconnect()`, signal `connectionFailed(reason)` (`ConnectionFailReason`);
+  `WifiNetwork.connectWithPsk(psk)`, `security` (`WifiSecurityType.Open/Owe/...`), `known`, `state`.
+- Bluetooth: `BluetoothAdapter.discovering` writable; `BluetoothDevice` `connect()`, `disconnect()`,
+  `pair()`, `paired`, `pairing`, `state` (`BluetoothDeviceState`), `battery`, `deviceName`, `icon`.
+- Qt: `QtQuick.Shapes` (`Shape.CurveRenderer`, `PathArc.direction`), `MonthGrid` / `DayOfWeekRow`
+  from `QtQuick.Controls.Basic` (MonthGrid needs an explicit height).
+- `console.log` doesn't reach `qs log`; use `console.warn` when debugging.
+- Scrolling: `WheelHandler` received no wheel events on the island's layer surface; a
+  `MouseArea { acceptedButtons: Qt.NoButton; onWheel: ... }` under the content works and lets
+  clicks through. Wheel events pass through MouseAreas that have no `onWheel`.
 - Deprecated: `Quickshell.configDir` / `shellRoot` (use `shellDir`), and setting window
   `width/height` (use `implicit*`).
 
@@ -215,7 +271,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 
 ## Testing on the laptop
 
-- Quickshell reloads on file changes. `qs log` prints the running instance's log; panels can be
+- Quickshell reloads on file changes, but a reload after adding a property to a singleton
+  (e.g. `Theme`) can leave parts blank; restart it then:
+  `hyprctl dispatch 'hl.dsp.exec_cmd("pkill -x qs; sleep 0.5; qs")'`. `qs log` prints the running instance's log; panels can be
   opened with `qs ipc call ...` and checked with `grim -g "x,y wxh" out.png`. Run `pkill qs; qs` in a terminal to watch its log (also saved
   under `/run/user/1000/quickshell/`). `qs ipc show` lists IPC targets.
 - `hyprctl reload` after editing a required Lua file; `hyprctl layers` shows layer namespaces;
