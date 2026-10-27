@@ -34,5 +34,6 @@ nautilus
 gvfs
 adw-gtk-theme
 yazi
+micro
 greetd
 greetd-tuigreet
