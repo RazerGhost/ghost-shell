@@ -49,19 +49,33 @@ echo "Compare with the PCI addresses below (1002 = AMD, 10de = NVIDIA):"
 lspci -nn -d ::03xx
 ls -l /dev/dri/by-path/ | grep -- '-card'
 
-step "Early KMS (amdgpu in the initramfs)"
-# Loads the AMD driver before any services start, so its takeover of the screen can't race
-# greetd at boot. Only rebuilds the initramfs when the drop-in changed.
+step "Boot: early KMS, no Plymouth splash"
+rebuild_boot=false
+
+# Early KMS: load the AMD driver before any services start. CachyOS's chwd removes the kms
+# hook on NVIDIA laptops (10-chwd-kms.conf), so without this amdgpu loads late.
 kms=system/etc/mkinitcpio.conf.d/20-early-amdgpu.conf
 if ! cmp -s "$kms" "/etc/mkinitcpio.conf.d/$(basename "$kms")"; then
     sudo install -Dm644 "$kms" "/etc/mkinitcpio.conf.d/$(basename "$kms")"
-    # On CachyOS with Limine, limine-mkinitcpio rebuilds and copies the images to the boot entries.
-    if command -v limine-mkinitcpio >/dev/null; then
-        sudo limine-mkinitcpio
-    else
-        sudo mkinitcpio -P
-    fi
+    rebuild_boot=true
 fi
+
+# Plymouth leaves tty1 in graphics mode when it quits, so tuigreet draws to a console that
+# shows nothing (black screen at boot). /etc/default/limine is bash; each
+# KERNEL_CMDLINE[default]+= line appends to the kernel command line.
+no_splash='KERNEL_CMDLINE[default]+=" plymouth.enable=0"'
+if ! grep -qxF "$no_splash" /etc/default/limine; then
+    echo "$no_splash" | sudo tee -a /etc/default/limine >/dev/null
+    rebuild_boot=true
+fi
+
+if $rebuild_boot; then
+    # limine-mkinitcpio (CachyOS) rebuilds the initramfs and rewrites the Limine boot entries.
+    sudo limine-mkinitcpio
+fi
+# Stop if the option didn't reach the boot entries: greetd would boot to a black screen.
+sudo grep -rqs --include=limine.conf 'plymouth.enable=0' /boot \
+    || fail "plymouth.enable=0 is not in /boot's limine.conf; check /etc/default/limine and run sudo limine-mkinitcpio"
 
 step "Login manager (greetd)"
 sudo install -Dm644 system/etc/greetd/config.toml /etc/greetd/config.toml
