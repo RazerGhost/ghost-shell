@@ -23,8 +23,9 @@ post_hook   = 'hyprctl reload'
 [templates.ghostty]
 input_path  = 'templates/ghostty'
 output_path = '~/.config/ghostty/themes/Matugen'
-# SIGUSR2 makes running Ghostty windows reload their config
-post_hook   = 'pkill -SIGUSR2 ghostty'
+# SIGUSR2 makes running Ghostty windows reload their config.
+# Hooks run through sh; `|| true` keeps it quiet when no Ghostty is open (pkill exits 1).
+post_hook   = 'pkill -SIGUSR2 ghostty || true'
 
 [templates.gtk]
 # Nautilus (GTK4/libadwaita) and GTK3 apps (adw-gtk3). Open apps need a restart to pick it up.
