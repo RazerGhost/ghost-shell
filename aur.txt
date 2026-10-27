@@ -1,1 +1,2 @@
 ttf-material-symbols-variable
+zen-browser-bin
