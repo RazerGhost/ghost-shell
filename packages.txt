@@ -25,3 +25,7 @@ matugen
 inter-font
 ttf-meslo-nerd
 nvidia-prime
+nautilus
+gvfs
+adw-gtk-theme
+yazi

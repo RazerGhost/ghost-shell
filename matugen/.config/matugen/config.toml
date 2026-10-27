@@ -1,5 +1,5 @@
 # matugen: generates Material colors from the wallpaper and writes them through the templates below.
-# This is the single source of truth for colors in Quickshell, Hyprland and Ghostty.
+# This is the single source of truth for colors in Quickshell, Hyprland, Ghostty, GTK and Yazi.
 #
 # Run: matugen image <wallpaper> -m dark --source-color-index 0
 # (--source-color-index 0 skips the interactive prompt when an image yields several source colors)
@@ -25,3 +25,13 @@ input_path  = 'templates/ghostty'
 output_path = '~/.config/ghostty/themes/Matugen'
 # SIGUSR2 makes running Ghostty windows reload their config
 post_hook   = 'pkill -SIGUSR2 ghostty'
+
+[templates.gtk]
+# Nautilus (GTK4/libadwaita) and GTK3 apps (adw-gtk3). Open apps need a restart to pick it up.
+input_path  = 'templates/gtk-colors.css'
+output_path = ['~/.config/gtk-3.0/gtk.css', '~/.config/gtk-4.0/gtk.css']
+
+[templates.yazi]
+# Yazi reads its theme at startup; reopen it to see new colors.
+input_path  = 'templates/yazi-theme.toml'
+output_path = '~/.config/yazi/theme.toml'

@@ -51,6 +51,11 @@ done
 # Quickshell fills this in for the QML language server; it's gitignored.
 touch quickshell/.config/quickshell/.qmlls.ini
 
+step "GTK dark mode and theme"
+# adw-gtk3 makes GTK3 apps match libadwaita (GTK4) ones; GTK4 apps follow color-scheme.
+gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark
+
 step "Generating colors with matugen"
 # Without a wallpaper, matugen builds the scheme from one seed color.
 # #6750a4 is the Material baseline purple, the same scheme as the fallbacks in Colors.qml.
