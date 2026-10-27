@@ -5,6 +5,11 @@ hyprpolkitagent
 hypridle
 hyprlock
 hyprsunset
+wireplumber
+upower
+power-profiles-daemon
+networkmanager
+bluez
 quickshell
 qt6-svg
 qt6-imageformats

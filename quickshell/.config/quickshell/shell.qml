@@ -3,7 +3,11 @@
 // uppercase letter become types (bar/Bar.qml -> Bar). No qmldir needed.
 import Quickshell
 import qs.bar
+import qs.launcher
+import qs.osd
 
 ShellRoot {
     Bar {}
+    Launcher {}
+    Osd {}
 }

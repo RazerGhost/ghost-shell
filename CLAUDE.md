@@ -10,6 +10,7 @@ Arch Linux + Hyprland dotfiles, deployed with GNU Stow.
 - Browser is Zen (`zen-browser-bin` from the AUR), not Firefox. Use it wherever a browser is launched or set as default.
 - Hyprland and Quickshell run on the laptop (CachyOS). A session on the laptop can run and test changes directly (`qs`, `hyprctl`, `journalctl`); a session on another machine can't, and hands the user a test checklist instead.
 - Commit and push after each phase or fix; the user may pull on another machine.
+- `tests/` holds QML tests (not a Stow package). Run them with `QT_QPA_PLATFORM=offscreen /usr/lib/qt6/bin/qmltestrunner -input tests`.
 - Files use LF line endings (enforced in `.gitattributes`), even when edited on Windows.
 - `ROADMAP.md` has the phase plan, decisions, open issues and verified API notes. Update it when a phase finishes or a decision changes.
 

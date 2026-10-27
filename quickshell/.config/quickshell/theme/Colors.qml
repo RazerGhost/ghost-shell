@@ -9,14 +9,18 @@ import Quickshell.Io
 Singleton {
     // Every name has an "m3" prefix because QML treats "on" + capital letter as a change
     // handler: with a `surface` property next to it, `onSurface` silently reads as #000000.
-    readonly property color m3primary:          json.primary
-    readonly property color m3onPrimary:        json.on_primary
-    readonly property color m3surface:          json.surface
-    readonly property color m3surfaceContainer: json.surface_container
-    readonly property color m3onSurface:        json.on_surface
-    readonly property color m3onSurfaceVariant: json.on_surface_variant
-    readonly property color m3outlineVariant:   json.outline_variant
-    readonly property color m3error:            json.error
+    readonly property color m3primary:                 json.primary
+    readonly property color m3onPrimary:               json.on_primary
+    readonly property color m3primaryContainer:        json.primary_container
+    readonly property color m3onPrimaryContainer:      json.on_primary_container
+    readonly property color m3surface:                 json.surface
+    readonly property color m3surfaceContainer:        json.surface_container
+    readonly property color m3surfaceContainerHigh:    json.surface_container_high
+    readonly property color m3surfaceContainerHighest: json.surface_container_highest
+    readonly property color m3onSurface:               json.on_surface
+    readonly property color m3onSurfaceVariant:        json.on_surface_variant
+    readonly property color m3outlineVariant:          json.outline_variant
+    readonly property color m3error:                   json.error
 
     // Written by matugen (templates/quickshell-colors.json). watchChanges + reload() picks up
     // a new wallpaper's colors live, without restarting the shell.
@@ -30,14 +34,18 @@ Singleton {
         // baseline dark scheme, used until the file exists.
         adapter: JsonAdapter {
             id: json
-            property string primary:            "#d0bcff"
-            property string on_primary:         "#381e72"
-            property string surface:            "#141218"
-            property string surface_container:  "#211f26"
-            property string on_surface:         "#e6e0e9"
-            property string on_surface_variant: "#cac4d0"
-            property string outline_variant:    "#49454f"
-            property string error:              "#f2b8b5"
+            property string primary:                   "#d0bcff"
+            property string on_primary:                "#381e72"
+            property string primary_container:         "#4f378b"
+            property string on_primary_container:      "#eaddff"
+            property string surface:                   "#141218"
+            property string surface_container:         "#211f26"
+            property string surface_container_high:    "#2b2930"
+            property string surface_container_highest: "#36343b"
+            property string on_surface:                "#e6e0e9"
+            property string on_surface_variant:        "#cac4d0"
+            property string outline_variant:           "#49454f"
+            property string error:                     "#f2b8b5"
         }
     }
 }

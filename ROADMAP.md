@@ -34,7 +34,7 @@ new setup step.
   Ghostty, GTK and Yazi. Dark mode by default.
 - **Icons:** Material Symbols (`Material Symbols Rounded`). **UI font:** Inter. **Mono:** MesloLGS Nerd Font.
 - **QML:** `shell.qml` entry, one folder per area (`bar/`, `launcher/`, `notifications/`, `osd/`,
-  `controlcenter/`, `services/`, `theme/`). Singletons for shared state, services and theme. No
+  `controlcenter/`, `services/`, `theme/`, `widgets/` for shared components). Singletons for shared state, services and theme. No
   hardcoded colors or sizes in components: use `Colors` and `Theme`. Comment the non-obvious parts
   briefly; the user is learning Quickshell through this.
 - **Panels** are toggled from Hyprland binds through Quickshell IPC (`qs ipc call <target> <fn>`).
@@ -61,11 +61,14 @@ new setup step.
 - greetd + tuigreet as the login screen (a stopgap until Phase 5).
 - Ghostty window padding. Zen browser (`zen-browser-bin`) instead of Firefox.
 
-### Phase 2: Bar complete + launcher + OSD
-- Remaining bar modules: system tray, volume, battery, network, bluetooth, power profile. Left and
-  right pills.
-- App launcher on Super+R: fuzzy search over desktop entries, keyboard navigation.
-- OSD popup for volume, mic mute and brightness changes.
+### Phase 2: Bar complete + launcher + OSD (built; waiting on the user's test results)
+- Bar: left pill `Tray` (hidden when empty), right pill `Network`, `BluetoothStatus` (click toggles
+  the adapter), `Volume` (click mutes, scroll changes), `PowerMode` (click cycles), `Battery`.
+  Shared `bar/BarIcon.qml`, `widgets/MaterialIcon.qml`; services `Audio` and `Brightness`.
+- Launcher (`launcher/`, Super+R): `Fuzzy.js` scoring, tested in `tests/tst_fuzzy.qml`. Terminal apps
+  open in Ghostty.
+- OSD (`osd/Osd.qml`) for volume, mute, mic mute and brightness, on the focused monitor.
+- Windows open floating and centered by default (user's request); Super+V tiles one.
 
 ### Phase 3: Notifications + control center + session menu
 - Quickshell as the notification server: popups plus a history / notification center.
@@ -107,6 +110,13 @@ new setup step.
 - **matugen's Quickshell JSON lives outside the shell directory**
   (`~/.local/state/quickshell/colors.json`). Quickshell reloads the whole shell when files in its config
   directory change; `Colors.qml` watches the file instead.
+- **Floating by default:** a `float = true, center = true` rule for every window in `rules.lua`; the
+  dwindle layout is kept for windows tiled with Super+V.
+- **Brightness OSD through IPC:** sysfs backlight files send no inotify events, so the brightness
+  binds run `qs ipc call brightness refresh` after `brightnessctl`. Volume and mic need nothing:
+  the OSD watches PipeWire.
+- **Bar layout:** the window is as wide as the center pill plus twice the wider side pill, so the
+  center pill stays centered; `mask` limits input to the pills.
 - **No wallpaper yet:** `install.sh` with no argument generates colors from seed `#6750a4`, the same
   scheme as the fallbacks in `Colors.qml`. `./install.sh "#rrggbb"` or `./install.sh <image>` overrides it.
 
@@ -131,6 +141,8 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   dim_around, xray, animation, no_anim, order, above_lock, no_screen_share })`.
 - `hl.exec_cmd` runs immediately (use inside `hl.on("hyprland.start", ...)`). `hl.dsp.exec_cmd` returns
   an action for `hl.bind`. Events: `hyprland.start`, `hyprland.shutdown`, `config.reloaded`.
+- Window rules: `hl.window_rule({ name, match = { class = ".*" }, float = true, center = true })`;
+  `float`/`center` are static effects (applied when the window opens).
 - Bind flags (third argument): `locked`, `release`, `repeating`, `mouse`, `long_press`,
   `non_consuming`, `description`, ...
 - `hl.env` runs before the compositor starts; `AQ_DRM_DEVICES` is a colon-separated list with the
@@ -159,6 +171,28 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `Quickshell.execDetached([...])`.
 - `Quickshell.Services.Greetd` exists: `createSession`, `respond`, `launch`, `cancelSession`; signals
   `authMessage`, `readyToLaunch`, `launched`, `authFailure`, `error`.
+- Services load lazily: `UPower`, `Bluetooth`, `Networking`, `SystemTray`, `DesktopEntries` are empty
+  until first accessed, then fill in asynchronously. Bindings are fine; a one-off read is not.
+- `Quickshell.Services.Pipewire`: `Pipewire.defaultAudioSink/Source` (`PwNode`), `node.audio.volume`
+  (0-1, writable), `.muted` (writable). Needs `PwObjectTracker { objects: [...] }` to fill `audio`.
+- `Quickshell.Services.UPower`: `UPower.displayDevice` (`percentage` 0-1, `state`
+  `UPowerDeviceState.Charging/...`, `isLaptopBattery`), `PowerProfiles.profile` (writable,
+  `PowerProfile.PowerSaver/Balanced/Performance`, `PowerProfile.toString()`),
+  `PowerProfiles.hasPerformanceProfile`.
+- `Quickshell.Bluetooth`: `Bluetooth.defaultAdapter` (`enabled` writable, `devices`),
+  `BluetoothDevice.connected`.
+- `Quickshell.Networking`: `Networking.devices` (`NetworkDevice`: `type` `DeviceType.Wifi/Wired`,
+  `connected`, `networks`), `WifiNetwork.signalStrength` (0-1), `Networking.wifiEnabled`.
+- `Quickshell.Services.SystemTray`: `SystemTray.items` of `SystemTrayItem` (`icon`, `title`, `id`,
+  `tooltipTitle`, `onlyMenu`, `hasMenu`, `menu`, `activate()`, `secondaryActivate()`).
+  `QsMenuAnchor { menu; anchor.item; anchor.edges: Edges.Bottom; open() }`.
+- `DesktopEntries.applications` of `DesktopEntry` (`name`, `genericName`, `comment`, `icon`,
+  `keywords`, `noDisplay`, `runInTerminal`, `command` (string list), `execute()`). `execute()`
+  ignores `runInTerminal`. `Quickshell.iconPath(name, fallback)`; `IconImage` in
+  `Quickshell.Widgets` (`source`, `implicitSize`).
+- `HyprlandFocusGrab { windows: [...]; active; onCleared }`. `mask: Region { Region { item } }`;
+  an empty `Region {}` makes a surface click-through. A layer surface with no anchors is centered.
+- `font.variableAxes: { "FILL": 1 }` fills Material Symbols (Qt 6.12).
 - Deprecated: `Quickshell.configDir` / `shellRoot` (use `shellDir`), and setting window
   `width/height` (use `implicit*`).
 
@@ -181,7 +215,8 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 
 ## Testing on the laptop
 
-- Quickshell reloads on file changes. Run `pkill qs; qs` in a terminal to watch its log (also saved
+- Quickshell reloads on file changes. `qs log` prints the running instance's log; panels can be
+  opened with `qs ipc call ...` and checked with `grim -g "x,y wxh" out.png`. Run `pkill qs; qs` in a terminal to watch its log (also saved
   under `/run/user/1000/quickshell/`). `qs ipc show` lists IPC targets.
 - `hyprctl reload` after editing a required Lua file; `hyprctl layers` shows layer namespaces;
   `hyprctl binds` shows loaded binds.

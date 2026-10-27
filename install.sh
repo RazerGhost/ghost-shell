@@ -86,13 +86,18 @@ sudo systemctl daemon-reload
 # It takes effect on the next boot.
 sudo systemctl enable greetd.service
 
+step "Services the Quickshell bar reads"
+# Network, Bluetooth and power profile modules talk to these over D-Bus.
+# UPower (battery) is started on demand by D-Bus, so it needs no enabling.
+sudo systemctl enable --now NetworkManager.service bluetooth.service power-profiles-daemon.service
+
 step "Linking configs with stow"
-# Every top-level directory is a Stow package, except system/ (installed above).
+# Every top-level directory is a Stow package, except system/ (installed above) and tests/.
 # -R re-links, so files added to an already-stowed package get linked too.
 # If stow reports a conflict, move the existing file aside and re-run.
 for pkg in */; do
     pkg=${pkg%/}
-    [[ $pkg == system ]] && continue
+    [[ $pkg == system || $pkg == tests ]] && continue
     echo "$pkg"
     stow -R -t "$HOME" "$pkg"
 done

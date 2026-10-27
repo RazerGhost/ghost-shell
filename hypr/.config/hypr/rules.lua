@@ -2,6 +2,14 @@
 ---- WINDOWS AND WORKSPACES ----
 --------------------------------
 
+-- New windows open floating and centered. Super+V tiles the focused window (and floats it again).
+hl.window_rule({
+    name   = "float-by-default",
+    match  = { class = ".*" },
+    float  = true,
+    center = true,
+})
+
 -- Ignore maximize requests from apps
 hl.window_rule({
     name  = "suppress-maximize-events",
@@ -39,4 +47,22 @@ hl.layer_rule({
     blur         = true,
     ignore_alpha = 0.3,
     animation    = "slide top",
+})
+
+-- Launcher: blurred, pops in from its center.
+hl.layer_rule({
+    name  = "qs-launcher",
+    match = { namespace = "^qs-launcher$" },
+    blur         = true,
+    ignore_alpha = 0.3,
+    animation    = "popin 90%",
+})
+
+-- OSD (volume / brightness popup): blurred, slides up from the bottom edge.
+hl.layer_rule({
+    name  = "qs-osd",
+    match = { namespace = "^qs-osd$" },
+    blur         = true,
+    ignore_alpha = 0.3,
+    animation    = "slide bottom",
 })

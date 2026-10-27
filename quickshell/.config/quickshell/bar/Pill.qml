@@ -5,6 +5,7 @@ import qs.theme
 // Children go into the row (default property alias), laid out left to right.
 Rectangle {
     default property alias content: row.data
+    property alias spacing: row.spacing
 
     implicitWidth: row.implicitWidth + Theme.spacing.l * 2
     implicitHeight: Theme.bar.height
