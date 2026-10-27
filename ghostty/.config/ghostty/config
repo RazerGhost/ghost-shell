@@ -4,3 +4,9 @@
 theme = Matugen
 
 font-family = MesloLGS Nerd Font
+
+# Space between the text and the window edge (Ghostty's default is almost none)
+window-padding-x = 12
+window-padding-y = 10
+# Spread leftover space (the window rarely fits an exact number of cells) evenly on all sides
+window-padding-balance = true
