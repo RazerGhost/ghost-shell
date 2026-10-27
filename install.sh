@@ -15,8 +15,12 @@ step() { printf '\n\033[1;34m==> %s\033[0m\n' "$*"; }
 fail() { printf '\033[1;31merror:\033[0m %s\n' "$*" >&2; exit 1; }
 
 step "Installing packages (packages.txt, aur.txt)"
-sudo pacman -S --needed - < packages.txt
-paru -S --needed - < aur.txt
+# Packages go in as arguments, not on stdin: pacman and paru read their "Proceed?" prompts
+# from stdin, and with the list piped in they'd get end-of-file instead of your answer.
+mapfile -t pacman_pkgs < <(grep -v '^[[:space:]]*$' packages.txt)
+mapfile -t aur_pkgs    < <(grep -v '^[[:space:]]*$' aur.txt)
+sudo pacman -S --needed "${pacman_pkgs[@]}"
+paru -S --needed "${aur_pkgs[@]}"
 
 step "GPU udev rule (stable /dev/dri/amd-igpu and /dev/dri/nvidia-dgpu)"
 rule=system/etc/udev/rules.d/61-gpu-symlinks.rules
