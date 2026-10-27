@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Set up (or update) this machine from the dotfiles repo. Safe to re-run.
 #
-# Usage: ./install.sh [wallpaper]
-#   wallpaper  image to generate matugen colors from (needed on the first run)
+# Usage: ./install.sh [wallpaper | "#rrggbb"]
+#   wallpaper  image to generate matugen colors from
+#   #rrggbb    seed color to generate them from instead (quote it: # starts a comment)
+#   Without either, the first run uses a default seed color.
 #
 # Run `git pull` before this script, not from it: pulling can change this file mid-run.
 set -euo pipefail
@@ -50,13 +52,19 @@ done
 touch quickshell/.config/quickshell/.qmlls.ini
 
 step "Generating colors with matugen"
-if [[ $# -ge 1 ]]; then
+# Without a wallpaper, matugen builds the scheme from one seed color.
+# #6750a4 is the Material baseline purple, the same scheme as the fallbacks in Colors.qml.
+default_seed="#6750a4"
+if [[ $# -ge 1 && $1 == \#* ]]; then
+    matugen color hex "$1" -m dark
+elif [[ $# -ge 1 ]]; then
     [[ -f $1 ]] || fail "wallpaper not found: $1"
     matugen image "$1" -m dark --source-color-index 0
 elif [[ -f $HOME/.local/state/quickshell/colors.json ]]; then
-    echo "Colors already generated; pass a wallpaper to regenerate."
+    echo "Colors already generated; pass a wallpaper or a hex color to regenerate."
 else
-    fail "no colors yet: re-run with a wallpaper, e.g. ./install.sh ~/Pictures/Wallpapers/foo.jpg"
+    echo "No wallpaper given, using seed color $default_seed"
+    matugen color hex "$default_seed" -m dark
 fi
 
 step "Done"
