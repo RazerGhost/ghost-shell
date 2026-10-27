@@ -21,3 +21,7 @@ slurp
 wl-clipboard
 cliphist
 papirus-icon-theme
+matugen
+inter-font
+ttf-meslo-nerd
+nvidia-prime

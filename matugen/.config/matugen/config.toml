@@ -1,0 +1,27 @@
+# matugen: generates Material colors from the wallpaper and writes them through the templates below.
+# This is the single source of truth for colors in Quickshell, Hyprland and Ghostty.
+#
+# Run: matugen image <wallpaper> -m dark --source-color-index 0
+# (--source-color-index 0 skips the interactive prompt when an image yields several source colors)
+#
+# Templates use matugen's syntax: {{colors.<name>.default.<format>}}, loops with <* for ... *>.
+# Relative input_path values resolve against this file's directory.
+
+[config]
+
+[templates.quickshell]
+input_path  = 'templates/quickshell-colors.json'
+# Outside ~/.config/quickshell on purpose: Quickshell reloads the whole shell when files in its
+# config directory change. Colors.qml watches this file and updates colors live instead.
+output_path = '~/.local/state/quickshell/colors.json'
+
+[templates.hyprland]
+input_path  = 'templates/hyprland-colors.lua'
+output_path = '~/.config/hypr/colors.lua'
+post_hook   = 'hyprctl reload'
+
+[templates.ghostty]
+input_path  = 'templates/ghostty'
+output_path = '~/.config/ghostty/themes/Matugen'
+# SIGUSR2 makes running Ghostty windows reload their config
+post_hook   = 'pkill -SIGUSR2 ghostty'

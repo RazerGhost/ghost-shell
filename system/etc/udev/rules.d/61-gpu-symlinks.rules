@@ -1,0 +1,8 @@
+# Stable names for the two GPUs, used by AQ_DRM_DEVICES in ~/.config/hypr/env.lua.
+# /dev/dri/cardN numbers can change between boots; these symlinks always point at the right card.
+# Matched by PCI vendor ID (0x1002 = AMD, 0x10de = NVIDIA), which works because this laptop
+# has exactly one GPU from each vendor.
+#
+# Install: sudo install -Dm644 61-gpu-symlinks.rules /etc/udev/rules.d/61-gpu-symlinks.rules
+KERNEL=="card*", SUBSYSTEM=="drm", SUBSYSTEMS=="pci", ATTRS{vendor}=="0x1002", SYMLINK+="dri/amd-igpu"
+KERNEL=="card*", SUBSYSTEM=="drm", SUBSYSTEMS=="pci", ATTRS{vendor}=="0x10de", SYMLINK+="dri/nvidia-dgpu"
