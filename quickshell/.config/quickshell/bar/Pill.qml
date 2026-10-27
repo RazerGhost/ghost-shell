@@ -9,7 +9,7 @@ Rectangle {
     implicitWidth: row.implicitWidth + Theme.spacing.l * 2
     implicitHeight: Theme.bar.height
     radius: Theme.radius.full
-    color: Qt.rgba(Colors.surfaceContainer.r, Colors.surfaceContainer.g, Colors.surfaceContainer.b, Theme.bar.opacity)
+    color: Qt.rgba(Colors.m3surfaceContainer.r, Colors.m3surfaceContainer.g, Colors.m3surfaceContainer.b, Theme.bar.opacity)
 
     // Animate width changes so the bar grows and shrinks smoothly.
     Behavior on implicitWidth {

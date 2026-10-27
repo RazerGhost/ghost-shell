@@ -16,7 +16,7 @@ Row {
     Text {
         anchors.verticalCenter: parent.verticalCenter
         text: Qt.formatDateTime(clock.date, "HH:mm")
-        color: Colors.onSurface
+        color: Colors.m3onSurface
         font.family: Theme.font.sans
         font.pixelSize: Theme.font.normal
         font.weight: Font.DemiBold
@@ -25,7 +25,7 @@ Row {
     Text {
         anchors.verticalCenter: parent.verticalCenter
         text: Qt.formatDateTime(clock.date, "ddd d MMM")
-        color: Colors.onSurfaceVariant
+        color: Colors.m3onSurfaceVariant
         font.family: Theme.font.sans
         font.pixelSize: Theme.font.normal
     }

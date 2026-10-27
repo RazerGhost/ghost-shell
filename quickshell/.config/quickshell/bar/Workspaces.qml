@@ -30,9 +30,9 @@ Row {
             implicitWidth: modelData.active ? Theme.workspace.activeDot : Theme.workspace.dot
             implicitHeight: Theme.workspace.dot
             radius: Theme.radius.full
-            color: modelData.urgent ? Colors.error
-                 : modelData.active ? Colors.primary
-                 : Colors.onSurfaceVariant
+            color: modelData.urgent ? Colors.m3error
+                 : modelData.active ? Colors.m3primary
+                 : Colors.m3onSurfaceVariant
             opacity: modelData.active || modelData.urgent ? 1 : 0.5
 
             Behavior on implicitWidth {

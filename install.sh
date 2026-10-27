@@ -26,14 +26,21 @@ if ! cmp -s "$rule" "/etc/udev/rules.d/$(basename "$rule")"; then
     sudo udevadm trigger --subsystem-match=drm
     udevadm settle
 fi
-# Hyprland won't start if these are missing or point at the same card, so stop here instead.
-[[ -e /dev/dri/amd-igpu ]]    || fail "/dev/dri/amd-igpu is missing (udev rule didn't match the AMD card)"
-[[ -e /dev/dri/nvidia-dgpu ]] || fail "/dev/dri/nvidia-dgpu is missing (udev rule didn't match the NVIDIA card)"
-igpu=$(readlink -f /dev/dri/amd-igpu)
-dgpu=$(readlink -f /dev/dri/nvidia-dgpu)
-[[ $igpu != "$dgpu" ]] || fail "both GPU symlinks point at $igpu"
-echo "amd-igpu    -> $igpu"
-echo "nvidia-dgpu -> $dgpu"
+# The iGPU is the primary GPU in AQ_DRM_DEVICES: without it Hyprland can't start, so stop here.
+[[ -e /dev/dri/amd-igpu ]] || fail "/dev/dri/amd-igpu is missing (udev rule didn't match the AMD card)"
+echo "amd-igpu    -> $(readlink -f /dev/dri/amd-igpu)"
+# The RTX is only needed for outputs wired to it (HDMI / USB-C), so a missing card is a warning.
+# It's missing when the NVIDIA driver didn't load or didn't create a DRM card.
+if [[ -e /dev/dri/nvidia-dgpu ]]; then
+    [[ $(readlink -f /dev/dri/nvidia-dgpu) != $(readlink -f /dev/dri/amd-igpu) ]] \
+        || fail "both GPU symlinks point at $(readlink -f /dev/dri/amd-igpu)"
+    echo "nvidia-dgpu -> $(readlink -f /dev/dri/nvidia-dgpu)"
+else
+    printf '\033[1;33mwarning:\033[0m /dev/dri/nvidia-dgpu is missing; external monitors on the RTX will not work.\n' >&2
+    echo "NVIDIA driver status:"
+    lspci -k -d 10de::03xx
+    lsmod | grep -E '^nvidia' || echo "  (no nvidia kernel modules loaded)"
+fi
 echo "Compare with the PCI addresses below (1002 = AMD, 10de = NVIDIA):"
 lspci -nn -d ::03xx
 ls -l /dev/dri/by-path/ | grep -- '-card'
