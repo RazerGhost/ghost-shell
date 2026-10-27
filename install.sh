@@ -38,6 +38,12 @@ echo "Compare with the PCI addresses below (1002 = AMD, 10de = NVIDIA):"
 lspci -nn -d ::03xx
 ls -l /dev/dri/by-path/ | grep -- '-card'
 
+step "Login manager (greetd)"
+sudo install -Dm644 system/etc/greetd/config.toml /etc/greetd/config.toml
+# Enable only, don't start: starting it now would take over tty1 under the running session.
+# It takes effect on the next boot.
+sudo systemctl enable greetd.service
+
 step "Linking configs with stow"
 # Every top-level directory is a Stow package, except system/ (installed above).
 # -R re-links, so files added to an already-stowed package get linked too.

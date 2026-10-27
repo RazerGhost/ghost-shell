@@ -1,0 +1,12 @@
+# greetd: login manager. Shows a greeter on tty1 at boot; after login it runs Hyprland.
+# Install: sudo install -Dm644 config.toml /etc/greetd/config.toml
+#
+# tuigreet is a stopgap text greeter; Phase 5 replaces it with a Quickshell greeter.
+
+[terminal]
+vt = 1
+
+[default_session]
+# --remember pre-fills the last username; --asterisks shows typing feedback for the password.
+command = "tuigreet --time --remember --asterisks --cmd start-hyprland"
+user = "greeter"
