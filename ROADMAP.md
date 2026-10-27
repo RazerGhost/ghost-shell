@@ -43,7 +43,7 @@ new setup step.
 
 ## Phases
 
-### Phase 1: Foundation (built; parts still untested, see "Open issues")
+### Phase 1: Foundation (done, verified on the laptop)
 - Hyprland split into `monitors`, `env`, `autostart`, `look`, `input`, `binds`, `rules`, plus the
   matugen-generated `colors.lua` (loaded last, through `pcall`).
 - GPU offload: udev rule `system/etc/udev/rules.d/61-gpu-symlinks.rules` creates `/dev/dri/amd-igpu`
@@ -112,22 +112,10 @@ new setup step.
 
 ## Open issues
 
-1. **RTX missing from the PCI bus.** `lspci -k -d 10de::03xx` prints nothing and no NVIDIA modules
-   load, so there is no `/dev/dri/nvidia-dgpu`. It was present on the first `install.sh` run and
-   disappeared after a reboot; a cold boot didn't bring it back. Not yet tried: the HP hard reset
-   (charger unplugged, power button held 30 s) and the BIOS graphics mode (must be Hybrid). Hyprland
-   starts fine with that path missing; `install.sh` only warns.
-2. **Boot fix untested (commit c7bff93).** Reboot should show tuigreet. Unverified: that
-   `limine-mkinitcpio` rewrites the kernel cmdline in the boot entries. `install.sh` stops if
-   `plymouth.enable=0` isn't in `/boot`'s `limine.conf`.
-3. **Clock fix untested:** the time text should now be light grey (it was black before the `m3`
-   rename).
-4. **GTK accent:** the template only sets `@define-color` names. libadwaita 1.6+ may apply the system
-   accent on top; if Nautilus keeps a blue accent, also set the CSS variables
-   (`:root { --accent-bg-color: @accent_bg_color; ... }`) in the GTK4 file.
-5. **Phase 1 checklist not fully reported yet:** live recolor (run matugen again and watch the bar,
-   borders and Ghostty change without restarting), `prime-run` showing up in `nvidia-smi`, the bar's
-   `slide top` layer animation.
+None. Phase 1 verified on the laptop on 2026-10-27: RTX back on the PCI bus (cause unknown; it
+returned on its own), tuigreet shows at boot, clock text is light, Nautilus follows the matugen accent,
+live recolor works for the bar, borders and Ghostty, the bar's slide animation plays, and
+`prime-run glxgears` shows up in `nvidia-smi`.
 
 ## Verified API notes
 
