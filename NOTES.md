@@ -152,7 +152,7 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - Hyprland sends every xdg toplevel the tiled-left/right/top/bottom states from the start
   (`XDGShell.cpp`, so apps drop their shadows). Qt reports a window tiled on all edges as
   maximized, so `FloatingWindow.maximized` is always true; use Hyprland's state instead
-  (`lastIpcObject.fullscreen === 1` is maximized). `startSystemMove()` works from `onPressed`.
+  (`lastIpcObject.fullscreen === 1` is maximized). `startSystemMove()` hands the pointer to Hyprland: calling it on press swallows double-clicks, so call it once the pointer has dragged past `Qt.styleHints.startDragDistance`.
 - An inline `component` can't be declared in a `pragma Singleton` file ("X is not a type"); put
   it in its own file.
 - A `JsonAdapter` in a `FileView` loads after the shell starts, even with `blockLoading` (that

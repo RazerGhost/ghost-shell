@@ -61,7 +61,14 @@ Singleton {
 
             width: parent.width
             height: Theme.settings.titleBar
-            onPressed: window.startSystemMove()
+            // The move starts once the pointer has dragged a little, not on the press itself:
+            // Hyprland takes over the pointer during a move, which swallowed double-clicks.
+            property point pressedAt
+            onPressed: mouse => pressedAt = Qt.point(mouse.x, mouse.y)
+            onPositionChanged: mouse => {
+                if (pressed && Math.hypot(mouse.x - pressedAt.x, mouse.y - pressedAt.y) > Qt.styleHints.startDragDistance)
+                    window.startSystemMove();
+            }
             onDoubleClicked: root.toggleMaximized()
 
             Text {
