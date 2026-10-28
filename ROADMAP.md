@@ -260,8 +260,9 @@ From a survey of every Quickshell 0.3.2 type and the quickshell-examples repo (u
 ### Emoji picker (built 2026-10-28; waiting on the user's test results)
 - An island menu (`controlcenter/EmojiPanel.qml`, Super+. like Windows): search field, a grid
   with the recently used emoji first (`~/.local/state/quickshell/emoji.json`), arrow keys and
-  Enter or click. The emoji is typed into the previous window with wtype, so the clipboard is
-  left alone. The list comes from the `unicode-emoji` package's emoji-test.txt (user's choice
+  Enter or click. Terminals get the emoji typed (wtype); other apps get it pasted
+  (Discord and other Electron apps ignore emoji typed through a virtual keyboard), and the
+  clipboard gets its old content back; both marked sensitive, so cliphist skips them. The list comes from the `unicode-emoji` package's emoji-test.txt (user's choice
   over a copy in the repo), parsed and searched by `services/EmojiData.js` (tested); skin-tone
   variants are left out. The search field is shared with the clipboard menu (`SearchField`).
 
