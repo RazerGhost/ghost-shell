@@ -62,6 +62,9 @@ hl.bind(mainMod .. " + Z",     hl.dsp.exec_cmd("qs ipc call snap picker"), { des
 hl.bind("ALT + Tab",         hl.dsp.exec_cmd("qs ipc call switcher next"), { description = "Switch windows" })
 hl.bind("ALT + SHIFT + Tab", hl.dsp.exec_cmd("qs ipc call switcher previous"), { description = "Switch windows, backwards" })
 
+-- Overview, like Windows' Task View: every window on the workspace, and the workspaces strip.
+hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("qs ipc call overview toggle"), { description = "Overview" })
+
 -- Focus with arrow keys
 hl.bind(mainMod .. " + CTRL + left",  hl.dsp.focus({ direction = "left" }), { description = "Move focus" })
 hl.bind(mainMod .. " + CTRL + right", hl.dsp.focus({ direction = "right" }), { description = "Move focus" })

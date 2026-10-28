@@ -115,6 +115,14 @@ Singleton {
         readonly property int labelHeight: 32  // app icon and title under each preview
     }
 
+    readonly property QtObject overview: QtObject {
+        readonly property int margin:     48  // around the window grid
+        readonly property int gap:        24  // between window previews
+        readonly property int label:      32  // app icon and title under each preview
+        readonly property int workspace:  168 // width of a workspace in the strip (16:9)
+        readonly property int stripSpace: 140 // height of the strip at the bottom
+    }
+
     readonly property QtObject snap: QtObject {
         readonly property int width: 56 // one layout picture in the snap picker (16:9)
     }

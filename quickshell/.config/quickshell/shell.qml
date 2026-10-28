@@ -9,6 +9,7 @@ import qs.idle
 import qs.launcher
 import qs.lock
 import qs.osd
+import qs.overview
 import qs.polkit
 import qs.screenshot
 import qs.settings
@@ -26,6 +27,7 @@ ShellRoot {
     PolkitPrompt {}
     Screenshot {}
     Osd {}
+    Overview {}
     SnapPicker {}
     SnapAssist {}
     Switcher {}

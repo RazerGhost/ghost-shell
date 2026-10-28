@@ -114,3 +114,12 @@ hl.layer_rule({
     ignore_alpha = 0.5,
     animation    = "fade",
 })
+
+-- Overview (Super+Tab): the dimmed desktop behind it is blurred too, and it fades in.
+hl.layer_rule({
+    name  = "qs-overview",
+    match = { namespace = "^qs-overview$" },
+    blur         = true,
+    ignore_alpha = 0.3,
+    animation    = "fade",
+})

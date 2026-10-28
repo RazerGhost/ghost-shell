@@ -141,6 +141,8 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   Monitor `lastIpcObject.reserved` is `[left, top, right, bottom]` (after `refreshMonitors()`);
   `hyprctl getoption general:gaps_out -j` gives `{ "css": "20 20 20 20" }` (top right bottom left).
   `hyprctl clients -j` has `focusHistoryID` (0 = focused, then most recently used).
+- Gestures: `hl.gesture({ fingers = 3, direction = "up", action = function() hl.exec_cmd("...") end })`;
+  directions include horizontal, vertical, up, down, left, right, pinch (wiki: binds/gestures).
 - `hl.dsp.cursor.move({ x, y })` moves the pointer: useful for testing hover behaviour.
 - While a layer surface with `WlrKeyboardFocus.Exclusive` is mapped, Hyprland refuses to focus any
   window (`FocusState.cpp`: "Refusing a keyboard focus to a window because of an exclusive ls").
