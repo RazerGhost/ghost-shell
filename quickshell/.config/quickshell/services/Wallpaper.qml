@@ -41,7 +41,7 @@ Singleton {
     }
 
     // matugen's wallpaper.sh saves the choice (the file below, which updates `path`) and runs
-    // matugen; `dots theme` uses the same script.
+    // matugen; `ghost theme` uses the same script.
     function set(path: string): void {
         apply.command = ["sh", Quickshell.env("HOME") + "/.config/matugen/wallpaper.sh", path];
         apply.running = true;

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # System setup for this laptop (needs sudo): the GPU udev rule, early KMS and no Plymouth,
 # greetd, and the services the shell reads.
-# Run by `dots install`; alone: `dots install system`. Safe to re-run.
+# Run by `ghost install`; alone: `ghost install system`. Safe to re-run.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 . modules/lib.sh

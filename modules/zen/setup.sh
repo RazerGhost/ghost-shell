@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Zen: the wallpaper's colors through userChrome.css.
-# Run by `dots install`; alone: `dots install zen`. Safe to re-run.
+# Run by `ghost install`; alone: `ghost install zen`. Safe to re-run.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 . modules/lib.sh
@@ -12,7 +12,7 @@ step "Zen: the wallpaper's colors"
 zen="$HOME/.config/zen"
 profile=$(sed -n 's/^Default=//p' "$zen/installs.ini" 2>/dev/null | head -n 1)
 if [[ -z $profile || ! -d $zen/$profile ]]; then
-    echo "Skipped: start Zen once, then run `dots install zen`."
+    echo "Skipped: start Zen once, then run `ghost install zen`."
     exit 0
 fi
 chrome="$zen/$profile/chrome"

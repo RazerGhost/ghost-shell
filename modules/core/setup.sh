@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # The desktop: links the configs (stow), GTK's look, the wallpaper folder, the colors, and the
 # login screen's copy of the shell.
-# Usage: dots install core [--theme <wallpaper | "#rrggbb">]
-# Run by `dots install`; alone: `dots install core`. Safe to re-run.
+# Usage: ghost install core [--theme <wallpaper | "#rrggbb">]
+# Run by `ghost install`; alone: `ghost install core`. Safe to re-run.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 . modules/lib.sh
@@ -45,5 +45,5 @@ sh matugen/.config/matugen/wallpaper.sh "$@"
 
 step "Login screen (Quickshell greeter)"
 # After the colors, so the login screen gets the current ones. Settings, colors and the wallpaper
-# reach it by themselves afterwards; after changing the shell's code, `dots greeter` updates it.
+# reach it by themselves afterwards; after changing the shell's code, `ghost greeter` updates it.
 modules/core/greeter.sh

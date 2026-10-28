@@ -6,7 +6,7 @@
 #   /var/lib/qs-greeter/      its home, with your user name
 #   /var/lib/qs-greeter/shared/  yours: copies of your settings, colors and lock screen picture,
 #                                which the shell keeps up to date (greeter/sync.sh)
-# The core module runs it; `dots greeter` runs it alone, which is needed after changing the
+# The core module runs it; `ghost greeter` runs it alone, which is needed after changing the
 # shell's code (the login screen runs its own copy). Settings, colors and the wallpaper reach it
 # by themselves.
 set -euo pipefail

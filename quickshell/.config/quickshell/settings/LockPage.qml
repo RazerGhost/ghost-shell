@@ -8,11 +8,11 @@ import qs.widgets
 
 // The lock screen and the login screen share one look: picture, blur, dimming, clock and date.
 // The login screen also shows your name and power buttons. The login screen gets these through
-// greeter/sync.sh, once `dots greeter` has set it up.
+// greeter/sync.sh, once `ghost greeter` has set it up.
 Column {
     id: root
 
-    // Whether the login screen can follow these (`dots greeter` made its folder yours).
+    // Whether the login screen can follow these (`ghost greeter` made its folder yours).
     property bool loginScreenReady: false
     // Thumbnails only load once the page has been shown (the built-in pictures are large).
     property bool opened: false
@@ -50,7 +50,7 @@ Column {
             anchors.verticalCenter: parent.verticalCenter
             text: root.loginScreenReady
                   ? "The login screen follows these too."
-                  : "These only change the lock screen until you run dots greeter once (it needs sudo)."
+                  : "These only change the lock screen until you run ghost greeter once (it needs sudo)."
             color: root.loginScreenReady ? Colors.m3onSurfaceVariant : Colors.m3error
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.small

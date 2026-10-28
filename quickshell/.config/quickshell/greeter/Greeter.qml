@@ -32,7 +32,7 @@ Scope {
             return;
         }
         if (user === "") {
-            message = "No user set up: run dots greeter";
+            message = "No user set up: run ghost greeter";
             messageIsError = true;
             tried();
             return;

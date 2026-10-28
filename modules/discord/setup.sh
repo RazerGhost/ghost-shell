@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Discord (Vesktop): Vencord built with the Ghost theme plugin, in the wallpaper's colors.
-# Run by `dots install`; alone: `dots install discord`. Safe to re-run.
+# Run by `ghost install`; alone: `ghost install discord`. Safe to re-run.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 . modules/lib.sh
@@ -8,7 +8,7 @@ cd "$(dirname "$0")/../.."
 step "Discord: Vencord with the Ghost theme plugin, for Vesktop"
 # Third-party Vencord plugins only load from a source build, so build Vencord with Ghost
 # (github.com/RazerGhost/discord-ghost) as a userplugin and point Vesktop at that build.
-# `dots install discord` again updates the plugin. Enable the plugin in Vesktop: Settings -> Plugins -> Ghost.
+# `ghost install discord` again updates the plugin. Enable the plugin in Vesktop: Settings -> Plugins -> Ghost.
 vencord_dir="$HOME/.local/share/vencord"
 ghost_dir="$HOME/.local/share/discord-ghost"
 # Vencord at a release (update: change the tag; github.com/Vendicated/Vencord/tags). Ghost is

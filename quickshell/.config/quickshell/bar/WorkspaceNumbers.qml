@@ -1,7 +1,7 @@
 import QtQuick
 import qs.theme
 
-// Every workspace as a number, shown while hovering the dots (user's choice): the current one
+// Every workspace as a number, shown while hovering the ghost (user's choice): the current one
 // filled, ones with windows bright, empty ones dim. Click one to go there.
 Row {
     id: root

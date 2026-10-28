@@ -424,7 +424,7 @@ PanelWindow {
                     }
                 }
 
-                // While hovering the dots: every workspace as a number, and the minimized windows.
+                // While hovering the ghost: every workspace as a number, and the minimized windows.
                 MenuSlot {
                     shown: root.shown === "peek-workspaces"
                     extraHeight: Theme.spacing.m * 2

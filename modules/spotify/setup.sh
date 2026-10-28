@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Spotify: Spicetify with the Ghost theme, in the wallpaper's colors.
-# Run by `dots install`; alone: `dots install spotify`. Safe to re-run.
+# Run by `ghost install`; alone: `ghost install spotify`. Safe to re-run.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 . modules/lib.sh
@@ -25,5 +25,5 @@ if [[ -f $HOME/.config/spotify/prefs ]]; then
     # select it (matugen runs the same hook on every wallpaper change).
     sh "$HOME/.config/matugen/hooks/spicetify-ghost.sh"
 else
-    echo "Skipped: open Spotify once and log in, then run `dots install spotify`."
+    echo "Skipped: open Spotify once and log in, then run `ghost install spotify`."
 fi

@@ -10,7 +10,7 @@ set -eu
 shared=/var/lib/qs-greeter/shared
 state="$HOME/.local/state/quickshell"
 
-# Not set up yet (`dots greeter` hasn't run): nothing to do.
+# Not set up yet (`ghost greeter` hasn't run): nothing to do.
 [ -w "$shared" ] || exit 0
 
 # Write to a temporary name first, so the login screen never reads a half-copied file.

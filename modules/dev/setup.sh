@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Development: Docker.
-# Run by `dots install`; alone: `dots install dev`. Safe to re-run.
+# Run by `ghost install`; alone: `ghost install dev`. Safe to re-run.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 . modules/lib.sh

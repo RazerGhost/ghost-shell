@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
-# dots: this machine's setup from the dotfiles repo, in one command. Linked into ~/.local/bin by
+# ghost: this machine's setup from the Ghost Shell repo, in one command. Linked into ~/.local/bin by
 # stow (the bin/ package); install.sh runs it from the repo on the first run.
 #
-#   dots install [module...] [--theme <wallpaper | "#rrggbb">]
-#                    packages and setup for the modules (default: this machine's, see below)
-#   dots update      pull the repo, then install again
-#   dots theme <wallpaper | "#rrggbb">
-#                    the wallpaper and the colors from it (the same as the shell's picker)
-#   dots greeter     copy the shell to the login screen (needed after changing the shell's code)
-#   dots doctor      check that everything is set up
-#   dots modules     list the modules, and which this machine uses
-#   dots keybinds    Hyprland's keybinds as a Markdown table (docs/keybinds.md is made with it)
+#   ghost install [module...] [--theme <wallpaper | "#rrggbb">]
+#                     packages and setup for the modules (default: this machine's, see below)
+#   ghost update      pull the repo, then install again
+#   ghost theme <wallpaper | "#rrggbb">
+#                     the wallpaper and the colors from it (the same as the shell's picker)
+#   ghost greeter     copy the shell to the login screen (needed after changing the shell's code)
+#   ghost doctor      check that everything is set up
+#   ghost modules     list the modules, and which this machine uses
+#   ghost keybinds    Hyprland's keybinds as a Markdown table (docs/keybinds.md is made with it)
 #
 # Modules are the folders in modules/: their packages (packages.txt, aur.txt) and setup
-# (setup.sh). Which ones this machine gets: ~/.config/dots/modules, one name per line (not in
+# (setup.sh). Which ones this machine gets: ~/.config/ghost/modules, one name per line (not in
 # the repo, so each machine has its own); without that file, all of them.
 set -euo pipefail
 
@@ -36,7 +36,7 @@ declare -A about=(
     [capture]="screen recording, color picker, text and QR codes from the screen"
     [phone]="KDE Connect: your phone's notifications, clipboard and files"
 )
-machine_modules="$HOME/.config/dots/modules"
+machine_modules="$HOME/.config/ghost/modules"
 
 # Lines of a list file without comments and blank lines (nothing if it doesn't exist).
 entries() {
@@ -66,7 +66,7 @@ cmd_install() {
     while (($#)); do
         case $1 in
             --theme) theme=("${2:?--theme needs a wallpaper or a \"#rrggbb\" color}"); shift 2 ;;
-            *) is_module "$1" || fail "no module \"$1\" (dots modules lists them)"; wanted+=("$1"); shift ;;
+            *) is_module "$1" || fail "no module \"$1\" (ghost modules lists them)"; wanted+=("$1"); shift ;;
         esac
     done
     local modules=()
@@ -126,11 +126,11 @@ cmd_update() {
     step "Pulling the repo"
     git pull --rebase
     # The new version of this script does the rest.
-    exec "$repo/bin/.local/bin/dots" install "$@"
+    exec "$repo/bin/.local/bin/ghost" install "$@"
 }
 
 cmd_theme() {
-    (($#)) || fail "dots theme needs a wallpaper or a \"#rrggbb\" color"
+    (($#)) || fail "ghost theme needs a wallpaper or a \"#rrggbb\" color"
     sh matugen/.config/matugen/wallpaper.sh "$1"
 }
 
@@ -160,7 +160,7 @@ cmd_doctor() {
         [[ $pkg == system || $pkg == tests || $pkg == modules || $pkg == docs ]] && continue
         # In simulation, stow prints nothing but its notice when everything is linked already.
         if stow -n -v -t "$HOME" "$pkg" 2>&1 | grep -qv "in simulation mode"; then
-            bad "$pkg: not linked or in conflict (dots install core links it)"
+            bad "$pkg: not linked or in conflict (ghost install core links it)"
         else
             ok "$pkg"
         fi
@@ -170,7 +170,7 @@ cmd_doctor() {
     for m in $(machine); do
         missing=$({ entries "modules/$m/packages.txt"; entries "modules/$m/aur.txt"; } | xargs -r pacman -T || true)
         if [[ -n $missing ]]; then
-            bad "$m: missing $(echo $missing) (dots install $m)"
+            bad "$m: missing $(echo $missing) (ghost install $m)"
         else
             ok "$m"
         fi
@@ -186,23 +186,23 @@ cmd_doctor() {
     if pgrep -x qs >/dev/null; then ok "the shell (Quickshell) is running"
     else bad "the shell isn't running (hypr/shell.sh starts it at login)"; fi
     if [[ -f $HOME/.local/state/quickshell/colors.json ]]; then ok "colors generated"
-    else bad "no colors yet (dots theme <wallpaper>)"; fi
+    else bad "no colors yet (ghost theme <wallpaper>)"; fi
 
     step "Login screen"
     if [[ -d /etc/greetd/quickshell ]] && diff -rq --exclude=.qmlls.ini quickshell/.config/quickshell /etc/greetd/quickshell >/dev/null 2>&1; then
         ok "its copy of the shell is up to date"
     else
-        bad "its copy of the shell is out of date (dots greeter)"
+        bad "its copy of the shell is out of date (ghost greeter)"
     fi
 
     step "Services"
     if machine | grep -qx system; then
         for unit in greetd.service NetworkManager.service bluetooth.service power-profiles-daemon.service; do
-            if systemctl is-enabled "$unit" >/dev/null 2>&1; then ok "$unit"; else bad "$unit isn't enabled (dots install system)"; fi
+            if systemctl is-enabled "$unit" >/dev/null 2>&1; then ok "$unit"; else bad "$unit isn't enabled (ghost install system)"; fi
         done
     fi
     if machine | grep -qx dev; then
-        if systemctl is-enabled docker.socket >/dev/null 2>&1; then ok "docker.socket"; else bad "docker.socket isn't enabled (dots install dev)"; fi
+        if systemctl is-enabled docker.socket >/dev/null 2>&1; then ok "docker.socket"; else bad "docker.socket isn't enabled (ghost install dev)"; fi
     fi
 
     echo
@@ -249,5 +249,5 @@ case ${1:-help} in
     modules) cmd_modules ;;
     keybinds) cmd_keybinds ;;
     help | -h | --help) sed -n '2,/^set -euo/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//' ;;
-    *) fail "unknown command \"$1\" (dots help lists them)" ;;
+    *) fail "unknown command \"$1\" (ghost help lists them)" ;;
 esac

@@ -1,4 +1,4 @@
-# dotfiles
+# Ghost Shell
 
 A complete desktop on Arch (CachyOS) built from Hyprland and a Quickshell shell, colored from the
 wallpaper. Made for an HP Omen 16 (AMD iGPU + NVIDIA RTX), but split into modules so another
@@ -34,29 +34,29 @@ The full plan and every decision behind it: [ROADMAP.md](ROADMAP.md). Keybinds:
 On Arch or CachyOS, with `git` installed:
 
 ```sh
-git clone https://github.com/RazerGhost/dotfiles ~/dotfiles
-cd ~/dotfiles
+git clone https://github.com/RazerGhost/ghost-shell ~/ghost-shell
+cd ~/ghost-shell
 ./install.sh ~/Pictures/some-wallpaper.jpg   # or "#22d3ee" for colors from one color
 ```
 
 It installs the packages, links the configs into your home folder (GNU Stow) and sets up the
 system (login screen, services). It asks for your password for pacman and the system parts. Log
 out and back in afterwards. Some app themes need the app started once first; the install says
-so and `dots install <module>` finishes them later.
+so and `ghost install <module>` finishes them later.
 
-## The `dots` command
+## The `ghost` command
 
-After the first install, `dots` (in `~/.local/bin`) does everything:
+After the first install, `ghost` (in `~/.local/bin`) does everything:
 
 | Command | |
 |---|---|
-| `dots update` | pull the repo, then install again (new packages, new setup steps) |
-| `dots install [module...]` | packages and setup for some or all modules |
-| `dots theme <wallpaper \| "#rrggbb">` | a new wallpaper and the colors from it |
-| `dots greeter` | update the login screen's copy of the shell (after changing its code) |
-| `dots doctor` | check that everything is set up; each problem says what fixes it |
-| `dots modules` | list the modules and which ones this machine uses |
-| `dots keybinds` | the keybinds as a Markdown table |
+| `ghost update` | pull the repo, then install again (new packages, new setup steps) |
+| `ghost install [module...]` | packages and setup for some or all modules |
+| `ghost theme <wallpaper \| "#rrggbb">` | a new wallpaper and the colors from it |
+| `ghost greeter` | update the login screen's copy of the shell (after changing its code) |
+| `ghost doctor` | check that everything is set up; each problem says what fixes it |
+| `ghost modules` | list the modules and which ones this machine uses |
+| `ghost keybinds` | the keybinds as a Markdown table |
 
 ## Modules
 
@@ -75,12 +75,12 @@ its setup (`setup.sh`).
 | `capture` | screen recording, color picker, text and QR codes from the screen |
 | `phone` | KDE Connect |
 
-Every module is installed unless `~/.config/dots/modules` lists the ones this machine wants, one
+Every module is installed unless `~/.config/ghost/modules` lists the ones this machine wants, one
 per line. That file isn't in the repo, so each machine keeps its own:
 
 ```sh
-mkdir -p ~/.config/dots
-printf '%s\n' core apps dev > ~/.config/dots/modules
+mkdir -p ~/.config/ghost
+printf '%s\n' core apps dev > ~/.config/ghost/modules
 ```
 
 The `system` module is written for this laptop (an AMD + NVIDIA GPU rule, Limine boot entries);
@@ -90,7 +90,7 @@ leave it out elsewhere.
 
 Settings made in the shell's settings window live outside the repo
 (`~/.local/state/quickshell/`). For things the settings window doesn't cover, these files are
-loaded last and aren't in git, so `dots update` never conflicts with them:
+loaded last and aren't in git, so `ghost update` never conflicts with them:
 
 | File | For |
 |---|---|

@@ -1,6 +1,6 @@
 # Keybinds
 
-Generated from Hyprland's binds with `dots keybinds > docs/keybinds.md`; every bind in
+Generated from Hyprland's binds with `ghost keybinds > docs/keybinds.md`; every bind in
 `hypr/.config/hypr/binds.lua` has a description. The settings window (Super+I -> Keybinds) shows
 the same list.
 
