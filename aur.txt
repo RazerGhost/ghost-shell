@@ -1,7 +1,14 @@
+# AUR packages (install.sh installs them with paru; # lines and blank lines are skipped).
+
+# The shell's icon font, and its icon theme
 ttf-material-symbols-variable
+colloid-icon-theme-git
+
+# Apps
 zen-browser-bin
+vesktop-bin
+
+# Spotify with Spicetify, Steam with Millennium
 spotify
 spicetify-cli
-vesktop-bin
 millennium
-colloid-icon-theme-git

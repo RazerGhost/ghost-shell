@@ -1,46 +1,65 @@
+# pacman packages (install.sh installs them; lines starting with # and blank lines are skipped).
+
+# Desktop: Hyprland and its helpers
 hyprland
-cachyos-wallpapers
 xdg-desktop-portal-hyprland
 xdg-desktop-portal-gtk
 hyprpolkitagent
 hypridle
 hyprlock
 hyprsunset
+nvidia-prime
+
+# The Quickshell shell, and what it runs or reads
+quickshell
+qt6-imageformats
 wireplumber
 upower
 power-profiles-daemon
 networkmanager
 bluez
 bluez-tools
-quickshell
-qt6-imageformats
-ghostty
-zed
-paru
-stow
-github-cli
 brightnessctl
 playerctl
 grim
 slurp
 wl-clipboard
 cliphist
+wtype
+libnotify
+xdg-utils
 matugen
+unicode-emoji
+cachyos-wallpapers
+
+# Fonts and themes
 inter-font
 ttf-meslo-nerd
 noto-fonts-emoji
-unicode-emoji
-nvidia-prime
-nautilus
-loupe
-celluloid
-gvfs
 adw-gtk-theme
-yazi
-micro
+
+# Login screen (greetd; tuigreet is the fallback)
 greetd
 greetd-tuigreet
+
+# Apps
+ghostty
+zed
+nautilus
+gvfs
+loupe
+celluloid
+yazi
+micro
 steam
+
+# Tools (install.sh uses paru, stow, nodejs and lspci from pciutils)
+paru
+stow
+github-cli
+pciutils
+
+# Development
 git
 nodejs
 npm
@@ -51,6 +70,8 @@ deno
 docker
 docker-compose
 docker-buildx
+
+# Tauri's build dependencies (Haunt, the user's Git client)
 webkit2gtk-4.1
 base-devel
 curl
@@ -61,4 +82,3 @@ appmenu-gtk-module
 libappindicator-gtk3
 librsvg
 xdotool
-wtype

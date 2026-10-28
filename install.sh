@@ -18,8 +18,8 @@ step "Installing packages (packages.txt, aur.txt)"
 # steam comes from [multilib]; CachyOS enables it in /etc/pacman.conf by default.
 # Packages go in as arguments, not on stdin: pacman and paru read their "Proceed?" prompts
 # from stdin, and with the list piped in they'd get end-of-file instead of your answer.
-mapfile -t pacman_pkgs < <(grep -v '^[[:space:]]*$' packages.txt)
-mapfile -t aur_pkgs    < <(grep -v '^[[:space:]]*$' aur.txt)
+mapfile -t pacman_pkgs < <(grep -v -e '^[[:space:]]*$' -e '^[[:space:]]*#' packages.txt)
+mapfile -t aur_pkgs    < <(grep -v -e '^[[:space:]]*$' -e '^[[:space:]]*#' aur.txt)
 sudo pacman -S --needed "${pacman_pkgs[@]}"
 # rustup installs no toolchain by itself. Set up stable before the AUR packages: some build
 # with Rust (millennium), and so does Haunt (Tauri).
