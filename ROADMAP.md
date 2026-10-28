@@ -438,7 +438,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
 - No keyboard backlight control: the Omen's RGB keyboard isn't exposed to Linux (no
   `kbd_backlight` LED) without HP's own tools.
 
-### Display settings (built 2026-10-28; waiting on the user's test results)
+### Display settings (done, verified on the laptop 2026-10-28)
 - Settings -> Display, per screen: resolution and refresh rate (from `hyprctl monitors -j`), scale,
   rotation and variable refresh rate (off, fullscreen only, always; `DisplayModes.js`, tested). A
   change is tried live (`hyprctl eval` of an `hl.monitor` call) with "Keep these display
