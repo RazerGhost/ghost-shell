@@ -71,7 +71,7 @@ its setup (`setup.sh`).
 | `dev` | languages, package managers and Docker |
 | `gaming` | Steam, Proton, Lutris, Heroic, MangoHud; Steam's theme |
 | `discord`, `spotify`, `zen` | those apps in the wallpaper's colors |
-| `haunt` | what the Haunt Git client needs |
+| `haunt` | the Haunt Git client, from its release package, and what building it needs |
 | `capture` | screen recording, color picker, text and QR codes from the screen |
 | `phone` | KDE Connect |
 

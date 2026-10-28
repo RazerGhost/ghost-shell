@@ -1,8 +1,7 @@
-# Haunt, the user's Git client: fuse2 runs its AppImage, the rest are Tauri's build
-# dependencies.
+# Haunt, the user's Git client: the app comes from its release's pacman package (setup.sh); these
+# are what building it from source needs (Tauri: `pnpm app`).
 # pacman packages; # lines and blank lines are skipped.
 
-fuse2
 webkit2gtk-4.1
 base-devel
 curl

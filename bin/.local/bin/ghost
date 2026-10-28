@@ -32,7 +32,7 @@ declare -A about=(
     [discord]="Vesktop with Vencord and the Ghost plugin"
     [spotify]="Spotify with Spicetify and the Ghost theme"
     [zen]="Zen in the wallpaper's colors"
-    [haunt]="what the Haunt Git client needs to run and build"
+    [haunt]="the Haunt Git client (its release package) and what building it needs"
     [capture]="screen recording, color picker, text and QR codes from the screen"
     [phone]="KDE Connect: your phone's notifications, clipboard and files"
 )
