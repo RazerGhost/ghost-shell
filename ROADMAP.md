@@ -97,7 +97,7 @@ new setup step.
   lock, suspend, log out, restart, shut down; the last three need a second click within 4 s.
   Lock uses Quickshell's lock screen (Phase 5).
 
-### Phase 4: Clipboard + wallpaper (built; waiting on the user's test results)
+### Phase 4: Clipboard + wallpaper (done, verified on the laptop 2026-10-28)
 - Clipboard menu in the island (`controlcenter/ClipboardPanel.qml`, Super+V): cliphist history
   with a search field, image thumbnails (decoded once into `$XDG_RUNTIME_DIR/qs-clipboard`),
   arrow keys / Enter, Delete or × to remove, Clear all. Picking an entry copies it and pastes it
