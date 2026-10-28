@@ -315,6 +315,14 @@ other session: pinning the Vencord/Spicetify downloads in install.sh.
   (tested). Sensors are found by hwmon name (numbers change between boots). The RTX is only
   asked (`nvidia-smi`) while it's awake: asking would wake it, so a sleeping one shows "Asleep".
 
+### Weather (built 2026-10-28; waiting on the user's test results)
+- A row under the date in the today menu (user's pick from the Glyph rice's ideas): icon,
+  temperature, sky, today's high and low, and the town (`controlcenter/WeatherRow.qml`,
+  `services/Weather.qml`, parsing in `Weather.js`, tested). open-meteo: free, no account. The town
+  is typed once in that row (click it to change; `weatherLocation` in settings.json) and looked
+  up with open-meteo's own geocoding, rather than guessing the place from the IP address
+  through another service. Refreshed every 30 minutes.
+
 ### Screenshot tool (built 2026-10-28; waiting on the user's test results)
 - `screenshot/Screenshot.qml`, like Windows' Snipping Tool (user's choice): Super+Shift+S freezes
   the focused monitor (one `ScreencopyView` frame) and dims it, with a Region / Window / Screen

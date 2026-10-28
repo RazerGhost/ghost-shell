@@ -59,6 +59,9 @@ Singleton {
             property bool greeterShowName: true     // your user name above the password field
             property bool greeterPowerButtons: true // suspend, restart and shut down
 
+            // The town for the weather in the today menu (services/Weather.qml); "" = no weather.
+            property string weatherLocation: ""
+
             // The shell's panels (island, menus, dock, launcher...): glass, see-through over
             // Hyprland's blur with a thin light edge (like the Ghost Spotify theme), or nearly solid.
             property bool glass: true

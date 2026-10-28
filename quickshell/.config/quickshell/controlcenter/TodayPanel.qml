@@ -5,8 +5,8 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// The "today" menu, opened by clicking the time: the date, the notification history, and a
-// month calendar that stays folded away until you click the date.
+// The "today" menu, opened by clicking the time: the date, the weather, the notification
+// history, and a month calendar that stays folded away until you click the date.
 Column {
     id: root
 
@@ -71,6 +71,11 @@ Column {
                 NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }
             }
         }
+    }
+
+    // The weather where you are.
+    WeatherRow {
+        width: parent.width - root.leftPadding - root.rightPadding
     }
 
     // Month title with previous / next buttons.
