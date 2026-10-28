@@ -86,16 +86,17 @@ Column {
 
             required property BluetoothDevice modelData
 
+            // `?.`: a device that just disappeared leaves its row for a moment with no device.
             width: ListView.view.width
-            icon: root.iconFor(modelData.icon)
-            title: modelData.name
-            subtitle: modelData.state === BluetoothDeviceState.Connecting ? "Connecting…"
-                    : modelData.state === BluetoothDeviceState.Disconnecting ? "Disconnecting…"
-                    : modelData.pairing ? "Pairing… (click to cancel)"
-                    : modelData.connected ? "Connected" + (modelData.batteryAvailable ? " · " + Math.round(modelData.battery * 100) + "% battery" : "")
-                    : modelData.paired ? "Paired"
+            icon: root.iconFor(modelData?.icon ?? "")
+            title: modelData?.name ?? ""
+            subtitle: modelData?.state === BluetoothDeviceState.Connecting ? "Connecting…"
+                    : modelData?.state === BluetoothDeviceState.Disconnecting ? "Disconnecting…"
+                    : modelData?.pairing ? "Pairing… (click to cancel)"
+                    : modelData?.connected ? "Connected" + (modelData.batteryAvailable ? " · " + Math.round(modelData.battery * 100) + "% battery" : "")
+                    : modelData?.paired ? "Paired"
                     : "Click to pair"
-            highlighted: modelData.connected
+            highlighted: modelData?.connected ?? false
             onActivated: root.choose(modelData)
 
             // Once paired: trust the device, so it can reconnect by itself later (a mouse waking

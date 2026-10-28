@@ -194,16 +194,18 @@ Column {
         delegate: ListRow {
             required property WifiNetwork modelData
 
+            // `?.`: a network that just disappeared leaves its row for a moment with no network.
             width: ListView.view.width
-            icon: NetworkStatus.wifiIcon(modelData.signalStrength)
-            title: modelData.name
-            subtitle: modelData.connected ? "Connected"
+            icon: NetworkStatus.wifiIcon(modelData?.signalStrength ?? 0)
+            title: modelData?.name ?? ""
+            subtitle: !modelData ? ""
+                    : modelData.connected ? "Connected"
                     : modelData.state === ConnectionState.Connecting ? "Connecting…"
                     : modelData.known ? "Saved"
                     : root.open(modelData) ? "Open"
                     : "Secured"
-            trailingIcon: root.open(modelData) || modelData.known ? "" : "lock"
-            highlighted: modelData.connected
+            trailingIcon: !modelData || root.open(modelData) || modelData.known ? "" : "lock"
+            highlighted: modelData?.connected ?? false
             onActivated: root.choose(modelData)
         }
     }
