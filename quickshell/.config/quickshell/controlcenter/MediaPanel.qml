@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Services.Mpris
 import Quickshell.Widgets
 import qs.services
 import qs.theme
@@ -51,6 +52,18 @@ Column {
             asynchronous: true
             sourceSize.width: width * 2
             Accessible.ignored: true
+        }
+
+        // Click the cover to bring the player to the front.
+        MouseArea {
+            anchors.fill: parent
+            enabled: Media.window !== null || (root.player?.canRaise ?? false)
+            cursorShape: Qt.PointingHandCursor
+            onClicked: Media.show()
+
+            Accessible.role: Accessible.Button
+            Accessible.name: "Show " + (root.player?.identity ?? "the player")
+            Accessible.onPressAction: Media.show()
         }
     }
 
@@ -163,6 +176,16 @@ Column {
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: Theme.spacing.m
 
+        // Shuffle and repeat, when the player supports them: accent colored while on.
+        IconButton {
+            anchors.verticalCenter: parent.verticalCenter
+            visible: root.player?.shuffleSupported ?? false
+            icon: "shuffle"
+            label: root.player?.shuffle ? "Shuffle on" : "Shuffle off"
+            color: root.player?.shuffle ? Colors.m3primary : Colors.m3onSurfaceVariant
+            onClicked: root.player.shuffle = !root.player.shuffle
+        }
+
         IconButton {
             anchors.verticalCenter: parent.verticalCenter
             icon: "skip_previous"
@@ -199,6 +222,19 @@ Column {
             enabled: root.player?.canGoNext ?? false
             opacity: enabled ? 1 : 0.35
             onClicked: root.player.next()
+        }
+
+        // Off -> repeat the playlist -> repeat this track -> off.
+        IconButton {
+            anchors.verticalCenter: parent.verticalCenter
+            visible: root.player?.loopSupported ?? false
+            icon: root.player?.loopState === MprisLoopState.Track ? "repeat_one" : "repeat"
+            label: root.player?.loopState === MprisLoopState.Track ? "Repeat this track"
+                 : root.player?.loopState === MprisLoopState.Playlist ? "Repeat all" : "Repeat off"
+            color: root.player?.loopState === MprisLoopState.None ? Colors.m3onSurfaceVariant : Colors.m3primary
+            onClicked: root.player.loopState = root.player.loopState === MprisLoopState.None ? MprisLoopState.Playlist
+                                             : root.player.loopState === MprisLoopState.Playlist ? MprisLoopState.Track
+                                             : MprisLoopState.None
         }
     }
 }
