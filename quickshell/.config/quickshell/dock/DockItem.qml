@@ -6,14 +6,18 @@ import qs.services
 import qs.theme
 import "DockApps.js" as DockApps
 
-// One app in the dock: its icon, a dot per open window (up to three; the focused app's are in
-// the accent color) and its name above it on hover. Click: open the app, or switch to it (again
-// to cycle its windows; on the focused app's only window, minimize it). Right-click: menu.
+// One app in the dock: its icon (magnified near the pointer), a dot per open window (up to three;
+// the focused app's are in the accent color) and its name above it on hover. Click: open the
+// app, or switch to it (again to cycle its windows; on the focused app's only window, minimize
+// it). Right-click: menu.
 MouseArea {
     id: root
 
     // { id, pinned, windows: [{ appId, window }] } from DockApps.items.
     required property var item
+    // 1 at rest; larger near the pointer (DockBar works it out). The icon and its slot grow
+    // together, so the neighbours move aside.
+    property real magnification: 1
     readonly property DesktopEntry entry: item.id.startsWith("app:") ? null : DesktopEntries.byId(item.id)
     readonly property list<HyprlandToplevel> windows: item.windows.map(w => w.window)
     readonly property bool focused: windows.includes(Windows.active)
@@ -35,8 +39,8 @@ MouseArea {
         }
     }
 
-    implicitWidth: Theme.dock.icon + Theme.spacing.m
-    implicitHeight: Theme.dock.height
+    implicitWidth: (Theme.dock.icon + Theme.spacing.m) * magnification
+    implicitHeight: Theme.dock.height + Theme.dock.icon * (magnification - 1)
     hoverEnabled: true
     acceptedButtons: Qt.LeftButton | Qt.RightButton
     cursorShape: Qt.PointingHandCursor
@@ -51,24 +55,21 @@ MouseArea {
     Accessible.name: name + (windows.length > 0 ? ", " + windows.length + " open" : "")
     Accessible.onPressAction: activate()
 
+    // Sits on the bar, above the dots, and grows upward.
     IconImage {
         id: icon
-        anchors.centerIn: parent
-        anchors.verticalCenterOffset: -Theme.spacing.xs
-        implicitSize: Theme.dock.icon
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: (Theme.dock.height - Theme.dock.icon) / 2
+        implicitSize: Theme.dock.icon * root.magnification
         source: Quickshell.iconPath(root.entry?.icon || root.windows[0]?.wayland?.appId || "", "application-x-executable")
-        scale: root.containsMouse ? 1.12 : 1
-
-        Behavior on scale {
-            NumberAnimation { duration: Theme.anim.fast; easing.type: Theme.anim.easing }
-        }
     }
 
-    // Open windows: one dot each, up to three.
+    // Open windows: one dot each, up to three, between the icon and the bar's edge.
     Row {
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: icon.bottom
-        anchors.topMargin: Theme.spacing.xs
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: Theme.spacing.xs
         spacing: 3
 
         Repeater {

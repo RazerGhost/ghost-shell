@@ -95,9 +95,11 @@ Singleton {
     }
 
     readonly property QtObject dock: QtObject {
-        readonly property int height:    60  // the dock's body, along the bottom edge
-        readonly property int icon:      40  // app icons
-        readonly property int radius:    24  // its top corners
+        readonly property int height:    60  // the bar
+        readonly property int margin:    8   // between the bar and the screen edge
+        readonly property int icon:      44  // app icons at rest
+        readonly property real magnify:  1.6 // the icon under the pointer grows to this
+        readonly property int radius:    22  // the bar's corners
         readonly property int trigger:   3   // the strip at the bottom edge that brings a hidden dock back
         readonly property int hideDelay: 500 // ms the dock stays after the pointer leaves
         readonly property int menuSpace: 240 // room above the dock for tooltips and the menu
