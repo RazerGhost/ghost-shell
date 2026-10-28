@@ -66,7 +66,9 @@ Scope {
 
         WlrLayershell.namespace: "qs-snap-assist"
         WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+        // OnDemand, not Exclusive: Hyprland refuses to focus windows while an exclusive surface
+        // exists, which raced pick()'s focus call (see Switcher.qml).
+        WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
 
         HyprlandFocusGrab {
             windows: [panel]
