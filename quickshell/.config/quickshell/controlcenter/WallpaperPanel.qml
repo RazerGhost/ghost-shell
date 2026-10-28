@@ -6,10 +6,10 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// The wallpaper picker, wider than the other menus: your pictures from ~/Pictures/Wallpapers in
-// one row, then the built-in ones that come with Hyprland and CachyOS (from their packages, so
-// they're not copied anywhere) in two rows. Both scroll sideways (the mouse wheel too). Click
-// one to use it; the colors follow the picture.
+// The wallpaper picker, wider than the other menus: a row of your pictures from
+// ~/Pictures/Wallpapers, then a row of the built-in ones that come with Hyprland and CachyOS
+// (from their packages, so they're not copied anywhere). Both scroll sideways (the mouse wheel
+// too). Click one to use it; the colors follow the picture.
 Column {
     id: root
 
@@ -162,14 +162,12 @@ Column {
         text: "Built-in (Hyprland and CachyOS)"
     }
 
-    // Two rows, filled top to bottom, then sideways.
-    GridView {
+    ListView {
         visible: hyprland.count + cachyos.count > 0
         width: root.contentWidth
-        height: cellHeight * 2
-        flow: GridView.FlowTopToBottom
-        cellWidth: root.thumbWidth + Theme.spacing.s
-        cellHeight: root.thumbHeight + Theme.spacing.s
+        height: root.thumbHeight
+        orientation: ListView.Horizontal
+        spacing: Theme.spacing.s
         clip: true
         boundsBehavior: Flickable.StopAtBounds
         model: root.files(hyprland).concat(root.files(cachyos))
