@@ -202,6 +202,8 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `hyprctl dispatch 'hl.dsp.exec_cmd("pkill -x qs; sleep 0.5; qs")'`. `qs log` prints the running instance's log; panels can be
   opened with `qs ipc call ...` and checked with `grim -g "x,y wxh" out.png`. Run `pkill qs; qs` in a terminal to watch its log (also saved
   under `/run/user/1000/quickshell/`). `qs ipc show` lists IPC targets.
+- A window inside a singleton (the settings window) can survive a reload with its old code:
+  after editing `settings/SettingsWindow.qml`, restart qs before testing.
 - `hyprctl reload` after editing a required Lua file; `hyprctl layers` shows layer namespaces;
   `hyprctl binds` shows loaded binds.
 - Changes to `env.lua`, the initramfs, the kernel cmdline or greetd only apply after logging in again
