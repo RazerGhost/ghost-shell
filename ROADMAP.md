@@ -268,6 +268,16 @@ From a survey of every Quickshell 0.3.2 type and the quickshell-examples repo (u
   (nothing measurable to gain); hibernate, i3/X11, sockets (not relevant). Bluetooth device
   batteries were already in the Bluetooth page.
 
+### Review and cleanup (done, verified on the laptop 2026-10-28)
+A review of the whole repo (two agents, findings checked), worked through in four batches:
+fragile parts (the shell restarts after a crash, lock falls back to hyprlock, default apps set
+from Settings at startup, night light retries, battery time), shared implementations
+(`Windows.show`/`forApp`, `Session`, `WindowPreview`, `AlbumArt`, `SearchField`, `MorphAnimation`,
+`Theme.state`, `Colors.scrim`), the window menu as one card on the window, the wallpaper strip as
+its own surface (with arrow keys), new settings (editor, keyboard and touchpad, windows), and
+cleanup (package lists with comments, files in the right folders, the roadmap). Left for the
+other session: pinning the Vencord/Spicetify downloads in install.sh.
+
 ### Emoji picker (done, verified on the laptop 2026-10-28)
 - An island menu (`controlcenter/EmojiPanel.qml`, Super+. like Windows): search field, a grid
   with the recently used emoji first (`~/.local/state/quickshell/emoji.json`), arrow keys and
