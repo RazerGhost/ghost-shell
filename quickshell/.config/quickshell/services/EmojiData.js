@@ -42,8 +42,10 @@ function filter(emoji, query) {
         const nameWords = name.split(/[\s:-]+/);
         return words.every(w => nameWords.some(n => n.startsWith(w))) ? 1 : 2;
     };
-    return emoji.map(e => ({ e: e, rank: rank(e) }))
+    // Ties keep Unicode's order through the index: the JavaScript engine's sort isn't stable
+    // ("grinning face" picked 😅 before 😀).
+    return emoji.map((e, index) => ({ e: e, index: index, rank: rank(e) }))
         .filter(r => r.rank >= 0)
-        .sort((a, b) => a.rank - b.rank)
+        .sort((a, b) => a.rank - b.rank || a.index - b.index)
         .map(r => r.e);
 }

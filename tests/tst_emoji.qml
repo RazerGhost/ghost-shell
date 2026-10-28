@@ -48,6 +48,14 @@ TestCase {
         compare(EmojiData.filter(emoji, "smil").map(e => e.emoji), ["☺️", "😁"]);
     }
 
+    function test_filterKeepsUnicodeOrderForTies() {
+        // Many names starting the same way: they must stay in their original order.
+        const emoji = [];
+        for (let i = 0; i < 40; i++)
+            emoji.push({ emoji: String(i), name: "grinning face " + i, group: "" });
+        compare(EmojiData.filter(emoji, "grinning face").map(e => e.emoji), emoji.map(e => e.emoji));
+    }
+
     function test_filterNeedsEveryWord() {
         const emoji = EmojiData.parse(sample);
         compare(EmojiData.filter(emoji, "face smiling").map(e => e.emoji), ["😁", "☺️"]);
