@@ -69,9 +69,10 @@ new setup step.
   three parts are evenly spaced
   (user's choice, 2026-10-28: with the clock forced into the exact middle it sat 20 px from the
   dots but 55 px from the status icons, which looked off-center; now 24 px gaps and 26 px ends,
-  the dots got smaller so the sides nearly match). The
-  closed island shifts a few px so the time or cover is exactly under the webcam in the screen's
-  middle (user's request); open menus are centered. Workspace dots always show at
+  the dots got smaller). The dots and the status icons get
+  the same width, the narrower group spreading out (`bar/Spread.js`, tested), so the island is
+  symmetric and the time or cover sits exactly in the screen's middle, under the webcam (user's
+  request). Workspace dots always show at
   least 5 (`WorkspaceSlots.js`, tested in `tests/tst_workspaces.qml`): click one to go there, even
   if it's empty; scroll over them to step through. Status icons: Wi-Fi as three arcs with the
   unlit ones dimmed to 45 % (`widgets/WifiIcon.qml`, also in the Wi-Fi tile and list), battery as an Android 16-style pill that fills with the charge, no text (user's choice: the

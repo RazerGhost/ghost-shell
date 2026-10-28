@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import qs.theme
+import "Spread.js" as Spread
 import "WorkspaceSlots.js" as WorkspaceSlots
 
 // Workspace dots for one monitor: always at least Theme.workspace.minimum of them, so you can
@@ -26,6 +27,12 @@ Item {
         return byId;
     }
     readonly property var slots: WorkspaceSlots.slots(Theme.workspace.minimum, Object.keys(existing).map(Number))
+
+    // The island gives the dots and the status icons the same width; the dots spread out to fill
+    // it when the icons are wider (see Spread.js).
+    property real fillWidth: 0
+    readonly property list<real> dotWidths: slots.map(s => s === active ? Theme.workspace.activeDot : Theme.workspace.dot)
+    readonly property real naturalWidth: Spread.naturalWidth(dotWidths, Theme.workspace.spacing)
 
     // Works for workspaces that don't exist yet, unlike HyprlandWorkspace.activate().
     // The string is Lua because the Hyprland config is (same dispatch as binds.lua).
@@ -63,7 +70,7 @@ Item {
         id: dots
 
         anchors.verticalCenter: parent.verticalCenter
-        spacing: Theme.workspace.spacing
+        spacing: Spread.spacing(root.dotWidths, Theme.workspace.spacing, root.fillWidth)
 
         Repeater {
             model: root.slots

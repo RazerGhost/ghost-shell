@@ -160,16 +160,7 @@ PanelWindow {
 
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
-        // Closed, the time (or cover) sits exactly in the screen's middle, under the laptop's
-        // webcam: the island moves by half the difference between its two sides (the dots are a
-        // little wider than the status icons). Open, the menus are centered.
-        // Whole pixels, so text and edges stay sharp.
-        anchors.horizontalCenterOffset: root.expanded ? 0 : Math.floor((status.implicitWidth - dotsSide.width) / 2)
         color: Colors.surfaceTranslucent
-
-        Behavior on anchors.horizontalCenterOffset {
-            NumberAnimation { duration: Theme.anim.morph; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.emphasized }
-        }
 
         // The morph: width, height and corner radius animate between the closed pill
         // and the open menu, all on the same curve so the shape moves as one.
@@ -207,18 +198,20 @@ PanelWindow {
             }
             Keys.onEscapePressed: root.island.panel = ""
 
-            // Workspaces | time | status icons, evenly spaced (user's choice): the same gap on
-            // both sides of the time and at both ends. The time and the status icons are buttons
-            // with padding inside; the dots get the same padding around them, so every gap is
-            // two paddings. The island shifts a few px to keep the time centered (see shape).
+            // Workspaces | time | status icons, evenly spaced and symmetric (user's choice): the
+            // dots and the status icons get the same width (the narrower group spreads out), so
+            // the time sits exactly in the screen's middle, under the webcam. The time and the
+            // status icons are buttons with padding inside; the dots get the same padding around
+            // them, so every gap is two paddings.
             Row {
                 id: topRow
+
+                readonly property real sideWidth: Math.max(workspaces.naturalWidth, statusIcons.naturalWidth)
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 height: Theme.island.height
 
                 Item {
-                    id: dotsSide
                     width: workspaces.implicitWidth + Theme.spacing.m * 2
                     height: parent.height
 
@@ -226,6 +219,7 @@ PanelWindow {
                         id: workspaces
                         anchors.centerIn: parent
                         screen: root.modelData
+                        fillWidth: topRow.sideWidth
                     }
                 }
 
@@ -284,7 +278,10 @@ PanelWindow {
                         active: root.panel === "settings"
                         onActivated: root.island.toggle("settings", root.modelData.name)
 
-                        StatusIcons {}
+                        StatusIcons {
+                            id: statusIcons
+                            fillWidth: topRow.sideWidth
+                        }
                     }
                 }
             }
