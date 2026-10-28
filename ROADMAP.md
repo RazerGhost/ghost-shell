@@ -171,7 +171,7 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
   (3-finger swipe up / hot corner, reusing the switcher's thumbnails), an emoji picker, a snipping
   overlay. Not possible on Wayland: a global app menu. Hard: real minimize, Stage Manager.
 
-### Dock (built; waiting on the user's test results)
+### Dock (done, verified on the laptop 2026-10-28)
 Added at the user's request (2026-10-28), between Phases 6 and 7.
 - `dock/Dock.qml` + `DockBar.qml` + `DockItem.qml`: a macOS-style bar floating above the bottom
   edge (user's choice, after first trying the island shape turned over); no magnification (tried,
