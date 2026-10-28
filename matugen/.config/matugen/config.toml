@@ -1,6 +1,7 @@
 # matugen: generates Material colors from the wallpaper and writes them through the templates below.
 # This is the single source of truth for colors in Quickshell, Hyprland, Ghostty, GTK, Yazi,
-# Spotify (the Ghost Spicetify theme), Discord (the Ghost Vencord plugin in Vesktop) and MangoHud.
+# Spotify (the Ghost Spicetify theme), Discord (the Ghost Vencord plugin in Vesktop), MangoHud,
+# Zed, Steam (Millennium's Material-Theme) and Zen.
 #
 # Run: matugen image <wallpaper> -m dark --source-color-index 0
 # (--source-color-index 0 skips the interactive prompt when an image yields several source colors)
@@ -58,3 +59,23 @@ output_path = '~/.config/vesktop/themes/ghost-matugen.css'
 # starts; Shift_L+F4 reloads it in a running game.
 input_path  = 'templates/mangohud.conf'
 output_path = '~/.config/MangoHud/MangoHud.conf'
+
+[templates.zed]
+# Zed's "Matugen" theme (zed/.config/zed/settings.json picks it). Zed watches its themes folder,
+# so open windows recolor live.
+input_path  = 'templates/zed-theme.json'
+output_path = '~/.config/zed/themes/matugen.json'
+
+[templates.steam]
+# Steam with Millennium's Material-Theme (Color: Matugen; install.sh installs and selects it).
+# Rendered to its own file, like Spotify's: the hook copies it into the theme's git checkout.
+input_path  = 'templates/steam-material.css'
+output_path = '~/.local/state/matugen/steam-material.css'
+post_hook   = 'sh ~/.config/matugen/hooks/steam-material.sh'
+
+[templates.zen]
+# Zen: rendered to its own file; the hook copies it into the profile and sets it up. Zen reads
+# userChrome.css at startup, so open windows keep their colors until Zen restarts.
+input_path  = 'templates/zen-colors.css'
+output_path = '~/.local/state/matugen/zen-colors.css'
+post_hook   = 'sh ~/.config/matugen/hooks/zen.sh'

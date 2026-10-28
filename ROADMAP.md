@@ -388,6 +388,23 @@ other session: pinning the Vencord/Spicetify downloads in install.sh.
   load colors change from primary to error). Changes go in the template: GOverlay writes the
   same file and would be overwritten. Games read it at start (Shift_L+F4 reloads). Verified with
   `mangohud vkcube`.
+- **Zed, Steam and Zen follow the wallpaper** (user's request, 2026-10-28):
+  - Zed: `templates/zed-theme.json` is a whole Zed theme ("Matugen", every key of Zed's One Dark;
+    terminal colors as in Ghostty) in `~/.config/zed/themes/`, which Zed watches; Zed's settings
+    are now in the repo (`zed/` package) and pick it. A Zed that was running when the themes
+    folder was replaced by the link needs one restart.
+  - Steam: Millennium's [Material-Theme](https://github.com/kuska1/Material-Theme) (MIT), whose
+    Color option "Matugen" re-reads `css/main/colors/matugen.css` every 1.5 s, so Steam
+    recolors live. matugen renders `templates/steam-material.css` (the theme's own template)
+    to the state folder and `hooks/steam-material.sh` copies it into the theme. install.sh
+    clones the theme into `~/.local/share/Steam/millennium/themes/` and, once Millennium has
+    written `~/.config/millennium/config.json`, selects it with Color: Matugen.
+  - Zen: `templates/zen-colors.css` sets Zen's own variables (its accent and dark base, from
+    which Zen derives the rest, plus backgrounds, menus, URL bar, borders); `hooks/zen.sh`
+    copies it into the profile from `installs.ini` as `chrome/matugen.css`, imports it from
+    `userChrome.css` and turns on `toolkit.legacyUserProfileCustomizations.stylesheets` in
+    `user.js`. Zen reads it at startup, so a new wallpaper shows after a Zen restart. Zen's
+    workspace gradients no longer apply (the template's values are `!important`).
 - **Spotify follows the wallpaper:** matugen renders `templates/spicetify-ghost.ini` (Ghost's
   `color.ini` keys) to `~/.local/state/matugen/spicetify-ghost.ini`, and `hooks/spicetify-ghost.sh`
   merges it into Ghost's `color.ini` as the `[matugen]` scheme, selects it and runs

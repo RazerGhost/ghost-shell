@@ -246,6 +246,48 @@ else
     echo "Skipped: open Spotify once and log in, then re-run this script."
 fi
 
+step "Steam: Material-Theme in the wallpaper's colors"
+# github.com/kuska1/Material-Theme (MIT), a Millennium theme. Its Color option "Matugen" reads
+# css/main/colors/matugen.css, which matugen fills (templates/steam-material.css and its hook).
+# Millennium writes its settings on Steam's first start with it; until then, only the theme is
+# put in place.
+theme_dir="$HOME/.local/share/Steam/millennium/themes/Material-Theme"
+if [[ -d $HOME/.local/share/Steam ]]; then
+    mkdir -p "$(dirname "$theme_dir")"
+    # The colors file is the theme's own, overwritten by matugen: undo that before pulling.
+    [[ -d $theme_dir/.git ]] && git -C "$theme_dir" checkout -- css/main/colors/matugen.css
+    clone_or_pull https://github.com/kuska1/Material-Theme "$theme_dir"
+    sh "$HOME/.config/matugen/hooks/steam-material.sh"
+fi
+millennium_config="$HOME/.config/millennium/config.json"
+if [[ -f $millennium_config ]]; then
+    # Select the theme with Color: Matugen, keeping your other Millennium settings.
+    MILLENNIUM_CONFIG="$millennium_config" node -e '
+        const fs = require("fs");
+        const path = process.env.MILLENNIUM_CONFIG;
+        const config = JSON.parse(fs.readFileSync(path, "utf8"));
+        config.themes ??= {};
+        config.themes.activeTheme = "Material-Theme";
+        config.themes.conditions ??= {};
+        config.themes.conditions["Material-Theme"] ??= {};
+        config.themes.conditions["Material-Theme"].Color = "Matugen";
+        fs.writeFileSync(path, JSON.stringify(config, null, 4));
+    '
+    echo "Restart Steam to load the theme."
+else
+    echo "Skipped selecting it: start Steam once (Millennium writes its settings), then re-run this script."
+fi
+
+step "Zen: the wallpaper's colors"
+# matugen's hook copies them into Zen's profile and turns on userChrome.css; the profile only
+# exists after Zen's first start (matugen runs the hook again on every wallpaper change).
+if sed -n 's/^Default=//p' "$HOME/.config/zen/installs.ini" 2>/dev/null | grep -q .; then
+    sh "$HOME/.config/matugen/hooks/zen.sh"
+    echo "Restart Zen to load them."
+else
+    echo "Skipped: start Zen once, then re-run this script."
+fi
+
 step "Login screen (Quickshell greeter)"
 # After matugen, so the login screen gets the current colors. Settings, colors and the wallpaper
 # reach it by themselves afterwards; re-run update-greeter.sh alone after changing the shell's code.

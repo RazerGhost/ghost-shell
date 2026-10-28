@@ -6,3 +6,4 @@ hypr/.config/hypr/colors.lua
 # Written by Quickshell's settings window
 hypr/.config/hypr/shell-settings.lua
 ghostty/.config/ghostty/themes/
+zed/.config/zed/themes/
