@@ -84,6 +84,16 @@ Singleton {
         readonly property int minimum:   5  // dots shown even when those workspaces are empty
     }
 
+    // Media in the island: the live activity, the hover player and the media menu.
+    readonly property QtObject media: QtObject {
+        readonly property int activityArt: 22   // cover in the closed island
+        readonly property int barHeight:   14   // the bouncing bars next to it
+        readonly property int barTick:     220  // ms between bar heights
+        readonly property int hoverDelay:  250  // ms of hover before the player opens, and of
+                                                // absence before it closes again
+        readonly property int menuArt:     160  // cover in the media menu
+    }
+
     readonly property QtObject battery: QtObject {
         readonly property real low: 0.15 // at or below this (and discharging) the battery turns red
         // The battery pill in the island (bar/BatteryPill.qml).

@@ -157,9 +157,14 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
   (Phase 6) and Super+V for the clipboard (Phase 4). Full list in `hypr/binds.lua`.
 - **Window buttons:** Hyprland draws no title bars, so instead of hyprbars: keybinds plus a window
   menu in the island for the focused window (close, maximize, float, move to workspace). Planned.
-- **Media in the island:** a "live activity" that takes the clock's place while music plays
-  (alternating with the time, so the island stays centered), expands on hover to show the track
-  and controls, and opens its own media menu on click. Planned; replaces the media card in "today".
+- **Media in the island:** while music plays, a "live activity" (`bar/MediaActivity.qml`: cover +
+  bouncing bars, an effect, not real levels) replaces the clock, so the island stays centered (no
+  alternating: user's choice). Hovering it opens a small player (`MediaCard`, no keyboard focus,
+  closes when the pointer leaves the island) and brings the time back in the middle. Clicking the
+  activity or the small player opens the media menu (`controlcenter/MediaPanel.qml`: cover, track,
+  seek bar, controls); clicking the middle opens whatever it shows. Player choice
+  lives in `services/Media.qml`. Spotify (1.3.4) reports a frozen MPRIS position (equal to the
+  track length) while playing, so its seek bar reads full; other players are untested.
 - **Bluetooth pairing agent:** Quickshell can't register a BlueZ agent, and devices like the
   Keychron M6 ask the host to confirm pairing (journal: "No agent available for request type 2").
   `bt-agent` (`bluez-tools`, user-approved) runs from `autostart.lua` as

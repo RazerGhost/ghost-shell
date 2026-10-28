@@ -4,8 +4,8 @@ import Quickshell
 import qs.theme
 import qs.widgets
 
-// The "today" menu, opened by clicking the time: the date, a month calendar and the media
-// player. (Phase 3 adds notifications here.)
+// The "today" menu, opened by clicking the time: the date and a month calendar. (Phase 3 adds
+// notifications here.)
 Column {
     id: root
 
@@ -132,9 +132,5 @@ Column {
                 font.weight: cell.today ? Font.DemiBold : Font.Normal
             }
         }
-    }
-
-    MediaCard {
-        width: parent.width - root.leftPadding - root.rightPadding
     }
 }

@@ -1,22 +1,35 @@
 import QtQuick
 import Quickshell.Services.Mpris
 import Quickshell.Widgets
+import qs.services
 import qs.theme
 import qs.widgets
 
-// Now playing, from any MPRIS player (Spotify, Zen, mpv...): cover, title, artist and
-// previous / play-pause / next. Hidden when nothing is playing or paused.
+// Compact now playing: cover, title, artist and previous / play-pause / next. The island
+// shows it when you hover the live activity. Hidden when there's no player.
 Rectangle {
     id: root
 
-    // The player that's playing, otherwise the first one (e.g. paused music).
-    readonly property MprisPlayer player: Mpris.players.values.find(p => p.isPlaying)
-                                          ?? Mpris.players.values[0] ?? null
+    readonly property MprisPlayer player: Media.player
+
+    // Clicked outside the buttons.
+    signal activated()
 
     visible: player !== null
     implicitHeight: Theme.tile.height + Theme.spacing.m * 2
     radius: Theme.radius.l
     color: Colors.m3surfaceContainerHighest
+
+    // Under everything else, so the buttons keep their own clicks.
+    MouseArea {
+        anchors.fill: parent
+        cursorShape: Qt.PointingHandCursor
+        onClicked: root.activated()
+    }
+
+    Accessible.role: Accessible.Button
+    Accessible.name: "Open media: " + (player?.trackTitle ?? "")
+    Accessible.onPressAction: root.activated()
 
     ClippingRectangle {
         id: cover
