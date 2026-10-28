@@ -75,6 +75,14 @@ Singleton {
         Windows.run(window, "float", `action = "enable"`);
         Windows.run(window, "resize", `x = ${r.width}, y = ${r.height}`);
         Windows.run(window, "move", `x = ${r.x}, y = ${r.y}`);
+        // An app with a minimum size (Discord) may stay bigger than asked: then keep it against
+        // the layout's outer side instead of sticking out past the screen (SnapLayout.fit).
+        geometry(window, current => {
+            if (current.size[0] <= r.width && current.size[1] <= r.height)
+                return;
+            const spot = SnapLayout.fit(layout, r, current.size[0], current.size[1]);
+            Windows.run(window, "move", `x = ${spot.x}, y = ${spot.y}`);
+        });
     }
 
     // The gaps changed (settings window): windows still exactly where they were snapped with the

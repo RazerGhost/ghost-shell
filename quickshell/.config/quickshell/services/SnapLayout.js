@@ -88,3 +88,21 @@ function snappedLayout(geometry, area, gapsOut, gapsIn) {
     }
     return "";
 }
+
+// Where a window goes when it won't shrink to its layout's rectangle `r` (an app's minimum size,
+// like Discord's 972 px against a 920 px half): it stays against the layout's outer side, and the
+// extra size overlaps towards the middle, like Windows. Returns { x, y }.
+function fit(name, r, width, height) {
+    const l = layout(name);
+    const span = l.span || 1;
+    const extraW = Math.max(0, width - r.width);
+    const extraH = Math.max(0, height - r.height);
+    const align = (start, count, size, extra) =>
+        start === 0 ? 0                          // touches the left/top edge: grow right/down
+        : start + size === count ? -extra        // touches the right/bottom edge: grow left/up
+        : -Math.round(extra / 2);                // in the middle: grow both ways
+    return {
+        x: r.x + align(l.col, l.cols, span, extraW),
+        y: r.y + align(l.row, l.rows, l.rowSpan || 1, extraH)
+    };
+}

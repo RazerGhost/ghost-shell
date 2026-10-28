@@ -17,6 +17,22 @@ TestCase {
         compare(SnapLayout.parseGaps("1 2 3 4"), { top: 1, right: 2, bottom: 3, left: 4 });
     }
 
+    function test_fitTooBigWindow() {
+        const left = SnapLayout.rect("left", area, gapsOut, 5);    // x 20, 935 wide
+        const right = SnapLayout.rect("right", area, gapsOut, 5);  // x 965, 935 wide
+        // Discord won't go below 972 px: the left half keeps its edge, the right half grows left.
+        compare(SnapLayout.fit("left", left, 972, 1004), { x: 20, y: 56 });
+        compare(SnapLayout.fit("right", right, 972, 1004), { x: 965 - 37, y: 56 });
+        // The center third grows both ways.
+        const center = SnapLayout.rect("center-third", area, gapsOut, 5);
+        compare(SnapLayout.fit("center-third", center, center.width + 40, center.height).x, center.x - 20);
+        // A bottom quarter that's too tall grows up.
+        const quarter = SnapLayout.rect("bottom-right", area, gapsOut, 5);
+        compare(SnapLayout.fit("bottom-right", quarter, quarter.width, quarter.height + 30).y, quarter.y - 30);
+        // A window that fits stays exactly in its rectangle.
+        compare(SnapLayout.fit("right", right, 935, 1004), { x: 965, y: 56 });
+    }
+
     function test_snappedLayout() {
         compare(SnapLayout.snappedLayout({ at: [965, 56], size: [935, 1004] }, area, gapsOut, 5), "right");
         compare(SnapLayout.snappedLayout({ at: [20, 56], size: [935, 1004] }, area, gapsOut, 5), "left");
