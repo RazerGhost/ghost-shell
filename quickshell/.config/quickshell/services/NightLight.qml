@@ -8,6 +8,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import "Schedule.js" as Schedule
 
 Singleton {
@@ -26,8 +27,9 @@ Singleton {
 
     function set(value: bool): void {
         on = value;
-        Quickshell.execDetached(on ? ["hyprctl", "hyprsunset", "temperature", String(temperature)]
-                                   : ["hyprctl", "hyprsunset", "identity"]);
+        retry.attempts = 0;
+        apply.running = false;
+        apply.running = true;
     }
 
     // Reaching the start or end time, or changing the schedule, switches it.
@@ -38,14 +40,31 @@ Singleton {
             set(true);
     }
 
-    // At startup, follow the schedule (off without one). hyprsunset starts alongside the shell
-    // at login and may not be up yet, so it's told again a little later.
+    // At startup, follow the schedule (off without one).
     Component.onCompleted: set(scheduledOn)
 
+    // Tells hyprsunset. It starts alongside the shell at login and may not be up yet: until it
+    // answers "ok", try again every second (for half a minute).
+    Process {
+        id: apply
+        command: root.on ? ["hyprctl", "hyprsunset", "temperature", String(root.temperature)]
+                         : ["hyprctl", "hyprsunset", "identity"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim() !== "ok" && retry.attempts < 30)
+                    retry.start();
+            }
+        }
+    }
+
     Timer {
-        running: true
-        interval: 3000
-        onTriggered: root.set(root.on)
+        id: retry
+        property int attempts: 0
+        interval: 1000
+        onTriggered: {
+            attempts++;
+            apply.running = true;
+        }
     }
 
     SystemClock {
