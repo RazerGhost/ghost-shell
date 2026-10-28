@@ -158,7 +158,9 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
   Super+Shift+Z) shows a picker (`snap/SnapPicker.qml`, its own card at the top center of the
   window, not in the island: user's choice) with halves, quarters, thirds and two-thirds. The
   window floats and gets an exact rectangle (`services/SnapLayout.js`, tested): the monitor minus
-  its reserved area (the island) and Hyprland's gaps, read with `hyprctl getoption`.
+  its reserved area (the island) and Hyprland's gaps, read with `hyprctl getoption`. The first
+  snap saves the window's position and size (from `hyprctl clients -j`); Super+Down puts a
+  snapped window back there, and minimizes any other window (Windows behaviour).
 - Later candidates from the same research, not planned yet: a macOS-style dock, an Exposé overview
   (3-finger swipe up / hot corner, reusing the switcher's thumbnails), an emoji picker, a snipping
   overlay. Not possible on Wayland: a global app menu. Hard: real minimize, Stage Manager.

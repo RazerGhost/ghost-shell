@@ -40,6 +40,11 @@ Scope {
             Snap.snap(Windows.active, layout);
         }
 
+        // qs ipc call snap down (Super+Down): un-snap the focused window, or minimize it.
+        function down(): void {
+            Snap.restoreOrMinimize(Windows.active);
+        }
+
         // qs ipc call snap picker: show or hide the layouts for the focused window.
         function picker(): void {
             root.toggle();

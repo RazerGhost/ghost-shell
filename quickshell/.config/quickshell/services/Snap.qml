@@ -17,13 +17,48 @@ Singleton {
     property var gapsOut: SnapLayout.parseGaps("20")
     property int gapsIn: 5
 
+    // Where each snapped window was before its first snap, by address: { at: [x, y], size: [w, h] }.
+    // Super+Down puts it back there (snapping again elsewhere keeps the original).
+    property var saved: ({})
+    // Callbacks waiting for `hyprctl clients -j` (see geometry()).
+    property var pending: []
+
     function snap(window: HyprlandToplevel, layout: string): void {
-        const monitor = window?.monitor;
-        Hyprland.refreshMonitors(); // keeps `reserved` below current for the next snap
-        if (!monitor) {
+        if (!window?.monitor) {
             console.warn("Snap: no window or monitor to snap");
             return;
         }
+        Hyprland.refreshMonitors(); // keeps `reserved` below current for the next snap
+        // A maximized or fullscreen window has to leave that state first.
+        Windows.run(window, "fullscreen", `mode = "maximized", action = "unset"`);
+        Windows.run(window, "fullscreen", `mode = "fullscreen", action = "unset"`);
+        if (saved[window.address]) {
+            place(window, layout);
+            return;
+        }
+        geometry(window, current => {
+            saved[window.address] = current;
+            place(window, layout);
+        });
+    }
+
+    // Super+Down: a snapped window goes back to where it was before snapping; any other window
+    // is minimized (like Windows).
+    function restoreOrMinimize(window: HyprlandToplevel): void {
+        if (!window)
+            return;
+        const before = saved[window.address];
+        if (!before) {
+            Windows.minimize(window);
+            return;
+        }
+        delete saved[window.address];
+        Windows.run(window, "resize", `x = ${before.size[0]}, y = ${before.size[1]}`);
+        Windows.run(window, "move", `x = ${before.at[0]}, y = ${before.at[1]}`);
+    }
+
+    function place(window: HyprlandToplevel, layout: string): void {
+        const monitor = window.monitor;
         // Space bars reserve (the island), as [left, top, right, bottom]; Hyprland sends it with
         // the monitor's details, which refreshMonitors() keeps current.
         const reserved = monitor.lastIpcObject?.reserved ?? [0, 0, 0, 0];
@@ -34,12 +69,39 @@ Singleton {
             height: monitor.height / monitor.scale - reserved[1] - reserved[3]
         };
         const r = SnapLayout.rect(layout, area, gapsOut, gapsIn);
-        // A maximized or fullscreen window has to leave that state first.
-        Windows.run(window, "fullscreen", `mode = "maximized", action = "unset"`);
-        Windows.run(window, "fullscreen", `mode = "fullscreen", action = "unset"`);
         Windows.run(window, "float", `action = "enable"`);
         Windows.run(window, "resize", `x = ${r.width}, y = ${r.height}`);
         Windows.run(window, "move", `x = ${r.x}, y = ${r.y}`);
+    }
+
+    // The window's current position and size, straight from Hyprland: Quickshell's copy
+    // (lastIpcObject) is only as fresh as its last refresh.
+    function geometry(window: HyprlandToplevel, callback: var): void {
+        pending.push({ address: "0x" + window.address, callback: callback });
+        clients.running = true;
+    }
+
+    Process {
+        id: clients
+        command: ["hyprctl", "clients", "-j"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const waiting = root.pending;
+                root.pending = [];
+                let list = [];
+                try {
+                    list = JSON.parse(text);
+                } catch (e) {
+                    console.warn("Snap: unexpected hyprctl clients output: " + e.message);
+                    return;
+                }
+                for (const request of waiting) {
+                    const client = list.find(c => c.address === request.address);
+                    if (client)
+                        request.callback({ at: client.at, size: client.size });
+                }
+            }
+        }
     }
 
     Component.onCompleted: Hyprland.refreshMonitors()

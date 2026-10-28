@@ -1,6 +1,6 @@
 // Window actions for the island's window menu, and "minimizing". Hyprland has no minimize, so a
 // minimized window is moved to a hidden special workspace; restoring moves it back to the
-// workspace you're on. The Super+Down bind in hypr/binds.lua uses the same workspace name.
+// workspace you're on.
 pragma Singleton
 
 import QtQuick
