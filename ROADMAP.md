@@ -244,6 +244,12 @@ fixed in config files should become settings.
   `yes | bt-agent -c NoInputNoOutput`: without `--daemon` it reads answers from stdin, and in
   `--daemon` mode it rejects confirmations unless a PIN file matches. The Bluetooth page also sets
   the adapter `pairable` and the device `trusted` before `pair()`, and connects once paired.
+- **Attention like a flashing taskbar button:** apps can't steal focus (`misc.focus_on_activate`
+  stays false); Hyprland marks them urgent and the island shows an `AttentionCard` (icon, title,
+  click to switch) for 5 s, after any notification pop-up. `services/Windows.qml` keeps its own
+  list from Hyprland's `urgent` raw events, dropping a window once it's focused or closed:
+  `HyprlandToplevel.urgent` didn't follow these events (false for a terminal bell). Opening a
+  window also sends `urgent` just before focusing it, which the list ignores.
 - **Notifications from the island** (user's choice over corner cards). Pop-ups wait while a menu
   is open. Notifications carry no timestamp, so the service records arrival times; after a shell
   restart (not a reload) the history is empty.
@@ -384,6 +390,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `window.close`, `window.open`, `window.update_state` (see the wiki's events.md). `input.follow_mouse`:
   0 cursor never focuses, 1 hover focuses, 2 click focuses (pointer separate), 3 click doesn't
   focus. `hl.dsp.window.alter_zorder({ window?, mode = "top" | "bottom" })`.
+- `Hyprland.rawEvent(event)` gives every socket2 event (`event.name`, `event.data`, e.g.
+  `urgent` with the address without 0x). Don't annotate the parameter's type in QML
+  (`HyprlandIpcEvent` isn't a registered name; Qt logs an error per event).
 - wtype: Hyprland doesn't run its binds for wtype's virtual keyboard, so binds can't be tested
   with it. `wtype -M alt` only sets the modifier, without Alt key events; `-P Alt_L` / `-p Alt_L`
   send real ones.

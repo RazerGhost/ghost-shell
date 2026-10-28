@@ -21,6 +21,40 @@ Singleton {
         ?? (Hyprland.toplevels?.values ?? []).find(t => t.wayland !== null && t.wayland === ToplevelManager.activeToplevel)
         ?? null
 
+    // Windows that asked for attention (an app can't take the focus by itself, like on Windows,
+    // so Hyprland marks it urgent instead), oldest first. The island shows the first one. A window
+    // leaves the list once it's focused or closed (closed ones turn into null).
+    // Kept here rather than read from HyprlandToplevel.urgent, which didn't follow these events
+    // (it stayed false for a terminal bell).
+    property list<HyprlandToplevel> attention: []
+    readonly property HyprlandToplevel needsAttention: attention.find(t => t !== null) ?? null
+
+    // The island has shown the current one long enough.
+    function attentionSeen(): void {
+        const seen = needsAttention;
+        attention = attention.filter(t => t !== null && t !== seen);
+    }
+
+    Connections {
+        target: Hyprland
+
+        // "urgent>>55e5..." (the window's address, without 0x). No type on `event`: its C++ type
+        // isn't registered under a QML name, and annotating it makes Qt complain on every event.
+        function onRawEvent(event): void {
+            if (event.name !== "urgent")
+                return;
+            const window = (Hyprland.toplevels?.values ?? []).find(t => t.address === event.data);
+            if (window && window !== Hyprland.activeToplevel && !root.attention.includes(window))
+                root.attention = [...root.attention.filter(t => t !== null), window];
+        }
+
+        // A window that gets focus no longer needs attention. This also drops a just-opened window:
+        // opening one sends "urgent" right before focusing it.
+        function onActiveToplevelChanged(): void {
+            root.attention = root.attention.filter(t => t !== null && t !== Hyprland.activeToplevel);
+        }
+    }
+
     // Hyprland's window selector. Quickshell gives the address without the "0x".
     function selector(window: HyprlandToplevel): string {
         return "address:0x" + window.address;

@@ -73,9 +73,15 @@ Scope {
             readonly property bool focusedScreen: Hyprland.focusedMonitor?.name === modelData.name
             readonly property Notification popup: !open && focusedScreen ? Notifications.current : null
 
+            // A window asking for attention, once no notification is popping up.
+            readonly property HyprlandToplevel attentionWindow: !open && focusedScreen && !Notifications.current
+                                                                ? Windows.needsAttention : null
+
             // What's shown below the top row: a menu, a pop-up, a hover view ("peek-media", ...)
             // or nothing.
-            readonly property string shown: open ? panel : popup ? "notification" : peek ? "peek-" + peek : ""
+            readonly property string shown: open ? panel : popup ? "notification"
+                                          : attentionWindow ? "attention"
+                                          : peek ? "peek-" + peek : ""
             readonly property bool expanded: shown !== ""
             // The wallpaper picker stretches across the whole top edge; other menus are narrow.
             readonly property real menuWidth: shown === "wallpaper" ? modelData.width - Theme.island.fillet * 2
@@ -102,6 +108,19 @@ Scope {
                 running: window.popupReady && window.popup !== null && !content.containsMouse
                          && window.popup.urgency !== NotificationUrgency.Critical
                 onTriggered: Notifications.next()
+            }
+
+            // The attention card stays as long as a pop-up, the same way.
+            property bool attentionReady: true
+            onAttentionWindowChanged: {
+                attentionReady = false;
+                Qt.callLater(() => attentionReady = true);
+            }
+
+            Timer {
+                interval: Theme.notifications.timeout
+                running: window.attentionReady && window.attentionWindow !== null && !content.containsMouse
+                onTriggered: Windows.attentionSeen()
             }
 
             // Hover the live activity or the workspace dots briefly to open their view; leave
@@ -296,9 +315,28 @@ Scope {
                                       : window.shown === "clipboard" ? clipboard.implicitHeight
                                       : window.shown === "wallpaper" ? wallpapers.implicitHeight
                                       : window.shown === "notification" ? popupCard.implicitHeight + Theme.spacing.s * 2
+                                      : window.shown === "attention" ? attentionCard.implicitHeight + Theme.spacing.s * 2
                                       : window.shown === "peek-media" ? peekCard.implicitHeight + Theme.spacing.s
                                       : window.shown === "peek-minimized" ? peekMinimized.implicitHeight + Theme.spacing.m * 2
                                       : 0
+
+                        AttentionCard {
+                            id: attentionCard
+                            x: Theme.spacing.s
+                            y: Theme.spacing.xs
+                            width: parent.width - Theme.spacing.s * 2
+                            window: window.attentionWindow
+                            opacity: window.shown === "attention" ? 1 : 0
+                            visible: opacity > 0 && window !== null
+                            onActivated: {
+                                Windows.focus(window);
+                                Windows.attentionSeen();
+                            }
+
+                            Behavior on opacity {
+                                NumberAnimation { duration: Theme.anim.normal }
+                            }
+                        }
 
                         NotificationCard {
                             id: popupCard
