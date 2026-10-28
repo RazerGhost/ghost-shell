@@ -382,6 +382,12 @@ other session: pinning the Vencord/Spicetify downloads in install.sh.
   seek bar, controls); clicking the middle opens whatever it shows. Player choice
   lives in `services/Media.qml`. Spotify (1.3.4) reports a frozen MPRIS position (equal to the
   track length) while playing, so its seek bar reads full; other players are untested.
+- **MangoHud follows the wallpaper** (user's request): matugen writes the whole
+  `~/.config/MangoHud/MangoHud.conf` from `templates/mangohud.conf` (what it shows: fps, frame
+  times, GPU and CPU load and temperature, RAM, VRAM, battery; a rounded card top left; fps and
+  load colors change from primary to error). Changes go in the template: GOverlay writes the
+  same file and would be overwritten. Games read it at start (Shift_L+F4 reloads). Verified with
+  `mangohud vkcube`.
 - **Spotify follows the wallpaper:** matugen renders `templates/spicetify-ghost.ini` (Ghost's
   `color.ini` keys) to `~/.local/state/matugen/spicetify-ghost.ini`, and `hooks/spicetify-ghost.sh`
   merges it into Ghost's `color.ini` as the `[matugen]` scheme, selects it and runs

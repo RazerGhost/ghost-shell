@@ -1,6 +1,6 @@
 # matugen: generates Material colors from the wallpaper and writes them through the templates below.
 # This is the single source of truth for colors in Quickshell, Hyprland, Ghostty, GTK, Yazi,
-# Spotify (the Ghost Spicetify theme) and Discord (the Ghost Vencord plugin in Vesktop).
+# Spotify (the Ghost Spicetify theme), Discord (the Ghost Vencord plugin in Vesktop) and MangoHud.
 #
 # Run: matugen image <wallpaper> -m dark --source-color-index 0
 # (--source-color-index 0 skips the interactive prompt when an image yields several source colors)
@@ -52,3 +52,9 @@ post_hook   = 'sh ~/.config/matugen/hooks/spicetify-ghost.sh'
 # install.sh turns the theme on in Vencord's settings.
 input_path  = 'templates/vesktop-ghost.css'
 output_path = '~/.config/vesktop/themes/ghost-matugen.css'
+
+[templates.mangohud]
+# MangoHud, the in-game overlay (games started with it on). It reads its config when a game
+# starts; Shift_L+F4 reloads it in a running game.
+input_path  = 'templates/mangohud.conf'
+output_path = '~/.config/MangoHud/MangoHud.conf'
