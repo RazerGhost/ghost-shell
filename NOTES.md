@@ -160,9 +160,8 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `hyprctl clients -j` has `focusHistoryID` (0 = focused, then most recently used).
 - Gestures: `hl.gesture({ fingers = 3, direction = "up", action = function() hl.exec_cmd("...") end })`;
   directions include horizontal, vertical, up, down, left, right, pinch (wiki: binds/gestures).
-- `general.gaps_in/out` only affect tiled windows. Here everything floats, so they matter only
-  where the shell places windows (Snap); a maximized window fills the work area minus a 2 px
-  border, no gaps.
+- `general.gaps_in/out` only affect tiled windows; a maximized window fills the work area minus a
+  2 px border, no gaps.
 - `hl.dsp.cursor.move({ x, y })` moves the pointer: useful for testing hover behaviour.
 - While a layer surface with `WlrKeyboardFocus.Exclusive` is mapped, Hyprland refuses to focus any
   window (`FocusState.cpp`: "Refusing a keyboard focus to a window because of an exclusive ls").

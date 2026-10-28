@@ -51,6 +51,13 @@ loupe
 celluloid
 yazi
 micro
+
+# Gaming: CachyOS's gaming set (added from CachyOS Hello): Steam, Proton and Wine
+# (proton-cachyos, wine-cachyos, umu-launcher, winetricks, protontricks), Lutris, Heroic,
+# Faugus, MangoHud with GOverlay, gamescope. Steam is listed on its own too: install.sh
+# sets up Millennium for it.
+cachyos-gaming-meta
+cachyos-gaming-applications
 steam
 
 # Tools (install.sh uses paru, stow, nodejs and lspci from pciutils)
@@ -71,7 +78,8 @@ docker
 docker-compose
 docker-buildx
 
-# Tauri's build dependencies (Haunt, the user's Git client)
+# Haunt, the user's Git client: fuse2 runs its AppImage, the rest are Tauri's build dependencies
+fuse2
 webkit2gtk-4.1
 base-devel
 curl
@@ -79,6 +87,6 @@ wget
 file
 openssl
 appmenu-gtk-module
-libappindicator-gtk3
+libappindicator
 librsvg
 xdotool

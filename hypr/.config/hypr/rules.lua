@@ -44,7 +44,7 @@ hl.layer_rule({
     no_anim = true,
 })
 
--- Snap picker: blurred, pops in over the window it snaps.
+-- Window menu (Alt+Space, Super+Z): blurred, pops in over its window.
 hl.layer_rule({
     name  = "qs-snap",
     match = { namespace = "^qs-snap$" },

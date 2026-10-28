@@ -15,7 +15,8 @@ hl.config({
             inactive_border = "rgba(595959aa)",
         },
 
-        -- Drag a window's edge or corner to resize it (Super + right-drag works too).
+        -- Drag a floating window's edge or corner to resize it (Super + right-drag works too).
+        -- Tiled windows ignore it (Hyprland doesn't pass drags to Lua layouts): Super+Alt+arrows.
         resize_on_border = true,
         allow_tearing    = false,
 
