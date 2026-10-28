@@ -91,7 +91,14 @@ Scope {
 
         // Cut the selection out of the frozen frame and save it. Done through a
         // ShaderEffectSource over the frozen picture, at the screen's real pixel size.
-        function take(r: rect): void {
+        function take(selection: rect): void {
+            // Whole pixels: the pointer reports fractional positions, and a crop starting between
+            // two pixels blends every pixel with its neighbour (blurry text). On whole pixels the
+            // result is identical to grim's.
+            const x = Math.round(selection.x);
+            const y = Math.round(selection.y);
+            const r = Qt.rect(x, y, Math.round(selection.x + selection.width) - x,
+                              Math.round(selection.y + selection.height) - y);
             if (r.width < 2 || r.height < 2)
                 return;
             const scale = monitor?.scale ?? 1;
