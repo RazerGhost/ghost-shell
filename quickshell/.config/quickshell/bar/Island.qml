@@ -19,7 +19,8 @@ import qs.widgets
 Scope {
     id: root
 
-    property string panel: ""      // "", "today", "settings", "media", "window" or "power"
+    // "", "today", "settings", "media", "window", "power", "clipboard" or "wallpaper"
+    property string panel: ""
     property string screenName: "" // the monitor the menu is open on
     // The window menu acts on the window that was focused when it opened.
     property HyprlandToplevel windowTarget: null
@@ -35,7 +36,8 @@ Scope {
         }
     }
 
-    // From Hyprland binds: qs ipc call island toggle settings (or: today, media, window, power)
+    // From Hyprland binds: qs ipc call island toggle settings (or: today, media, window, power,
+    // clipboard, wallpaper)
     IpcHandler {
         target: "island"
 
@@ -75,6 +77,8 @@ Scope {
             // or nothing.
             readonly property string shown: open ? panel : popup ? "notification" : peek ? "peek-" + peek : ""
             readonly property bool expanded: shown !== ""
+            // The wallpaper picker is wider than the other menus.
+            readonly property real menuWidth: shown === "wallpaper" ? Theme.island.wideWidth : Theme.island.panelWidth
 
             // While music plays the middle of the island shows the music instead of the time.
             // Once the island opens (hover player or a menu) the time comes back, since the
@@ -123,7 +127,7 @@ Scope {
             // layer surface every animation frame would stutter. Only the island itself takes
             // input (mask); the rest is transparent and clicks go to the windows below.
             anchors.top: true
-            implicitWidth: Math.max(closedWidth, Theme.island.panelWidth) + Theme.island.fillet * 2
+            implicitWidth: Math.max(closedWidth, Theme.island.wideWidth) + Theme.island.fillet * 2
             implicitHeight: Theme.island.maxHeight
             color: "transparent"
             mask: Region { item: island }
@@ -156,7 +160,7 @@ Scope {
 
                 // The morph: width, height and corner radius animate between the closed pill
                 // and the open menu, all on the same curve so the shape moves as one.
-                bodyWidth: window.expanded ? Math.max(window.closedWidth, Theme.island.panelWidth) : window.closedWidth
+                bodyWidth: window.expanded ? Math.max(window.closedWidth, window.menuWidth) : window.closedWidth
                 bodyHeight: Theme.island.height + (window.expanded ? menus.implicitHeight : 0)
                 radius: window.expanded ? Theme.island.openRadius : Theme.island.height / 2
 
@@ -281,12 +285,14 @@ Scope {
 
                         anchors.top: topRow.bottom
                         anchors.horizontalCenter: parent.horizontalCenter
-                        width: Theme.island.panelWidth
+                        width: window.menuWidth
                         implicitHeight: window.shown === "today" ? today.implicitHeight
                                       : window.shown === "settings" ? settings.implicitHeight
                                       : window.shown === "media" ? media.implicitHeight
                                       : window.shown === "window" ? windowMenu.implicitHeight
                                       : window.shown === "power" ? powerMenu.implicitHeight
+                                      : window.shown === "clipboard" ? clipboard.implicitHeight
+                                      : window.shown === "wallpaper" ? wallpapers.implicitHeight
                                       : window.shown === "notification" ? popupCard.implicitHeight + Theme.spacing.s * 2
                                       : window.shown === "peek-media" ? peekCard.implicitHeight + Theme.spacing.s
                                       : window.shown === "peek-minimized" ? peekMinimized.implicitHeight + Theme.spacing.m * 2
@@ -321,9 +327,38 @@ Scope {
                             }
                         }
 
+                        WallpaperPanel {
+                            id: wallpapers
+                            width: Theme.island.wideWidth
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            opacity: window.shown === "wallpaper" ? 1 : 0
+                            visible: opacity > 0
+
+                            Behavior on opacity {
+                                NumberAnimation { duration: Theme.anim.normal }
+                            }
+                        }
+
+                        ClipboardPanel {
+                            id: clipboard
+                            width: Theme.island.panelWidth
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            opacity: window.shown === "clipboard" ? 1 : 0
+                            visible: opacity > 0
+                            onPicked: entry => {
+                                root.panel = "";
+                                Clipboard.paste(entry);
+                            }
+
+                            Behavior on opacity {
+                                NumberAnimation { duration: Theme.anim.normal }
+                            }
+                        }
+
                         PowerPanel {
                             id: powerMenu
-                            width: parent.width
+                            width: Theme.island.panelWidth
+                            anchors.horizontalCenter: parent.horizontalCenter
                             opacity: window.shown === "power" ? 1 : 0
                             visible: opacity > 0
                             onDone: root.panel = ""
@@ -335,7 +370,8 @@ Scope {
 
                         WindowPanel {
                             id: windowMenu
-                            width: parent.width
+                            width: Theme.island.panelWidth
+                            anchors.horizontalCenter: parent.horizontalCenter
                             target: root.windowTarget
                             opacity: window.shown === "window" ? 1 : 0
                             visible: opacity > 0
@@ -363,7 +399,8 @@ Scope {
 
                         MediaPanel {
                             id: media
-                            width: parent.width
+                            width: Theme.island.panelWidth
+                            anchors.horizontalCenter: parent.horizontalCenter
                             opacity: window.shown === "media" ? 1 : 0
                             visible: opacity > 0
 
@@ -374,7 +411,8 @@ Scope {
 
                         TodayPanel {
                             id: today
-                            width: parent.width
+                            width: Theme.island.panelWidth
+                            anchors.horizontalCenter: parent.horizontalCenter
                             opacity: window.panel === "today" ? 1 : 0
                             visible: opacity > 0
 
@@ -385,8 +423,9 @@ Scope {
 
                         QuickSettings {
                             id: settings
-                            width: parent.width
-                            onPowerMenu: root.panel = "power"
+                            width: Theme.island.panelWidth
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            onOpenMenu: menu => root.panel = menu
                             opacity: window.panel === "settings" ? 1 : 0
                             visible: opacity > 0
 

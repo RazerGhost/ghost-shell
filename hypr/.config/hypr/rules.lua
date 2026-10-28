@@ -49,6 +49,13 @@ hl.layer_rule({
     animation    = "slide top",
 })
 
+-- Wallpaper: no open animation (it would slide in at login); Quickshell fades it itself.
+hl.layer_rule({
+    name  = "qs-wallpaper",
+    match = { namespace = "^qs-wallpaper$" },
+    no_anim = true,
+})
+
 -- Launcher: blurred, pops in from its center.
 hl.layer_rule({
     name  = "qs-launcher",

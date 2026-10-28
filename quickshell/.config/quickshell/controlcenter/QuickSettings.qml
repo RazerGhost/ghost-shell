@@ -11,8 +11,8 @@ Item {
 
     property string page: "main" // "main", "wifi" or "bluetooth"
 
-    // The power button; the island opens the power menu.
-    signal powerMenu()
+    // A button here opens another island menu ("power", "wallpaper").
+    signal openMenu(string menu)
     readonly property int padding: Theme.spacing.l
 
     // The island grows and shrinks to fit the current page.
@@ -133,7 +133,7 @@ Item {
             onMoved: value => Brightness.set(value)
         }
 
-        // Battery on the left, tray icons and the power button on the right.
+        // Battery on the left; tray icons, wallpaper and power buttons on the right.
         Item {
             width: parent.width
             implicitHeight: Theme.slider.height
@@ -172,9 +172,16 @@ Item {
 
                 IconButton {
                     anchors.verticalCenter: parent.verticalCenter
+                    icon: "wallpaper"
+                    label: "Wallpaper"
+                    onClicked: root.openMenu("wallpaper")
+                }
+
+                IconButton {
+                    anchors.verticalCenter: parent.verticalCenter
                     icon: "power_settings_new"
                     label: "Power menu"
-                    onClicked: root.powerMenu()
+                    onClicked: root.openMenu("power")
                 }
             }
         }

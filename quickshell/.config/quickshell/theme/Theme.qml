@@ -60,6 +60,7 @@ Singleton {
         readonly property int fillet:     14  // radius of the concave joins to the screen edge
         readonly property int openRadius: 32  // bottom corners when open (closed: half the height)
         readonly property int panelWidth: 380 // width of the open menus
+        readonly property int wideWidth:  820 // the wallpaper picker, wider for its grid
         // Height of the island's window. The open island never grows past this; the rest of
         // the window is transparent and lets clicks through.
         readonly property int maxHeight:  840
@@ -92,6 +93,16 @@ Singleton {
         readonly property int hoverDelay:  250  // ms of hover before the player opens, and of
                                                 // absence before it closes again
         readonly property int menuArt:     160  // cover in the media menu
+    }
+
+    readonly property QtObject wallpaper: QtObject {
+        readonly property int columns: 4 // thumbnails per row in the picker
+        readonly property int rows:    3 // visible rows; the grid scrolls past that
+    }
+
+    readonly property QtObject clipboard: QtObject {
+        readonly property int height:      360 // the list scrolls past this
+        readonly property int imageHeight: 56  // image thumbnails
     }
 
     readonly property QtObject notifications: QtObject {

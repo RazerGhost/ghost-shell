@@ -119,6 +119,10 @@ step "GTK dark mode and theme"
 gsettings set org.gnome.desktop.interface color-scheme prefer-dark
 gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark
 
+step "Wallpaper folder"
+# The wallpaper picker (quick settings) shows the pictures in here.
+mkdir -p "$HOME/Pictures/Wallpapers"
+
 step "Generating colors with matugen"
 # Without a wallpaper, matugen builds the scheme from one seed color.
 # #6750a4 is the Material baseline purple, the same scheme as the fallbacks in Colors.qml.
@@ -128,6 +132,13 @@ if [[ $# -ge 1 && $1 == \#* ]]; then
 elif [[ $# -ge 1 ]]; then
     [[ -f $1 ]] || fail "wallpaper not found: $1"
     matugen image "$1" -m dark --source-color-index 0
+    # Also make it the wallpaper Quickshell draws (services/Wallpaper.qml reads this file).
+    WALLPAPER="$(realpath "$1")" node -e '
+        const fs = require("fs");
+        const file = process.env.HOME + "/.local/state/quickshell/wallpaper.json";
+        fs.mkdirSync(require("path").dirname(file), { recursive: true });
+        fs.writeFileSync(file, JSON.stringify({ path: process.env.WALLPAPER }, null, 4) + "\n");
+    '
 elif [[ -f $HOME/.local/state/quickshell/colors.json ]]; then
     echo "Colors already generated; pass a wallpaper or a hex color to regenerate."
 else

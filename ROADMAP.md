@@ -98,11 +98,18 @@ new setup step.
   lock, suspend, log out, restart, shut down; the last three need a second click within 4 s.
   Lock runs hyprlock, which has no config until Phase 5.
 
-### Phase 4: Clipboard + wallpaper
-- Clipboard picker on Super+V using cliphist history (Super+V is kept free for it).
-- Wallpaper drawn by Quickshell on the background layer, with a picker over `~/Pictures/Wallpapers`
-  that also runs matugen (`matugen image <path> -m dark --source-color-index 0`).
-  `misc.force_default_wallpaper` in `look.lua` may need changing once Quickshell draws the wallpaper.
+### Phase 4: Clipboard + wallpaper (built; waiting on the user's test results)
+- Clipboard menu in the island (`controlcenter/ClipboardPanel.qml`, Super+V): cliphist history
+  with a search field, image thumbnails (decoded once into `$XDG_RUNTIME_DIR/qs-clipboard`),
+  arrow keys / Enter, Delete or × to remove, Clear all. Picking an entry copies it and pastes it
+  into the previous window with `wtype` (user's choice). Parsing in `ClipboardEntries.js`, tested.
+- Wallpaper: Quickshell draws it on the background layer (`wallpaper/WallpaperLayer.qml`, fades
+  in). The picker (`controlcenter/WallpaperPanel.qml`, wallpaper button in quick settings or
+  `qs ipc call island toggle wallpaper`) is wider than the other menus (user's choice) and shows
+  `~/Pictures/Wallpapers` (local folder only: the user prefers real photos or anime art and
+  picks them themselves). Choosing one runs matugen on it. The choice is saved in
+  `~/.local/state/quickshell/wallpaper.json`; `qs ipc call wallpaper set <path>` and
+  `./install.sh <image>` set it too. With none chosen, Hyprland's default wallpaper shows.
 
 ### Phase 5: Lock screen + idle + greeter
 - Quickshell session lock with PAM. Keep `hyprlock` as a fallback bind (currently Super+L) and tell the
@@ -162,9 +169,9 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
   menu closed immediately. (The launcher maps a new surface with `Exclusive`, which works.)
 - **Keybinds: Windows-style** (user's choice, 2026-10-28): tap Super or Super+Space launcher,
   Super+Enter terminal, Super+E files, Super+B browser, Super+W / Alt+F4 close, Super+Up maximize,
-  Super+Down minimize, Super+T float/tile, Alt+Space window menu, Super+N quick settings, Super+C calendar, Super+Shift+S screenshot,
+  Super+Down minimize, Super+T float/tile, Alt+Space window menu, Super+N quick settings, Super+C calendar, Super+Shift+S screenshot, Super+V clipboard,
   Ctrl+Alt+Delete power menu, Super+Ctrl+arrows focus. Super+Left/Right are kept free for snapping
-  (Phase 6) and Super+V for the clipboard (Phase 4). Full list in `hypr/binds.lua`.
+  (Phase 6). Full list in `hypr/binds.lua`.
 - **Window buttons:** Hyprland draws no title bars, so instead of hyprbars: keybinds plus a window
   menu in the island (`controlcenter/WindowPanel.qml`, Alt+Space or right-click the island's top
   row): minimize, maximize, float/tile, fullscreen, close, move to workspace 1-5, and the minimized
@@ -195,6 +202,9 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
   can't report a manual override, so the tile state comes from its profile at startup and on each
   switch (`on-switch = qs ipc call nightlight refresh`) and from the tile itself.
 - **Island window height** is 840 px (was 680) so the "today" menu with notifications fits.
+- **Island menu widths:** menus are `Theme.island.panelWidth` (380) wide, the wallpaper picker
+  `wideWidth` (820); the island's window is as wide as the widest. Regular menus keep their width
+  and stay centered while the island is wider.
 - **Calendar locale:** `Qt.locale(Qt.uiLanguage)` (en_GB): the user has English UI with Dutch
   regional formats, and plain `Qt.locale()` gave Dutch day names next to English dates.
 - **No wallpaper yet:** `install.sh` with no argument generates colors from seed `#6750a4`, the same
@@ -291,6 +301,13 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `invoke()`), `transient`, `lastGeneration` (true for ones carried over a reload, which are
   announced again), `dismiss()`, `expire()`. No timestamp. App icons can be names, paths or URLs;
   show them with `IconImage` (a plain `Image` scales up a tiny icon).
+- cliphist: `cliphist list` prints `<id>\t<preview>` newest first; images look like
+  `[[ binary data 120 KiB png 1920x1080 ]]`. `cliphist decode <id>`, `cliphist delete` (the
+  whole line on stdin), `cliphist wipe`. `wtype -M ctrl v -m ctrl` presses Ctrl+V.
+- `Qt.labs.folderlistmodel` `FolderListModel { folder; nameFilters; showDirs }` (roles
+  `filePath`, `fileName`) doesn't notice its folder being created later; reset `folder` to
+  re-read. `FileView.writeAdapter()` saves a `JsonAdapter`; `printErrors: false` silences a
+  missing file.
 - hyprsunset 0.4: `hyprctl hyprsunset temperature <K>` / `identity` / `reset` / `profile` (prints
   the active profile's Time/Temperature/Gamma/Identity, not manual overrides). Profiles in
   `~/.config/hypr/hyprsunset.conf` with `time`, `temperature`, `identity`, `on-switch`.

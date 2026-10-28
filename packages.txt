@@ -58,3 +58,4 @@ appmenu-gtk-module
 libappindicator-gtk3
 librsvg
 xdotool
+wtype

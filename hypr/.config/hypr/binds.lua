@@ -24,6 +24,7 @@ hl.bind(mainMod .. " + Z",       hl.dsp.exec_cmd(editor))
 -- Island menus
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("qs ipc call island toggle settings")) -- quick settings
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("qs ipc call island toggle today"))    -- calendar
+hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("qs ipc call island toggle clipboard")) -- clipboard history
 
 -- Session
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
