@@ -425,6 +425,15 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   Settings -> Windows -> Wobbly windows (off by default), through `shell-settings.lua`
   (`HyprlandConfig.js`, tested). The spring curve key renamed to `damping`.
 
+### Touchpad off with a mouse (built 2026-10-28; untested: needs a mouse and a finger)
+- Settings -> Keyboard and mouse: "Touchpad off while a mouse is connected" (off by default;
+  `services/Touchpad.qml`). Hyprland sends no device events, so `hyprctl devices -j` is read every
+  3 s while it's on; a mouse is any pointer device other than the touchpad's own two
+  (`TouchpadDevices.js`, tested); the touchpads switch with `hl.device` through `hyprctl eval`.
+  Not a plain "off": a laptop without its touchpad and no mouse can't easily get it back.
+- No keyboard backlight control: the Omen's RGB keyboard isn't exposed to Linux (no
+  `kbd_backlight` LED) without HP's own tools.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

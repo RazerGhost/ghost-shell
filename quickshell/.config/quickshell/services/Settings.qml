@@ -77,6 +77,7 @@ Singleton {
             property real pointerSpeed: 0        // -1 (slow) to 1 (fast), mouse and touchpad
             property bool naturalScroll: false   // the touchpad's
             property bool tapToClick: true
+            property bool touchpadOffWithMouse: false // services/Touchpad.qml
             property int gapsIn: 5               // between windows
             property int gapsOut: 20             // between windows and the screen's edges
             property int borderSize: 2

@@ -37,8 +37,12 @@ ShellRoot {
     Idle {}
     HyprlandSettings {}
 
-    // Low battery warnings: a singleton, so it only runs once something uses it.
-    Component.onCompleted: BatteryAlerts.check()
+    // Background services that are singletons, so they only run once something uses them: low
+    // battery warnings and the touchpad's mouse rule.
+    Component.onCompleted: {
+        BatteryAlerts.check();
+        Touchpad.enabled;
+    }
 
     // The system's default apps follow the settings (services/Apps.qml).
     Connections {

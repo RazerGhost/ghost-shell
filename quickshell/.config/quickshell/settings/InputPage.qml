@@ -104,6 +104,17 @@ Column {
         }
 
         SettingRow {
+            title: "Touchpad off while a mouse is connected"
+            subtitle: "Back on by itself when the mouse is gone"
+
+            Switch {
+                label: "Touchpad off while a mouse is connected"
+                checked: Settings.values.touchpadOffWithMouse
+                onToggled: Settings.values.touchpadOffWithMouse = !checked
+            }
+        }
+
+        SettingRow {
             title: "Pointer speed"
             subtitle: "Mouse and touchpad"
 

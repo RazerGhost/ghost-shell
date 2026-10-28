@@ -55,7 +55,7 @@ Singleton {
         { id: "power", section: "System", icon: "battery_charging_full", title: "Power",
           words: "idle dim lock screen off suspend sleep battery plugged low power saver warning" },
         { id: "input", section: "System", icon: "touchpad_mouse", title: "Keyboard and mouse",
-          words: "keyboard layout language touchpad natural scrolling tap click pointer speed" },
+          words: "keyboard layout language touchpad natural scrolling tap click pointer speed mouse off" },
         { id: "snapshots", section: "System", icon: "history", title: "Snapshots",
           words: "backup restore btrfs snapper undo files home" },
         { id: "apps", section: "Apps", icon: "apps", title: "Default apps",
