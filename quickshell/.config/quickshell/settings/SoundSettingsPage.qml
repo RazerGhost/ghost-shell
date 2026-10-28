@@ -3,8 +3,9 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// Equalizer: a preset or five bands by hand, for the output that's playing (each speaker or pair
-// of headphones keeps its own; services/Equalizer.qml). Changes are heard at once.
+// Sound: the equalizer, a preset or five bands by hand for the output that's playing (each
+// speaker or pair of headphones keeps its own; services/Equalizer.qml), heard at once; and sound
+// events, which of the shell's short sounds play (services/Sounds.qml).
 Column {
     spacing: Theme.spacing.l
 
@@ -57,6 +58,46 @@ Column {
                     value: Equalizer.gains[band.index]
                     format: v => (v > 0 ? "+" : "") + v + " dB"
                     onPicked: v => Equalizer.setBand(band.index, v)
+                }
+            }
+        }
+    }
+
+    SettingGroup {
+        title: "Sound events"
+
+        SettingRow {
+            title: "Play sounds"
+            subtitle: "Short sounds for the events below, quieter than other sound"
+
+            Switch {
+                label: "Play sounds"
+                checked: Settings.values.soundEvents
+                onToggled: Settings.values.soundEvents = !checked
+            }
+        }
+
+        Repeater {
+            model: [
+                { key: "soundNotifications", title: "Notifications", subtitle: "Not while Do Not Disturb is on" },
+                { key: "soundDevices", title: "Charger and USB", subtitle: "Plugging in and out" },
+                { key: "soundFeedback", title: "Volume and screenshots", subtitle: "A tick for the volume keys, a shutter for screenshots" },
+                { key: "soundBattery", title: "Low battery", subtitle: "With the battery warnings" }
+            ]
+
+            SettingRow {
+                id: eventRow
+
+                required property var modelData
+
+                title: modelData.title
+                subtitle: modelData.subtitle
+                enabled: Settings.values.soundEvents
+
+                Switch {
+                    label: eventRow.title
+                    checked: Settings.values[eventRow.modelData.key]
+                    onToggled: Settings.values[eventRow.modelData.key] = !checked
                 }
             }
         }

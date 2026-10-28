@@ -36,6 +36,7 @@ Scope {
     // Saves the picture and tells the user; `path` is where grabToImage wrote it.
     function done(path: string): void {
         open = false;
+        Sounds.play("feedback", "screen-capture");
         Quickshell.execDetached(["sh", "-c", `
             wl-copy --type image/png < "$1"
             action=$(notify-send -a Screenshot -i "$1" -A default=Open "Screenshot saved" "Copied to the clipboard, and saved in Pictures/Screenshots")

@@ -48,6 +48,8 @@ Scope {
         target: Audio
 
         function onVolumeChanged(): void {
+            if (root.ready)
+                Sounds.play("feedback", "audio-volume-change");
             root.show(Audio.icon, "Volume", Audio.volume);
         }
 

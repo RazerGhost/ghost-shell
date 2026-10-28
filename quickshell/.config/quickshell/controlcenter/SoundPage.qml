@@ -82,7 +82,7 @@ Column {
         }
     }
 
-    // The chosen output's preset; the bands themselves are in Settings -> Equalizer.
+    // The chosen output's preset; the bands themselves are in Settings -> Sound.
     Item {
         visible: Equalizer.running
         width: root.width

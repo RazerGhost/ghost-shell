@@ -42,7 +42,9 @@ Singleton {
             PowerProfiles.profile = PowerProfile.PowerSaver;
             body += " Power saver is on until you plug in.";
         }
-        notify.command = ["notify-send", "--app-name=Battery", "--icon=battery-caution",
+        // Its own sound (the low battery switch), not the notification chime.
+        Sounds.play("battery", "dialog-warning");
+        notify.command = ["notify-send", "--app-name=Battery", "--icon=battery-caution", "--hint=boolean:suppress-sound:true",
             "--urgency=" + (warning === "critical" ? "critical" : "normal"),
             (warning === "critical" ? "Battery very low: " : "Battery low: ") + percent + time, body];
         notify.running = true;

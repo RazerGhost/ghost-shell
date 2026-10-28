@@ -466,7 +466,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   whichever output is the default. Each output keeps its own gains (`equalizer` in
   settings.json); `services/Equalizer.qml` sets them with `pw-cli` when the output changes or
   the filter restarts. The preset in quick settings' Sound page, the bands in Settings ->
-  Equalizer. The equalizer's nodes are left out of the Sound page's outputs and apps.
+  Sound. The equalizer's nodes are left out of the Sound page's outputs and apps.
 
 ### Screen time (built 2026-10-29; waiting on the user's test results)
 - Settings -> Screen time (user's choice: a Settings page, only showing the time; no limits or
@@ -484,6 +484,17 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   as key caps, progress dots, Skip / Back / Next. Right or Enter, Left, Escape. Shown on the
   first start (`welcomeSeen` in settings.json) and again from Settings -> Keybinds ("Show the
   welcome tour") or `qs ipc call welcome show`.
+
+### Sound events (built 2026-10-29; waiting on the user's test results)
+- `services/Sounds.qml`: short sounds from the freedesktop sound theme (`sound-theme-freedesktop`,
+  already installed), played with `pw-play` at 60 % through the default output, on by default
+  (user's choice). Notifications (a chime, the warning for critical ones; apps' `sound-name` and
+  `suppress-sound` hints are honoured; none during Do Not Disturb), the charger
+  (`UPower.onBattery`: a full battery stops charging while still plugged in) and USB devices
+  (`udevadm monitor`, no Quickshell API), the volume keys (any volume change, at most one tick
+  per 150 ms) and screenshots, and the low battery alerts (their own warning; the notification
+  stays quiet). `SoundEvents.js` tested. Settings -> Sound (was Equalizer): a switch for all and
+  one per kind.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

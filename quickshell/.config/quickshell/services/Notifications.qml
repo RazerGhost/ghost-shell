@@ -79,8 +79,11 @@ Singleton {
             if (notification.lastGeneration)
                 return;
             root.received[notification.id] = Date.now();
-            if (!root.doNotDisturb || notification.urgency === NotificationUrgency.Critical)
+            const critical = notification.urgency === NotificationUrgency.Critical;
+            if (!root.doNotDisturb || critical) {
                 root.queue = [...root.queue, notification];
+                Sounds.playNotification(notification.hints, critical);
+            }
         }
     }
 }
