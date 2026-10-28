@@ -207,6 +207,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `submit()`, `cancelAuthenticationRequest()`. `pkexec true` is a harmless test.
 - `IdleInhibitor { window; enabled }` (`Quickshell.Wayland`). `hyprctl clients -j` shows
   `inhibitingIdle` per window (Vesktop holds one during voice).
+- A notification sent again with the same id (`notify-send -r <id>`) updates the existing
+  `Notification` object in place (its bindings update); `hints` is a JS object, e.g.
+  `hints.value` (progress 0-100). Verified with notify-send.
 - Notifications: `NotificationServer.inlineReplySupported`, `Notification.hasInlineReply`,
   `sendInlineReply(text)` (an `inline-reply` action over D-Bus).
 - Testing notifications by hand: `gdbus call ... Notify` prints `(uint32 7,)`; take the id with

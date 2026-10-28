@@ -99,7 +99,9 @@ new setup step.
   hover; critical ones stay until dismissed), and stay in the history in the "today" menu until
   dismissed or "Clear all". The menu opens with the month calendar folded (user's choice); click
   the date to show it. Click a card for the app's default action; its other actions
-  are buttons. Bodies are shown as plain text (no markup).
+  are buttons. Bodies are shown as plain text (no markup). A progress bar shows when the app sends a progress value (the `value`
+  hint, `notify-send -h int:value:64`; `NotificationProgress.js`, tested), updating as the app
+  updates the notification.
 - Quick settings tiles: Do Not Disturb (no pop-ups except critical; history still collects) and
   night light (`services/NightLight.qml`, hyprsunset; warmth and a schedule in Settings, see
   decisions). Both became round buttons under the wide tiles later (see the Quickshell additions).

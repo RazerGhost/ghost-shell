@@ -5,6 +5,7 @@ import Quickshell.Widgets
 import qs.services
 import qs.theme
 import qs.widgets
+import "NotificationProgress.js" as NotificationProgress
 import "NotificationTime.js" as NotificationTime
 
 // One notification: app icon (or the notification's own image), app and time, title, text,
@@ -138,6 +139,32 @@ MouseArea {
                 wrapMode: Text.Wrap
                 maximumLineCount: 3
                 elide: Text.ElideRight
+            }
+
+            // Progress of a long task (a download, a copy), when the app sends it; apps update the
+            // same notification as it goes.
+            Rectangle {
+                readonly property real progress: NotificationProgress.progress(root.notification?.hints)
+
+                width: parent.width
+                height: Theme.spacing.xs
+                radius: height / 2
+                visible: progress >= 0
+                color: Colors.m3surfaceContainerHighest
+
+                Accessible.role: Accessible.ProgressBar
+                Accessible.name: Math.round(progress * 100) + " %"
+
+                Rectangle {
+                    width: parent.width * Math.max(0, parent.progress)
+                    height: parent.height
+                    radius: height / 2
+                    color: Colors.m3primary
+
+                    Behavior on width {
+                        NumberAnimation { duration: Theme.anim.normal }
+                    }
+                }
             }
 
             // Quick reply, when the app offers it.
