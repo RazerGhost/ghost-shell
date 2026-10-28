@@ -81,8 +81,11 @@ Singleton {
     }
 
     readonly property QtObject workspace: QtObject {
-        readonly property int dot:       8  // inactive indicator: a dot
-        readonly property int activeDot: 24 // active indicator stretches into a pill
+        // Sized so the five dots are about as wide as the Wi-Fi and battery icons, which keeps
+        // the evenly spaced island close to symmetric.
+        readonly property int dot:       6  // inactive indicator: a dot
+        readonly property int activeDot: 16 // active indicator stretches into a pill
+        readonly property int spacing:   4  // between the dots
         readonly property int minimum:   5  // dots shown even when those workspaces are empty
     }
 

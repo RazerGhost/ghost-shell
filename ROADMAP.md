@@ -66,7 +66,10 @@ new setup step.
 ### Phase 2: Island + control center + launcher + OSD (done, verified on the laptop 2026-10-28,
   except the media card: untested until Spotify is installed)
 - Island (`bar/Island.qml` for the state, `IslandWindow.qml` per monitor, `IslandShape.qml`): closed = workspaces, clock, `StatusIcons`; the
-  clock sits in the exact middle (both sides get the same width). Workspace dots always show at
+  three parts are evenly spaced
+  (user's choice, 2026-10-28: with the clock forced into the exact middle it sat 20 px from the
+  dots but 55 px from the status icons, which looked off-center; now 24 px gaps and 26 px ends,
+  the time a few px off the exact middle; the dots got smaller so the sides nearly match). Workspace dots always show at
   least 5 (`WorkspaceSlots.js`, tested in `tests/tst_workspaces.qml`): click one to go there, even
   if it's empty; scroll over them to step through. Status icons: Wi-Fi as three arcs with the
   unlit ones dimmed to 45 % (`widgets/WifiIcon.qml`, also in the Wi-Fi tile and list), battery as an Android 16-style pill that fills with the charge, no text (user's choice: the

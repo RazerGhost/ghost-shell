@@ -198,26 +198,24 @@ PanelWindow {
             }
             Keys.onEscapePressed: root.island.panel = ""
 
-            // Workspaces | time | status icons. Both sides get the width of the wider
-            // one, so the time sits exactly in the middle of the island.
+            // Workspaces | time | status icons, evenly spaced (user's choice): the same gap on
+            // both sides of the time and at both ends. The time and the status icons are buttons
+            // with padding inside; the dots get the same padding around them, so every gap is
+            // two paddings. The island stays centered on the screen; the time is off its exact
+            // middle by half the difference between the dots and the status icons (a few px).
             Row {
                 id: topRow
 
-                // The dots get the same inset as the status icons have inside their button.
-                readonly property real sideWidth: Math.max(workspaces.implicitWidth + Theme.spacing.m, status.implicitWidth)
-
                 anchors.horizontalCenter: parent.horizontalCenter
                 height: Theme.island.height
-                spacing: Theme.spacing.s
 
                 Item {
-                    width: topRow.sideWidth
+                    width: workspaces.implicitWidth + Theme.spacing.m * 2
                     height: parent.height
 
                     Workspaces {
                         id: workspaces
-                        anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacing.m
+                        anchors.centerIn: parent
                         screen: root.modelData
                     }
                 }
@@ -267,12 +265,12 @@ PanelWindow {
                 }
 
                 Item {
-                    width: topRow.sideWidth
+                    width: status.implicitWidth
                     height: parent.height
 
                     IslandButton {
                         id: status
-                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
                         label: "Quick settings"
                         active: root.panel === "settings"
                         onActivated: root.island.toggle("settings", root.modelData.name)

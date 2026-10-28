@@ -63,7 +63,7 @@ Item {
         id: dots
 
         anchors.verticalCenter: parent.verticalCenter
-        spacing: Theme.spacing.xs + 2
+        spacing: Theme.workspace.spacing
 
         Repeater {
             model: root.slots
