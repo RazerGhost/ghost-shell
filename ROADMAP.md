@@ -335,7 +335,7 @@ other session: pinning the Vencord/Spicetify downloads in install.sh.
   change that). Super + right-drag on a tiled window moves the borders on the pointer's side
   (user's request): Hyprland doesn't pass drags to Lua layouts, so `drag.lua` follows the
   pointer with `hl.timer` + `hl.get_cursor_pos` while the button is held (`tiling.drag`, tested).
-  Dragging the border itself (without Super) does nothing on tiled windows. `input.float_switch_override_focus = 0`, or focusing a tiled window under a
+  Super + left-drag on a tiled window swaps it with the tiled window it's dropped on (`tiling.swap`, tested). Dragging the border itself (without Super) does nothing on tiled windows. `input.float_switch_override_focus = 0`, or focusing a tiled window under a
   floating one jumped back to the window under the pointer. Windows already open when this came
   in keep floating until tiled. Helpers float: CachyOS Hello (a window rule), its root terminals
   (`ghostty -e pkexec`, floated from `windows.lua` when the title becomes "pkexec": a rule only

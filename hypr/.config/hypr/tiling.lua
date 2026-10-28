@@ -407,6 +407,16 @@ function M.reset(state)
     return state
 end
 
+-- Swaps windows `a` and `b` (dragging one onto the other). Returns false if either isn't here.
+function M.swap(state, a, b)
+    local i, j = index_of(state.slots, a), index_of(state.slots, b)
+    if not (i and j) then
+        return false
+    end
+    state.slots[i], state.slots[j] = b, a
+    return true
+end
+
 -- Empty cells' rectangles (Snap Assist fills them).
 function M.empty(state, area)
     local result = {}

@@ -194,6 +194,13 @@ test("move swaps with the neighbour in that direction", function()
     eq(T.move(s, "c", "left", area), false)
 end)
 
+test("swap trades two windows' cells", function()
+    local s = T.sync(nil, { "a", "b", "c" }, nil)
+    assert(T.swap(s, "a", "c"))
+    eq(s.slots, { "c", "b", "a" })
+    eq(T.swap(s, "a", "z"), false)
+end)
+
 test("reset goes back to automatic, keeping the order", function()
     local s = T.sync(nil, { "a" }, nil)
     s = T.snap(s, "a", "right")

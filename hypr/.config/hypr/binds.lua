@@ -102,12 +102,15 @@ hl.bind(mainMod .. " + SHIFT + grave", hl.dsp.window.move({ workspace = "special
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }), { description = "Next or previous workspace" })
 hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }), { description = "Next or previous workspace" })
 
--- Move/resize windows with mouse
+-- Move/resize windows with mouse. Hyprland's own drag and resize only reach floating windows;
+-- for tiled ones drag.lua follows the pointer while the button is held (it does nothing over a
+-- floating window): left-drag swaps the window with the tiled one it's dropped on, right-drag
+-- moves the borders nearest the pointer.
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true, description = "Move window" })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true, description = "Resize window" })
--- Tiled windows: drag.lua follows the pointer while the button is held (Hyprland's resize above
--- only reaches floating ones). It does nothing over a floating window.
 local drag = require("drag")
+hl.bind(mainMod .. " + mouse:272", drag.start_move, { non_consuming = true })
+hl.bind(mainMod .. " + mouse:272", drag.stop_move, { release = true, non_consuming = true })
 hl.bind(mainMod .. " + mouse:273", drag.start, { non_consuming = true })
 hl.bind(mainMod .. " + mouse:273", drag.stop, { release = true, non_consuming = true })
 

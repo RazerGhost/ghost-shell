@@ -12,6 +12,7 @@
 --                           top-left, left-third, right-two-thirds... (tiling.spots)
 --   resize <direction>      move the focused window's border: left, right, up, down
 --   move <direction>        swap the focused window with its neighbour that way
+--   swap <address> <address>  swap two windows (dragging one onto the other)
 --   auto                    back to arranging by the number of windows
 --   place                   place the windows again (after a mouse drag changed the shares)
 -- e.g. hyprctl dispatch 'hl.dsp.layout("snap left")'.
@@ -81,13 +82,15 @@ hl.layout.register("shell", {
             return tiling.resize(state, focused, arg, resize_step) or "shell layout: nothing to resize that way"
         elseif command == "move" then
             return tiling.move(state, focused, arg, ctx.area) or "shell layout: no window that way"
+        elseif command == "swap" then
+            return tiling.swap(state, arg, address) or "shell layout: not two tiled windows here"
         elseif command == "auto" then
             tiling.reset(state)
             return true
         elseif command == "place" then
             return true -- the shares changed (a mouse drag); Hyprland places the windows again
         end
-        return "shell layout: expected snap, resize, move, auto or place"
+        return "shell layout: expected snap, resize, move, swap, auto or place"
     end,
 })
 

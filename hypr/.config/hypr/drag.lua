@@ -1,20 +1,24 @@
------------------------------
----- RESIZING BY DRAGGING ----
------------------------------
--- Super + right-drag on a tiled window moves the borders nearest the pointer (bound in
--- binds.lua). Hyprland doesn't tell Lua layouts how far a window is dragged, so while the button
--- is held a timer follows the pointer, changes the arrangement's shares (tiling.drag) and asks
--- the layout (layout.lua) to place the windows again.
+------------------------------------
+---- DRAGGING TILED WINDOWS ----
+------------------------------------
+-- Hyprland doesn't tell Lua layouts where a tiled window is dragged, so these follow the pointer
+-- themselves (bound in binds.lua, next to Hyprland's own drag and resize for floating windows):
+-- - Super + right-drag moves the borders nearest the pointer: while the button is held a timer
+--   changes the arrangement's shares (tiling.drag) and asks the layout (layout.lua) to place the
+--   windows again.
+-- - Super + left-drag swaps the window with the tiled one it's dropped on.
 local tiling = require("tiling")
 local layout = require("layout")
 
 -- The drag in progress, if any.
 local drag
 
-local function tiled_window_at(pos)
+-- The tiled window under `pos`, other than `except` (the one being dragged sits under the
+-- pointer too).
+local function tiled_window_at(pos, except)
     for _, window in ipairs(hl.get_windows()) do
         local ws = window.workspace
-        if not window.floating and ws and ws.visible and not ws.special
+        if not window.floating and ws and ws.visible and not ws.special and window.address ~= except
             and pos.x >= window.at.x and pos.x < window.at.x + window.size.x
             and pos.y >= window.at.y and pos.y < window.at.y + window.size.y then
             return window
@@ -69,4 +73,26 @@ local function end_drag()
     end
 end
 
-return { start = start_drag, stop = end_drag }
+-- The window being moved by Super + left-drag, if it's tiled.
+local moving
+
+local function start_move()
+    local pos = hl.get_cursor_pos()
+    local window = pos and tiled_window_at(pos)
+    moving = window and window.address
+    if moving then
+        -- The layout message goes to the focused workspace.
+        hl.dispatch(hl.dsp.focus({ window = "address:" .. moving }))
+    end
+end
+
+local function end_move()
+    local pos = hl.get_cursor_pos()
+    local target = moving and pos and tiled_window_at(pos, moving)
+    if target then
+        hl.dispatch(hl.dsp.layout("swap " .. moving .. " " .. target.address))
+    end
+    moving = nil
+end
+
+return { start = start_drag, stop = end_drag, start_move = start_move, stop_move = end_move }
