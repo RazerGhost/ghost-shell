@@ -7,7 +7,8 @@ import qs.theme
 
 // The wallpaper picker: its own strip across the top of the focused screen, under the island
 // (user's choice; it used to stretch the island itself). Opened from quick settings' wallpaper
-// button or `qs ipc call wallpaper picker`; Escape or a click elsewhere closes it.
+// button or `qs ipc call wallpaper picker`; arrow keys and Enter pick one, Escape or a click
+// elsewhere closes it.
 Scope {
     PanelWindow {
         id: window
@@ -43,6 +44,7 @@ Scope {
             color: Colors.surfaceTranslucent
             focus: true
             Keys.onEscapePressed: Wallpaper.pickerOpen = false
+            Keys.onPressed: event => panel.handleKey(event)
 
             WallpaperPanel {
                 id: panel

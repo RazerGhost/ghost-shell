@@ -30,14 +30,46 @@ Column {
         if (active) {
             opened = true;
             Wallpaper.rescan();
+            // Start on the current wallpaper.
+            list.currentIndex = Math.max(0, Wallpaper.pictures.findIndex(p => p.filePath === Wallpaper.path));
+            list.positionViewAtIndex(list.currentIndex, ListView.Center);
         }
     }
 
-    // One picture in the grid. The current wallpaper gets an accent outline.
+    // From the strip (WallpaperPicker.qml): Left/Right move the selection, Enter uses it.
+    function handleKey(event: var): void {
+        switch (event.key) {
+        case Qt.Key_Left:
+            list.decrementCurrentIndex();
+            break;
+        case Qt.Key_Right:
+            list.incrementCurrentIndex();
+            break;
+        case Qt.Key_Home:
+            list.currentIndex = 0;
+            break;
+        case Qt.Key_End:
+            list.currentIndex = list.count - 1;
+            break;
+        case Qt.Key_Return:
+        case Qt.Key_Enter:
+            if (list.currentItem)
+                Wallpaper.set(list.currentItem.filePath);
+            break;
+        default:
+            return;
+        }
+        list.positionViewAtIndex(list.currentIndex, ListView.Contain);
+        event.accepted = true;
+    }
+
+    // One picture in the grid. The current wallpaper gets an accent outline, the selected one
+    // (pointer or arrow keys) a light one.
     component Thumbnail: MouseArea {
         id: cell
 
         required property var modelData
+        required property int index
         readonly property string filePath: modelData.filePath
         readonly property string fileName: modelData.fileName
         readonly property bool current: filePath === Wallpaper.path
@@ -46,10 +78,12 @@ Column {
         height: root.thumbHeight
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
+        onEntered: list.currentIndex = index
         onClicked: Wallpaper.set(filePath)
 
         Accessible.role: Accessible.ListItem
         Accessible.name: fileName + (current ? ", current wallpaper" : "")
+        Accessible.selected: ListView.isCurrentItem
         Accessible.onPressAction: Wallpaper.set(filePath)
 
         ClippingRectangle {
@@ -72,7 +106,7 @@ Column {
             anchors.fill: parent
             radius: Theme.radius.m
             color: "transparent"
-            border.width: cell.current ? 3 : cell.containsMouse ? 2 : 0
+            border.width: cell.current ? 3 : cell.ListView.isCurrentItem ? 2 : 0
             border.color: cell.current ? Colors.m3primary : Colors.m3onSurface
         }
     }
@@ -102,6 +136,8 @@ Column {
     }
 
     ListView {
+        id: list
+
         width: root.contentWidth
         height: root.thumbHeight
         orientation: ListView.Horizontal
