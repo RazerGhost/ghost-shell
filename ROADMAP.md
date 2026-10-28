@@ -189,7 +189,7 @@ Added at the user's request (2026-10-28), between Phases 6 and 7.
   below the screen, so the pointer counted as having left).
 - It reserves no space (`ExclusionMode.Ignore`); maximized windows cover it.
 
-### Phase 7: Settings app (built 2026-10-28; waiting on the user's test results)
+### Phase 7: Settings app (done, verified on the laptop 2026-10-28)
 Added at the user's request, after night light went manual-only: things that were fixed in
 config files became settings.
 - A normal window (user's choice over a wide island menu; `settings/SettingsWindow.qml`, a
