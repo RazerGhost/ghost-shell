@@ -91,76 +91,10 @@ hl.layout.register("shell", {
     end,
 })
 
--- Super + right-drag on a tiled window moves the borders nearest the pointer (binds.lua). Hyprland
--- doesn't tell Lua layouts how far a window is dragged, so while the button is held a timer
--- follows the pointer and asks the layout to place the windows again.
-local drag
-
-local function tiled_window_at(pos)
-    for _, window in ipairs(hl.get_windows()) do
-        local ws = window.workspace
-        if not window.floating and ws and ws.visible and not ws.special
-            and pos.x >= window.at.x and pos.x < window.at.x + window.size.x
-            and pos.y >= window.at.y and pos.y < window.at.y + window.size.y then
-            return window
-        end
-    end
-end
-
-local function follow_pointer()
-    local pos = hl.get_cursor_pos()
-    if not (drag and pos) then
-        return
-    end
-    local dx = (pos.x - drag.start.x) / drag.area.w
-    local dy = (pos.y - drag.start.y) / drag.area.h
-    if dx == drag.dx and dy == drag.dy then
-        return
-    end
-    drag.dx, drag.dy = dx, dy
-    local moved = tiling.drag(drag.state, drag.base, drag.id, drag.side_x, dx)
-    moved = tiling.drag(drag.state, drag.base, drag.id, drag.side_y, dy) or moved
-    if moved then
-        hl.dispatch(hl.dsp.layout("place"))
-    end
-end
-
-local function start_drag()
-    local pos = hl.get_cursor_pos()
-    local window = pos and tiled_window_at(pos)
-    local ws = window and window.workspace.id
-    if not (window and states[ws] and areas[ws]) then
-        return -- a floating window: Hyprland's own resize bind handles it
-    end
-    -- The layout message goes to the focused workspace, so focus the window being resized.
-    hl.dispatch(hl.dsp.focus({ window = "address:" .. window.address }))
-    drag = {
-        state = states[ws],
-        base = tiling.shares(states[ws]),
-        area = areas[ws],
-        id = window.address,
-        start = { x = pos.x, y = pos.y },
-        -- The borders on the pointer's side of the window's middle, like resizing from a corner.
-        side_x = pos.x > window.at.x + window.size.x / 2 and "right" or "left",
-        side_y = pos.y > window.at.y + window.size.y / 2 and "bottom" or "top",
-        timer = hl.timer(follow_pointer, { timeout = 16, type = "repeat" }),
-    }
-end
-
-local function end_drag()
-    if drag then
-        drag.timer:set_enabled(false)
-        drag = nil
-    end
-end
-
 -- For the shell's Snap Assist: the empty cells of a workspace as a JSON list of
 -- { "x", "y", "width", "height" } (without gaps). JSON, so even no cells is an answer: hyprctl
 -- prints "unknown request" for an empty string. hyprctl repl 'return ShellLayout.empty(1)'
 ShellLayout = {
-    start_drag = start_drag,
-    end_drag = end_drag,
-
     empty = function(ws)
         local state, area = states[ws], areas[ws]
         local cells = {}
@@ -170,5 +104,13 @@ ShellLayout = {
                 round(box.x), round(box.y), round(box.w), round(box.h)))
         end
         return "[" .. table.concat(cells, ",") .. "]"
+    end,
+}
+
+-- For drag.lua: a workspace's arrangement and the area it was last placed in (nil, nil before
+-- the workspace had tiled windows).
+return {
+    workspace = function(ws)
+        return states[ws], areas[ws]
     end,
 }

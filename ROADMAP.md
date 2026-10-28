@@ -332,7 +332,7 @@ other session: pinning the Vencord/Spicetify downloads in install.sh.
   size is cut off at its box. Dialogs float by themselves; Super+Shift+Space or the window menu's
   Float/Tile floats any window, and floating windows stay above tiled ones (Hyprland can't
   change that). Super + right-drag on a tiled window moves the borders on the pointer's side
-  (user's request): Hyprland doesn't pass drags to Lua layouts, so `layout.lua` follows the
+  (user's request): Hyprland doesn't pass drags to Lua layouts, so `drag.lua` follows the
   pointer with `hl.timer` + `hl.get_cursor_pos` while the button is held (`tiling.drag`, tested).
   Dragging the border itself (without Super) does nothing on tiled windows. `input.float_switch_override_focus = 0`, or focusing a tiled window under a
   floating one jumped back to the window under the pointer. Windows already open when this came
@@ -340,7 +340,7 @@ other session: pinning the Vencord/Spicetify downloads in install.sh.
 - **Click to focus and raise on focus** (Windows/macOS behaviour, user's choice after research):
   `input.follow_mouse = 2` (hover still scrolls, a click focuses) and `hypr/windows.lua` raises
   every newly focused window (`hl.on("window.active", ...)` + `alter_zorder({ mode = "top" })`);
-  Hyprland only raises on click by itself. `windows.lua` holds the window behaviours.
+  Hyprland only raises on click by itself.
 - **Brightness OSD through IPC:** sysfs backlight files send no inotify events, so the brightness
   binds run `qs ipc call brightness refresh` after `brightnessctl`. Volume and mic need nothing:
   the OSD watches PipeWire.
@@ -426,7 +426,7 @@ other session: pinning the Vencord/Spicetify downloads in install.sh.
   `yes | bt-agent -c NoInputNoOutput`: without `--daemon` it reads answers from stdin, and in
   `--daemon` mode it rejects confirmations unless a PIN file matches. The Bluetooth page also sets
   the adapter `pairable` and the device `trusted` before `pair()`, and connects once paired.
-- **Apps reopen where they were** (`hypr/windows.lua`): on `window.close` a floating window's
+- **Apps reopen where they were** (`hypr/positions.lua`): on `window.close` a floating window's
   position and size are saved per class in `~/.local/state/hypr/window-positions`; on
   `window.open` they're applied, unless another window of that class is open (dialogs, second
   windows) or the spot is off-screen. Fullscreen and minimized windows aren't saved.

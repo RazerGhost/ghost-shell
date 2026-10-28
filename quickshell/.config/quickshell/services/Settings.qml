@@ -69,7 +69,7 @@ Singleton {
             property int gapsOut: 20             // between windows and the screen's edges
             property int borderSize: 2
             property int rounding: 10            // window corners
-            property bool rememberPositions: true // apps reopen where they were (windows.lua)
+            property bool rememberPositions: true // floating apps reopen where they were (positions.lua)
 
             // Desktop entry ids of the apps Super+Enter, Super+B and Super+E open, and of the apps
             // pictures, videos and audio files open in.

@@ -37,7 +37,7 @@ function lua(v) {
         "    },",
         "})",
         "",
-        "-- Read by windows.lua.",
+        "-- Read by positions.lua.",
         `ShellSettings = { remember_positions = ${v.rememberPositions !== false} }`,
         ""
     ].join("\n");
