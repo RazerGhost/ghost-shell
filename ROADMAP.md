@@ -292,7 +292,8 @@ other session: pinning the Vencord/Spicetify downloads in install.sh.
   their shapes (`services/WindowGrid.js`, tested, shared with Snap Assist): click or arrow keys
   and Enter to switch, × to close. A strip of the
   workspaces in use as miniatures (windows at their positions): click to go, drag a window onto
-  one to move it, + for a new workspace. Keyboard on demand (focus race, see the switcher).
+  one to move it, + for a new workspace; or 1-9 / Shift+Left/Right to move the selected window
+  (the overview stays open to sort more). Keyboard on demand (focus race, see the switcher).
 
 ### Update indicator (built 2026-10-28; waiting on the user's test results)
 - `services/Updates.qml` counts waiting updates: `checkupdates` (repositories, from
