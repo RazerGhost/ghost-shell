@@ -49,7 +49,9 @@ MouseArea {
         width: Theme.icon.normal
         height: width
 
-        MaterialIcon {
+        // WifiIcon: a weak Wi-Fi signal keeps its unlit arcs visible (dimmed); other symbols
+        // are drawn as is.
+        WifiIcon {
             anchors.centerIn: parent
             visible: root.appIcon === ""
             icon: root.icon

@@ -41,7 +41,9 @@ Rectangle {
         }
     }
 
-    MaterialIcon {
+    // WifiIcon: a weak Wi-Fi signal keeps its unlit arcs visible (dimmed); other symbols
+    // are drawn as is.
+    WifiIcon {
         id: glyph
         anchors.left: parent.left
         anchors.leftMargin: Theme.spacing.l

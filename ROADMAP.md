@@ -69,7 +69,7 @@ new setup step.
   clock sits in the exact middle (both sides get the same width). Workspace dots always show at
   least 5 (`WorkspaceSlots.js`, tested in `tests/tst_workspaces.qml`): click one to go there, even
   if it's empty; scroll over them to step through. Status icons: Wi-Fi as three arcs with the
-  unlit ones dimmed to 45 % (`widgets/WifiIcon.qml`), battery as an Android 16-style pill that fills with the charge, no text (user's choice: the
+  unlit ones dimmed to 45 % (`widgets/WifiIcon.qml`, also in the Wi-Fi tile and list), battery as an Android 16-style pill that fills with the charge, no text (user's choice: the
   percentage is in quick settings) (`bar/BatteryPill.qml`). Opens
   `controlcenter/TodayPanel.qml` (calendar, `MediaCard`) or `QuickSettings.qml` (tiles for Wi-Fi,
   Bluetooth, power mode, microphone; volume and brightness `LevelSlider`s; battery; `Tray`), with
