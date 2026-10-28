@@ -160,7 +160,16 @@ PanelWindow {
 
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
+        // Closed, the time (or cover) sits exactly in the screen's middle, under the laptop's
+        // webcam: the island moves by half the difference between its two sides (the dots are a
+        // little wider than the status icons). Open, the menus are centered.
+        // Whole pixels, so text and edges stay sharp.
+        anchors.horizontalCenterOffset: root.expanded ? 0 : Math.floor((status.implicitWidth - dotsSide.width) / 2)
         color: Colors.surfaceTranslucent
+
+        Behavior on anchors.horizontalCenterOffset {
+            NumberAnimation { duration: Theme.anim.morph; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.emphasized }
+        }
 
         // The morph: width, height and corner radius animate between the closed pill
         // and the open menu, all on the same curve so the shape moves as one.
@@ -201,8 +210,7 @@ PanelWindow {
             // Workspaces | time | status icons, evenly spaced (user's choice): the same gap on
             // both sides of the time and at both ends. The time and the status icons are buttons
             // with padding inside; the dots get the same padding around them, so every gap is
-            // two paddings. The island stays centered on the screen; the time is off its exact
-            // middle by half the difference between the dots and the status icons (a few px).
+            // two paddings. The island shifts a few px to keep the time centered (see shape).
             Row {
                 id: topRow
 
@@ -210,6 +218,7 @@ PanelWindow {
                 height: Theme.island.height
 
                 Item {
+                    id: dotsSide
                     width: workspaces.implicitWidth + Theme.spacing.m * 2
                     height: parent.height
 
