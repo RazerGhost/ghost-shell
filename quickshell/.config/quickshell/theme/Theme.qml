@@ -23,6 +23,7 @@ Singleton {
 
     readonly property QtObject font: QtObject {
         readonly property string sans: "Inter"
+        readonly property string mono: "MesloLGS Nerd Font" // error messages
         readonly property string icon: "Material Symbols Rounded"
         readonly property int iconWeight: 300 // Material Symbols line weight (400 is the font's default)
 

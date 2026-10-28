@@ -14,7 +14,7 @@ PanelWindow {
     id: root
 
     required property ShellScreen modelData
-    required property var island // Island.qml: panel, screenName, windowTarget, toggle()
+    required property var island // Island.qml: panel, screenName, windowTarget, toggle(), reload*
     screen: modelData
 
     readonly property string panel: island.screenName === modelData.name ? island.panel : ""
@@ -35,7 +35,9 @@ PanelWindow {
 
     // What's shown below the top row: a menu, a pop-up, a hover view ("peek-media", ...)
     // or nothing.
-    readonly property string shown: open ? panel : popup ? "notification"
+    readonly property string shown: open ? panel
+                                  : island.reloadShown && focusedScreen ? "reload"
+                                  : popup ? "notification"
                                   : attentionWindow ? "attention"
                                   : peek ? "peek-" + peek : ""
     readonly property bool expanded: shown !== ""
@@ -302,6 +304,50 @@ PanelWindow {
                         onActivated: {
                             Windows.focus(root.attentionWindow);
                             Windows.attentionSeen();
+                        }
+                    }
+                }
+
+                // "Shell reloaded", or why it couldn't (see Island.qml).
+                MenuSlot {
+                    shown: root.shown === "reload"
+                    extraHeight: Theme.spacing.m * 2
+
+                    Row {
+                        x: Theme.spacing.l
+                        y: Theme.spacing.m
+                        width: parent.width - Theme.spacing.l * 2
+                        spacing: Theme.spacing.m
+
+                        MaterialIcon {
+                            id: reloadIcon
+                            icon: root.island.reloadError ? "error" : "check_circle"
+                            color: root.island.reloadError ? Colors.m3error : Colors.m3primary
+                        }
+
+                        Column {
+                            width: parent.width - reloadIcon.width - parent.spacing
+                            spacing: Theme.spacing.xs
+
+                            Text {
+                                text: root.island.reloadError ? "Shell reload failed" : "Shell reloaded"
+                                color: Colors.m3onSurface
+                                font.family: Theme.font.sans
+                                font.pixelSize: Theme.font.normal
+                                font.weight: Font.DemiBold
+                            }
+
+                            Text {
+                                width: parent.width
+                                visible: text !== ""
+                                text: root.island.reloadError
+                                color: Colors.m3onSurfaceVariant
+                                font.family: Theme.font.mono
+                                font.pixelSize: Theme.font.small
+                                wrapMode: Text.Wrap
+                                maximumLineCount: 6
+                                elide: Text.ElideRight
+                            }
                         }
                     }
                 }

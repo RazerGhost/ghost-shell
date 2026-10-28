@@ -21,6 +21,36 @@ Scope {
     // The window menu acts on the window that was focused when it opened.
     property HyprlandToplevel windowTarget: null
 
+    // After the shell reloads (a file in its folder changed), the island says so instead of
+    // Quickshell's own pop-up: briefly when it worked, longer with the error when it didn't (the
+    // old shell keeps running then).
+    property bool reloadShown: false
+    property string reloadError: ""
+
+    Connections {
+        target: Quickshell
+
+        function onReloadCompleted(): void {
+            Quickshell.inhibitReloadPopup();
+            root.reloadError = "";
+            root.reloadShown = true;
+            reloadTimer.restart();
+        }
+
+        function onReloadFailed(error: string): void {
+            Quickshell.inhibitReloadPopup();
+            root.reloadError = error;
+            root.reloadShown = true;
+            reloadTimer.restart();
+        }
+    }
+
+    Timer {
+        id: reloadTimer
+        interval: root.reloadError ? 10000 : 2000
+        onTriggered: root.reloadShown = false
+    }
+
     function toggle(name: string, screen: string): void {
         if (panel === name && screenName === screen) {
             panel = "";
