@@ -10,18 +10,19 @@ import "ScreenTime.js" as ScreenTimeJs
 // focused window's app gets 10 s more, unless nothing has been touched for 2 minutes (a playing
 // video or a game that keeps the screen on still counts: they hold an idle inhibitor). A locked
 // screen and suspend count as nothing. Saved to ~/.local/state/quickshell/screentime.json once a
-// minute; 30 days are kept. Across a shell reload the counts are carried over in memory: a
-// write started while the shell reloads is cancelled.
+// minute; 30 days are kept. Across a shell reload the counts are carried over in memory, as
+// JSON text (a JavaScript object can't move to the reloaded shell's engine): a write started
+// while the shell reloads is cancelled.
 Singleton {
     id: root
 
     readonly property int sample: 10 // seconds
-    readonly property var data: persist.data ?? {}
-    readonly property bool loaded: persist.data !== null
+    property var data: ({})
+    property bool loaded: false
 
     function save(): void {
         if (persist.unsaved)
-            file.setText(JSON.stringify(persist.data));
+            file.setText(persist.json);
         persist.unsaved = false;
     }
 
@@ -29,8 +30,15 @@ Singleton {
         id: persist
         reloadableId: "screenTime"
 
-        property var data: null // null until read from the file (on the first start)
+        property string json: "" // `data`, kept up to date
         property bool unsaved: false
+
+        onReloaded: {
+            if (json !== "") {
+                root.data = JSON.parse(json);
+                root.loaded = true;
+            }
+        }
     }
 
     FileView {
@@ -38,19 +46,16 @@ Singleton {
         path: Quickshell.env("HOME") + "/.local/state/quickshell/screentime.json"
         printErrors: false // missing until the first minute is saved
         onLoaded: {
-            if (persist.data !== null)
+            if (root.loaded)
                 return; // carried over from before a reload, which is newer
             try {
-                persist.data = JSON.parse(text());
+                root.data = JSON.parse(text());
             } catch (e) {
                 console.warn("screentime.json isn't valid JSON, starting over:", e);
-                persist.data = {};
             }
+            root.loaded = true;
         }
-        onLoadFailed: {
-            if (persist.data === null)
-                persist.data = {};
-        }
+        onLoadFailed: root.loaded = true
     }
 
     IdleMonitor {
@@ -68,7 +73,8 @@ Singleton {
                 return;
             // By desktop entry, so the page can show the app's name and icon.
             const app = DesktopEntries.heuristicLookup(appId)?.id ?? appId;
-            persist.data = ScreenTimeJs.add(root.data, ScreenTimeJs.day(new Date()), app, root.sample);
+            root.data = ScreenTimeJs.add(root.data, ScreenTimeJs.day(new Date()), app, root.sample);
+            persist.json = JSON.stringify(root.data);
             persist.unsaved = true;
         }
     }

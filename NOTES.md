@@ -221,7 +221,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - `FileView.setText()` writes asynchronously unless `blockWrites: true`; called from
   `Component.onDestruction` during a shell reload, nothing was written (verified). Keep state
   that must survive a reload in `PersistentProperties { reloadableId: "..." }` (its `reloaded`
-  signal fires only when an old instance's values were carried over).
+  signal fires only when an old instance's values were carried over). A `var` holding a
+  JavaScript object can't cross ("JSValue can't be reassigned to another engine"): keep it as
+  JSON text in a `string` property and parse it in `onReloaded` (verified).
 - `DesktopEntry.categories` (list), `DesktopEntries.byId(id)`.
 - `hl.bind(keys, action, { description = "..." })`; `hyprctl binds -j` gives `modmask` (Super 64,
   Ctrl 4, Alt 8, Shift 1), `key`, `description`, `has_description`.

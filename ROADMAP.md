@@ -476,7 +476,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   game holding an idle inhibitor still counts); suspend and a locked screen count nothing.
   Apps by desktop entry id (web apps by their own entry). `screentime.json` keeps 30 days
   (`ScreenTime.js`, tested), saved every minute; across a shell reload the counts stay in
-  `PersistentProperties` (a write during a reload is cancelled).
+  `PersistentProperties` as JSON text (a write during a reload is cancelled).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
