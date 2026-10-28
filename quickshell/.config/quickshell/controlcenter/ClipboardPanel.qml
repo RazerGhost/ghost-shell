@@ -4,7 +4,7 @@ import Quickshell.Widgets
 import qs.services
 import qs.theme
 import qs.widgets
-import "ClipboardEntries.js" as ClipboardEntries
+import "../services/ClipboardEntries.js" as ClipboardEntries
 
 // The clipboard menu (Super+V): what you copied, newest first, with a search field. Click an
 // entry or press Enter to paste it; Delete or × removes one.

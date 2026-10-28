@@ -2,7 +2,7 @@
 //   QT_QPA_PLATFORM=offscreen /usr/lib/qt6/bin/qmltestrunner -input tests
 import QtQuick
 import QtTest
-import "../quickshell/.config/quickshell/controlcenter/ClipboardEntries.js" as Entries
+import "../quickshell/.config/quickshell/services/ClipboardEntries.js" as Entries
 
 TestCase {
     name: "ClipboardEntries"

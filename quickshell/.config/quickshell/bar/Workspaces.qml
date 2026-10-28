@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import qs.theme
-import "WorkspaceSlots.js" as WorkspaceSlots
+import "../services/WorkspaceSlots.js" as WorkspaceSlots
 
 // Workspace dots for one monitor: one per workspace in use, plus the one you're on (user's
 // choice), so there are usually only a few. The active one stretches into a pill. Click a dot to

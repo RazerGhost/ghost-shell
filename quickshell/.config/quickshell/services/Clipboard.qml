@@ -6,7 +6,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import "../controlcenter/ClipboardEntries.js" as ClipboardEntries
+import "ClipboardEntries.js" as ClipboardEntries
 
 Singleton {
     id: root

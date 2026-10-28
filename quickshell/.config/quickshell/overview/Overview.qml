@@ -7,7 +7,7 @@ import Quickshell.Widgets
 import qs.services
 import qs.theme
 import qs.widgets
-import "../bar/WorkspaceSlots.js" as WorkspaceSlots
+import "../services/WorkspaceSlots.js" as WorkspaceSlots
 import "OverviewLayout.js" as OverviewLayout
 
 // The overview, like Windows' Task View (user's choice): Super+Tab or a three-finger swipe up.

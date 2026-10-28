@@ -2,7 +2,7 @@
 //   QT_QPA_PLATFORM=offscreen /usr/lib/qt6/bin/qmltestrunner -input tests
 import QtQuick
 import QtTest
-import "../quickshell/.config/quickshell/bar/WorkspaceSlots.js" as WorkspaceSlots
+import "../quickshell/.config/quickshell/services/WorkspaceSlots.js" as WorkspaceSlots
 
 TestCase {
     name: "WorkspaceSlots"
