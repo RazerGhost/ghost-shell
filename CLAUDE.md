@@ -13,7 +13,8 @@ Arch Linux + Hyprland dotfiles, deployed with GNU Stow.
 - Commit and push after each phase or fix; the user may pull on another machine.
 - `tests/` holds QML tests (not a Stow package). Run them with `QT_QPA_PLATFORM=offscreen /usr/lib/qt6/bin/qmltestrunner -input tests`.
 - Files use LF line endings (enforced in `.gitattributes`), even when edited on Windows.
-- `ROADMAP.md` has the phase plan, decisions, open issues and verified API notes. Update it when a phase finishes or a decision changes.
+- `ROADMAP.md` has the phase plan, decisions and open issues. Update it when a phase finishes or a decision changes.
+- `NOTES.md` has the verified Quickshell/Hyprland API facts and how to test on the laptop. Read it before using an API it might cover, and add facts you verify.
 
 @ENGINEERING_PRINCIPLES.md
 @ROADMAP.md

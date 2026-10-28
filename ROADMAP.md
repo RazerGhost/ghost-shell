@@ -1,7 +1,6 @@
 # Roadmap: Quickshell desktop shell + Hyprland
 
-Handover document for continuing this work. Phase 1 was built in a Windows session that couldn't
-run anything; work now continues on the laptop, where changes can be run and tested directly.
+The phase plan and the decisions behind the shell. API facts and testing tips are in `NOTES.md`.
 
 ## The task
 
@@ -17,7 +16,7 @@ notification daemon or launcher.
 
 **API accuracy:** Quickshell and Hyprland's Lua API change between versions. Check every type,
 property and function against quickshell.org/docs (v0.3.x) and wiki.hypr.land (0.56) before using it,
-not memory or old dotfiles. Facts already checked are listed under "Verified API notes" below. Say in
+not memory or old dotfiles. Facts already checked are in `NOTES.md` ("Verified API notes"). Say in
 the phase summary what couldn't be verified.
 
 **After each phase, report:** what was built; commands to run (fish-compatible); a test checklist;
@@ -55,7 +54,7 @@ new setup step.
 - matugen config and templates (`matugen/.config/matugen/`) for Quickshell (JSON), Hyprland
   (`colors.lua`), Ghostty, GTK3/4 (`gtk.css`) and Yazi (`theme.toml`).
 - Quickshell: `theme/Theme.qml` (tokens), `theme/Colors.qml` (matugen JSON, live reload),
-  `bar/Bar.qml` + `Pill.qml` + `Workspaces.qml` + `Clock.qml` (center pill only).
+  and a first bar of floating pills, replaced by the island in Phase 2.
 
 **Added alongside Phase 1 at the user's request:**
 - `install.sh`: packages, GPU rule check, early KMS, Plymouth off, greetd, GTK dark mode, stow for
@@ -105,7 +104,7 @@ new setup step.
 - Wallpaper: Quickshell draws it on the background layer (`wallpaper/WallpaperLayer.qml`, fades
   in). The picker (`controlcenter/WallpaperPanel.qml`, wallpaper button in quick settings or
   `qs ipc call island toggle wallpaper`) stretches the island across the whole top edge (user's
-  choice: its own strip, not a menu; the bottom edge is kept free for a dock) with one row of
+  choice: its own strip, not a menu; the bottom edge is the dock's) with one row of
   pictures: `~/Pictures/Wallpapers` first (local folder only: the user prefers real photos or
   anime art and picks them themselves), then the built-in ones: Hyprland's `/usr/share/hypr/wall*.png` and
   the `cachyos-wallpapers` package (in packages.txt). Those stay in their packages, not in this
@@ -248,11 +247,10 @@ fixed in config files should become settings.
 - **Keybinds: Windows-style** (user's choice, 2026-10-28): tap Super or Super+Space launcher,
   Super+Enter terminal, Super+E files, Super+B browser, Super+W / Alt+F4 close, Super+Up maximize,
   Super+Down minimize, Alt+Space window menu, Alt+Tab switcher, Super+Left/Right snap, Super+Z snap picker, Super+N quick settings, Super+C calendar, Super+Shift+S screenshot, Super+V clipboard, Super+L lock (Super+Shift+L hyprlock fallback),
-  Ctrl+Alt+Delete power menu, Super+Ctrl+arrows focus. Super+Left/Right are kept free for snapping
-  (Phase 6). Full list in `hypr/binds.lua`.
+  Ctrl+Alt+Delete power menu, Super+Ctrl+arrows focus. Full list in `hypr/binds.lua`.
 - **Window buttons:** Hyprland draws no title bars, so instead of hyprbars: keybinds plus a window
   menu in the island (`controlcenter/WindowPanel.qml`, Alt+Space or right-click the island's top
-  row): minimize, maximize, float/tile, fullscreen, close, move to workspace 1-5, and the minimized
+  row): minimize, maximize, snap, fullscreen, close, move to workspace 1-5, and the minimized
   windows to restore.
 - **Minimize:** Hyprland has none. A minimized window moves to the hidden `special:minimized`
   workspace (Super+Down, the window menu, the dock); the next most recent window on that workspace
@@ -297,7 +295,7 @@ fixed in config files should become settings.
 - **Island menu widths:** menus are `Theme.island.panelWidth` (380) wide; the wallpaper picker
   spans the screen, so the island's window is as wide as the screen. Regular menus keep their
   width and stay centered while the island is wider.
-- **Bottom edge reserved for a dock** (the user plans one): nothing else goes there.
+- **The bottom edge belongs to the dock:** nothing else goes there.
 - **Calendar locale:** `Qt.locale(Qt.uiLanguage)` (en_GB): the user has English UI with Dutch
   regional formats, and plain `Qt.locale()` gave Dutch day names next to English dates.
 - **No wallpaper yet:** `install.sh` with no argument generates colors from seed `#6750a4`, the same
@@ -305,182 +303,4 @@ fixed in config files should become settings.
 
 ## Open issues
 
-None. Phase 1 verified on the laptop on 2026-10-27: RTX back on the PCI bus (cause unknown; it
-returned on its own), tuigreet shows at boot, clock text is light, Nautilus follows the matugen accent,
-live recolor works for the bar, borders and Ghostty, the bar's slide animation plays, and
-`prime-run glxgears` shows up in `nvidia-smi`.
-
-## Verified API notes
-
-Checked against the docs or source in October 2026. Re-check anything not listed.
-
-**Hyprland 0.56 (Lua)**
-- `require("name")` is relative to `hyprland.lua`; a missing file aborts the calling file, so use
-  `pcall(require, "name")` for optional files. The docs don't say whether required files are watched
-  for changes; use `hyprctl reload`.
-- Colors: `"rgba(rrggbbaa)"`, `"#rrggbb"`, `"rgb(...)"`; gradients are
-  `{ colors = { ... }, angle = 45 }`.
-- `hl.layer_rule({ name, match = { namespace = "<regex>" }, blur, blur_popups, ignore_alpha (0–1),
-  dim_around, xray, animation, no_anim, order, above_lock, no_screen_share })`.
-- `hl.exec_cmd` runs immediately (use inside `hl.on("hyprland.start", ...)`). `hl.dsp.exec_cmd` returns
-  an action for `hl.bind`. Events: `hyprland.start`, `hyprland.shutdown`, `config.reloaded`.
-- Window rules: `hl.window_rule({ name, match = { class = ".*" }, float = true, center = true })`;
-  `float`/`center` are static effects (applied when the window opens).
-- Bind flags (third argument): `locked`, `release`, `repeating`, `mouse`, `long_press`,
-  `non_consuming`, `description`, ...
-- `hl.env` runs before the compositor starts; `AQ_DRM_DEVICES` is a colon-separated list with the
-  primary GPU first. `/dev/dri/by-path` can't be used in it because those paths contain colons.
-
-**Quickshell 0.3.2**
-- Imports: `import qs.<folder>` relative to `shell.qml`; no `qmldir` needed. Singletons:
-  `pragma Singleton` with a `Singleton {}` root.
-- `PanelWindow`: `anchors.*`, `margins.*`, `implicitWidth/Height`, `exclusionMode`
-  (`ExclusionMode.Auto/Normal/Ignore`), `exclusiveZone`, `mask: Region`. Set `color: "transparent"`
-  from the start. Anchoring only `top` centers the window (wlr-layer-shell spec).
-  `WlrLayershell.namespace / .layer (WlrLayer.Background|Bottom|Top|Overlay) / .keyboardFocus
-  (WlrKeyboardFocus.None|Exclusive|OnDemand)`.
-- `Quickshell.Hyprland`: `Hyprland.workspaces / monitors / toplevels` are ObjectModels (`.values` in
-  JS). `focusedWorkspace`, `focusedMonitor`, `monitorFor(screen)`, `refreshWorkspaces()`.
-  `HyprlandWorkspace`: `id`, `name`, `active`, `focused`, `urgent`, `monitor`, `toplevels`,
-  `activate()`. `Hyprland.dispatch(str)` sends the string as-is; with a Lua config it must be Lua,
-  e.g. `hl.dsp.focus({ workspace = "3" })`. Prefer `activate()` where it exists.
-- `SystemClock { precision: SystemClock.Minutes }`, then `Qt.formatDateTime(clock.date, ...)`.
-- `FileView { path; watchChanges: true; onFileChanged: reload(); adapter: JsonAdapter { ... } }`.
-  `Quickshell.env("HOME")`. `Quickshell.statePath()` points at a per-shell folder, not
-  `~/.local/state`.
-- `IpcHandler { target: "name"; function f(arg: string): void {} }`: arguments and returns must be
-  typed (string, int, bool, real, color). Call with `qs ipc call name f`; list with `qs ipc show`.
-- `Process { command: [...]; running }` (no shell; use `["sh", "-c", ...]`), `StdioCollector`,
-  `Quickshell.execDetached([...])`.
-- `Quickshell.Services.Greetd` exists: `createSession`, `respond`, `launch`, `cancelSession`; signals
-  `authMessage`, `readyToLaunch`, `launched`, `authFailure`, `error`.
-- Services load lazily: `UPower`, `Bluetooth`, `Networking`, `SystemTray`, `DesktopEntries` are empty
-  until first accessed, then fill in asynchronously. Bindings are fine; a one-off read is not.
-- `Quickshell.Services.Pipewire`: `Pipewire.defaultAudioSink/Source` (`PwNode`), `node.audio.volume`
-  (0-1, writable), `.muted` (writable). Needs `PwObjectTracker { objects: [...] }` to fill `audio`.
-- `Quickshell.Services.UPower`: `UPower.displayDevice` (`percentage` 0-1, `state`
-  `UPowerDeviceState.Charging/...`, `isLaptopBattery`), `PowerProfiles.profile` (writable,
-  `PowerProfile.PowerSaver/Balanced/Performance`, `PowerProfile.toString()`),
-  `PowerProfiles.hasPerformanceProfile`.
-- `Quickshell.Bluetooth`: `Bluetooth.defaultAdapter` (`enabled` writable, `devices`),
-  `BluetoothDevice.connected`.
-- `Quickshell.Networking`: `Networking.devices` (`NetworkDevice`: `type` `DeviceType.Wifi/Wired`,
-  `connected`, `networks`), `WifiNetwork.signalStrength` (0-1), `Networking.wifiEnabled`.
-- `Quickshell.Services.SystemTray`: `SystemTray.items` of `SystemTrayItem` (`icon`, `title`, `id`,
-  `tooltipTitle`, `onlyMenu`, `hasMenu`, `menu`, `activate()`, `secondaryActivate()`).
-  `QsMenuAnchor { menu; anchor.item; anchor.edges: Edges.Bottom; open() }`.
-- `DesktopEntries.applications` of `DesktopEntry` (`name`, `genericName`, `comment`, `icon`,
-  `keywords`, `noDisplay`, `runInTerminal`, `command` (string list), `execute()`). `execute()`
-  ignores `runInTerminal`. `Quickshell.iconPath(name, fallback)`; `IconImage` in
-  `Quickshell.Widgets` (`source`, `implicitSize`).
-- `HyprlandFocusGrab { windows: [...]; active; onCleared }`. `mask: Region { Region { item } }`;
-  an empty `Region {}` makes a surface click-through. A layer surface with no anchors is centered.
-- `font.variableAxes: { "FILL": 1 }` fills Material Symbols (Qt 6.12).
-- `Quickshell.Services.Mpris`: `Mpris.players` of `MprisPlayer` (`trackTitle`, `trackArtist`,
-  `trackArtUrl`, `isPlaying`, `canTogglePlaying`, `canGoNext/Previous`, `togglePlaying()`, `next()`,
-  `previous()`).
-- Networking: `Networking.wifiEnabled` and `WifiDevice.scannerEnabled` are writable;
-  `Network.connect()`, `disconnect()`, signal `connectionFailed(reason)` (`ConnectionFailReason`);
-  `WifiNetwork.connectWithPsk(psk)`, `security` (`WifiSecurityType.Open/Owe/...`), `known`, `state`.
-- Bluetooth: `BluetoothAdapter.discovering` writable; `BluetoothDevice` `connect()`, `disconnect()`,
-  `pair()`, `paired`, `pairing`, `state` (`BluetoothDeviceState`), `battery`, `deviceName`, `icon`.
-- Qt: `QtQuick.Shapes` (`Shape.CurveRenderer`, `PathArc.direction`), `MonthGrid` / `DayOfWeekRow`
-  from `QtQuick.Controls.Basic` (MonthGrid needs an explicit height).
-- `console.log` doesn't reach `qs log`; use `console.warn` when debugging.
-- `Quickshell.Services.Notifications`: `NotificationServer { keepOnReload; actionsSupported;
-  imageSupported; persistenceSupported; onNotification: n => n.tracked = true }`;
-  `trackedNotifications`. `Notification`: `id`, `appName`, `appIcon`, `image`, `summary`, `body`,
-  `urgency` (`NotificationUrgency.Low/Normal/Critical`), `actions` (`identifier`, `text`,
-  `invoke()`), `transient`, `lastGeneration` (true for ones carried over a reload, which are
-  announced again), `dismiss()`, `expire()`. No timestamp. App icons can be names, paths or URLs;
-  show them with `IconImage` (a plain `Image` scales up a tiny icon).
-- Lock: `WlSessionLock { locked; WlSessionLockSurface { ... } }` (one surface per screen;
-  `Quickshell.Wayland`). `PamContext { config: "login"; start(); respond(text) }` with
-  `responseRequired`, `completed(PamResult.Success/Failed/Error/MaxTries)`, `error(PamError)`.
-  `MultiEffect` (`QtQuick.Effects`) blurs (`blurEnabled`, `blur`, `blurMax`). Use
-  `Qt.locale(name).toString(date, format)`; `Qt.formatDate(date, locale, x)` treats `x` as a
-  format type, not a string.
-- hypridle 0.1.8: `general { lock_cmd; before_sleep_cmd; after_sleep_cmd; inhibit_sleep }`,
-  `listener { timeout; on-timeout; on-resume; condition_cmd; condition_retry }`. Screen off is
-  `hyprctl dispatch 'hl.dsp.dpms({ action = "disable" })'`.
-- cliphist: `cliphist list` prints `<id>\t<preview>` newest first; images look like
-  `[[ binary data 120 KiB png 1920x1080 ]]`. `cliphist decode <id>`, `cliphist delete` (the
-  whole line on stdin), `cliphist wipe`. `wtype -M ctrl v -m ctrl` presses Ctrl+V.
-- `Qt.labs.folderlistmodel` `FolderListModel { folder; nameFilters; showDirs }` (roles
-  `filePath`, `fileName`) doesn't notice its folder being created later; reset `folder` to
-  re-read. `FileView.writeAdapter()` saves a `JsonAdapter`; `printErrors: false` silences a
-  missing file.
-- hyprsunset 0.4: `hyprctl hyprsunset temperature <K>` / `identity` / `reset` / `profile` (prints
-  the active profile's Time/Temperature/Gamma/Identity, not manual overrides). Profiles in
-  `~/.config/hypr/hyprsunset.conf` with `time`, `temperature`, `identity`, `on-switch`.
-- `HyprlandToplevel.address` has no `0x` (Hyprland's selector needs `address:0x<address>`).
-  `Hyprland.activeToplevel` is null after the shell starts until focus changes; match
-  `ToplevelManager.activeToplevel` (`Quickshell.Wayland`) against `HyprlandToplevel.wayland`.
-  `DesktopEntries.heuristicLookup(appId)` finds a window's .desktop entry (icon).
-- Lua dispatchers take a target window: `hl.dsp.window.move({ window = "address:0x...",
-  workspace = "special:x", follow = false })`, also `close`, `float`, `fullscreen({ mode =
-  "maximized" | "fullscreen", action = "toggle" })`, `move({ x, y, relative })`;
-  `hl.dsp.focus({ window = ... })`. A special workspace that's never toggled stays hidden.
-- Lua events: `hl.on("window.active", function(window, reason) ... end)`, also `window.urgent`,
-  `window.close`, `window.open`, `window.update_state` (see the wiki's events.md). `input.follow_mouse`:
-  0 cursor never focuses, 1 hover focuses, 2 click focuses (pointer separate), 3 click doesn't
-  focus. `hl.dsp.window.alter_zorder({ window?, mode = "top" | "bottom" })`.
-- Lua `HL.Window` (stubs in `/usr/share/hypr/stubs/hl.meta.lua`): `address` (with 0x, so
-  `"address:" .. w.address` selects it), `class`, `at.x/.y`, `size.x/.y`, `floating`, `fullscreen`
-  (0 = no), `workspace.name`, `focus_history_id`, `pinned`. `hl.get_windows()`, `hl.get_monitors()`
-  (`x`, `y`, `width`, `height`, `scale`). Lua's `io` and `os` work in the config. A window is still
-  readable in `window.close`.
-- `Hyprland.rawEvent(event)` gives every socket2 event (`event.name`, `event.data`, e.g.
-  `urgent` with the address without 0x). Don't annotate the parameter's type in QML
-  (`HyprlandIpcEvent` isn't a registered name; Qt logs an error per event).
-- wtype: Hyprland doesn't run its binds for wtype's virtual keyboard, so binds can't be tested
-  with it. `wtype -M alt` only sets the modifier, without Alt key events; `-P Alt_L` / `-p Alt_L`
-  send real ones.
-- `ScreencopyView { captureSource: toplevel.wayland; live; constraintSize }` (`Quickshell.Wayland`)
-  captures windows on other workspaces too.
-- `float({ action })` takes `"toggle"` (default), `"enable"`/`"on"`, `"disable"`/`"off"`; an
-  unknown value like `"set"` toggles. `fullscreen` uses `"set"`/`"unset"`. `resize({ window, x, y
-  })` and `move({ window, x, y })` take logical pixels (a 940x1004 resize gives exactly that).
-  Monitor `lastIpcObject.reserved` is `[left, top, right, bottom]` (after `refreshMonitors()`);
-  `hyprctl getoption general:gaps_out -j` gives `{ "css": "20 20 20 20" }` (top right bottom left).
-  `hyprctl clients -j` has `focusHistoryID` (0 = focused, then most recently used).
-- `hl.dsp.cursor.move({ x, y })` moves the pointer: useful for testing hover behaviour.
-- A singleton is only created when something uses it, so an `IpcHandler` inside one doesn't exist
-  until then ("Target not found"); put handlers in always-loaded components.
-- Scrolling: `WheelHandler` received no wheel events on the island's layer surface; a
-  `MouseArea { acceptedButtons: Qt.NoButton; onWheel: ... }` under the content works and lets
-  clicks through. Wheel events pass through MouseAreas that have no `onWheel`.
-- Deprecated: `Quickshell.configDir` / `shellRoot` (use `shellDir`), and setting window
-  `width/height` (use `implicit*`).
-
-**matugen 4.2** (in Arch `extra`)
-- Templates: `{{colors.<name>.default.hex}}` (also `hex_stripped`, `rgba`, ...), `{{mode}}`, loops
-  `<* for name, value in colors *>`, filters like `| set_alpha: 0.5`. Relative `input_path` resolves
-  against the config file; `output_path` can be a list.
-- Hooks run through `sh -c`. A non-zero exit is only logged; the run continues.
-- `matugen image <img> -m dark --source-color-index 0` (the index skips an interactive prompt),
-  `matugen color hex "#rrggbb" -m dark`.
-
-**Others**
-- Ghostty: `theme = Matugen` loads `~/.config/ghostty/themes/Matugen`; `SIGUSR2` reloads the config.
-  Ghostty runs as one process for all windows (`--gtk-single-instance=true`), so new windows only
-  get config changes after that reload; `window-decoration = client` showed in new windows after it.
-- GTK: libadwaita and adw-gtk3 read `@define-color accent_bg_color, window_bg_color, view_*,
-  headerbar_*, sidebar_*, card_*, popover_*` from `~/.config/gtk-{3,4}.0/gtk.css`. Open apps need a
-  restart.
-- Yazi 26.9: sections `[mgr] [tabs] [mode] [indicator] [status] [input] [pick] [cmp] [tasks] ...`. A
-  partial `theme.toml` is merged with the defaults; Yazi reads it at startup.
-- tuigreet 0.11 (`greetd-tuigreet`): `--time --remember --asterisks --cmd <command>`.
-
-## Testing on the laptop
-
-- Quickshell reloads on file changes, but a reload after adding a property to a singleton
-  (e.g. `Theme`) can leave parts blank; restart it then:
-  `hyprctl dispatch 'hl.dsp.exec_cmd("pkill -x qs; sleep 0.5; qs")'`. `qs log` prints the running instance's log; panels can be
-  opened with `qs ipc call ...` and checked with `grim -g "x,y wxh" out.png`. Run `pkill qs; qs` in a terminal to watch its log (also saved
-  under `/run/user/1000/quickshell/`). `qs ipc show` lists IPC targets.
-- `hyprctl reload` after editing a required Lua file; `hyprctl layers` shows layer namespaces;
-  `hyprctl binds` shows loaded binds.
-- Changes to `env.lua`, the initramfs, the kernel cmdline or greetd only apply after logging in again
-  or rebooting. Say so in the checklist, and give a recovery path (Ctrl+Alt+F2, then
-  `sudo systemctl disable greetd`) before changes that could stop the user getting to a desktop.
+None.
