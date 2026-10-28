@@ -199,6 +199,7 @@ Singleton {
         readonly property int content:   600 // the pages' maximum width
         readonly property int rowHeight: 64
         readonly property int stepper:   96  // the value between a stepper's - and +
+        readonly property int stepperWide: 170 // a stepper showing a screen mode ("1920 × 1080, 165 Hz")
     }
 
     readonly property QtObject osd: QtObject {

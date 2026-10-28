@@ -1,6 +1,7 @@
 // The Hyprland side of the settings window: the generated ~/.config/hypr/shell-settings.lua.
 // Plain JavaScript, so it can be tested on its own (tests/tst_hyprlandconfig.qml).
 .pragma library
+.import "DisplayModes.js" as DisplayModes
 
 // A layout code is letters, digits and _ (several separated by commas); anything else is
 // replaced by the default, so the generated Lua can't be broken by a hand-edited settings file.
@@ -45,6 +46,10 @@ function lua(v) {
         `        wobble = { enabled = ${v.wobble === true} },`,
         "    },",
         "})",
+        "",
+        // Screens set up in the Display page, by output name (the rest keep monitors.lua's
+        // "preferred"); one that isn't safe to write is left out.
+        ...Object.entries(v.monitors || {}).map(([output, setup]) => DisplayModes.lua(output, setup)).filter(l => l !== ""),
         "",
         "-- Read by positions.lua.",
         `ShellSettings = { remember_positions = ${v.rememberPositions !== false} }`,

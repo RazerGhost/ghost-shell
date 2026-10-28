@@ -13,6 +13,7 @@ Row {
     // Past the last value comes the first again (times of day go round).
     property bool wrap
     property string label // what screen readers announce
+    property int valueWidth: Theme.settings.stepper
 
     signal picked(var value)
 
@@ -51,7 +52,7 @@ Row {
 
     Text {
         anchors.verticalCenter: parent.verticalCenter
-        width: Theme.settings.stepper
+        width: root.valueWidth
         horizontalAlignment: Text.AlignHCenter
         text: root.format(root.value)
         color: root.enabled ? Colors.m3onSurface : Colors.m3onSurfaceVariant

@@ -45,7 +45,7 @@ Singleton {
         { id: "appearance", section: "Personalize", icon: "palette", title: "Appearance",
           words: "wallpaper colors theme glass blur style frost acrylic transparent see-through border corners rounding" },
         { id: "display", section: "Personalize", icon: "brightness_6", title: "Display",
-          words: "night light warm blue light schedule screen" },
+          words: "night light warm blue light schedule screen monitor resolution refresh rate hz scale rotation rotate vrr adaptive sync" },
         { id: "lock", section: "Personalize", icon: "lock", title: "Lock screen",
           words: "login greeter picture blur darken clock date name power buttons" },
         { id: "windows", section: "System", icon: "select_window", title: "Windows",

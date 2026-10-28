@@ -84,6 +84,9 @@ Singleton {
             property int rounding: 10            // window corners
             property string blurStyle: "kawase"  // Hyprland's blur variant (HyprlandConfig.js lists them)
             property bool wobble: false          // windows wobble while moved or resized
+            // Screens set up in Settings -> Display, by output name: { mode, scale, transform, vrr }
+            // (settings/DisplayModes.js); the others use monitors.lua's "preferred".
+            property var monitors: ({})
             property bool rememberPositions: true // floating apps reopen where they were (positions.lua)
 
             // Desktop entry ids of the apps Super+Enter, Super+B and Super+E open, and of the apps

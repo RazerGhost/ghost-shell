@@ -39,6 +39,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   is cut off at the box, not moved.
 - Hyprland runs Lua 5.5. `hyprctl eval '<lua>'` runs code in the config's state; `hyprctl repl
   'return x'` prints a value, but prints "unknown request" for an empty string.
+- `hyprctl eval 'hl.monitor({ output = "eDP-1", mode = "1920x1080@60", position = "auto", scale = 1,
+  transform = 0, vrr = 2 })'` changes the screen at once (verified 165 -> 60 -> 165 Hz on the
+  laptop); a `hyprctl reload` goes back to what the config files say.
 - Hyprland 0.57 (running since 2026-10-28): `hl.on("window.minimize", function(window, minimize))`
   fires for foreign-toplevel requests (a toplevel's `minimized = true` in Quickshell's
   `ToplevelManager` triggers it; verified) and apps that ask. GTK apps grey their minimize button

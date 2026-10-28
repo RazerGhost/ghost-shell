@@ -1,12 +1,182 @@
 import QtQuick
+import Quickshell
+import Quickshell.Io
 import qs.services
 import qs.theme
 import qs.widgets
 import "../services/Schedule.js" as Schedule
+import "DisplayModes.js" as DisplayModes
 
-// Display: night light (on/off, how warm, and an optional daily schedule).
+// Display: each screen's resolution and refresh rate, scale, rotation and variable refresh rate;
+// night light (on/off, how warm, and an optional daily schedule).
+//
+// A screen change is tried live (`hyprctl eval` of an `hl.monitor` call) and only saved when
+// "Keep" is clicked; otherwise it goes back after 15 s, so a mode the screen can't show undoes
+// itself. Saved setups go to shell-settings.lua (HyprlandConfig.js) and override monitors.lua.
 Column {
+    id: root
+
+    property var monitors: [] // `hyprctl monitors -j`, re-read each time the page is shown
+    // The change being tried: { output, setup, previous }, or null.
+    property var trial: null
+    property int secondsLeft
+
+    function apply(output: string, setup: var): void {
+        const lua = DisplayModes.lua(output, setup);
+        if (lua !== "")
+            Quickshell.execDetached(["hyprctl", "eval", lua]);
+    }
+
+    // Further changes to the same screen keep the setup from before the first one to go back to.
+    function tryOut(output: string, current: var, change: var): void {
+        const setup = Object.assign({}, current, change);
+        trial = { output: output, setup: setup, previous: trial ? trial.previous : current };
+        secondsLeft = 15;
+        countdown.restart();
+        apply(output, setup);
+    }
+
+    function keep(): void {
+        countdown.stop();
+        Settings.values.monitors = Object.assign({}, Settings.values.monitors, { [trial.output]: trial.setup });
+        trial = null;
+        read.running = true;
+    }
+
+    function revert(): void {
+        countdown.stop();
+        apply(trial.output, trial.previous);
+        trial = null;
+        read.running = true;
+    }
+
     spacing: Theme.spacing.l
+    onVisibleChanged: {
+        if (visible)
+            read.running = true;
+    }
+    Component.onCompleted: read.running = true
+    // Closing the settings window mid-try goes back rather than keeping an unconfirmed mode.
+    Component.onDestruction: {
+        if (trial)
+            revert();
+    }
+
+    Process {
+        id: read
+        command: ["hyprctl", "monitors", "-j"]
+        stdout: StdioCollector {
+            onStreamFinished: root.monitors = JSON.parse(text)
+        }
+    }
+
+    Timer {
+        id: countdown
+        interval: 1000
+        repeat: true
+        onTriggered: {
+            root.secondsLeft--;
+            if (root.secondsLeft <= 0)
+                root.revert();
+        }
+    }
+
+    SettingGroup {
+        visible: root.trial !== null
+        title: "Keep these display settings?"
+
+        SettingRow {
+            title: "Going back in " + root.secondsLeft + " s"
+            subtitle: "If the screen looks wrong, wait and it changes back"
+
+            Row {
+                spacing: Theme.spacing.s
+
+                TextButton {
+                    text: "Go back"
+                    onClicked: root.revert()
+                }
+
+                TextButton {
+                    text: "Keep"
+                    filled: true
+                    onClicked: root.keep()
+                }
+            }
+        }
+    }
+
+    Repeater {
+        model: root.monitors
+
+        SettingGroup {
+            id: screen
+
+            required property var modelData
+            readonly property string output: modelData.name
+            readonly property bool trying: root.trial?.output === output
+            // What the steppers show: the change being tried, else what the screen runs now.
+            readonly property var setup: trying ? root.trial.setup
+                : DisplayModes.current(modelData, Settings.values.monitors[output]?.vrr)
+            readonly property var modes: DisplayModes.modes(modelData.availableModes).reverse()
+
+            title: output.startsWith("eDP") ? "Built-in screen" : (modelData.description || output)
+            // One screen at a time: another one waits until this try is kept or undone.
+            enabled: root.trial === null || trying
+
+            SettingRow {
+                title: "Resolution and refresh rate"
+
+                Stepper {
+                    label: "Resolution and refresh rate"
+                    valueWidth: Theme.settings.stepperWide
+                    values: screen.modes.map(m => m.mode)
+                    value: screen.setup.mode
+                    format: v => screen.modes.find(m => m.mode === v)?.label ?? v
+                    onPicked: v => root.tryOut(screen.output, screen.setup, { mode: v })
+                }
+            }
+
+            SettingRow {
+                title: "Scale"
+                subtitle: "Makes everything bigger; Hyprland rounds to the nearest size that fits"
+
+                Stepper {
+                    label: "Scale"
+                    values: [1, 1.25, 1.5, 1.75, 2]
+                    value: screen.setup.scale
+                    format: v => Math.round(v * 100) + " %"
+                    onPicked: v => root.tryOut(screen.output, screen.setup, { scale: v })
+                }
+            }
+
+            SettingRow {
+                title: "Rotation"
+
+                Stepper {
+                    label: "Rotation"
+                    values: [0, 1, 2, 3] // Hyprland's transforms without the flipped ones
+                    wrap: true
+                    value: screen.setup.transform
+                    format: v => ["Normal", "90°", "180°", "270°"][v] ?? "Flipped"
+                    onPicked: v => root.tryOut(screen.output, screen.setup, { transform: v })
+                }
+            }
+
+            SettingRow {
+                title: "Variable refresh rate"
+                subtitle: "Smoother games on screens that support it"
+
+                Stepper {
+                    label: "Variable refresh rate"
+                    values: [0, 2, 1]
+                    value: screen.setup.vrr
+                    format: v => ({ 0: "Off", 1: "Always", 2: "Fullscreen" })[v] ?? "Off"
+                    onPicked: v => root.tryOut(screen.output, screen.setup, { vrr: v })
+                }
+            }
+        }
+    }
 
     SettingGroup {
         SettingRow {

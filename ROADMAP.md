@@ -368,7 +368,7 @@ command, modules with local overrides, docs; not CI checks).
 
 ### Settings reorganized (built 2026-10-28; waiting on the user's test results)
 User's choice: a grouped sidebar with search. Personalize: Appearance (wallpaper, glass, window
-border and corners), Display (night light; room for monitor settings), Lock screen. System:
+border and corners), Display (screens, night light), Lock screen. System:
 Windows (gaps, hot corner, reopen floating apps), Notifications (Do Not Disturb), Power (idle and
 sleep), Keyboard and mouse. Apps: Default apps, Keybinds, Weather and clock (the weather town, and
 a 24-hour setting now shared by the island and the lock screen: `clock24Hour`, was `lock24Hour`).
@@ -437,6 +437,15 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   Not a plain "off": a laptop without its touchpad and no mouse can't easily get it back.
 - No keyboard backlight control: the Omen's RGB keyboard isn't exposed to Linux (no
   `kbd_backlight` LED) without HP's own tools.
+
+### Display settings (built 2026-10-28; waiting on the user's test results)
+- Settings -> Display, per screen: resolution and refresh rate (from `hyprctl monitors -j`), scale,
+  rotation and variable refresh rate (off, fullscreen only, always; `DisplayModes.js`, tested). A
+  change is tried live (`hyprctl eval` of an `hl.monitor` call) with "Keep these display
+  settings?": it goes back after 15 s unless kept, so a mode the screen can't show undoes itself.
+  Kept setups are saved in `monitors` in settings.json and written to `shell-settings.lua`, which
+  overrides monitors.lua's "preferred". Positions stay "auto": arranging several screens isn't
+  built (only the laptop's screen to test with).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

@@ -38,6 +38,15 @@ TestCase {
         verify(HyprlandConfig.lua(Object.assign({}, defaults, { blurStyle: "water" })).includes('variant = "kawase"'));
     }
 
+    function test_monitors() {
+        const lua = HyprlandConfig.lua(Object.assign({}, defaults, { monitors: {
+            "eDP-1": { mode: "1920x1080@60", scale: 1, transform: 0, vrr: 0 },
+            'bad" })': { mode: "1920x1080@60", scale: 1, transform: 0, vrr: 0 }
+        } }));
+        verify(lua.includes('hl.monitor({ output = "eDP-1", mode = "1920x1080@60"'));
+        verify(!lua.includes("bad"));
+    }
+
     function test_badNumbersFallBack() {
         const lua = HyprlandConfig.lua(Object.assign({}, defaults, { gapsIn: "lots", rounding: NaN }));
         verify(lua.includes("gaps_in     = 5,"));
