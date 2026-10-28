@@ -9,6 +9,7 @@ import qs.idle
 import qs.launcher
 import qs.lock
 import qs.osd
+import qs.polkit
 import qs.settings
 import qs.snap
 import qs.switcher
@@ -21,6 +22,7 @@ ShellRoot {
     Launcher {}
     Lock {}
     LoginScreenSync {}
+    PolkitPrompt {}
     Osd {}
     SnapPicker {}
     SnapAssist {}

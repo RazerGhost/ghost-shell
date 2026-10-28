@@ -225,6 +225,30 @@ choice).
 - The wallpaper list moved from the island's picker into `services/Wallpaper.qml`
   (`pictures`, `rescan()`), shared by the picker and this page.
 
+### Quickshell additions (built 2026-10-28; waiting on the user's test results)
+From a survey of every Quickshell 0.3.2 type and the quickshell-examples repo (user: "do all").
+- Quick settings: a **Sound** tile and page (output device, microphone, per-app volume:
+  `controlcenter/SoundPage.qml`) and **Keep awake** (`services/KeepAwake.qml`, an
+  `IdleInhibitor` on the island windows). The menu got too long, so (user's choice) Wi-Fi,
+  Bluetooth, Sound and Power mode stay wide tiles and microphone, Do Not Disturb, night light
+  and keep awake are round buttons (`RoundToggle`, Android 16 style).
+- Media menu: shuffle and repeat buttons; clicking the cover focuses the player's window.
+- App shortcuts (.desktop actions) in the dock's right-click menu and in the launcher, ranked
+  with the apps (`Fuzzy.results`, tested).
+- The island's music bars follow the speakers' real level (`PwNodePeakMonitor`).
+- The island reports shell reloads and their errors (replaces Quickshell's pop-up).
+- Quick reply for notifications that offer it (`inline-reply`).
+- `ScriptModel` for lists that change while shown; `PersistentProperties` keeps the open island
+  menu and the settings window across reloads.
+- **Quickshell is the polkit agent** (`polkit/PolkitPrompt.qml`): apps' password prompts are a
+  card over the dimmed screen. `hyprpolkitagent` had failed at every login (started before
+  Wayland was up), so there was no agent at all; it's no longer started (`autostart.lua`), but
+  stays installed: if the shell is down, `systemctl --user start hyprpolkitagent` brings it back.
+- Skipped, with reasons: global shortcuts instead of `qs ipc` binds (a call takes ~27 ms, not
+  noticeable, and the binds would lose their fallback when the shell is down); `LazyLoader`
+  (nothing measurable to gain); hibernate, i3/X11, sockets (not relevant). Bluetooth device
+  batteries were already in the Bluetooth page.
+
 ## Decisions made
 
 - **External monitors:** keep the RTX in `AQ_DRM_DEVICES` (second, after the iGPU), so outputs wired

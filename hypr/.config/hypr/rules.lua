@@ -104,3 +104,13 @@ hl.layer_rule({
     ignore_alpha = 0.3,
     animation    = "slide bottom",
 })
+
+-- Password prompt for apps (polkit): the card is blurred, not the dimmed screen around it
+-- (the dimming is 40% opaque, under ignore_alpha), and it fades in.
+hl.layer_rule({
+    name  = "qs-polkit",
+    match = { namespace = "^qs-polkit$" },
+    blur         = true,
+    ignore_alpha = 0.5,
+    animation    = "fade",
+})

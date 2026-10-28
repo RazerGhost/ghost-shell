@@ -165,6 +165,18 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `FileView` per file), each with `modelData`.
 - An `IpcHandler` exposes every function and property declared inside it (it scans its own
   QML type), so keep helpers outside it.
+- `ScriptModel { values }` needs a JS array: spread a typed QML list (`[...list]`). Without
+  `objectProp` it compares values structurally, so a recomputed but equal list changes nothing.
+- `PwNodePeakMonitor { node: Pipewire.defaultAudioSink }` measures what plays through the speakers
+  (`peaks` per channel, `peak`; 0-1); `enabled` turns it off.
+- `PolkitAgent` registers as the session's polkit agent (`isRegistered`); only one agent can.
+  `flow` (`AuthFlow`): `message`, `iconName`, `selectedIdentity.displayName`, `inputPrompt`,
+  `responseVisible`, `isResponseRequired`, `supplementaryMessage`/`supplementaryIsError`,
+  `submit()`, `cancelAuthenticationRequest()`. `pkexec true` is a harmless test.
+- `IdleInhibitor { window; enabled }` (`Quickshell.Wayland`). `hyprctl clients -j` shows
+  `inhibitingIdle` per window (Vesktop holds one during voice).
+- Notifications: `NotificationServer.inlineReplySupported`, `Notification.hasInlineReply`,
+  `sendInlineReply(text)` (an `inline-reply` action over D-Bus).
 - `qs ipc call` exits 0 even for an unknown target, but non-zero when no shell is running.
 - `hyprctl hyprsunset temperature` prints the last temperature set, also after `identity`, so it
   doesn't tell whether night light is on.
