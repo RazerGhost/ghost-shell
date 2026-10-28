@@ -122,6 +122,13 @@ PanelWindow {
     // made Hyprland drop the focus grab right after it started, closing the menu at once.
     WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
+    // "Keep awake" in quick settings: Hyprland holds off idling while a visible surface asks it
+    // to, and the island is always visible.
+    IdleInhibitor {
+        window: root
+        enabled: KeepAwake.on
+    }
+
     // Closes the menu when you click any other window or surface.
     HyprlandFocusGrab {
         windows: [root]

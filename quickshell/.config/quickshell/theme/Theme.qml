@@ -67,6 +67,7 @@ Singleton {
 
     readonly property QtObject tile: QtObject {
         readonly property int height: 64
+        readonly property int round:  52 // the round on/off buttons under the tiles
     }
 
     readonly property QtObject slider: QtObject {

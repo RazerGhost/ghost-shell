@@ -6,18 +6,19 @@ import qs.theme
 import qs.widgets
 
 // The quick settings menu: tiles, volume and brightness sliders, battery and tray.
-// The Wi-Fi and Bluetooth tiles slide in a page of their own, like Android.
+// The Wi-Fi, Bluetooth and Sound tiles slide in a page of their own, like Android.
 Item {
     id: root
 
-    property string page: "main" // "main", "wifi" or "bluetooth"
+    property string page: "main" // "main", "wifi", "bluetooth" or "sound"
 
     // A button here opens another island menu ("power", "wallpaper").
     signal openMenu(string menu)
     readonly property int padding: Theme.spacing.l
 
     // The island grows and shrinks to fit the current page.
-    implicitHeight: (page === "wifi" ? wifiPage : page === "bluetooth" ? bluetoothPage : mainPage).implicitHeight
+    implicitHeight: (page === "wifi" ? wifiPage : page === "bluetooth" ? bluetoothPage
+                     : page === "sound" ? soundPage : mainPage).implicitHeight
                     + padding
     clip: true // pages slide in from the side
 
@@ -66,6 +67,16 @@ Item {
                 onClicked: root.page = "bluetooth"
             }
 
+            Tile {
+                width: parent.tileWidth
+                icon: Audio.icon
+                title: "Sound"
+                subtitle: Audio.sink ? Audio.deviceName(Audio.sink) : "No output"
+                active: !Audio.muted
+                hasPage: true
+                onClicked: root.page = "sound"
+            }
+
             // power-profiles-daemon. Cycles power saver -> balanced -> performance.
             Tile {
                 width: parent.tileWidth
@@ -89,31 +100,42 @@ Item {
                 }
             }
 
-            Tile {
-                width: parent.tileWidth
+        }
+
+        // The simple on/off settings, as round buttons (Android 16's small tiles).
+        Row {
+            id: toggles
+
+            width: parent.width
+            // Spread evenly: the gaps share what the buttons leave.
+            spacing: (width - Theme.tile.round * 4) / 3
+
+            RoundToggle {
                 icon: Audio.micMuted ? "mic_off" : "mic"
-                title: "Microphone"
-                subtitle: Audio.micMuted ? "Muted" : "On"
+                title: Audio.micMuted ? "Microphone muted" : "Microphone on"
                 active: !Audio.micMuted
                 onClicked: Audio.toggleMicMute()
             }
 
-            Tile {
-                width: parent.tileWidth
+            RoundToggle {
                 icon: Notifications.doNotDisturb ? "do_not_disturb_on" : "do_not_disturb_off"
                 title: "Do Not Disturb"
-                subtitle: Notifications.doNotDisturb ? "On" : "Off"
                 active: Notifications.doNotDisturb
                 onClicked: Notifications.doNotDisturb = !Notifications.doNotDisturb
             }
 
-            Tile {
-                width: parent.tileWidth
+            RoundToggle {
                 icon: NightLight.on ? "nightlight" : "light_mode"
                 title: "Night light"
-                subtitle: NightLight.on ? "On" : "Off"
                 active: NightLight.on
                 onClicked: NightLight.toggle()
+            }
+
+            RoundToggle {
+                icon: "coffee"
+                title: "Keep awake"
+                active: KeepAwake.on
+                onClicked: KeepAwake.on = !KeepAwake.on
             }
         }
 
@@ -215,6 +237,17 @@ Item {
         x: root.page === "bluetooth" ? root.padding : root.width
         width: root.width - root.padding * 2
         active: root.visible && root.page === "bluetooth"
+        onBack: root.page = "main"
+
+        Behavior on x {
+            NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }
+        }
+    }
+
+    SoundPage {
+        id: soundPage
+        x: root.page === "sound" ? root.padding : root.width
+        width: root.width - root.padding * 2
         onBack: root.page = "main"
 
         Behavior on x {

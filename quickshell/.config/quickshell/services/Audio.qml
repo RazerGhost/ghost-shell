@@ -18,6 +18,13 @@ Singleton {
                                  : volume < 0.5 ? "volume_down"
                                  : "volume_up"
 
+    // A short name for a speaker or microphone. Built-in sound cards have long names ("Ryzen HD
+    // Audio Controller Speaker") but a short profile name ("Speaker"); Bluetooth devices only
+    // have their own name, which is short already. The node must be tracked (PwObjectTracker).
+    function deviceName(node: PwNode): string {
+        return node?.properties["device.profile.description"] || node?.description || node?.nickname || node?.name || "";
+    }
+
     // Matches the cap in the volume keybinds (wpctl -l 1).
     function setVolume(value: real): void {
         if (sink?.audio)
