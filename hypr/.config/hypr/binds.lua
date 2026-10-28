@@ -19,7 +19,7 @@ hl.bind(mainMod .. " + Return",  hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + E",       hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(terminal .. " -e yazi"))
 hl.bind(mainMod .. " + B",       hl.dsp.exec_cmd(browser))
-hl.bind(mainMod .. " + Z",       hl.dsp.exec_cmd(editor))
+hl.bind(mainMod .. " + SHIFT + Z", hl.dsp.exec_cmd(editor))
 
 -- Island menus
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("qs ipc call island toggle settings")) -- quick settings
@@ -47,7 +47,12 @@ hl.bind(mainMod .. " + F",    hl.dsp.window.fullscreen({ mode = "fullscreen", ac
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit")) -- dwindle only
 
--- Focus with arrow keys (Super+Left/Right stay free for Phase 6's snapping)
+-- Snapping (Windows 11 style): halves directly, every layout in a picker over the window.
+hl.bind(mainMod .. " + left",  hl.dsp.exec_cmd("qs ipc call snap active left"))
+hl.bind(mainMod .. " + right", hl.dsp.exec_cmd("qs ipc call snap active right"))
+hl.bind(mainMod .. " + Z",     hl.dsp.exec_cmd("qs ipc call snap picker"))
+
+-- Focus with arrow keys
 hl.bind(mainMod .. " + CTRL + left",  hl.dsp.focus({ direction = "left" }))
 hl.bind(mainMod .. " + CTRL + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mainMod .. " + CTRL + up",    hl.dsp.focus({ direction = "up" }))

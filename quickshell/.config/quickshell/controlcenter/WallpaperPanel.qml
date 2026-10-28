@@ -6,10 +6,10 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// The wallpaper picker, wider than the other menus: a row of your pictures from
-// ~/Pictures/Wallpapers, then a row of the built-in ones that come with Hyprland and CachyOS
-// (from their packages, so they're not copied anywhere). Both scroll sideways (the mouse wheel
-// too). Click one to use it; the colors follow the picture.
+// The wallpaper picker: the island stretches across the whole top edge and shows one row of
+// pictures, scrolling sideways (the mouse wheel too). Your pictures from ~/Pictures/Wallpapers
+// come first, then the built-in ones that come with Hyprland and CachyOS (from their packages,
+// so they're not copied anywhere). Click one to use it; the colors follow the picture.
 Column {
     id: root
 
@@ -18,11 +18,11 @@ Column {
     property bool opened: false
 
     readonly property real contentWidth: width - leftPadding - rightPadding
-    readonly property real thumbWidth: (contentWidth - Theme.spacing.s * (Theme.wallpaper.columns - 1)) / Theme.wallpaper.columns
-    readonly property real thumbHeight: thumbWidth * 9 / 16
+    readonly property real thumbHeight: Theme.wallpaper.thumbHeight
+    readonly property real thumbWidth: thumbHeight * 16 / 9
 
-    // The pictures in a FolderListModel as { filePath, fileName }, so the two built-in folders
-    // can share one strip.
+    // The pictures in a FolderListModel as { filePath, fileName }, so all three folders can
+    // share one row.
     function files(model: FolderListModel): var {
         const list = [];
         for (let i = 0; i < model.count; i++)
@@ -109,12 +109,6 @@ Column {
         }
     }
 
-    component SectionTitle: Text {
-        color: Colors.m3onSurfaceVariant
-        font.family: Theme.font.sans
-        font.pixelSize: Theme.font.small
-    }
-
     // Title, with a button to open your folder (to add pictures).
     Item {
         width: root.contentWidth
@@ -122,7 +116,9 @@ Column {
 
         Text {
             anchors.verticalCenter: parent.verticalCenter
-            text: "Wallpapers"
+            textFormat: Text.StyledText
+            text: "Wallpapers" + (yours.count === 0
+                  ? "<font color='" + Colors.m3onSurfaceVariant + "'>  ·  add your own to ~/Pictures/Wallpapers</font>" : "")
             color: Colors.m3onSurface
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.normal
@@ -137,43 +133,18 @@ Column {
         }
     }
 
-    SectionTitle {
-        text: yours.count > 0 ? "Your pictures" : "Your pictures: none yet. Put some in ~/Pictures/Wallpapers (Open folder)."
-    }
-
     ListView {
-        visible: yours.count > 0
         width: root.contentWidth
         height: root.thumbHeight
         orientation: ListView.Horizontal
         spacing: Theme.spacing.s
         clip: true
         boundsBehavior: Flickable.StopAtBounds
-        model: root.files(yours) // re-read when the folder changes (files() reads its count)
+        // files() reads each folder's count, so the row updates when a folder changes.
+        model: root.files(yours).concat(root.files(hyprland), root.files(cachyos))
         delegate: Thumbnail {}
 
         Accessible.role: Accessible.List
-        Accessible.name: "Your pictures"
-    }
-
-    SectionTitle {
-        topPadding: Theme.spacing.xs
-        visible: hyprland.count + cachyos.count > 0
-        text: "Built-in (Hyprland and CachyOS)"
-    }
-
-    ListView {
-        visible: hyprland.count + cachyos.count > 0
-        width: root.contentWidth
-        height: root.thumbHeight
-        orientation: ListView.Horizontal
-        spacing: Theme.spacing.s
-        clip: true
-        boundsBehavior: Flickable.StopAtBounds
-        model: root.files(hyprland).concat(root.files(cachyos))
-        delegate: Thumbnail {}
-
-        Accessible.role: Accessible.List
-        Accessible.name: "Built-in wallpapers"
+        Accessible.name: "Wallpapers"
     }
 }

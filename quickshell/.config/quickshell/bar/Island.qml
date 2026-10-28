@@ -77,8 +77,9 @@ Scope {
             // or nothing.
             readonly property string shown: open ? panel : popup ? "notification" : peek ? "peek-" + peek : ""
             readonly property bool expanded: shown !== ""
-            // The wallpaper picker is wider than the other menus.
-            readonly property real menuWidth: shown === "wallpaper" ? Theme.island.wideWidth : Theme.island.panelWidth
+            // The wallpaper picker stretches across the whole top edge; other menus are narrow.
+            readonly property real menuWidth: shown === "wallpaper" ? modelData.width - Theme.island.fillet * 2
+                                                                    : Theme.island.panelWidth
 
             // While music plays the middle of the island shows the music instead of the time.
             // Once the island opens (hover player or a menu) the time comes back, since the
@@ -127,7 +128,8 @@ Scope {
             // layer surface every animation frame would stutter. Only the island itself takes
             // input (mask); the rest is transparent and clicks go to the windows below.
             anchors.top: true
-            implicitWidth: Math.max(closedWidth, Theme.island.wideWidth) + Theme.island.fillet * 2
+            // As wide as the screen: the wallpaper picker spans it.
+            implicitWidth: modelData.width
             implicitHeight: Theme.island.maxHeight
             color: "transparent"
             mask: Region { item: island }
@@ -329,7 +331,7 @@ Scope {
 
                         WallpaperPanel {
                             id: wallpapers
-                            width: Theme.island.wideWidth
+                            width: window.menuWidth
                             anchors.horizontalCenter: parent.horizontalCenter
                             opacity: window.shown === "wallpaper" ? 1 : 0
                             visible: opacity > 0

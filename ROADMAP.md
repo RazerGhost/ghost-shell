@@ -104,12 +104,13 @@ new setup step.
   into the previous window with `wtype` (user's choice). Parsing in `ClipboardEntries.js`, tested.
 - Wallpaper: Quickshell draws it on the background layer (`wallpaper/WallpaperLayer.qml`, fades
   in). The picker (`controlcenter/WallpaperPanel.qml`, wallpaper button in quick settings or
-  `qs ipc call island toggle wallpaper`) is wider than the other menus (user's choice) and shows
-  `~/Pictures/Wallpapers` (local folder only: the user prefers real photos or anime art and
-  picks them themselves), then a "Built-in" section: Hyprland's `/usr/share/hypr/wall*.png` and
+  `qs ipc call island toggle wallpaper`) stretches the island across the whole top edge (user's
+  choice: its own strip, not a menu; the bottom edge is kept free for a dock) with one row of
+  pictures: `~/Pictures/Wallpapers` first (local folder only: the user prefers real photos or
+  anime art and picks them themselves), then the built-in ones: Hyprland's `/usr/share/hypr/wall*.png` and
   the `cachyos-wallpapers` package (in packages.txt). Those stay in their packages, not in this
-  repo: their licensing is unclear (no artist credits) and they're ~200 MB. Both sections scroll
-  sideways in one row each (user's choice: horizontal, not vertical).
+  repo: their licensing is unclear (no artist credits) and they're ~200 MB. The row scrolls
+  sideways (user's choice: one horizontal row, own and built-in together).
   Thumbnails load the first time the picker opens. Choosing one runs matugen on it. The choice is saved in
   `~/.local/state/quickshell/wallpaper.json`; `qs ipc call wallpaper set <path>` and
   `./install.sh <image>` set it too. With none chosen, Hyprland's default wallpaper shows.
@@ -143,7 +144,7 @@ go back with Ctrl+Alt+F1 and unlock with your password.
 restarting): Ctrl+Alt+F2, log in, then switch greetd back to tuigreet and restart it:
 `sudo sed -i 's/^command = "env/# command = "env/; s/^# command = "tuigreet/command = "tuigreet/' /etc/greetd/config.toml && sudo systemctl restart greetd`.
 
-### Phase 6: Window switching + snap layouts
+### Phase 6: Window switching + snap layouts (snapping built; Alt+Tab in progress)
 Added at the user's request after researching Windows/macOS features (2026-10-28). The phase number
 isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
 - **Alt+Tab switcher** (Windows/macOS style): an overlay with a live thumbnail of every window
@@ -152,11 +153,11 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
   takes the keyboard (`Exclusive`) while open so it sees the Alt release. Check before building:
   whether Hyprland exposes focus order (`focusHistoryID` or similar) for MRU sorting, and how much
   live capture of many windows costs on battery (fall back to still frames if it's heavy).
-- **Snap layouts** (Windows 11 style): a small picker for the focused window with halves, quarters
-  and thirds; picking one moves and resizes the (floating) window into that area of the monitor,
-  minus the island's reserved zone and gaps. Check the Lua dispatchers for moving/resizing a window
-  (exact names, and pixels vs. percent) on wiki.hypr.land. Ask the user which key opens it (and
-  whether hovering a window's maximize area should too; Hyprland has no title bars, so probably not).
+- **Snapping** (built): Super+Left/Right snap the focused window to halves; Super+Z (Zed moved to
+  Super+Shift+Z) shows a picker (`snap/SnapPicker.qml`, its own card at the top center of the
+  window, not in the island: user's choice) with halves, quarters, thirds and two-thirds. The
+  window floats and gets an exact rectangle (`services/SnapLayout.js`, tested): the monitor minus
+  its reserved area (the island) and Hyprland's gaps, read with `hyprctl getoption`.
 - Later candidates from the same research, not planned yet: a macOS-style dock, an Exposé overview
   (3-finger swipe up / hot corner, reusing the switcher's thumbnails), an emoji picker, a snipping
   overlay. Not possible on Wayland: a global app menu. Hard: real minimize, Stage Manager.
@@ -243,9 +244,10 @@ fixed in config files should become settings.
   profile at startup (`on-switch = qs ipc call nightlight refresh`) and from the tile itself. The
   conf file shows how to add a schedule back.
 - **Island window height** is 840 px (was 680) so the "today" menu with notifications fits.
-- **Island menu widths:** menus are `Theme.island.panelWidth` (380) wide, the wallpaper picker
-  `wideWidth` (820); the island's window is as wide as the widest. Regular menus keep their width
-  and stay centered while the island is wider.
+- **Island menu widths:** menus are `Theme.island.panelWidth` (380) wide; the wallpaper picker
+  spans the screen, so the island's window is as wide as the screen. Regular menus keep their
+  width and stay centered while the island is wider.
+- **Bottom edge reserved for a dock** (the user plans one): nothing else goes there.
 - **Calendar locale:** `Qt.locale(Qt.uiLanguage)` (en_GB): the user has English UI with Dutch
   regional formats, and plain `Qt.locale()` gave Dutch day names next to English dates.
 - **No wallpaper yet:** `install.sh` with no argument generates colors from seed `#6750a4`, the same
@@ -369,6 +371,14 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   workspace = "special:x", follow = false })`, also `close`, `float`, `fullscreen({ mode =
   "maximized" | "fullscreen", action = "toggle" })`, `move({ x, y, relative })`;
   `hl.dsp.focus({ window = ... })`. A special workspace that's never toggled stays hidden.
+- `float({ action })` takes `"toggle"` (default), `"enable"`/`"on"`, `"disable"`/`"off"`; an
+  unknown value like `"set"` toggles. `fullscreen` uses `"set"`/`"unset"`. `resize({ window, x, y
+  })` and `move({ window, x, y })` take logical pixels (a 940x1004 resize gives exactly that).
+  Monitor `lastIpcObject.reserved` is `[left, top, right, bottom]` (after `refreshMonitors()`);
+  `hyprctl getoption general:gaps_out -j` gives `{ "css": "20 20 20 20" }` (top right bottom left).
+  `hyprctl clients -j` has `focusHistoryID` (0 = focused, then most recently used).
+- A singleton is only created when something uses it, so an `IpcHandler` inside one doesn't exist
+  until then ("Target not found"); put handlers in always-loaded components.
 - Scrolling: `WheelHandler` received no wheel events on the island's layer surface; a
   `MouseArea { acceptedButtons: Qt.NoButton; onWheel: ... }` under the content works and lets
   clicks through. Wheel events pass through MouseAreas that have no `onWheel`.

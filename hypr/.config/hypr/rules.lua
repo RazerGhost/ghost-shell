@@ -56,6 +56,15 @@ hl.layer_rule({
     no_anim = true,
 })
 
+-- Snap picker: blurred, pops in over the window it snaps.
+hl.layer_rule({
+    name  = "qs-snap",
+    match = { namespace = "^qs-snap$" },
+    blur         = true,
+    ignore_alpha = 0.3,
+    animation    = "popin 90%",
+})
+
 -- Launcher: blurred, pops in from its center.
 hl.layer_rule({
     name  = "qs-launcher",

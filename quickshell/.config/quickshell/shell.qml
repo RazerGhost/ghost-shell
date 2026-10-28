@@ -6,6 +6,7 @@ import qs.bar
 import qs.launcher
 import qs.lock
 import qs.osd
+import qs.snap
 import qs.wallpaper
 
 ShellRoot {
@@ -14,4 +15,5 @@ ShellRoot {
     Launcher {}
     Lock {}
     Osd {}
+    SnapPicker {}
 }

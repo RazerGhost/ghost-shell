@@ -60,7 +60,6 @@ Singleton {
         readonly property int fillet:     14  // radius of the concave joins to the screen edge
         readonly property int openRadius: 32  // bottom corners when open (closed: half the height)
         readonly property int panelWidth: 380 // width of the open menus
-        readonly property int wideWidth:  820 // the wallpaper picker, wider for its grid
         // Height of the island's window. The open island never grows past this; the rest of
         // the window is transparent and lets clicks through.
         readonly property int maxHeight:  840
@@ -95,6 +94,10 @@ Singleton {
         readonly property int menuArt:     160  // cover in the media menu
     }
 
+    readonly property QtObject snap: QtObject {
+        readonly property int width: 56 // one layout picture in the snap picker (16:9)
+    }
+
     readonly property QtObject lock: QtObject {
         readonly property int clock:      112 // the big clock
         readonly property int fieldWidth: 340 // password field
@@ -102,7 +105,7 @@ Singleton {
     }
 
     readonly property QtObject wallpaper: QtObject {
-        readonly property int columns: 4 // thumbnails visible side by side in the picker
+        readonly property int thumbHeight: 120 // thumbnails in the picker (16:9)
     }
 
     readonly property QtObject clipboard: QtObject {
