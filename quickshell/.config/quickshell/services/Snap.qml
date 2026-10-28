@@ -21,6 +21,9 @@ Singleton {
     // Super+Down puts it back there. Snapping a snapped window elsewhere keeps the original; a
     // window moved by hand since gets its new spot remembered. Forgotten when the window closes.
     property var saved: ({})
+    // The layout each window was last snapped to, by address, so a change of gaps can place the
+    // ones still there again (see the gaps Process below).
+    property var layouts: ({})
     // Callbacks waiting for `hyprctl clients -j` (see geometry()).
     property var pending: []
 
@@ -61,15 +64,31 @@ Singleton {
             return;
         }
         delete saved[window.address];
+        delete layouts[window.address];
         Windows.run(window, "resize", `x = ${before.size[0]}, y = ${before.size[1]}`);
         Windows.run(window, "move", `x = ${before.at[0]}, y = ${before.at[1]}`);
     }
 
     function place(window: HyprlandToplevel, layout: string): void {
+        layouts[window.address] = layout;
         const r = rect(window.monitor, layout);
         Windows.run(window, "float", `action = "enable"`);
         Windows.run(window, "resize", `x = ${r.width}, y = ${r.height}`);
         Windows.run(window, "move", `x = ${r.x}, y = ${r.y}`);
+    }
+
+    // The gaps changed (settings window): windows still exactly where they were snapped with the
+    // old gaps move to the same layout with the new ones. Ones moved by hand since stay put.
+    function replaceSnapped(oldOut: var, oldIn: int): void {
+        for (const window of Windows.recent) {
+            const layout = layouts[window.address];
+            const info = window.lastIpcObject;
+            if (!layout || !info?.at || !window.monitor)
+                continue;
+            const geometry = { at: info.at, size: info.size };
+            if (SnapLayout.snappedLayout(geometry, area(window.monitor), oldOut, oldIn) === layout)
+                place(window, layout);
+        }
     }
 
     // Where `layout` is on `monitor`, in global logical pixels.
@@ -95,8 +114,10 @@ Singleton {
         target: Hyprland
 
         function onRawEvent(event): void {
-            if (event.name === "closewindow")
+            if (event.name === "closewindow") {
                 delete root.saved[event.data];
+                delete root.layouts[event.data];
+            }
         }
     }
 
@@ -160,8 +181,11 @@ Singleton {
                 // Two JSON objects, one per line: { "option": ..., "css": "20 20 20 20" }.
                 try {
                     const [out, inner] = text.trim().split("\n").map(line => JSON.parse(line));
+                    const oldOut = root.gapsOut;
+                    const oldIn = root.gapsIn;
                     root.gapsOut = SnapLayout.parseGaps(out.css);
                     root.gapsIn = SnapLayout.parseGaps(inner.css).top;
+                    root.replaceSnapped(oldOut, oldIn);
                 } catch (e) {
                     console.warn("Snap: couldn't read Hyprland's gaps, using defaults: " + e.message);
                 }

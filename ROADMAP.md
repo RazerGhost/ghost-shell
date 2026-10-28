@@ -222,7 +222,8 @@ config files became settings.
     speed) and **Windows** (gaps, border, corners, apps reopening where they were): Hyprland
     options, written to the generated `hypr/shell-settings.lua` (gitignored, loaded last by
     hyprland.lua; `settings/HyprlandSettings.qml` + tested `HyprlandConfig.js`) and applied with
-    `hyprctl reload` only when the content changes. Snapping re-reads the gaps. The login screen
+    `hyprctl reload` only when the content changes. The gaps only apply to snapped windows
+    (everything floats); snapped windows move along when they change. The login screen
     gets the file through the shared folder (keyboard layout).
   - **Keybinds:** read from Hyprland (`hyprctl binds -j`, every bind in `binds.lua` has a
     description), grouped per description (`settings/Keybinds.js`, tested).
