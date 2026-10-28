@@ -67,6 +67,7 @@ its setup (`setup.sh`).
 |---|---|
 | `core` | Hyprland, the shell, fonts and themes, the login screen, the colors |
 | `system` | this laptop's GPU rule, boot options, greetd and services |
+| `snapshots` | Btrfs snapshots: the system's before and after every update (bootable), your home folder hourly |
 | `apps` | terminal, editor, files, pictures, video, music, browser |
 | `dev` | languages, package managers and Docker |
 | `gaming` | Steam, Proton, Lutris, Heroic, MangoHud; Steam's theme |

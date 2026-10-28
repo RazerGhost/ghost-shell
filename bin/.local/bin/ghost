@@ -22,10 +22,11 @@ cd "$repo"
 . modules/lib.sh
 
 # In the order they're set up: core first (configs, colors), the apps after it.
-all_modules=(core system apps dev gaming discord spotify zen haunt capture phone)
+all_modules=(core system snapshots apps dev gaming discord spotify zen haunt capture phone)
 declare -A about=(
     [core]="Hyprland, the shell, fonts and themes, the login screen, the colors"
     [system]="this laptop's GPU rule, boot options, greetd and services (sudo)"
+    [snapshots]="Btrfs snapshots: the system's at every update, your home hourly (sudo)"
     [apps]="terminal, editor, files, pictures, video, music, browser"
     [dev]="languages, package managers and Docker"
     [gaming]="Steam, Proton, Lutris, Heroic, MangoHud; Millennium's theme"
@@ -145,7 +146,7 @@ cmd_modules() {
     for m in "${all_modules[@]}"; do
         mark=" "
         grep -qx "$m" <<<"$chosen" && mark="*"
-        printf '  %s %-8s %s\n' "$mark" "$m" "${about[$m]}"
+        printf '  %s %-9s %s\n' "$mark" "$m" "${about[$m]}"
     done
 }
 

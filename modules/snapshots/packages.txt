@@ -1,0 +1,8 @@
+# Btrfs snapshots: snapper with snap-pac (a snapshot before and after every pacman transaction),
+# limine-snapper-sync (bootable snapshots in the boot menu), Btrfs Assistant (browse and restore).
+# pacman packages; # lines and blank lines are skipped.
+
+snapper
+snap-pac
+limine-snapper-sync
+btrfs-assistant
