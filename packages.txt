@@ -39,6 +39,7 @@ greetd-tuigreet
 steam
 git
 nodejs
+npm
 pnpm
 rustup
 bun

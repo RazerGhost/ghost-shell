@@ -1,6 +1,6 @@
 # matugen: generates Material colors from the wallpaper and writes them through the templates below.
-# This is the single source of truth for colors in Quickshell, Hyprland, Ghostty, GTK, Yazi and
-# Spotify (the Ghost Spicetify theme).
+# This is the single source of truth for colors in Quickshell, Hyprland, Ghostty, GTK, Yazi,
+# Spotify (the Ghost Spicetify theme) and Discord (the Ghost Vencord plugin in Vesktop).
 #
 # Run: matugen image <wallpaper> -m dark --source-color-index 0
 # (--source-color-index 0 skips the interactive prompt when an image yields several source colors)
@@ -45,3 +45,10 @@ output_path = '~/.config/yazi/theme.toml'
 input_path  = 'templates/spicetify-ghost.ini'
 output_path = '~/.local/state/matugen/spicetify-ghost.ini'
 post_hook   = 'sh ~/.config/matugen/hooks/spicetify-ghost.sh'
+
+[templates.vesktop]
+# Discord in Vesktop: the Ghost plugin reads these (Accent "From matugen", "Colours from matugen").
+# Vencord watches its themes folder, so open Vesktop windows update live; no hook needed.
+# install.sh turns the theme on in Vencord's settings.
+input_path  = 'templates/vesktop-ghost.css'
+output_path = '~/.config/vesktop/themes/ghost-matugen.css'

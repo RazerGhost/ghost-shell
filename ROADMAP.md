@@ -33,7 +33,7 @@ new setup step.
   Aesthetic reference: saneAspect's Hyprland/Quickshell builds (clean, rounded, Material-ish, subtle
   animations).
 - **Colors:** matugen from the wallpaper is the single source of truth for Quickshell, Hyprland borders,
-  Ghostty, GTK, Yazi and Spotify (Ghost theme). Dark mode by default.
+  Ghostty, GTK, Yazi, Spotify (Ghost theme) and Discord (Ghost plugin). Dark mode by default.
 - **Icons:** Material Symbols (`Material Symbols Rounded`), outline at weight 300 (user's choice after comparing styles, 2026-10-28: filled made the few symbols with a solid variant look heavy; light sits closer to the Colloid app icons). **UI font:** Inter. **Mono:** MesloLGS Nerd Font.
 - **QML:** `shell.qml` entry, one folder per area (`bar/`, `launcher/`, `notifications/`, `osd/`,
   `controlcenter/`, `services/`, `theme/`, `widgets/` for shared components). Singletons for shared
@@ -326,6 +326,13 @@ From a survey of every Quickshell 0.3.2 type and the quickshell-examples repo (u
   follows the album art unless its setting Colours -> Accent is "Theme" (then it's `primary`).
   Spotify runs on Wayland (`spotify/.config/spotify-flags.conf`, read by the AUR package's
   launcher). Not yet tested on the laptop.
+- **Discord follows the wallpaper:** matugen writes `templates/vesktop-ghost.css` (`--matugen-*`
+  variables) into Vesktop's themes folder as `ghost-matugen.css`; Vencord watches that folder, so
+  Discord recolours live. The Ghost plugin (discord-ghost) uses it for Accent "From matugen" and
+  "Colours from matugen". install.sh sets Vesktop's `nativeTitleBar` (no Discord window buttons;
+  Hyprland draws none), enables the theme, and gives the plugin matugen and Hyprland's rounding as
+  defaults on first run only. If Vesktop runs under XWayland, `~/.config/vesktop-flags.conf` with
+  `--ozone-platform-hint=auto` (vesktop-bin's launcher reads it). Not yet tested on the laptop.
 - **Bluetooth pairing agent:** Quickshell can't register a BlueZ agent, and devices like the
   Keychron M6 ask the host to confirm pairing (journal: "No agent available for request type 2").
   `bt-agent` (`bluez-tools`, user-approved) runs from `autostart.lua` as

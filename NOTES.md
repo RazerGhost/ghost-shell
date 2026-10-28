@@ -206,6 +206,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   restart.
 - Spotify (AUR `spotify`): `/usr/bin/spotify` is a script that reads extra flags from
   `$XDG_CONFIG_HOME/spotify-flags.conf`, one per line, `#` comments skipped.
+- Vesktop (`vesktop-bin` 1.6.8): `/usr/bin/vesktop` reads flags from `~/.config/electron-flags.conf`,
+  `~/.config/vesktop-flags.conf` and `~/.config/vesktop/vesktop-flags.conf`. Its `settings.json` key
+  `nativeTitleBar` (default false) drops Discord's own window buttons; Vencord's settings are in
+  `~/.config/vesktop/settings/settings.json` (`enabledThemes`, `plugins.<Name>`).
 - Spicetify 2.46: `spicetify refresh` rewrites the theme's CSS, JS, colors and assets without a full
   apply; `spicetify config color_scheme <name>` picks a `color.ini` section.
 - Yazi 26.9: sections `[mgr] [tabs] [mode] [indicator] [status] [input] [pick] [cmp] [tasks] ...`. A

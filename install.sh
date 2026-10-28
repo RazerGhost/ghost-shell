@@ -187,6 +187,28 @@ VESKTOP_STATE="$HOME/.config/vesktop/state.json" VENCORD_DIST="$vencord_dir/dist
     fs.mkdirSync(require("path").dirname(path), { recursive: true });
     fs.writeFileSync(path, JSON.stringify(state, null, 4));
 '
+# Vesktop and Vencord settings, merged so your other choices survive re-runs:
+# - nativeTitleBar: Vesktop stops drawing Discord's minimize/maximize/close (Hyprland draws no
+#   decorations; Super+drag moves the window).
+# - the "Ghost matugen" theme on (matugen writes it, see templates/vesktop-ghost.css), and the
+#   Ghost plugin's defaults on first run only: on, accent and colors from matugen, Hyprland's
+#   rounding. Change them in Vesktop's settings afterwards.
+VESKTOP_DIR="$HOME/.config/vesktop" node -e '
+    const fs = require("fs"), { dirname } = require("path");
+    const dir = process.env.VESKTOP_DIR;
+    const edit = (path, change) => {
+        const data = fs.existsSync(path) ? JSON.parse(fs.readFileSync(path, "utf8")) : {};
+        change(data);
+        fs.mkdirSync(dirname(path), { recursive: true });
+        fs.writeFileSync(path, JSON.stringify(data, null, 4));
+    };
+    edit(dir + "/settings.json", (s) => { s.nativeTitleBar = true; });
+    edit(dir + "/settings/settings.json", (s) => {
+        s.enabledThemes = [...new Set([...(s.enabledThemes ?? []), "ghost-matugen.css"])];
+        s.plugins ??= {};
+        s.plugins.Ghost ??= { enabled: true, accentSource: "matugen", matugenColors: true, radius: 10, gap: 10 };
+    });
+'
 
 step "Spotify: the Ghost Spicetify theme"
 # github.com/RazerGhost/spicetify-ghost. Its installer loads the theme from GitHub, so it
