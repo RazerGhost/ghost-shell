@@ -85,8 +85,9 @@ Scope {
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
 
         // The window the arrow keys and Enter act on (an index into `windows`); the pointer moves
-        // it too. Starts on the window you were using.
+        // it too. Starts on the window you were using; stays in range when one moves away.
         property int selected: 0
+        onWindowsChanged: selected = Math.min(selected, Math.max(0, windows.length - 1))
 
         onVisibleChanged: {
             if (visible) {
@@ -106,14 +107,26 @@ Scope {
             }
         }
 
-        // Arrow keys move the selection, Enter switches to it, Escape closes.
+        // Arrow keys move the selection, Enter switches to it, Escape closes. 1-9 move the
+        // selected window to that workspace, Shift+Left/Right to the one before or after this one;
+        // the overview stays open, so you can sort several.
         Item {
             id: keys
             focus: true
             Keys.onEscapePressed: root.open = false
             Keys.onPressed: event => {
                 const directions = { [Qt.Key_Left]: "left", [Qt.Key_Right]: "right", [Qt.Key_Up]: "up", [Qt.Key_Down]: "down" };
-                if (directions[event.key]) {
+                const selectedWindow = window.windows[window.selected];
+                const current = window.workspace?.id ?? 1;
+                if (event.key >= Qt.Key_1 && event.key <= Qt.Key_9 && selectedWindow) {
+                    Windows.moveToWorkspace(selectedWindow, event.key - Qt.Key_0);
+                    event.accepted = true;
+                } else if ((event.modifiers & Qt.ShiftModifier) && (event.key === Qt.Key_Left || event.key === Qt.Key_Right)) {
+                    const target = current + (event.key === Qt.Key_Left ? -1 : 1);
+                    if (selectedWindow && target >= 1)
+                        Windows.moveToWorkspace(selectedWindow, target);
+                    event.accepted = true;
+                } else if (directions[event.key]) {
                     window.selected = WindowGrid.neighbour(window.rows, window.selected, directions[event.key]);
                     event.accepted = true;
                 } else if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && window.windows[window.selected]) {
