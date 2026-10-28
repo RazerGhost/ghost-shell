@@ -11,8 +11,8 @@ import "../services/WorkspaceSlots.js" as WorkspaceSlots
 import "../services/WindowGrid.js" as WindowGrid
 
 // The overview, like Windows' Task View (user's choice): Super+Tab or a three-finger swipe up.
-// The current workspace's windows as live previews; click one to switch to it, hover for × to
-// close it. A strip at the bottom shows every workspace in use as a miniature: click one to go
+// The current workspace's windows as live previews; click one (or pick it with the arrow keys and
+// Enter) to switch to it, hover for × to close it. A strip at the bottom shows every workspace in use as a miniature: click one to go
 // there, drag a window onto one to move it there, + for a new one. Escape, Super+Tab again, a
 // swipe down or a click on the background closes it.
 Scope {
@@ -84,9 +84,15 @@ Scope {
         // Hyprland refuses to focus windows while an exclusive surface exists (see Switcher).
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
 
+        // The window the arrow keys and Enter act on (an index into `windows`); the pointer moves
+        // it too. Starts on the window you were using.
+        property int selected: 0
+
         onVisibleChanged: {
-            if (visible)
+            if (visible) {
+                selected = Math.max(0, windows.indexOf(Windows.active));
                 keys.forceActiveFocus();
+            }
         }
 
         // The dimmed (and, through the layer rule, blurred) desktop. Click it to close.
@@ -100,10 +106,22 @@ Scope {
             }
         }
 
+        // Arrow keys move the selection, Enter switches to it, Escape closes.
         Item {
             id: keys
             focus: true
             Keys.onEscapePressed: root.open = false
+            Keys.onPressed: event => {
+                const directions = { [Qt.Key_Left]: "left", [Qt.Key_Right]: "right", [Qt.Key_Up]: "up", [Qt.Key_Down]: "down" };
+                if (directions[event.key]) {
+                    window.selected = WindowGrid.neighbour(window.rows, window.selected, directions[event.key]);
+                    event.accepted = true;
+                } else if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && window.windows[window.selected]) {
+                    root.open = false;
+                    Windows.show(window.windows[window.selected]);
+                    event.accepted = true;
+                }
+            }
         }
 
         // The windows, a centered grid between the island and the strip.
@@ -192,7 +210,9 @@ Scope {
                                     width: parent.width
                                     height: slot.modelData.height
                                     cursorShape: Qt.PointingHandCursor
+                                    hoverEnabled: true
                                     drag.target: card
+                                    onEntered: window.selected = slot.modelData.index
                                     onPressed: mouse => card.grab = Qt.point(mouse.x, mouse.y)
                                     onClicked: {
                                         root.open = false;
@@ -211,7 +231,7 @@ Scope {
                                     anchors.fill: parent
                                     toplevel: slot.toplevel
                                     previewHeight: slot.modelData.height
-                                    highlighted: hovered
+                                    highlighted: window.selected === slot.modelData.index
                                     capturing: root.open
                                     closable: true
                                 }
