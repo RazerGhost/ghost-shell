@@ -10,3 +10,7 @@ window-padding-x = 12
 window-padding-y = 10
 # Spread leftover space (the window rarely fits an exact number of cells) evenly on all sides
 window-padding-balance = true
+
+# Draw Ghostty's own title bar (close, maximize, minimize; drag to move). Hyprland draws none,
+# and with the default "auto" Ghostty leaves it to the compositor, so there'd be no bar at all.
+window-decoration = client
