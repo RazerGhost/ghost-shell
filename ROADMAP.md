@@ -95,7 +95,7 @@ new setup step.
   night light (`services/NightLight.qml`, hyprsunset at 4000 K; manual only, see decisions).
 - Power menu (`controlcenter/PowerPanel.qml`, power button in quick settings or Ctrl+Alt+Delete):
   lock, suspend, log out, restart, shut down; the last three need a second click within 4 s.
-  Lock runs hyprlock, which has no config until Phase 5.
+  Lock uses Quickshell's lock screen (Phase 5).
 
 ### Phase 4: Clipboard + wallpaper (built; waiting on the user's test results)
 - Clipboard menu in the island (`controlcenter/ClipboardPanel.qml`, Super+V): cliphist history
@@ -114,7 +114,7 @@ new setup step.
   `~/.local/state/quickshell/wallpaper.json`; `qs ipc call wallpaper set <path>` and
   `./install.sh <image>` set it too. With none chosen, Hyprland's default wallpaper shows.
 
-### Phase 5: Lock screen + idle + greeter (lock screen verified; greeter built, not yet booted)
+### Phase 5: Lock screen + idle + greeter (done, verified on the laptop 2026-10-28)
 - Lock screen (`lock/Lock.qml`, `LockContent.qml`): Quickshell `WlSessionLock` on every monitor,
   blurred wallpaper, big clock and date, password field checked through PAM's `login` config.
   `qs ipc call lock lock` (Super+L, power menu, hypridle); `qs ipc call lock preview` shows it
@@ -130,8 +130,8 @@ new setup step.
   can't read the user's home, so `update-greeter.sh` (run by install.sh) copies the shell to
   `/etc/greetd/quickshell/` and snapshots colors, wallpaper and user name into its home. Re-run
   it after changing the wallpaper. When qs quits after launching, the greeter's Hyprland exits
-  (`qs ...; hyprctl dispatch 'hl.dsp.exit()'`), so greetd starts the session. Checked nested in a
-  Hyprland window; not yet at a real boot.
+  (`qs ...; hyprctl dispatch 'hl.dsp.exit()'`), so greetd starts the session. Verified at a real
+  boot: login works.
 
 **Lock screen recovery.** If the lock screen crashes, Hyprland keeps the session locked (red
 screen). `misc.allow_session_lock_restore` (look.lua) lets another lock screen take over:
@@ -168,7 +168,8 @@ fixed in config files should become settings.
   categorized like the island menus. Candidates: night light (manual or a schedule, times,
   temperature), idle timings (dim, lock, screen off, suspend; battery vs. plugged in), a Do Not
   Disturb schedule, the wallpaper (the picker), a readable list of keybinds, default apps
-  (browser, terminal).
+  (browser, terminal). The login screen's look and options too (the user wants more
+  customization there later), which update-greeter.sh would carry over.
 - Choices saved in one settings file outside the shell directory (like
   `~/.local/state/quickshell/*.json`), read by the services. Settings that live in other
   programs' configs (hypridle, hyprsunset) need those files generated from it, or the program
