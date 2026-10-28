@@ -67,13 +67,11 @@ hl.window_rule({
 -- Quickshell panels are layer surfaces; each sets a namespace starting with "qs-"
 -- (check with: hyprctl layers).
 
--- Island (the bar): blur behind it. ignore_alpha skips the fully transparent parts of its
--- surface (the window is as big as the open menu), so only the island itself gets blurred.
+-- Island (the bar): slides in. It asks for blur behind its exact shape itself
+-- (BackgroundEffect in bar/IslandWindow.qml), so no blur rule.
 hl.layer_rule({
     name  = "qs-island",
     match = { namespace = "^qs-island$" },
-    blur         = true,
-    ignore_alpha = 0.3,
     animation    = "slide top",
 })
 
@@ -111,12 +109,11 @@ hl.layer_rule({
     animation    = "popin 90%",
 })
 
--- Dock: blurred; no open animation, it slides itself.
+-- Dock: no open animation, it slides itself. It asks for blur behind the bar and its cards
+-- itself (BackgroundEffect in dock/DockBar.qml), so no blur rule.
 hl.layer_rule({
     name  = "qs-dock",
     match = { namespace = "^qs-dock$" },
-    blur         = true,
-    ignore_alpha = 0.3,
     no_anim      = true,
 })
 

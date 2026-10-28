@@ -112,6 +112,38 @@ PanelWindow {
     color: "transparent"
     mask: Region { item: shape }
 
+    // Blur behind exactly the island's shape (ext-background-effect, which Hyprland 0.57 has;
+    // replaces a layer rule that blurred every pixel above 30 % opacity): the body, rounded at
+    // the bottom, and the strip along the screen edge with the fillets cut out of it (circles
+    // centred where the fillets' arcs are).
+    BackgroundEffect.blurRegion: Region {
+        item: content
+        bottomLeftRadius: shape.radius
+        bottomRightRadius: shape.radius
+
+        Region {
+            x: shape.x
+            width: shape.width
+            height: Theme.island.fillet
+
+            Region {
+                shape: RegionShape.Ellipse
+                intersection: Intersection.Subtract
+                x: shape.x - Theme.island.fillet
+                width: Theme.island.fillet * 2
+                height: Theme.island.fillet * 2
+            }
+
+            Region {
+                shape: RegionShape.Ellipse
+                intersection: Intersection.Subtract
+                x: shape.x + shape.width - Theme.island.fillet
+                width: Theme.island.fillet * 2
+                height: Theme.island.fillet * 2
+            }
+        }
+    }
+
     // Reserve only the closed island's height; the open menu floats over windows.
     exclusionMode: ExclusionMode.Normal
     exclusiveZone: Theme.island.height

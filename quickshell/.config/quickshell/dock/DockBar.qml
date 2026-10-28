@@ -63,6 +63,23 @@ PanelWindow {
         }
     }
 
+    // Blur behind exactly the dock and its cards (ext-background-effect; replaces a layer rule
+    // that blurred every pixel above 30 % opacity).
+    BackgroundEffect.blurRegion: Region {
+        item: shape
+        radius: Theme.dock.radius
+
+        Region {
+            item: menu.visible ? menu : null
+            radius: menu.radius
+        }
+
+        Region {
+            item: previews.visible ? previews : null
+            radius: previews.radius
+        }
+    }
+
     WlrLayershell.namespace: "qs-dock"
     WlrLayershell.layer: WlrLayer.Top
 

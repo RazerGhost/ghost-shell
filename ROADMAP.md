@@ -505,6 +505,14 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   the wallpaper's colors (matugen's `hyprland-colors.lua`: the active tab in the primary
   container color, the others like the shell's surfaces, blurred).
 
+### Native blur shapes (built 2026-10-29; waiting on the user's test results)
+- The island and the dock (user's choice: these two first, the menus and pop-ups after
+  comparing) ask Hyprland for blur behind their exact shape (`BackgroundEffect.blurRegion`,
+  ext-background-effect-v1) instead of a layer rule blurring every pixel above 30 % opacity: the
+  island's body rounded at the bottom plus the screen-edge strip minus the fillets' circles; the
+  dock's bar, right-click menu and previews. Their `blur`/`ignore_alpha` layer rules are gone.
+  If it looks better, the other panels follow, and the glass opacity could go below 35 %.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

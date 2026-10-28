@@ -37,6 +37,12 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   a name twice is an error (`hyprctl eval` of the file again fails; `hyprctl reload` works).
   Verified on the laptop. A tiled app with a minimum size bigger than its box (Discord, 972 px)
   is cut off at the box, not moved.
+- `BackgroundEffect.blurRegion: Region { ... }` (Quickshell.Wayland, attached to a window) asks
+  the compositor to blur behind that region (ext-background-effect-v1; Hyprland 0.57 has it,
+  checked in its binary). `Region` nests (children combine, or cut with
+  `intersection: Intersection.Subtract`), has `shape: RegionShape.Ellipse` and per-corner radii,
+  so the island's concave fillets are a strip minus two circles. A surface using it shouldn't
+  also have a `blur` layer rule.
 - Window groups (tabs) in 0.57: `hl.dsp.group.toggle/next/prev/active({ index })/lock/
   move_window({ forward })`; into or out of a group is `hl.dsp.window.move({ into_group = "l"|"r"|"u"|"d" })`
   (`into_or_create_group`, `out_of_group = true`); `group.move_window` only reorders tabs. A
