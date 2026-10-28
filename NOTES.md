@@ -149,6 +149,12 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - `FloatingWindow { title; implicitWidth/Height; minimumSize; color }` is a normal toplevel
   (class `org.quickshell`); Hyprland draws no decorations for it. Closing it (Super+W) sets
   `visible` to false; setting it true again reopens it.
+- Hyprland sends every xdg toplevel the tiled-left/right/top/bottom states from the start
+  (`XDGShell.cpp`, so apps drop their shadows). Qt reports a window tiled on all edges as
+  maximized, so `FloatingWindow.maximized` is always true; use Hyprland's state instead
+  (`lastIpcObject.fullscreen === 1` is maximized). `startSystemMove()` works from `onPressed`.
+- An inline `component` can't be declared in a `pragma Singleton` file ("X is not a type"); put
+  it in its own file.
 - A `JsonAdapter` in a `FileView` loads after the shell starts, even with `blockLoading` (that
   only affects `text()`/`data()`): bindings see the defaults first, then the saved values.
   `onAdapterUpdated: writeAdapter()` saves every change.

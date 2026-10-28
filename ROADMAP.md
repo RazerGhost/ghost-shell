@@ -317,6 +317,14 @@ choice).
   do that without regenerating its config and restarting; it now only locks before suspend.
   Wayland idle inhibitors (a playing video in the browser) hold the steps off; D-Bus inhibitors
   (`systemd-inhibit`, which hypridle also honoured) don't.
+- **Apps may maximize themselves** (2026-10-28): the `suppress_event = "maximize"` rule from
+  Hyprland's example config (Phase 1) is gone. With everything floating it made the maximize
+  buttons in title bars (Ghostty, GTK apps, the settings window) do nothing. Apps that ask to
+  start maximized now do.
+- **Settings window title bar** (user's request: like the other apps): drawn by the window
+  itself, GTK style: "Settings" over the sidebar, the page name, maximize and close (round
+  buttons); drag to move, double-click to maximize. Maximizing goes through Hyprland, not
+  `FloatingWindow.maximized` (see NOTES.md).
 - **App keybinds go through the shell** (Phase 7): Super+Enter/B/E and Super+Shift+E call
   `qs ipc call apps ...`, which opens the default app chosen in settings. If the shell isn't
   running the call fails and the bind falls back to Ghostty / Zen / Nautilus, so there's always a

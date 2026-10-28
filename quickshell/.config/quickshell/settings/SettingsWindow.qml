@@ -1,10 +1,13 @@
 // The settings window: a normal app window (user's choice, rather than an island menu) with the
-// categories on the left. Opened with Super+I, the gear in quick settings, or
+// categories on the left and a title bar like the other apps' (maximize and close, the same
+// buttons as GTK apps get from install.sh's button-layout; Hyprland ignores minimize requests). Opened with Super+I, the gear in quick settings, or
 // `qs ipc call settings open` (shell.qml). Choices are saved by services/Settings.qml.
 pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
+import qs.services
 import qs.theme
 import qs.widgets
 
@@ -13,6 +16,19 @@ Singleton {
 
     property bool open: false
     property string page: "nightlight"
+
+    // This window in Hyprland's list, for maximizing. Not FloatingWindow.maximized: Hyprland marks
+    // every window as tiled on all edges (so apps drop their shadows), which Qt reports as
+    // maximized. Hyprland's own state (fullscreen 1 = maximized) stays fresh because the dock
+    // re-reads the window list on every fullscreen change.
+    readonly property HyprlandToplevel toplevel: (Hyprland.toplevels?.values ?? [])
+        .find(t => t.wayland?.appId === "org.quickshell" && t.title === "Settings") ?? null
+    readonly property bool maximized: toplevel?.lastIpcObject?.fullscreen === 1
+
+    function toggleMaximized(): void {
+        if (toplevel)
+            Windows.toggleMaximized(toplevel);
+    }
 
     readonly property var pages: [
         { id: "nightlight", icon: "nightlight", title: "Night light" },
@@ -39,29 +55,71 @@ Singleton {
                 root.open = false;
         }
 
-        // The categories.
-        Column {
-            id: sidebar
+        // The title bar: drag it to move the window, double-click to maximize.
+        MouseArea {
+            id: titleBar
 
-            width: Theme.settings.sidebar
-            height: parent.height
-            topPadding: Theme.spacing.l
-            leftPadding: Theme.spacing.m
-            rightPadding: Theme.spacing.m
-            spacing: Theme.spacing.xs
-
-            Accessible.role: Accessible.PageTabList
-            Accessible.name: "Settings categories"
+            width: parent.width
+            height: Theme.settings.titleBar
+            onPressed: window.startSystemMove()
+            onDoubleClicked: root.toggleMaximized()
 
             Text {
-                leftPadding: Theme.spacing.m
-                bottomPadding: Theme.spacing.m
+                anchors.left: parent.left
+                anchors.leftMargin: Theme.spacing.m * 2
+                anchors.verticalCenter: parent.verticalCenter
                 text: "Settings"
                 color: Colors.m3onSurface
                 font.family: Theme.font.sans
                 font.pixelSize: Theme.font.title
                 font.weight: Font.DemiBold
             }
+
+            // The chosen page's name, above it.
+            Text {
+                x: Theme.settings.sidebar + Theme.spacing.l * 2
+                anchors.verticalCenter: parent.verticalCenter
+                text: root.pages.find(p => p.id === root.page)?.title ?? ""
+                color: Colors.m3onSurface
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.large
+                font.weight: Font.DemiBold
+                Accessible.role: Accessible.Heading
+            }
+
+            Row {
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacing.m
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacing.xs
+
+                WindowButton {
+                    icon: root.maximized ? "filter_none" : "crop_square"
+                    label: root.maximized ? "Restore" : "Maximize"
+                    onClicked: root.toggleMaximized()
+                }
+
+                WindowButton {
+                    icon: "close"
+                    label: "Close"
+                    onClicked: root.open = false
+                }
+            }
+        }
+
+        // The categories.
+        Column {
+            id: sidebar
+
+            anchors.top: titleBar.bottom
+            anchors.bottom: parent.bottom
+            width: Theme.settings.sidebar
+            leftPadding: Theme.spacing.m
+            rightPadding: Theme.spacing.m
+            spacing: Theme.spacing.xs
+
+            Accessible.role: Accessible.PageTabList
+            Accessible.name: "Settings categories"
 
             Repeater {
                 model: root.pages
@@ -125,9 +183,9 @@ Singleton {
 
             anchors.left: sidebar.right
             anchors.right: parent.right
-            anchors.top: parent.top
+            anchors.top: titleBar.bottom
             anchors.bottom: parent.bottom
-            contentHeight: pages.implicitHeight + Theme.spacing.l * 2
+            contentHeight: pages.implicitHeight + Theme.spacing.l
             clip: true
             boundsBehavior: Flickable.StopAtBounds
 
@@ -135,19 +193,8 @@ Singleton {
                 id: pages
 
                 x: Theme.spacing.l
-                y: Theme.spacing.l
                 width: Math.min(Theme.settings.content, content.width - Theme.spacing.l * 2)
                 spacing: Theme.spacing.l
-
-                Text {
-                    leftPadding: Theme.spacing.l
-                    text: root.pages.find(p => p.id === root.page)?.title ?? ""
-                    color: Colors.m3onSurface
-                    font.family: Theme.font.sans
-                    font.pixelSize: Theme.font.title
-                    font.weight: Font.DemiBold
-                    Accessible.role: Accessible.Heading
-                }
 
                 // Only the chosen page is visible; a Column skips the others.
                 NightLightPage {
