@@ -1,5 +1,4 @@
 import QtQuick
-import Qt.labs.folderlistmodel
 import Quickshell
 import Quickshell.Widgets
 import qs.services
@@ -21,48 +20,15 @@ Column {
     readonly property real thumbHeight: Theme.wallpaper.thumbHeight
     readonly property real thumbWidth: thumbHeight * 16 / 9
 
-    // The pictures in a FolderListModel as { filePath, fileName }, so all three folders can
-    // share one row.
-    function files(model: FolderListModel): var {
-        const list = [];
-        for (let i = 0; i < model.count; i++)
-            list.push({ filePath: model.get(i, "filePath"), fileName: model.get(i, "fileName") });
-        return list;
-    }
-
     padding: Theme.spacing.l
     topPadding: Theme.spacing.s
     spacing: Theme.spacing.s
 
-    // Re-read your folder each time the picker opens: the folder listing doesn't notice the
-    // folder being created after the shell started (e.g. by "Open folder").
     onVisibleChanged: {
         if (visible) {
             opened = true;
-            yours.folder = "";
-            yours.folder = "file://" + Wallpaper.folder;
+            Wallpaper.rescan();
         }
-    }
-
-    FolderListModel {
-        id: yours
-        folder: "file://" + Wallpaper.folder
-        nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
-        showDirs: false
-    }
-
-    FolderListModel {
-        id: hyprland
-        folder: "file:///usr/share/hypr"
-        nameFilters: ["wall*.png"] // the folder also holds other images
-        showDirs: false
-    }
-
-    FolderListModel {
-        id: cachyos
-        folder: "file:///usr/share/wallpapers/cachyos-wallpapers"
-        nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
-        showDirs: false
     }
 
     // One picture in the grid. The current wallpaper gets an accent outline.
@@ -117,7 +83,7 @@ Column {
         Text {
             anchors.verticalCenter: parent.verticalCenter
             textFormat: Text.StyledText
-            text: "Wallpapers" + (yours.count === 0
+            text: "Wallpapers" + (Wallpaper.ownCount === 0
                   ? "<font color='" + Colors.m3onSurfaceVariant + "'>  ·  add your own to ~/Pictures/Wallpapers</font>" : "")
             color: Colors.m3onSurface
             font.family: Theme.font.sans
@@ -140,8 +106,7 @@ Column {
         spacing: Theme.spacing.s
         clip: true
         boundsBehavior: Flickable.StopAtBounds
-        // files() reads each folder's count, so the row updates when a folder changes.
-        model: root.files(yours).concat(root.files(hyprland), root.files(cachyos))
+        model: Wallpaper.pictures
         delegate: Thumbnail {}
 
         Accessible.role: Accessible.List

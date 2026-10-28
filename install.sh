@@ -203,8 +203,8 @@ else
 fi
 
 step "Login screen (Quickshell greeter)"
-# After matugen, so the login screen gets the current colors. Re-run update-greeter.sh alone to
-# update its look after changing the wallpaper.
+# After matugen, so the login screen gets the current colors. Settings, colors and the wallpaper
+# reach it by themselves afterwards; re-run update-greeter.sh alone after changing the shell's code.
 ./update-greeter.sh
 
 step "Done"

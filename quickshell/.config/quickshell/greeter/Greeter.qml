@@ -4,12 +4,14 @@ import Quickshell.Io
 import Quickshell.Services.Greetd
 import Quickshell.Wayland
 import qs.lock
+import qs.services
 
 // The login screen, run by greetd at boot (see greeter.qml and system/etc/greetd/). It looks
 // like the lock screen: type the password and Enter starts Hyprland for that user.
 //
 // It runs as greetd's "greeter" user, which can't read your home folder, so update-greeter.sh
-// gives it a copy of this shell and a snapshot of your colors, wallpaper and user name.
+// gives it a copy of this shell and your user name, and greeter/sync.sh keeps a copy of your
+// settings, colors and the lock screen's picture where it can read them.
 Scope {
     id: root
 
@@ -104,7 +106,10 @@ Scope {
             LockContent {
                 id: content
                 anchors.fill: parent
-                user: root.user
+                // Its own copy of the lock screen's picture (greeter/sync.sh).
+                wallpaper: Wallpaper.path
+                user: Settings.values.greeterShowName ? root.user : ""
+                powerButtons: Settings.values.greeterPowerButtons
                 message: root.message
                 messageIsError: root.messageIsError
                 busy: root.busy

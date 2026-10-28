@@ -7,7 +7,8 @@ import qs.widgets
 
 // What the lock screen shows on each monitor: the wallpaper blurred and darkened, a big clock
 // and the date, and the password field. Lock.qml checks the password. The login screen
-// (greeter/Greeter.qml) uses it too, with the user's name above the field.
+// (greeter/Greeter.qml) uses it too, with the user's name above the field and power buttons.
+// The look (blur, dimming, clock, date) follows the settings window's "Lock and login screen".
 Item {
     id: root
 
@@ -16,8 +17,12 @@ Item {
     property bool messageIsError
     // A password is being checked; the field waits.
     property bool busy
+    // The picture behind everything (blurred); "" shows the plain background color.
+    property string wallpaper
     // Shown above the password field when set (the login screen).
     property string user
+    // Suspend, restart and shut down in the bottom right corner (the login screen).
+    property bool powerButtons
 
     signal submitted(string password)
 
@@ -37,7 +42,7 @@ Item {
         id: wallpaper
         anchors.fill: parent
         visible: false // drawn through the blur below
-        source: Wallpaper.path ? "file://" + Wallpaper.path : ""
+        source: root.wallpaper ? "file://" + root.wallpaper : ""
         fillMode: Image.PreserveAspectCrop
         sourceSize: Qt.size(width, height)
     }
@@ -47,9 +52,9 @@ Item {
         visible: wallpaper.status === Image.Ready
         source: wallpaper
         blurEnabled: true
-        blur: 1
+        blur: Settings.values.lockBlur / 100
         blurMax: Theme.lock.blur
-        brightness: -0.25 // darker, so the clock and field stand out
+        brightness: -Settings.values.lockDim / 100 // darker, so the clock and field stand out
     }
 
     SystemClock {
@@ -65,7 +70,8 @@ Item {
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: Qt.formatTime(clock.date, "HH:mm")
+            visible: Settings.values.lockClock
+            text: Qt.formatTime(clock.date, Settings.values.lock24Hour ? "HH:mm" : "h:mm AP")
             color: Colors.m3onSurface
             font.family: Theme.font.sans
             font.pixelSize: Theme.lock.clock
@@ -75,6 +81,7 @@ Item {
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
+            visible: Settings.values.lockDate
             // English names even with Dutch regional formats, like the calendar.
             text: Qt.locale(Qt.uiLanguage).toString(clock.date, "dddd, d MMMM")
             color: Colors.m3onSurfaceVariant
@@ -174,6 +181,31 @@ Item {
             color: root.messageIsError ? Colors.m3error : Colors.m3onSurfaceVariant
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.normal
+        }
+    }
+
+    Row {
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.margins: Theme.spacing.l * 2
+        visible: root.powerButtons
+        spacing: Theme.spacing.m
+
+        Repeater {
+            model: [
+                { icon: "bedtime", label: "Suspend", command: "suspend" },
+                { icon: "restart_alt", label: "Restart", command: "reboot" },
+                { icon: "power_settings_new", label: "Shut down", command: "poweroff" }
+            ]
+
+            IconButton {
+                required property var modelData
+                icon: modelData.icon
+                label: modelData.label
+                iconSize: Theme.icon.launcher
+                color: Colors.m3onSurface
+                onClicked: Quickshell.execDetached(["systemctl", modelData.command])
+            }
         }
     }
 }

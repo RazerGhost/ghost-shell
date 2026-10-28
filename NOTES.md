@@ -155,6 +155,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - `DesktopEntry.categories` (list), `DesktopEntries.byId(id)`.
 - `hl.bind(keys, action, { description = "..." })`; `hyprctl binds -j` gives `modmask` (Super 64,
   Ctrl 4, Alt 8, Shift 1), `key`, `description`, `has_description`.
+- `Repeater` only creates visual items; `Variants { model: [...] }` creates any object (e.g. a
+  `FileView` per file), each with `modelData`.
+- An `IpcHandler` exposes every function and property declared inside it (it scans its own
+  QML type), so keep helpers outside it.
 - `qs ipc call` exits 0 even for an unknown target, but non-zero when no shell is running.
 - `hyprctl hyprsunset temperature` prints the last temperature set, also after `identity`, so it
   doesn't tell whether night light is on.

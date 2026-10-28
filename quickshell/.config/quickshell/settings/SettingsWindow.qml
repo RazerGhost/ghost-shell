@@ -18,6 +18,7 @@ Singleton {
         { id: "nightlight", icon: "nightlight", title: "Night light" },
         { id: "dnd", icon: "do_not_disturb_on", title: "Do Not Disturb" },
         { id: "idle", icon: "bedtime", title: "Idle and power" },
+        { id: "lock", icon: "lock", title: "Lock and login screen" },
         { id: "apps", icon: "apps", title: "Default apps" },
         { id: "keybinds", icon: "keyboard", title: "Keybinds" }
     ]
@@ -162,6 +163,11 @@ Singleton {
                 IdlePage {
                     width: parent.width
                     visible: root.page === "idle"
+                }
+
+                LockPage {
+                    width: parent.width
+                    visible: root.page === "lock"
                 }
 
                 AppsPage {

@@ -3,13 +3,14 @@
 # your home folder, so this copies what it needs into place:
 #   /etc/greetd/quickshell/   this repo's Quickshell config (greeter.qml is the entry point)
 #   /etc/greetd/hypr/         the greeter's Hyprland config + your monitors, env and input
-#   /var/lib/qs-greeter/      its home: a snapshot of your colors and wallpaper, and your name
-# install.sh runs it. Run it again after changing your wallpaper or colors to update the login
-# screen's look.
+#   /var/lib/qs-greeter/      its home, with your user name
+#   /var/lib/qs-greeter/shared/  yours: copies of your settings, colors and lock screen picture,
+#                                which the shell keeps up to date (greeter/sync.sh)
+# install.sh runs it. Run it again after changing the shell's code (the login screen runs its own
+# copy); settings, colors and the wallpaper reach it by themselves.
 set -euo pipefail
 cd "$(dirname "$0")"
 
-state="$HOME/.local/state/quickshell"
 greeter_home=/var/lib/qs-greeter
 greeter_state=$greeter_home/.local/state/quickshell
 
@@ -23,26 +24,21 @@ done
 
 sudo install -d -o greeter -g greeter "$greeter_home" "$greeter_home/.local" \
     "$greeter_home/.local/state" "$greeter_state"
-if [[ -f $state/colors.json ]]; then
-    sudo install -m644 -o greeter -g greeter "$state/colors.json" "$greeter_state/colors.json"
-fi
-
-# The wallpaper: copy the picture itself (its path is in your home) and point the copy at it.
-wallpaper=$(node -e 'try { process.stdout.write(require(process.argv[1]).path || "") } catch {}' \
-    "$state/wallpaper.json")
-greeter_wallpaper=""
-if [[ -n $wallpaper && -f $wallpaper ]]; then
-    greeter_wallpaper="$greeter_home/wallpaper.${wallpaper##*.}"
-    sudo install -m644 -o greeter -g greeter "$wallpaper" "$greeter_wallpaper"
-fi
+# The shared folder is yours, so the shell can update it without sudo; the greeter only reads
+# it. Its files show up in the greeter's state folder (where the shell's services look) through
+# symlinks. Older versions copied them there instead, and the wallpaper into the home folder.
+sudo install -d -o "$USER" -g "$USER" -m755 "$greeter_home/shared"
+for file in settings.json colors.json wallpaper.json; do
+    sudo ln -sfn "$greeter_home/shared/$file" "$greeter_state/$file"
+done
+sudo rm -f "$greeter_home"/wallpaper.*
+sh quickshell/.config/quickshell/greeter/sync.sh
 
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
-WALLPAPER="$greeter_wallpaper" GREETER_USER="$USER" TMP="$tmp" node -e '
+GREETER_USER="$USER" TMP="$tmp" node -e '
     const fs = require("fs");
-    const write = (name, data) => fs.writeFileSync(process.env.TMP + "/" + name, JSON.stringify(data, null, 4) + "\n");
-    write("wallpaper.json", { path: process.env.WALLPAPER });
-    write("greeter.json", { user: process.env.GREETER_USER });
+    fs.writeFileSync(process.env.TMP + "/greeter.json", JSON.stringify({ user: process.env.GREETER_USER }, null, 4) + "\n");
 '
-sudo install -m644 -o greeter -g greeter "$tmp/wallpaper.json" "$tmp/greeter.json" "$greeter_state/"
+sudo install -m644 -o greeter -g greeter "$tmp/greeter.json" "$greeter_state/"
 echo "Login screen updated for $USER."

@@ -4,6 +4,7 @@
 pragma Singleton
 
 import QtQuick
+import Qt.labs.folderlistmodel
 import Quickshell
 import Quickshell.Io
 
@@ -14,11 +15,52 @@ Singleton {
     // The current wallpaper's path; "" until one is chosen (Hyprland's default shows then).
     readonly property string path: state.path
 
+    // Every picture to choose from, as { filePath, fileName }: yours from ~/Pictures/Wallpapers
+    // first, then the built-in ones that come with Hyprland and CachyOS (from their packages,
+    // so they're not copied anywhere). Reading each folder's count keeps this up to date.
+    readonly property var pictures: files(yours).concat(files(hyprland), files(cachyos))
+    readonly property int ownCount: yours.count
+
+    function files(model: FolderListModel): var {
+        const list = [];
+        for (let i = 0; i < model.count; i++)
+            list.push({ filePath: model.get(i, "filePath"), fileName: model.get(i, "fileName") });
+        return list;
+    }
+
+    // Re-read your folder (pickers call this when they open): the folder listing doesn't notice
+    // the folder being created after the shell started (e.g. by "Open folder").
+    function rescan(): void {
+        yours.folder = "";
+        yours.folder = "file://" + folder;
+    }
+
     function set(path: string): void {
         state.path = path;
         file.writeAdapter();
         matugen.command = ["matugen", "image", path, "-m", "dark", "--source-color-index", "0"];
         matugen.running = true;
+    }
+
+    FolderListModel {
+        id: yours
+        folder: "file://" + root.folder
+        nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
+        showDirs: false
+    }
+
+    FolderListModel {
+        id: hyprland
+        folder: "file:///usr/share/hypr"
+        nameFilters: ["wall*.png"] // the folder also holds other images
+        showDirs: false
+    }
+
+    FolderListModel {
+        id: cachyos
+        folder: "file:///usr/share/wallpapers/cachyos-wallpapers"
+        nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
+        showDirs: false
     }
 
     // Kept next to matugen's colors.json, outside the shell directory: Quickshell reloads the

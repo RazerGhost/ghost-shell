@@ -4,6 +4,7 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Services.Pam
 import Quickshell.Wayland
+import qs.services
 
 // The lock screen. `qs ipc call lock lock` locks the session (Super+L, the power menu, hypridle
 // when idle or before suspend); the password is checked through PAM's "login" config, the same
@@ -17,6 +18,8 @@ Scope {
     property bool busy
     // The password waiting for PAM to ask for it.
     property string pending
+    // The picture chosen for the lock screen in settings, or else the desktop's.
+    readonly property string wallpaper: Settings.values.lockWallpaper || Wallpaper.path
 
     signal tried()
 
@@ -37,6 +40,7 @@ Scope {
             LockContent {
                 id: content
                 anchors.fill: parent
+                wallpaper: root.wallpaper
                 message: root.message
                 messageIsError: root.messageIsError
                 busy: root.busy
@@ -122,6 +126,7 @@ Scope {
 
         LockContent {
             anchors.fill: parent
+            wallpaper: root.wallpaper
             message: "Preview: nothing is locked"
             onSubmitted: preview.visible = false
         }

@@ -128,8 +128,8 @@ new setup step.
   as the `greeter` user inside a small Hyprland (`system/etc/greetd/hypr/hyprland.lua`, which
   requires copies of `monitors/env/input.lua`), with `HOME=/var/lib/qs-greeter`. The greeter
   can't read the user's home, so `update-greeter.sh` (run by install.sh) copies the shell to
-  `/etc/greetd/quickshell/` and snapshots colors, wallpaper and user name into its home. Re-run
-  it after changing the wallpaper. When qs quits after launching, the greeter's Hyprland exits
+  `/etc/greetd/quickshell/` and the user name into its home; settings, colors and the picture
+  reach it through a shared folder (see "Lock and login screen settings"). When qs quits after launching, the greeter's Hyprland exits
   (`qs ...; hyprctl dispatch 'hl.dsp.exit()'`), so greetd starts the session. Verified at a real
   boot: login works.
 
@@ -207,8 +207,23 @@ config files became settings.
     system defaults (`xdg-settings`, `xdg-mime`).
   - **Keybinds:** read from Hyprland (`hyprctl binds -j`, every bind in `binds.lua` has a
     description), grouped per description (`settings/Keybinds.js`, tested).
-- Later: the login screen's look and options (user's choice to do them after this), which
-  `update-greeter.sh` would carry over.
+
+### Lock and login screen settings (built 2026-10-28; waiting on the user's test results)
+The follow-up to Phase 7 (user's choice of options; the lock screen shares the look, user's
+choice).
+- A "Lock and login screen" page: the picture (same as the desktop, or one of the wallpaper
+  pictures), blur, darkening, the time (and 12/24-hour), the date; for the login screen, the user
+  name and power buttons (suspend, restart, shut down; `systemctl` as the greeter user, which
+  logind allows for the active session). "Preview" shows the lock screen. All in `LockContent`.
+- **How the login screen gets them without sudo:** `update-greeter.sh` creates
+  `/var/lib/qs-greeter/shared/`, owned by the user and only read by the greeter, and symlinks
+  `settings.json`, `colors.json` and `wallpaper.json` in the greeter's state folder to it, so the
+  greeter's services read them like the desktop's. `greeter/sync.sh` copies the user's settings,
+  colors and the lock screen's picture there; `lock/LoginScreenSync.qml` runs it at startup and
+  whenever one of those files changes. The greeter's code stays root-owned in `/etc`, so the
+  shared folder only holds data. `update-greeter.sh` is now only needed after code changes.
+- The wallpaper list moved from the island's picker into `services/Wallpaper.qml`
+  (`pictures`, `rescan()`), shared by the picker and this page.
 
 ## Decisions made
 

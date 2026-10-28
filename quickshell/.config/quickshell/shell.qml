@@ -20,6 +20,7 @@ ShellRoot {
     Dock {}
     Launcher {}
     Lock {}
+    LoginScreenSync {}
     Osd {}
     SnapPicker {}
     SnapAssist {}

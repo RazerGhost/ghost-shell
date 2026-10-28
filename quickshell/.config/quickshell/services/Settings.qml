@@ -42,6 +42,17 @@ Singleton {
             property int idleAcScreenOff: 6
             property int idleAcSuspend: 0
 
+            // The lock screen and the login screen (both drawn by lock/LockContent.qml; the login
+            // screen gets a copy of this file, see greeter/sync.sh).
+            property string lockWallpaper: "" // a picture's path; "" = the desktop's wallpaper
+            property int lockBlur: 100        // percent of Theme.lock.blur
+            property int lockDim: 25          // percent darker
+            property bool lockClock: true
+            property bool lockDate: true
+            property bool lock24Hour: true
+            property bool greeterShowName: true     // your user name above the password field
+            property bool greeterPowerButtons: true // suspend, restart and shut down
+
             // Desktop entry ids of the apps Super+Enter, Super+B and Super+E open.
             property string terminal: "com.mitchellh.ghostty"
             property string browser: "zen"
