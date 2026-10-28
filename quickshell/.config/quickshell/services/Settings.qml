@@ -53,11 +53,14 @@ Singleton {
             property bool greeterShowName: true     // your user name above the password field
             property bool greeterPowerButtons: true // suspend, restart and shut down
 
-            // Desktop entry ids of the apps Super+Enter, Super+B and Super+E open, and the image viewer.
+            // Desktop entry ids of the apps Super+Enter, Super+B and Super+E open, and of the apps
+            // pictures, videos and audio files open in.
             property string terminal: "com.mitchellh.ghostty"
             property string browser: "zen"
             property string fileManager: "org.gnome.Nautilus"
             property string imageViewer: "org.gnome.Loupe" // screenshots open in it
+            property string videoPlayer: "org.gnome.Showtime"
+            property string audioPlayer: "org.gnome.Decibels"
         }
     }
 }

@@ -9,17 +9,28 @@ import Quickshell
 Singleton {
     id: root
 
-    // The .desktop categories an app needs to be offered as each kind of default app.
+    // The .desktop categories an app needs to be offered as each kind of default app: all of
+    // them; a nested list means any one of those (Decibels says Music, not Player).
     readonly property var categories: ({
         terminal: ["TerminalEmulator"],
         browser: ["WebBrowser"],
         fileManager: ["FileManager"],
-        imageViewer: ["Graphics", "Viewer"]
+        imageViewer: ["Graphics", "Viewer"],
+        videoPlayer: ["Video", "Player"],
+        audioPlayer: ["Audio", ["Player", "Music"]]
     })
 
-    // The picture types the image viewer opens (screenshots, pictures in Nautilus).
-    readonly property list<string> imageTypes: ["image/png", "image/jpeg", "image/gif", "image/webp",
-        "image/bmp", "image/tiff", "image/avif", "image/heic", "image/svg+xml", "image/x-icon"]
+    // The file types each kind becomes the system's default for (what other apps and Nautilus
+    // open things with). The browser is set through xdg-settings instead (links and web pages).
+    readonly property var fileTypes: ({
+        fileManager: ["inode/directory"],
+        imageViewer: ["image/png", "image/jpeg", "image/gif", "image/webp", "image/bmp", "image/tiff",
+                      "image/avif", "image/heic", "image/svg+xml", "image/x-icon"],
+        videoPlayer: ["video/mp4", "video/x-matroska", "video/webm", "video/quicktime", "video/x-msvideo",
+                      "video/mpeg", "video/ogg", "video/x-flv", "video/3gpp"],
+        audioPlayer: ["audio/mpeg", "audio/flac", "audio/ogg", "audio/x-vorbis+ogg", "audio/opus",
+                      "audio/wav", "audio/x-wav", "audio/mp4", "audio/aac", "audio/webm"]
+    })
 
     function launch(entry: DesktopEntry): void {
         // execute() ignores Terminal=true, so run those apps in the terminal ourselves.
@@ -54,19 +65,18 @@ Singleton {
     // Installed apps that can be the default of a kind, by name.
     function candidates(kind: string): list<DesktopEntry> {
         return DesktopEntries.applications.values
-            .filter(e => !e.noDisplay && categories[kind].every(c => e.categories.includes(c)))
+            .filter(e => !e.noDisplay && categories[kind].every(c => Array.isArray(c) ? c.some(any => e.categories.includes(any))
+                                                                                       : e.categories.includes(c)))
             .sort((a, b) => a.name.localeCompare(b.name));
     }
 
-    // Choose the default app of a kind. The browser, file manager and image viewer also become
-    // the system's defaults, for the links, folders and pictures other apps open.
+    // Choose the default app of a kind. Apart from the terminal, it also becomes the system's
+    // default, for the links, folders, pictures, videos and music other apps open.
     function setDefault(kind: string, id: string): void {
         Settings.values[kind] = id;
         if (kind === "browser")
             Quickshell.execDetached(["xdg-settings", "set", "default-web-browser", id + ".desktop"]);
-        else if (kind === "fileManager")
-            Quickshell.execDetached(["xdg-mime", "default", id + ".desktop", "inode/directory"]);
-        else if (kind === "imageViewer")
-            Quickshell.execDetached(["xdg-mime", "default", id + ".desktop", ...imageTypes]);
+        else if (fileTypes[kind])
+            Quickshell.execDetached(["xdg-mime", "default", id + ".desktop", ...fileTypes[kind]]);
     }
 }

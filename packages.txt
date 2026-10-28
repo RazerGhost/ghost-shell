@@ -31,6 +31,8 @@ ttf-meslo-nerd
 nvidia-prime
 nautilus
 loupe
+showtime
+decibels
 gvfs
 adw-gtk-theme
 yazi

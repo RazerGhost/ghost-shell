@@ -208,7 +208,8 @@ Singleton {
             Column {
                 id: pages
 
-                x: Theme.spacing.l
+                // Centered when the window is wider than a page (maximized).
+                x: Math.max(Theme.spacing.l, (content.width - width) / 2)
                 width: Math.min(Theme.settings.content, content.width - Theme.spacing.l * 2)
                 spacing: Theme.spacing.l
 
