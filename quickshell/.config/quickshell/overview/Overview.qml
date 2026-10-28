@@ -92,8 +92,7 @@ Scope {
         // The dimmed (and, through the layer rule, blurred) desktop. Click it to close.
         Rectangle {
             anchors.fill: parent
-            color: "black"
-            opacity: 0.45
+            color: Colors.scrim
 
             MouseArea {
                 anchors.fill: parent

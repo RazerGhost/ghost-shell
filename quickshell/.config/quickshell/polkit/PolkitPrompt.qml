@@ -46,8 +46,7 @@ Scope {
 
         Rectangle {
             anchors.fill: parent
-            color: "black"
-            opacity: 0.4
+            color: Colors.scrim
         }
 
         Rectangle {

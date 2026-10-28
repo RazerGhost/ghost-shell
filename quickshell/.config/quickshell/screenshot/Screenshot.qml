@@ -158,7 +158,7 @@ Scope {
             visible: frozen.hasContent && !capture.immediate
 
             readonly property rect hole: root.mode === "window" ? hover.windowRect : capture.selection
-            readonly property color shade: Qt.rgba(0, 0, 0, 0.45)
+            readonly property color shade: Colors.scrim
 
             Rectangle { x: 0; y: 0; width: parent.width; height: parent.hole.y; color: parent.shade }
             Rectangle { x: 0; y: parent.hole.y + parent.hole.height; width: parent.width; height: parent.height - y; color: parent.shade }

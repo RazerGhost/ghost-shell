@@ -26,6 +26,10 @@ Singleton {
     readonly property color surfaceTranslucent: Qt.rgba(m3surfaceContainer.r, m3surfaceContainer.g,
                                                          m3surfaceContainer.b, Theme.surfaceOpacity)
 
+    // Dims the screen behind the overview, the screenshot overlay and password prompts.
+    readonly property color m3scrim:                   json.scrim
+    readonly property color scrim: Qt.rgba(m3scrim.r, m3scrim.g, m3scrim.b, 0.45)
+
     // Written by matugen (templates/quickshell-colors.json). watchChanges + reload() picks up
     // a new wallpaper's colors live, without restarting the shell.
     FileView {
@@ -50,6 +54,7 @@ Singleton {
             property string on_surface_variant:        "#cac4d0"
             property string outline_variant:           "#49454f"
             property string error:                     "#f2b8b5"
+            property string scrim:                     "#000000"
         }
     }
 }
