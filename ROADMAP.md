@@ -621,6 +621,10 @@ windows).
   (size 8, 3 passes, more vibrancy, a little darker; look.lua). Ghostty (`background-opacity
   0.85`) and Zed (`background.appearance: blurred`, main backgrounds at 85 %) are see-through
   too; those are fixed, not following the setting. GTK/libadwaita apps can't be.
+- **JavaScript runtime: bun** (user's choice, 2026-10-28): the setup's scripts (`json_edit`,
+  `wallpaper.sh`, `ghost keybinds`, the Haunt lookup) and the discord-ghost build (`bun install`
+  reads its package-lock.json; tested) run on bun. npm is gone. Node and pnpm stay only for
+  Vencord, which pins pnpm (`packageManager`) and builds with `node`; Haunt also wants Node 22.18+.
 - **Island window height** is 840 px (was 680) so the "today" menu with notifications fits.
 - **Island menu widths:** menus are `Theme.island.panelWidth` (380) wide, and the island's window
   is just that wide (plus its curves and offset); the wallpaper picker is its own surface.

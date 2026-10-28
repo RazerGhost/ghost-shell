@@ -26,7 +26,7 @@ clone_at() {
 # environment variables, so paths never need quoting inside the code:
 #   VENCORD_DIST=... json_edit ~/.config/vesktop/state.json 'data.vencordDir = process.env.VENCORD_DIST'
 json_edit() {
-    JSON_FILE="$1" JSON_CHANGE="$2" node -e '
+    JSON_FILE="$1" JSON_CHANGE="$2" bun -e '
         const fs = require("fs"), { dirname } = require("path");
         const path = process.env.JSON_FILE;
         const data = fs.existsSync(path) ? JSON.parse(fs.readFileSync(path, "utf8")) : {};

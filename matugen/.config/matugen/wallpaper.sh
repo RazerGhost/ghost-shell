@@ -19,7 +19,7 @@ case "${1-}" in
         from_seed "$1"
         ;;
     "")
-        current=$(node -e 'process.stdout.write(require(process.argv[1]).path || "")' \
+        current=$(bun -e 'process.stdout.write(require(process.argv[1]).path || "")' \
             "$state/wallpaper.json" 2>/dev/null || true)
         if [ -n "$current" ] && [ -f "$current" ]; then
             echo "Colors from the current wallpaper: $current"
@@ -35,7 +35,7 @@ case "${1-}" in
         [ -f "$1" ] || { echo "wallpaper not found: $1" >&2; exit 1; }
         # The shell's wallpaper service watches this file and draws the picture it names.
         mkdir -p "$state"
-        WALLPAPER=$(realpath "$1") node -e '
+        WALLPAPER=$(realpath "$1") bun -e '
             require("fs").writeFileSync(process.argv[1], JSON.stringify({ path: process.env.WALLPAPER }, null, 4) + "\n");
         ' "$state/wallpaper.json"
         from_image "$(realpath "$1")"

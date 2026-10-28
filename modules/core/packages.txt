@@ -48,12 +48,12 @@ adw-gtk-theme
 greetd
 greetd-tuigreet
 
-# Tools the setup uses (paru, stow, git, node for JSON edits, lspci) and the shell's update count
+# Tools the setup uses (paru, stow, git, bun for JSON edits and scripts, lspci) and the shell's update count
 # (checkupdates from pacman-contrib)
 paru
 pacman-contrib
 stow
 git
-nodejs
+bun
 github-cli
 pciutils

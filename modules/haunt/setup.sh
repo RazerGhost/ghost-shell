@@ -9,7 +9,7 @@ cd "$(dirname "$0")/../.."
 
 step "Haunt (from its newest release)"
 # All releases are pre-releases so far, so not GitHub's "latest": the newest with the package.
-asset=$(curl -fsSL https://api.github.com/repos/RazerGhost/haunt/releases | node -e '
+asset=$(curl -fsSL https://api.github.com/repos/RazerGhost/haunt/releases | bun -e '
     const releases = JSON.parse(require("fs").readFileSync(0, "utf8"));
     for (const release of releases) {
         const asset = release.assets.find(a => /^haunt-bin-.+-x86_64\.pkg\.tar\.zst$/.test(a.name));

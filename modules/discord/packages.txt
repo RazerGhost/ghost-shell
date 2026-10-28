@@ -4,5 +4,5 @@
 # Building Vencord and the plugin
 git
 nodejs
-npm
+bun
 pnpm

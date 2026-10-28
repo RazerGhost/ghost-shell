@@ -15,7 +15,8 @@ ghost_dir="$HOME/.local/share/discord-ghost"
 # yours, so it follows its main branch.
 clone_at https://github.com/Vendicated/Vencord "$vencord_dir" v1.15.13
 clone_or_pull https://github.com/RazerGhost/discord-ghost "$ghost_dir"
-(cd "$ghost_dir" && npm ci && node build.mjs --vencord "$vencord_dir")
+# Ghost with bun (its package-lock.json is npm's; bun reads it): Vencord itself pins pnpm and Node.
+(cd "$ghost_dir" && bun install && bun build.mjs --vencord "$vencord_dir")
 (cd "$vencord_dir" && pnpm install --frozen-lockfile && pnpm build)
 # Vesktop's "Vencord location" setting (Developer options) is vencordDir in state.json.
 # Vesktop reads it at startup, so restart Vesktop after the first run.

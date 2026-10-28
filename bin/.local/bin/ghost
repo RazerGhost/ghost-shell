@@ -217,7 +217,7 @@ cmd_doctor() {
 # Every bind with a description, by category, as Markdown: the settings window's keybinds page
 # in text. The grouping is the page's own (quickshell's settings/Keybinds.js, loaded here).
 cmd_keybinds() {
-    hyprctl binds -j | KEYBINDS_JS="quickshell/.config/quickshell/settings/Keybinds.js" node -e '
+    hyprctl binds -j | KEYBINDS_JS="quickshell/.config/quickshell/settings/Keybinds.js" bun -e '
         const fs = require("fs");
         // The file is a QML JavaScript library: everything but its ".pragma library" line is plain JS.
         const source = fs.readFileSync(process.env.KEYBINDS_JS, "utf8").replace(/^\.pragma library$/m, "");

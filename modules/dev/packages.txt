@@ -3,7 +3,6 @@
 
 git
 nodejs
-npm
 pnpm
 rustup
 bun
