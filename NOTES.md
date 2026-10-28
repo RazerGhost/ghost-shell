@@ -40,7 +40,8 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - Hyprland runs Lua 5.5. `hyprctl eval '<lua>'` runs code in the config's state; `hyprctl repl
   'return x'` prints a value, but prints "unknown request" for an empty string.
 - Hyprland 0.57 (running since 2026-10-28): `hl.on("window.minimize", function(window, minimize))`
-  fires for apps' minimize buttons and foreign-toplevel requests (a toplevel's `minimized = true`
+  fires for foreign-toplevel requests and apps that ask; GTK apps grey their minimize button out,
+  since Hyprland's wm_capabilities only lists fullscreen and maximize (XDGShell.cpp), so it (a toplevel's `minimized = true`
   in Quickshell's `ToplevelManager` triggers it; verified). `decoration.blur.variant` takes names:
   kawase (0), frost, ripple, drops, water, fluid_jar, prism, heat_shimmer, acrylic, aurora, haze
   (ripple, drops and water animate). `decoration.wobble.enabled`. Spring curves use `damping`

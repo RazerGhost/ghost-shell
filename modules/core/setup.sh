@@ -29,9 +29,10 @@ gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark
 gsettings set org.gnome.desktop.interface icon-theme Colloid-Dark
 # Default apps (pictures, videos, music, browser, folders) are set by the shell at startup, from
 # its settings (services/Apps.qml), so a re-run doesn't undo a choice made in Settings.
-# Title bar buttons for apps that draw their own bar (GTK apps, Ghostty). Minimize works since
-# Hyprland 0.57 (windows.lua sends it to the shell's hidden workspace).
-gsettings set org.gnome.desktop.wm.preferences button-layout 'appmenu:minimize,maximize,close'
+# Title bar buttons for apps that draw their own bar (GTK apps, Ghostty). No minimize: Hyprland
+# (0.57) doesn't tell windows it can minimize (xdg-shell's wm_capabilities: only fullscreen and
+# maximize), so GTK greys the button out. Super+Down or the window menu minimizes.
+gsettings set org.gnome.desktop.wm.preferences button-layout 'appmenu:maximize,close'
 
 step "Wallpaper folder"
 # The wallpaper picker (quick settings) shows the pictures in here.

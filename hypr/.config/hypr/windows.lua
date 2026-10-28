@@ -23,8 +23,9 @@ hl.on("window.title", function(window)
     hl.dispatch(hl.dsp.window.center({ window = target }))
 end)
 
--- Minimize buttons in apps (GTK title bars, Ghostty) and taskbar-style requests: Hyprland 0.57
--- tells Lua about them. Minimized windows go to the same hidden workspace the shell uses
+-- Minimize requests from apps and taskbar-style tools (foreign-toplevel): Hyprland 0.57 tells Lua
+-- about them. GTK apps still show their minimize button greyed out: Hyprland doesn't advertise
+-- the minimize capability to windows (XDGShell.cpp), so GTK never sends the request. Minimized windows go to the same hidden workspace the shell uses
 -- (quickshell's services/Windows.qml), and come back to the workspace you're on.
 hl.on("window.minimize", function(window, minimize)
     if not window then
