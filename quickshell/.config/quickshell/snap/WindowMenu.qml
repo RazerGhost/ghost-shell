@@ -6,13 +6,14 @@ import Quickshell.Wayland
 import qs.services
 import qs.theme
 
-// Snapping, Windows 11 style. Super+Z shows the layouts in a small card at the top of the
-// focused window (so it's clear which window moves); Super+Left/Right snap to halves directly.
+// The window menu (Alt+Space or Super+Z), a card at the top of the focused window, so it's clear
+// which window it's about: its title bar actions and workspace (WindowActions.qml), and the snap
+// layouts, Windows 11 style (SnapLayouts.qml). Super+Left/Right snap to halves directly.
 Scope {
     id: root
 
     property bool open: false
-    // The window being snapped: the one focused when the picker opened.
+    // The window the menu is about: the one focused when it opened.
     property HyprlandToplevel target: null
 
     // Hyprland's latest details for the window: position and size, [x, y] in global coordinates.
@@ -45,7 +46,7 @@ Scope {
             Snap.restoreOrMinimize(Windows.active);
         }
 
-        // qs ipc call snap picker: show or hide the layouts for the focused window.
+        // qs ipc call snap picker: show or hide the window menu for the focused window.
         function picker(): void {
             root.toggle();
         }
@@ -70,10 +71,11 @@ Scope {
 
         WlrLayershell.namespace: "qs-snap"
         WlrLayershell.layer: WlrLayer.Overlay
-        // Take the keyboard while open, for Escape.
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+        // The keyboard, for Escape. OnDemand, not Exclusive: minimizing focuses the next window
+        // as the menu closes, which an exclusive surface would refuse (see the switcher).
+        WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
 
-        // Closes the picker when you click anywhere else.
+        // Closes the menu when you click anywhere else.
         HyprlandFocusGrab {
             windows: [window]
             active: window.visible
@@ -83,18 +85,29 @@ Scope {
         Rectangle {
             id: card
 
-            implicitWidth: layouts.implicitWidth + Theme.spacing.l * 2
-            implicitHeight: layouts.implicitHeight + Theme.spacing.l * 2
+            implicitWidth: menu.implicitWidth + Theme.spacing.l * 2
+            implicitHeight: menu.implicitHeight + Theme.spacing.l * 2
             radius: Theme.radius.xl
             color: Colors.surfaceTranslucent
             focus: true
             Keys.onEscapePressed: root.open = false
 
-            SnapLayouts {
-                id: layouts
+            Column {
+                id: menu
                 anchors.centerIn: parent
-                target: root.target
-                onDone: root.open = false
+                spacing: Theme.spacing.l
+
+                WindowActions {
+                    width: layouts.implicitWidth
+                    target: root.target
+                    onDone: root.open = false
+                }
+
+                SnapLayouts {
+                    id: layouts
+                    target: root.target
+                    onDone: root.open = false
+                }
             }
         }
     }

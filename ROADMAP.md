@@ -329,9 +329,10 @@ From a survey of every Quickshell 0.3.2 type and the quickshell-examples repo (u
   Ctrl+Alt+Delete power menu, Super+Ctrl+arrows focus, Super+I settings. Full list in
   `hypr/binds.lua` and the settings window.
 - **Window buttons:** Hyprland draws no title bars, so instead of hyprbars: keybinds plus a window
-  menu in the island (`controlcenter/WindowPanel.qml`, Alt+Space or right-click the island's top
-  row): minimize, maximize, snap, fullscreen, close, move to workspace 1-5, and the minimized
-  windows to restore.
+  menu on the window itself (`snap/WindowMenu.qml`, Alt+Space or Super+Z; user's choice
+  2026-10-28, it used to be an island menu next to a separate snap picker): minimize, maximize,
+  fullscreen, close, move to workspace 1-5, and the snap layouts. Minimized windows are restored
+  from the workspace dots' hover.
 - **Minimize:** Hyprland has none. A minimized window moves to the hidden `special:minimized`
   workspace (Super+Down, the window menu, the dock); the next most recent window on that workspace
   gets the focus, and `Windows.active` ignores minimized windows (Hyprland can still report one as

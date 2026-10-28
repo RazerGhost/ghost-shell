@@ -6,16 +6,16 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// The window menu (Alt+Space, or right-click the island): what title bar buttons would do for
-// the focused window (minimize, maximize, snap, fullscreen, close), moving it to another
-// workspace, and the minimized windows to bring back.
+// The top of the window menu (WindowMenu.qml): the window's icon and title, what title bar
+// buttons would do (minimize, maximize, fullscreen, close) and moving it to another workspace.
+// The snap layouts come below it.
 Column {
     id: root
 
     // The window the menu acts on: the one focused when the menu opened.
     property HyprlandToplevel target
 
-    // An action ran; the island closes the menu.
+    // An action ran; the menu closes.
     signal done()
 
     function act(action: var): void {
@@ -23,8 +23,6 @@ Column {
         done();
     }
 
-    padding: Theme.spacing.l
-    topPadding: Theme.spacing.s
     spacing: Theme.spacing.m
 
     // A round button with a caption below, like a share sheet's row.
@@ -69,7 +67,7 @@ Column {
 
     // The window: app icon, title, app.
     Row {
-        width: parent.width - root.leftPadding - root.rightPadding
+        width: parent.width
         spacing: Theme.spacing.m
 
         IconImage {
@@ -111,9 +109,6 @@ Column {
 
         Action { icon: "minimize"; text: "Minimize"; onTriggered: root.act(Windows.minimize) }
         Action { icon: "open_in_full"; text: "Maximize"; onTriggered: root.act(Windows.toggleMaximized) }
-        // The snap picker is its own surface (snap/SnapPicker.qml); it snaps the focused window,
-        // which is this one again once the menu has closed.
-        Action { icon: "space_dashboard"; text: "Snap"; onTriggered: root.act(() => Quickshell.execDetached(["qs", "ipc", "call", "snap", "picker"])) }
         Action { icon: "fullscreen"; text: "Fullscreen"; onTriggered: root.act(Windows.toggleFullscreen) }
         Action { icon: "close"; text: "Close"; onTriggered: root.act(Windows.close) }
     }
@@ -121,7 +116,7 @@ Column {
     // Move to workspace: one numbered pill per workspace dot; the window's own is filled.
     Column {
         visible: root.target !== null
-        width: parent.width - root.leftPadding - root.rightPadding
+        width: parent.width
         spacing: Theme.spacing.s
 
         Text {
@@ -170,10 +165,5 @@ Column {
                 }
             }
         }
-    }
-
-    MinimizedList {
-        width: parent.width - root.leftPadding - root.rightPadding
-        onRestored: root.done()
     }
 }

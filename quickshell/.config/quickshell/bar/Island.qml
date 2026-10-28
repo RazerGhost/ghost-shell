@@ -15,7 +15,7 @@ import qs.services
 Scope {
     id: root
 
-    // "", "today", "settings", "media", "window", "power", "clipboard", "emoji" or "wallpaper"
+    // "", "today", "settings", "media", "power", "clipboard", "emoji" or "wallpaper"
     property alias panel: persist.panel
     property alias screenName: persist.screenName // the monitor the menu is open on
 
@@ -27,8 +27,6 @@ Scope {
         property string panel: ""
         property string screenName: ""
     }
-    // The window menu acts on the window that was focused when it opened.
-    property HyprlandToplevel windowTarget: null
 
     // After the shell reloads (a file in its folder changed), the island says so instead of
     // Quickshell's own pop-up: briefly when it worked, longer with the error when it didn't (the
@@ -64,14 +62,12 @@ Scope {
         if (panel === name && screenName === screen) {
             panel = "";
         } else {
-            if (name === "window")
-                windowTarget = Windows.active;
             panel = name;
             screenName = screen;
         }
     }
 
-    // From Hyprland binds: qs ipc call island toggle settings (or: today, media, window, power,
+    // From Hyprland binds: qs ipc call island toggle settings (or: today, media, power,
     // clipboard, emoji, wallpaper)
     IpcHandler {
         target: "island"

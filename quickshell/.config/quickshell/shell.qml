@@ -30,7 +30,7 @@ ShellRoot {
     Screenshot {}
     Osd {}
     Overview {}
-    SnapPicker {}
+    WindowMenu {}
     SnapAssist {}
     Switcher {}
     Idle {}

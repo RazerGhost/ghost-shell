@@ -14,7 +14,7 @@ PanelWindow {
     id: root
 
     required property ShellScreen modelData
-    required property var island // Island.qml: panel, screenName, windowTarget, toggle(), reload*
+    required property var island // Island.qml: panel, screenName, toggle(), reload*
     screen: modelData
 
     readonly property string panel: island.screenName === modelData.name ? island.panel : ""
@@ -183,8 +183,7 @@ PanelWindow {
 
         // Everything inside the island, clipped to its current size so the menus are
         // revealed as it grows. A MouseArea to know whether the pointer is over the island
-        // (hover reaches it through its children too), and for right-clicking the top
-        // row to open the window menu. Left clicks go to the buttons inside.
+        // (hover reaches it through its children too). Clicks go to the buttons inside.
         MouseArea {
             id: content
 
@@ -194,11 +193,7 @@ PanelWindow {
             clip: true
             focus: true
             hoverEnabled: true
-            acceptedButtons: Qt.RightButton
-            onClicked: mouse => {
-                if (mouse.y < Theme.island.height)
-                    root.island.toggle("window", root.modelData.name);
-            }
+            acceptedButtons: Qt.NoButton
             Keys.onEscapePressed: root.island.panel = ""
 
             // Workspaces | time | status icons, symmetric (user's choice): both sides are as wide
@@ -422,16 +417,6 @@ PanelWindow {
 
                     PowerPanel {
                         width: parent.width
-                        onDone: root.island.panel = ""
-                    }
-                }
-
-                MenuSlot {
-                    shown: root.shown === "window"
-
-                    WindowPanel {
-                        width: parent.width
-                        target: root.island.windowTarget
                         onDone: root.island.panel = ""
                     }
                 }

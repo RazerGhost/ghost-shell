@@ -52,14 +52,15 @@ hl.bind(mainMod .. " + up",   hl.dsp.window.fullscreen({ mode = "maximized", act
 -- window is minimized (Hyprland has no minimize, so it goes to a hidden special workspace that the
 -- island lists; see quickshell's services/Windows.qml and Snap.qml).
 hl.bind(mainMod .. " + down", hl.dsp.exec_cmd("qs ipc call snap down"), { description = "Unsnap or minimize" })
--- Window menu in the island (like Windows' Alt+Space): minimize, maximize, move, restore.
-hl.bind("ALT + space", hl.dsp.exec_cmd("qs ipc call island toggle window"), { description = "Window menu" })
+-- Window menu on the window (like Windows' Alt+Space): minimize, maximize, fullscreen, close,
+-- the snap layouts and moving it to another workspace. Super+Z opens the same menu.
+hl.bind("ALT + space", hl.dsp.exec_cmd("qs ipc call snap picker"), { description = "Window menu and snap layouts" })
 hl.bind(mainMod .. " + F",    hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }), { description = "Fullscreen" })
 
 -- Snapping (Windows 11 style): halves directly, every layout in a picker over the window.
 hl.bind(mainMod .. " + left",  hl.dsp.exec_cmd("qs ipc call snap active left"), { description = "Snap left" })
 hl.bind(mainMod .. " + right", hl.dsp.exec_cmd("qs ipc call snap active right"), { description = "Snap right" })
-hl.bind(mainMod .. " + Z",     hl.dsp.exec_cmd("qs ipc call snap picker"), { description = "Snap layouts" })
+hl.bind(mainMod .. " + Z",     hl.dsp.exec_cmd("qs ipc call snap picker"), { description = "Window menu and snap layouts" })
 
 -- Alt+Tab switcher: Tab steps through the windows, releasing Alt switches (Quickshell sees that).
 hl.bind("ALT + Tab",         hl.dsp.exec_cmd("qs ipc call switcher next"), { description = "Switch windows" })
