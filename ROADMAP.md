@@ -92,8 +92,7 @@ new setup step.
   the date to show it. Click a card for the app's default action; its other actions
   are buttons. Bodies are shown as plain text (no markup).
 - Quick settings tiles: Do Not Disturb (no pop-ups except critical; history still collects) and
-  night light (`services/NightLight.qml`, hyprsunset: 4000 K from 20:00 to 07:00 by
-  `hypr/hyprsunset.conf`, the tile overrides it until the next switch).
+  night light (`services/NightLight.qml`, hyprsunset at 4000 K; manual only, see decisions).
 - Power menu (`controlcenter/PowerPanel.qml`, power button in quick settings or Ctrl+Alt+Delete):
   lock, suspend, log out, restart, shut down; the last three need a second click within 4 s.
   Lock runs hyprlock, which has no config until Phase 5.
@@ -222,9 +221,11 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
 - **Notifications from the island** (user's choice over corner cards). Pop-ups wait while a menu
   is open. Notifications carry no timestamp, so the service records arrival times; after a shell
   restart (not a reload) the history is empty.
-- **Night light schedule** in `hyprsunset.conf` (user's choice: tile + automatic). hyprsunset
-  can't report a manual override, so the tile state comes from its profile at startup and on each
-  switch (`on-switch = qs ipc call nightlight refresh`) and from the tile itself.
+- **Night light is manual** (user's choice, after first having a 20:00-07:00 schedule turned it on
+  at every evening login): `hyprsunset.conf` has one all-day neutral profile, and only the tile
+  turns it warm. hyprsunset can't report a manual override, so the tile state comes from its
+  profile at startup (`on-switch = qs ipc call nightlight refresh`) and from the tile itself. The
+  conf file shows how to add a schedule back.
 - **Island window height** is 840 px (was 680) so the "today" menu with notifications fits.
 - **Island menu widths:** menus are `Theme.island.panelWidth` (380) wide, the wallpaper picker
   `wideWidth` (820); the island's window is as wide as the widest. Regular menus keep their width
