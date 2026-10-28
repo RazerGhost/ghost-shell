@@ -1,2 +1,6 @@
 ttf-material-symbols-variable
 zen-browser-bin
+spotify
+spicetify-cli
+vesktop-bin
+millennium

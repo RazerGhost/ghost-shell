@@ -15,11 +15,15 @@ step() { printf '\n\033[1;34m==> %s\033[0m\n' "$*"; }
 fail() { printf '\033[1;31merror:\033[0m %s\n' "$*" >&2; exit 1; }
 
 step "Installing packages (packages.txt, aur.txt)"
+# steam comes from [multilib]; CachyOS enables it in /etc/pacman.conf by default.
 # Packages go in as arguments, not on stdin: pacman and paru read their "Proceed?" prompts
 # from stdin, and with the list piped in they'd get end-of-file instead of your answer.
 mapfile -t pacman_pkgs < <(grep -v '^[[:space:]]*$' packages.txt)
 mapfile -t aur_pkgs    < <(grep -v '^[[:space:]]*$' aur.txt)
 sudo pacman -S --needed "${pacman_pkgs[@]}"
+# rustup installs no toolchain by itself. Set up stable before the AUR packages: some build
+# with Rust (millennium), and so does Haunt (Tauri).
+rustup toolchain list | grep -q stable || rustup default stable
 paru -S --needed "${aur_pkgs[@]}"
 
 step "GPU udev rule (stable /dev/dri/amd-igpu and /dev/dri/nvidia-dgpu)"
@@ -91,6 +95,12 @@ step "Services the Quickshell bar reads"
 # UPower (battery) is started on demand by D-Bus, so it needs no enabling.
 sudo systemctl enable --now NetworkManager.service bluetooth.service power-profiles-daemon.service
 
+step "Spotify: let Spicetify patch it"
+# Spicetify rewrites files in /opt/spotify. Its docs make the folder writable for everyone;
+# owning it as this user is enough. Spotify updates replace the files, so run
+# `spicetify backup apply` after one.
+sudo chown -R "$USER" /opt/spotify
+
 step "Linking configs with stow"
 # Every top-level directory is a Stow package, except system/ (installed above) and tests/.
 # -R re-links, so files added to an already-stowed package get linked too.
@@ -123,6 +133,57 @@ elif [[ -f $HOME/.local/state/quickshell/colors.json ]]; then
 else
     echo "No wallpaper given, using seed color $default_seed"
     matugen color hex "$default_seed" -m dark
+fi
+
+step "Dev tools: Docker"
+# docker.socket starts Docker on first use instead of at every boot.
+sudo systemctl enable --now docker.socket
+# The docker group lets you run docker without sudo. Membership is equivalent to root access
+# (containers can mount /), so only your own user is added. It applies after logging in again.
+id -nG "$USER" | grep -qw docker || sudo usermod -aG docker "$USER"
+
+# Clone a repo, or fast-forward it if it's already there.
+clone_or_pull() {
+    if [[ -d $2/.git ]]; then
+        git -C "$2" pull --ff-only
+    else
+        git clone "$1" "$2"
+    fi
+}
+
+step "Discord: Vencord with the Ghost theme plugin, for Vesktop"
+# Third-party Vencord plugins only load from a source build, so build Vencord with Ghost
+# (github.com/RazerGhost/discord-ghost) as a userplugin and point Vesktop at that build.
+# Re-run this script to update both. Enable the plugin in Vesktop: Settings -> Plugins -> Ghost.
+vencord_dir="$HOME/.local/share/vencord"
+ghost_dir="$HOME/.local/share/discord-ghost"
+clone_or_pull https://github.com/Vendicated/Vencord "$vencord_dir"
+clone_or_pull https://github.com/RazerGhost/discord-ghost "$ghost_dir"
+(cd "$ghost_dir" && npm ci && node build.mjs --vencord "$vencord_dir")
+(cd "$vencord_dir" && pnpm install --frozen-lockfile && pnpm build)
+# Vesktop's "Vencord location" setting (Developer options) is vencordDir in state.json.
+# Vesktop reads it at startup, so restart Vesktop after the first run.
+VESKTOP_STATE="$HOME/.config/vesktop/state.json" VENCORD_DIST="$vencord_dir/dist" node -e '
+    const fs = require("fs");
+    const path = process.env.VESKTOP_STATE;
+    const state = fs.existsSync(path) ? JSON.parse(fs.readFileSync(path, "utf8")) : {};
+    state.vencordDir = process.env.VENCORD_DIST;
+    fs.mkdirSync(require("path").dirname(path), { recursive: true });
+    fs.writeFileSync(path, JSON.stringify(state, null, 4));
+'
+
+step "Spotify: the Ghost Spicetify theme"
+# github.com/RazerGhost/spicetify-ghost. Its installer loads the theme from GitHub, so it
+# updates itself. Spicetify needs Spotify's prefs file, which Spotify writes on first start.
+if [[ -f $HOME/.config/spotify/prefs ]]; then
+    # Spicetify patches a backup of the original Spotify; the first run has to make it.
+    # The [Backup] version in its config stays empty until then.
+    if ! grep -A1 '^\[Backup\]' "$HOME/.config/spicetify/config-xpui.ini" 2>/dev/null | grep -q 'version *= *[0-9]'; then
+        spicetify backup apply
+    fi
+    curl -fsSL https://raw.githubusercontent.com/RazerGhost/spicetify-ghost/main/install.sh | sh
+else
+    echo "Skipped: open Spotify once and log in, then re-run this script."
 fi
 
 step "Done"
