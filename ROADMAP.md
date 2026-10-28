@@ -107,7 +107,10 @@ new setup step.
   in). The picker (`controlcenter/WallpaperPanel.qml`, wallpaper button in quick settings or
   `qs ipc call island toggle wallpaper`) is wider than the other menus (user's choice) and shows
   `~/Pictures/Wallpapers` (local folder only: the user prefers real photos or anime art and
-  picks them themselves). Choosing one runs matugen on it. The choice is saved in
+  picks them themselves), then a "Built-in" section: Hyprland's `/usr/share/hypr/wall*.png` and
+  the `cachyos-wallpapers` package (in packages.txt). Those stay in their packages, not in this
+  repo: their licensing is unclear (no artist credits) and they're ~200 MB. Thumbnails load the
+  first time the picker opens. Choosing one runs matugen on it. The choice is saved in
   `~/.local/state/quickshell/wallpaper.json`; `qs ipc call wallpaper set <path>` and
   `./install.sh <image>` set it too. With none chosen, Hyprland's default wallpaper shows.
 

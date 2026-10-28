@@ -6,27 +6,108 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// The wallpaper picker: the pictures in ~/Pictures/Wallpapers as a grid, wider than the other
-// menus so more fit side by side. Click one to use it; the colors follow the picture.
+// The wallpaper picker, wider than the other menus so more pictures fit side by side: your
+// pictures from ~/Pictures/Wallpapers, then the built-in ones that come with Hyprland and
+// CachyOS (from their packages, so they're not copied anywhere). Click one to use it; the
+// colors follow the picture.
 Column {
     id: root
+
+    // Thumbnails only load once the picker has been opened: the built-in pictures are large
+    // (up to 5K), and decoding them all at login would keep the CPU busy for nothing.
+    property bool opened: false
+
+    readonly property real contentWidth: width - leftPadding - rightPadding
+    readonly property real thumbWidth: (contentWidth - Theme.spacing.s * (Theme.wallpaper.columns - 1)) / Theme.wallpaper.columns
+    readonly property real thumbHeight: thumbWidth * 9 / 16
 
     padding: Theme.spacing.l
     topPadding: Theme.spacing.s
     spacing: Theme.spacing.s
 
-    // Re-read the folder each time the picker opens: the folder listing doesn't notice the
+    // Re-read your folder each time the picker opens: the folder listing doesn't notice the
     // folder being created after the shell started (e.g. by "Open folder").
     onVisibleChanged: {
         if (visible) {
-            pictures.folder = "";
-            pictures.folder = "file://" + Wallpaper.folder;
+            opened = true;
+            yours.folder = "";
+            yours.folder = "file://" + Wallpaper.folder;
         }
     }
 
-    // Title, with a button to open the folder (to add pictures).
+    FolderListModel {
+        id: yours
+        folder: "file://" + Wallpaper.folder
+        nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
+        showDirs: false
+    }
+
+    FolderListModel {
+        id: hyprland
+        folder: "file:///usr/share/hypr"
+        nameFilters: ["wall*.png"] // the folder also holds other images
+        showDirs: false
+    }
+
+    FolderListModel {
+        id: cachyos
+        folder: "file:///usr/share/wallpapers/cachyos-wallpapers"
+        nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
+        showDirs: false
+    }
+
+    // One picture in the grid. The current wallpaper gets an accent outline.
+    component Thumbnail: MouseArea {
+        id: cell
+
+        required property string filePath
+        required property string fileName
+        readonly property bool current: filePath === Wallpaper.path
+
+        width: root.thumbWidth
+        height: root.thumbHeight
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        onClicked: Wallpaper.set(filePath)
+
+        Accessible.role: Accessible.ListItem
+        Accessible.name: fileName + (current ? ", current wallpaper" : "")
+        Accessible.onPressAction: Wallpaper.set(filePath)
+
+        ClippingRectangle {
+            anchors.fill: parent
+            radius: Theme.radius.m
+            color: Colors.m3surfaceContainerHigh
+
+            Image {
+                anchors.fill: parent
+                source: root.opened ? "file://" + cell.filePath : ""
+                fillMode: Image.PreserveAspectCrop
+                asynchronous: true
+                // Thumbnails only; decoding full-size pictures would take seconds and memory.
+                sourceSize.width: width * 2
+                Accessible.ignored: true
+            }
+        }
+
+        Rectangle {
+            anchors.fill: parent
+            radius: Theme.radius.m
+            color: "transparent"
+            border.width: cell.current ? 3 : cell.containsMouse ? 2 : 0
+            border.color: cell.current ? Colors.m3primary : Colors.m3onSurface
+        }
+    }
+
+    component SectionTitle: Text {
+        color: Colors.m3onSurfaceVariant
+        font.family: Theme.font.sans
+        font.pixelSize: Theme.font.small
+    }
+
+    // Title, with a button to open your folder (to add pictures).
     Item {
-        width: parent.width - root.leftPadding - root.rightPadding
+        width: root.contentWidth
         height: openFolder.height
 
         Text {
@@ -46,82 +127,55 @@ Column {
         }
     }
 
-    GridView {
-        id: grid
-
-        readonly property int columns: Theme.wallpaper.columns
-        readonly property real thumbWidth: cellWidth - Theme.spacing.s
-
-        width: parent.width - root.leftPadding - root.rightPadding
-        cellWidth: width / columns
-        cellHeight: thumbWidth * 9 / 16 + Theme.spacing.s
-        implicitHeight: Math.min(Math.ceil(count / columns), Theme.wallpaper.rows) * cellHeight
+    Flickable {
+        width: root.contentWidth
+        height: Math.min(contentHeight, Theme.wallpaper.height)
+        contentHeight: sections.implicitHeight
         clip: true
         boundsBehavior: Flickable.StopAtBounds
 
         Accessible.role: Accessible.List
 
-        model: FolderListModel {
-            id: pictures
-            folder: "file://" + Wallpaper.folder
-            nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
-            showDirs: false
-            sortField: FolderListModel.Name
-        }
+        Column {
+            id: sections
+            width: parent.width
+            spacing: Theme.spacing.s
 
-        delegate: MouseArea {
-            id: cell
+            SectionTitle {
+                text: yours.count > 0 ? "Your pictures" : "Your pictures: none yet. Put some in ~/Pictures/Wallpapers (Open folder)."
+            }
 
-            required property string filePath
-            required property string fileName
-            readonly property bool current: filePath === Wallpaper.path
+            Grid {
+                visible: yours.count > 0
+                columns: Theme.wallpaper.columns
+                spacing: Theme.spacing.s
 
-            width: grid.thumbWidth
-            height: grid.cellHeight - Theme.spacing.s
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: Wallpaper.set(filePath)
-
-            Accessible.role: Accessible.ListItem
-            Accessible.name: fileName + (current ? ", current wallpaper" : "")
-            Accessible.onPressAction: Wallpaper.set(filePath)
-
-            ClippingRectangle {
-                anchors.fill: parent
-                radius: Theme.radius.m
-                color: Colors.m3surfaceContainerHigh
-
-                Image {
-                    anchors.fill: parent
-                    source: "file://" + cell.filePath
-                    fillMode: Image.PreserveAspectCrop
-                    asynchronous: true
-                    // Thumbnails only; decoding full-size photos would take seconds and memory.
-                    sourceSize.width: width * 2
-                    Accessible.ignored: true
+                Repeater {
+                    model: yours
+                    Thumbnail {}
                 }
             }
 
-            // The current wallpaper gets an accent outline; hovered ones a faint one.
-            Rectangle {
-                anchors.fill: parent
-                radius: Theme.radius.m
-                color: "transparent"
-                border.width: cell.current ? 3 : cell.containsMouse ? 2 : 0
-                border.color: cell.current ? Colors.m3primary : Colors.m3onSurface
+            SectionTitle {
+                topPadding: Theme.spacing.xs
+                visible: hyprland.count + cachyos.count > 0
+                text: "Built-in (Hyprland and CachyOS)"
+            }
+
+            Grid {
+                columns: Theme.wallpaper.columns
+                spacing: Theme.spacing.s
+
+                Repeater {
+                    model: hyprland
+                    Thumbnail {}
+                }
+
+                Repeater {
+                    model: cachyos
+                    Thumbnail {}
+                }
             }
         }
-    }
-
-    Text {
-        visible: grid.count === 0
-        width: parent.width - root.leftPadding - root.rightPadding
-        horizontalAlignment: Text.AlignHCenter
-        topPadding: Theme.spacing.m
-        bottomPadding: Theme.spacing.m
-        text: "No pictures yet. Put some in ~/Pictures/Wallpapers (Open folder)."
-        color: Colors.m3onSurfaceVariant
-        font.family: Theme.font.sans
-        font.pixelSize: Theme.font.normal
     }
 }
