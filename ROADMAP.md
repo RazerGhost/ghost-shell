@@ -211,7 +211,9 @@ config files became settings.
     in separately (`idle/Idle.qml`, see decisions).
   - **Default apps:** terminal, browser, file manager, image viewer (Loupe), video and audio
     player (Celluloid for both, user's choice over Showtime + Decibels) (installed apps of the
-    matching .desktop categories). The keybinds open the chosen ones; the browser and file manager also become the
+    matching .desktop categories). The shell makes the system's defaults (xdg-mime,
+    xdg-settings) match the settings at every start, the only place they're set, so re-running
+    install.sh doesn't undo a choice. The keybinds open the chosen ones; the browser and file manager also become the
     system defaults (`xdg-settings`, `xdg-mime`).
   - **Keybinds:** read from Hyprland (`hyprctl binds -j`, every bind in `binds.lua` has a
     description), grouped per description (`settings/Keybinds.js`, tested).

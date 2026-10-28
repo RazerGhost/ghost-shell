@@ -1,6 +1,7 @@
 // Entry point: Quickshell loads ~/.config/quickshell/shell.qml.
 // `import qs.<folder>` imports a folder relative to this file; files starting with an
 // uppercase letter become types (bar/Bar.qml -> Bar). No qmldir needed.
+import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.bar
@@ -12,6 +13,7 @@ import qs.osd
 import qs.overview
 import qs.polkit
 import qs.screenshot
+import qs.services
 import qs.settings
 import qs.snap
 import qs.switcher
@@ -32,6 +34,16 @@ ShellRoot {
     SnapAssist {}
     Switcher {}
     Idle {}
+
+    // The system's default apps follow the settings (services/Apps.qml).
+    Connections {
+        target: Settings
+
+        function onLoadedChanged(): void {
+            if (Settings.loaded)
+                Apps.applySystemDefaults();
+        }
+    }
 
     // Here because the settings window is a singleton, which only exists once something uses it.
     IpcHandler {

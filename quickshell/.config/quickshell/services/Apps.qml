@@ -74,9 +74,26 @@ Singleton {
     // default, for the links, folders, pictures, videos and music other apps open.
     function setDefault(kind: string, id: string): void {
         Settings.values[kind] = id;
+        applySystemDefault(kind);
+    }
+
+    function applySystemDefault(kind: string): void {
+        const id = Settings.values[kind];
         if (kind === "browser")
             Quickshell.execDetached(["xdg-settings", "set", "default-web-browser", id + ".desktop"]);
         else if (fileTypes[kind])
             Quickshell.execDetached(["xdg-mime", "default", id + ".desktop", ...fileTypes[kind]]);
+    }
+
+    // Make the system's defaults match the settings (shell.qml, once they're loaded): this is
+    // the one place the file types are set, also on a new install. One after another in one
+    // shell: xdg-mime processes running side by side overwrite each other's mimeapps.list.
+    // The app ids go in as arguments ($1, $2, ...), not into the script text.
+    function applySystemDefaults(): void {
+        const kinds = Object.keys(fileTypes);
+        const lines = ['xdg-settings set default-web-browser "$1.desktop"'];
+        kinds.forEach((kind, i) => lines.push(`xdg-mime default "$${i + 2}.desktop" ${fileTypes[kind].join(" ")}`));
+        Quickshell.execDetached(["sh", "-c", lines.join("\n"), "sh", Settings.values.browser,
+                                 ...kinds.map(kind => Settings.values[kind])]);
     }
 }

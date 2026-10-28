@@ -120,14 +120,8 @@ gsettings set org.gnome.desktop.interface color-scheme prefer-dark
 gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark
 # Colloid icons (user's choice); Quickshell gets the same theme from QS_ICON_THEME in env.lua.
 gsettings set org.gnome.desktop.interface icon-theme Colloid-Dark
-# Pictures (screenshots too) open in Loupe, videos and music files in Celluloid (user's choice);
-# Settings -> Default apps can change them (services/Apps.qml has the same type lists).
-xdg-mime default org.gnome.Loupe.desktop image/png image/jpeg image/gif image/webp image/bmp \
-    image/tiff image/avif image/heic image/svg+xml image/x-icon
-xdg-mime default io.github.celluloid_player.Celluloid.desktop video/mp4 video/x-matroska video/webm video/quicktime \
-    video/x-msvideo video/mpeg video/ogg video/x-flv video/3gpp
-xdg-mime default io.github.celluloid_player.Celluloid.desktop audio/mpeg audio/flac audio/ogg audio/x-vorbis+ogg \
-    audio/opus audio/wav audio/x-wav audio/mp4 audio/aac audio/webm
+# Default apps (pictures, videos, music, browser, folders) are set by the shell at startup, from
+# its settings (services/Apps.qml), so a re-run doesn't undo a choice made in Settings.
 # Title bar buttons for apps that draw their own bar (GTK apps, Ghostty). No minimize: Hyprland
 # ignores apps' minimize requests (Super+Down or the window menu minimizes instead).
 gsettings set org.gnome.desktop.wm.preferences button-layout 'appmenu:maximize,close'

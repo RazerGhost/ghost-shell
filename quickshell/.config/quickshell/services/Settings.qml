@@ -8,7 +8,11 @@ import Quickshell
 import Quickshell.Io
 
 Singleton {
+    id: root
+
     readonly property JsonAdapter values: adapter
+    // The file has been read (or found missing, so the defaults below apply).
+    property bool loaded: false
 
     FileView {
         path: Quickshell.env("HOME") + "/.local/state/quickshell/settings.json"
@@ -18,6 +22,8 @@ Singleton {
         watchChanges: true
         onFileChanged: reload()
         onAdapterUpdated: writeAdapter()
+        onLoaded: root.loaded = true
+        onLoadFailed: root.loaded = true
 
         adapter: JsonAdapter {
             id: adapter
