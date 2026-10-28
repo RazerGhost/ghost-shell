@@ -115,7 +115,7 @@ new setup step.
   `~/.local/state/quickshell/wallpaper.json`; `qs ipc call wallpaper set <path>` and
   `./install.sh <image>` set it too. With none chosen, Hyprland's default wallpaper shows.
 
-### Phase 5: Lock screen + idle + greeter (lock screen and idle built; greeter not started)
+### Phase 5: Lock screen + idle + greeter (lock screen verified; greeter built, not yet booted)
 - Lock screen (`lock/Lock.qml`, `LockContent.qml`): Quickshell `WlSessionLock` on every monitor,
   blurred wallpaper, big clock and date, password field checked through PAM's `login` config.
   `qs ipc call lock lock` (Super+L, power menu, hypridle); `qs ipc call lock preview` shows it
@@ -124,15 +124,25 @@ new setup step.
 - Idle (`hypr/hypridle.conf`, user's "balanced" choice): dim at 4 min, lock at 5, screen off at
   5.5, suspend at 15 only on battery (`condition_cmd` checks `ACAD/online`). Locks before every
   suspend (`inhibit_sleep = 3` waits for the lock).
-- Still to do: the Quickshell greeter (`Quickshell.Services.Greetd`) replacing tuigreet, sharing
-  `LockContent`'s look. It runs inside a small Hyprland instance started by greetd; switching
-  over is a change to `command` in `system/etc/greetd/config.toml`.
+- Greeter (`greeter.qml` entry + `greeter/Greeter.qml`, `Quickshell.Services.Greetd`): the lock
+  screen's look plus the user's name; Enter logs in and launches `start-hyprland`. greetd runs it
+  as the `greeter` user inside a small Hyprland (`system/etc/greetd/hypr/hyprland.lua`, which
+  requires copies of `monitors/env/input.lua`), with `HOME=/var/lib/qs-greeter`. The greeter
+  can't read the user's home, so `update-greeter.sh` (run by install.sh) copies the shell to
+  `/etc/greetd/quickshell/` and snapshots colors, wallpaper and user name into its home. Re-run
+  it after changing the wallpaper. When qs quits after launching, the greeter's Hyprland exits
+  (`qs ...; hyprctl dispatch 'hl.dsp.exit()'`), so greetd starts the session. Checked nested in a
+  Hyprland window; not yet at a real boot.
 
 **Lock screen recovery.** If the lock screen crashes, Hyprland keeps the session locked (red
 screen). `misc.allow_session_lock_restore` (look.lua) lets another lock screen take over:
 Ctrl+Alt+F2, log in, run
 `hyprctl --instance 0 dispatch 'hl.dsp.exec_cmd("hyprlock -c /usr/share/hypr/hyprlock.conf")'`,
 go back with Ctrl+Alt+F1 and unlock with your password.
+
+**Login screen recovery.** If the Quickshell greeter doesn't come up (black screen, or it keeps
+restarting): Ctrl+Alt+F2, log in, then switch greetd back to tuigreet and restart it:
+`sudo sed -i 's/^command = "env/# command = "env/; s/^# command = "tuigreet/command = "tuigreet/' /etc/greetd/config.toml && sudo systemctl restart greetd`.
 
 ### Phase 6: Window switching + snap layouts
 Added at the user's request after researching Windows/macOS features (2026-10-28). The phase number

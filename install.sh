@@ -197,5 +197,10 @@ else
     echo "Skipped: open Spotify once and log in, then re-run this script."
 fi
 
+step "Login screen (Quickshell greeter)"
+# After matugen, so the login screen gets the current colors. Re-run update-greeter.sh alone to
+# update its look after changing the wallpaper.
+./update-greeter.sh
+
 step "Done"
 echo "Log out and back in if this was the first run or env.lua changed (GPU settings apply at Hyprland start)."

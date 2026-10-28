@@ -6,7 +6,8 @@ import qs.theme
 import qs.widgets
 
 // What the lock screen shows on each monitor: the wallpaper blurred and darkened, a big clock
-// and the date, and the password field. Lock.qml checks the password.
+// and the date, and the password field. Lock.qml checks the password. The login screen
+// (greeter/Greeter.qml) uses it too, with the user's name above the field.
 Item {
     id: root
 
@@ -15,6 +16,8 @@ Item {
     property bool messageIsError
     // A password is being checked; the field waits.
     property bool busy
+    // Shown above the password field when set (the login screen).
+    property string user
 
     signal submitted(string password)
 
@@ -85,6 +88,28 @@ Item {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: parent.height * 0.2
         spacing: Theme.spacing.m
+
+        Row {
+            anchors.horizontalCenter: parent.horizontalCenter
+            visible: root.user !== ""
+            spacing: Theme.spacing.s
+
+            MaterialIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                icon: "account_circle"
+                color: Colors.m3onSurface
+                font.pixelSize: Theme.icon.launcher
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: root.user
+                color: Colors.m3onSurface
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.large
+                font.weight: Font.DemiBold
+            }
+        }
 
         Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
