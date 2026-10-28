@@ -196,9 +196,11 @@ PanelWindow {
             Keys.onEscapePressed: root.island.panel = ""
 
             // Workspaces | time | status icons, symmetric (user's choice): both sides are as wide
-            // as the wider group, each group centered on its side, so the time sits exactly in the
-            // screen's middle, under the webcam. Groups keep their own spacing: spreading the
-            // narrower one to match left odd gaps (two dots far apart).
+            // as the wider group, so the time sits exactly in the screen's middle, under the
+            // webcam. Each group sits against the island's end with the same padding, like a
+            // status bar around a notch (user's choice: centered on its side, one workspace dot
+            // floated in empty space next to the wider status icons). Groups keep their own
+            // spacing: spreading the narrower one to match left odd gaps (two dots far apart).
             Row {
                 id: topRow
 
@@ -214,7 +216,9 @@ PanelWindow {
 
                     Workspaces {
                         id: workspaces
-                        anchors.centerIn: parent
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacing.m // the status button's own padding
+                        anchors.verticalCenter: parent.verticalCenter
                         screen: root.modelData
                     }
                 }
@@ -269,7 +273,8 @@ PanelWindow {
 
                     IslandButton {
                         id: status
-                        anchors.centerIn: parent
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
                         label: "Quick settings"
                         active: root.panel === "settings"
                         onActivated: root.island.toggle("settings", root.modelData.name)

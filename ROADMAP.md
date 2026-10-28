@@ -70,8 +70,9 @@ new setup step.
   (user's choice, 2026-10-28: with the clock forced into the exact middle it sat 20 px from the
   dots but 55 px from the status icons, which looked off-center; now 24 px gaps and 26 px ends,
   the dots got smaller). Both sides of the island are as wide as
-  the wider group, each group centered on its side (spreading the narrower group to match looked
-  odd with two dots), so the island is symmetric and the time or cover sits exactly in the screen's middle, under the webcam (user's
+  the wider group, each group against the island's end with the same padding (user's choice
+  2026-10-28: centered on its side, one workspace dot floated in empty space next to the wider
+  status icons; spreading the narrower group to match looked odd with two dots), so the island is symmetric and the time or cover sits exactly in the screen's middle, under the webcam (user's
   request). Workspace dots only for workspaces
   in use plus the current one (user's choice, `WorkspaceSlots.used`, tested); hovering them shows
   all workspaces 1-5 (and higher ones in use) as numbers to click (`WorkspaceNumbers.qml`), with
