@@ -407,9 +407,19 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   the dark menu (`ColorQuantizer` + `MediaAccent.js`, tested); grey or black and white covers keep
   the theme's accent. The cover is downloaded per track for it (`Media.artFile`).
 
+### Snapshots (done 2026-10-28; the Settings page waiting on the user's test results)
+- The `snapshots` module (user's request after first skipping it): CachyOS had set up snapper
+  for `/` with snap-pac (before and after every pacman transaction) and limine-snapper-sync
+  (bootable from the boot menu); the module makes that reproducible, lets the user list them
+  (`ALLOW_USERS`, `SYNC_ACL`) and adds a `home` config: hourly, keeping 10 hourly, 7 daily,
+  4 weekly. `~/.cache` and `~/.local/share/Steam/steamapps` became subvolumes (reflink copy and
+  swap), so home snapshots leave them out. Run by the user (needs sudo); verified afterwards.
+- Settings -> Snapshots: the latest system snapshots per update ("System update", "Installed:
+  ..."; `SnapshotList.js`, tested against the real list), the home ones with "Open" (their files
+  in the file manager), "Take one now", and Btrfs Assistant for restoring.
+
 ### Not doing (user's call, 2026-10-28)
-Hibernation, Btrfs snapshots, fingerprint login and dictation (from the Omarchy/Ryoku research):
-skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
+Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
 
 ## Decisions made
