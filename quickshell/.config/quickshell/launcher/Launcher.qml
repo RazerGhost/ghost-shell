@@ -8,6 +8,7 @@ import qs.services
 import qs.theme
 import qs.widgets
 import "Fuzzy.js" as Fuzzy
+import "Calc.js" as Calc
 
 // App launcher: type to fuzzy-search installed apps, arrow keys to pick, Enter to launch,
 // Escape or a click outside to close. Toggled with `qs ipc call launcher toggle` (tap Super or Super+Space).
@@ -101,28 +102,134 @@ Scope {
                     placeholder: "Search apps"
                     fontSize: Theme.font.large
 
-                    // New results: select the best match again.
-                    onTextChanged: list.currentIndex = 0
+                    // New results: select the best match again (the answer, while there is one).
+                    onTextChanged: {
+                        list.currentIndex = 0;
+                        calc.ask(text);
+                    }
                     onKeyPressed: event => {
                         switch (event.key) {
                         case Qt.Key_Escape:
                             root.open = false;
                             break;
                         case Qt.Key_Down:
-                            list.incrementCurrentIndex();
+                            if (calc.selected)
+                                calc.selected = false;
+                            else
+                                list.incrementCurrentIndex();
                             break;
                         case Qt.Key_Up:
-                            list.decrementCurrentIndex();
+                            if (list.currentIndex === 0 && calc.answer !== "")
+                                calc.selected = true;
+                            else
+                                list.decrementCurrentIndex();
                             break;
                         case Qt.Key_Return:
                         case Qt.Key_Enter:
-                            if (list.currentItem)
+                            if (calc.selected)
+                                calc.copy();
+                            else if (list.currentItem)
                                 root.launch(list.currentItem.modelData);
                             break;
                         default:
                             return; // typing goes to the field
                         }
                         event.accepted = true;
+                    }
+                }
+
+                // The calculator: a sum or a unit conversion typed into the search ("5 km in
+                // miles", "20 usd to eur") answered by qalc (Calc.js, tested). Selected while it
+                // shows; Enter copies the answer.
+                MouseArea {
+                    id: calc
+
+                    property string answer: ""
+                    property bool selected: false
+                    property string asked: ""
+
+                    function ask(query: string): void {
+                        if (!Calc.isExpression(query)) {
+                            answer = "";
+                            selected = false;
+                            return;
+                        }
+                        asked = query;
+                        wait.restart();
+                    }
+
+                    function copy(): void {
+                        Quickshell.execDetached(["wl-copy", answer]);
+                        root.open = false;
+                    }
+
+                    width: parent.width
+                    height: Theme.launcher.rowHeight
+                    visible: answer !== ""
+                    onAnswerChanged: selected = answer !== ""
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: copy()
+
+                    Accessible.role: Accessible.Button
+                    Accessible.name: "Result: " + answer + ", press Enter to copy"
+                    Accessible.onPressAction: copy()
+
+                    // After typing pauses, so qalc doesn't run for every key.
+                    Timer {
+                        id: wait
+                        interval: 150
+                        onTriggered: qalc.running = true
+                    }
+
+                    Process {
+                        id: qalc
+                        // Dots for decimals whatever the regional format.
+                        command: ["qalc", "-s", "decimal comma off", "-t", Calc.prepare(calc.asked)]
+                        stdout: StdioCollector {
+                            onStreamFinished: {
+                                // An answer to an older question: the search changed since.
+                                if (calc.asked === search.text)
+                                    calc.answer = Calc.answer(text, calc.asked);
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: Theme.radius.m
+                        color: Colors.m3surfaceContainerHighest
+                        visible: calc.selected || calc.containsMouse
+                    }
+
+                    MaterialIcon {
+                        id: calcIcon
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacing.s + (Theme.icon.launcher - width) / 2
+                        anchors.verticalCenter: parent.verticalCenter
+                        icon: "calculate"
+                        color: Colors.m3primary
+                    }
+
+                    Column {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacing.s + Theme.icon.launcher + Theme.spacing.m
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Text {
+                            text: "= " + calc.answer
+                            color: Colors.m3onSurface
+                            font.family: Theme.font.sans
+                            font.pixelSize: Theme.font.normal
+                            font.weight: Font.DemiBold
+                        }
+
+                        Text {
+                            text: "Enter copies the result"
+                            color: Colors.m3onSurfaceVariant
+                            font.family: Theme.font.sans
+                            font.pixelSize: Theme.font.small
+                        }
                     }
                 }
 
@@ -145,6 +252,7 @@ Scope {
                     highlight: Rectangle {
                         radius: Theme.radius.m
                         color: Colors.m3surfaceContainerHighest
+                        visible: !calc.selected // the calculator's answer is selected instead
                     }
 
                     delegate: MouseArea {

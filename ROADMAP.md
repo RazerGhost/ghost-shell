@@ -87,7 +87,9 @@ new setup step.
   Super+C or `qs ipc call island toggle settings|today`.
 - Services: `Audio`, `Brightness`, `NetworkStatus`, `BluetoothStatus`, `Battery`. Widgets:
   `MaterialIcon`, `IconButton`, `Switch`, `LevelSlider`, `TextButton`.
-- Launcher (`launcher/`, tap Super or Super+Space): `Fuzzy.js` scoring, tested in `tests/tst_fuzzy.qml`. Terminal apps
+- Launcher (`launcher/`, tap Super or Super+Space): `Fuzzy.js` scoring, tested in `tests/tst_fuzzy.qml`. A
+  calculator: sums and unit or currency conversions ("5 km in miles") answered by `qalc`
+  (libqalculate) above the apps; Enter copies (`Calc.js`, tested). Terminal apps
   open in Ghostty.
 - OSD (`osd/Osd.qml`) for volume, mute, mic mute and brightness, on the focused monitor.
 - Windows open floating and centered (user's request). Since Phase 6 nothing tiles; see decisions.
