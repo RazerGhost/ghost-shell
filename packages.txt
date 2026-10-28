@@ -13,9 +13,7 @@ networkmanager
 bluez
 bluez-tools
 quickshell
-qt6-svg
 qt6-imageformats
-qt6-5compat
 ghostty
 zed
 paru
