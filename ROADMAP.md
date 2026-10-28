@@ -397,6 +397,11 @@ From a survey of every Quickshell 0.3.2 type and the quickshell-examples repo (u
   itself, GTK style: "Settings" over the sidebar, the page name, maximize and close (round
   buttons); drag to move, double-click to maximize. Maximizing goes through Hyprland, not
   `FloatingWindow.maximized` (see NOTES.md).
+- **The shell restarts after a crash** (`hypr/shell.sh`, started by `autostart.lua`): the lock
+  screen, idle, notifications and password prompts live in it. A normal exit or `pkill -x qs`
+  (exit 143) ends the loop; a crash (exit 255) restarts qs after a second. Locking falls back to
+  hyprlock when the shell isn't running (Super+L, hypridle's `lock_cmd`), and the idle lock goes
+  straight to the shell instead of through hypridle.
 - **App keybinds go through the shell** (Phase 7): Super+Enter/B/E and Super+Shift+E call
   `qs ipc call apps ...`, which opens the default app chosen in settings. If the shell isn't
   running the call fails and the bind falls back to Ghostty / Zen / Nautilus, so there's always a

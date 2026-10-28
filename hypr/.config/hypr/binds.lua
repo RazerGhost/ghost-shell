@@ -3,6 +3,9 @@
 ---------------------
 
 local editor = "zeditor"
+-- hyprlock with its sample config: the fallback lock screen (Super+Shift+L, and Super+L when the
+-- shell isn't running).
+local fallbackLock = "hyprlock -c /usr/share/hypr/hyprlock.conf"
 
 -- The terminal, browser and file manager are chosen in Quickshell's settings window, so these
 -- binds ask the shell to open them. If the shell isn't running (qs ipc fails), they fall back to
@@ -36,9 +39,9 @@ hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("qs ipc call island toggle clipboard"
 hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("qs ipc call island toggle emoji"), { description = "Emoji" })
 
 -- Session
-hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("qs ipc call lock lock"), { description = "Lock" })
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("qs ipc call lock lock || " .. fallbackLock), { description = "Lock" })
 -- Fallback lock screen with hyprlock's sample config, in case Quickshell's misbehaves.
-hl.bind(mainMod .. " + SHIFT + L", hl.dsp.exec_cmd("hyprlock -c /usr/share/hypr/hyprlock.conf"), { description = "Lock (fallback lock screen)" })
+hl.bind(mainMod .. " + SHIFT + L", hl.dsp.exec_cmd(fallbackLock), { description = "Lock (fallback lock screen)" })
 -- Power menu in the island: lock, suspend, log out, restart, shut down.
 hl.bind("CTRL + ALT + Delete", hl.dsp.exec_cmd("qs ipc call island toggle power"), { description = "Power menu" })
 

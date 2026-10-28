@@ -29,10 +29,11 @@ Scope {
 
     Step {
         minutes: Settings.values["idle" + root.power + "Lock"]
-        // hypridle's lock_cmd shows Quickshell's lock screen.
+        // Straight to the lock screen, not through hypridle (loginctl lock-session), so it
+        // also locks if hypridle isn't running.
         onIsIdleChanged: {
             if (isIdle)
-                Quickshell.execDetached(["loginctl", "lock-session"]);
+                Quickshell.execDetached(["qs", "ipc", "call", "lock", "lock"]);
         }
     }
 
