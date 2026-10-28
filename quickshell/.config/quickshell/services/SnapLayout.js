@@ -76,3 +76,15 @@ function rect(name, area, gapsOut, gapsIn) {
         height: Math.round(cellH * rowSpan + gap * (rowSpan - 1))
     };
 }
+
+// The layout a window exactly fills (geometry: { at: [x, y], size: [w, h] }), or "" when it isn't
+// snapped (moved or resized by hand since). Snap.qml remembers a window's spot only then.
+function snappedLayout(geometry, area, gapsOut, gapsIn) {
+    for (const name of names()) {
+        const r = rect(name, area, gapsOut, gapsIn);
+        if (r.x === geometry.at[0] && r.y === geometry.at[1]
+                && r.width === geometry.size[0] && r.height === geometry.size[1])
+            return name;
+    }
+    return "";
+}

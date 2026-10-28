@@ -1,6 +1,6 @@
 // Snapping windows into halves, quarters and thirds of their monitor, Windows 11 style:
-// Super+Left/Right (`qs ipc call snap active left`, handled in bar/Island.qml) and the snap
-// menu (Super+Z). The window floats and gets the exact rectangle from SnapLayout.js, with
+// Super+Left/Right (`qs ipc call snap active left`, handled in snap/SnapPicker.qml) and the
+// snap menu (Super+Z). The window floats and gets the exact rectangle from SnapLayout.js, with
 // Hyprland's own gaps.
 pragma Singleton
 
@@ -17,8 +17,9 @@ Singleton {
     property var gapsOut: SnapLayout.parseGaps("20")
     property int gapsIn: 5
 
-    // Where each snapped window was before its first snap, by address: { at: [x, y], size: [w, h] }.
-    // Super+Down puts it back there (snapping again elsewhere keeps the original).
+    // Where each snapped window was before it was snapped, by address: { at: [x, y], size: [w, h] }.
+    // Super+Down puts it back there. Snapping a snapped window elsewhere keeps the original; a
+    // window moved by hand since gets its new spot remembered. Forgotten when the window closes.
     property var saved: ({})
     // Callbacks waiting for `hyprctl clients -j` (see geometry()).
     property var pending: []
@@ -42,12 +43,9 @@ Singleton {
             if (!assisted)
                 snapped(window, layout);
         };
-        if (saved[window.address]) {
-            done();
-            return;
-        }
         geometry(window, current => {
-            saved[window.address] = current;
+            if (!saved[window.address] || SnapLayout.snappedLayout(current, area(window.monitor), gapsOut, gapsIn) === "")
+                saved[window.address] = current;
             done();
         });
     }
@@ -76,16 +74,30 @@ Singleton {
 
     // Where `layout` is on `monitor`, in global logical pixels.
     function rect(monitor: HyprlandMonitor, layout: string): var {
-        // Space bars reserve (the island), as [left, top, right, bottom]; Hyprland sends it with
-        // the monitor's details, which refreshMonitors() keeps current.
+        return SnapLayout.rect(layout, area(monitor), gapsOut, gapsIn);
+    }
+
+    // The part of `monitor` windows snap into: all of it but what bars reserve (the island), as
+    // [left, top, right, bottom]; Hyprland sends that with the monitor's details, which
+    // refreshMonitors() keeps current.
+    function area(monitor: HyprlandMonitor): var {
         const reserved = monitor.lastIpcObject?.reserved ?? [0, 0, 0, 0];
-        const area = {
+        return {
             x: monitor.x + reserved[0],
             y: monitor.y + reserved[1],
             width: monitor.width / monitor.scale - reserved[0] - reserved[2],
             height: monitor.height / monitor.scale - reserved[1] - reserved[3]
         };
-        return SnapLayout.rect(layout, area, gapsOut, gapsIn);
+    }
+
+    // A closed window's spot is forgotten (Hyprland can reuse its address).
+    Connections {
+        target: Hyprland
+
+        function onRawEvent(event): void {
+            if (event.name === "closewindow")
+                delete root.saved[event.data];
+        }
     }
 
     // The window's current position and size, straight from Hyprland: Quickshell's copy

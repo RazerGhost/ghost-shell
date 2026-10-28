@@ -17,6 +17,14 @@ TestCase {
         compare(SnapLayout.parseGaps("1 2 3 4"), { top: 1, right: 2, bottom: 3, left: 4 });
     }
 
+    function test_snappedLayout() {
+        compare(SnapLayout.snappedLayout({ at: [965, 56], size: [935, 1004] }, area, gapsOut, 5), "right");
+        compare(SnapLayout.snappedLayout({ at: [20, 56], size: [935, 1004] }, area, gapsOut, 5), "left");
+        // Moved a pixel by hand, or a free window: not snapped.
+        compare(SnapLayout.snappedLayout({ at: [966, 56], size: [935, 1004] }, area, gapsOut, 5), "");
+        compare(SnapLayout.snappedLayout({ at: [300, 200], size: [800, 600] }, area, gapsOut, 5), "");
+    }
+
     function test_halves() {
         compare(SnapLayout.rect("left", area, gapsOut, 5), { x: 20, y: 56, width: 935, height: 1004 });
         compare(SnapLayout.rect("right", area, gapsOut, 5), { x: 965, y: 56, width: 935, height: 1004 });
