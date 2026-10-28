@@ -235,7 +235,6 @@ From a survey of every Quickshell 0.3.2 type and the quickshell-examples repo (u
 - Media menu: shuffle and repeat buttons; clicking the cover focuses the player's window.
 - App shortcuts (.desktop actions) in the dock's right-click menu and in the launcher, ranked
   with the apps (`Fuzzy.results`, tested).
-- The island's music bars follow the speakers' real level (`PwNodePeakMonitor`).
 - The island reports shell reloads and their errors (replaces Quickshell's pop-up).
 - Quick reply for notifications that offer it (`inline-reply`).
 - `ScriptModel` for lists that change while shown; `PersistentProperties` keeps the open island
@@ -305,8 +304,8 @@ From a survey of every Quickshell 0.3.2 type and the quickshell-examples repo (u
   it to the current workspace and focuses it (`services/Windows.qml`). Hovering the workspace dots shows the minimized windows
   (`MinimizedList`, also in the window menu); no separate indicator, to keep the island
   consistent (user's choice).
-- **Media in the island:** while music plays, a "live activity" (`bar/MediaActivity.qml`: cover +
-  bars following the speakers' sound level, `PwNodePeakMonitor`) replaces the clock, so the island stays centered (no
+- **Media in the island:** while music plays, a "live activity" (`bar/MediaActivity.qml`: the
+  album cover; level bars next to it were dropped, user's choice) replaces the clock, so the island stays centered (no
   alternating: user's choice). Hovering it opens a small player (`MediaCard`, no keyboard focus,
   closes when the pointer leaves the island) and brings the time back in the middle. Clicking the
   activity or the small player opens the media menu (`controlcenter/MediaPanel.qml`: cover, track,
