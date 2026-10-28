@@ -1,0 +1,253 @@
+#!/usr/bin/env bash
+# dots: this machine's setup from the dotfiles repo, in one command. Linked into ~/.local/bin by
+# stow (the bin/ package); install.sh runs it from the repo on the first run.
+#
+#   dots install [module...] [--theme <wallpaper | "#rrggbb">]
+#                    packages and setup for the modules (default: this machine's, see below)
+#   dots update      pull the repo, then install again
+#   dots theme <wallpaper | "#rrggbb">
+#                    the wallpaper and the colors from it (the same as the shell's picker)
+#   dots greeter     copy the shell to the login screen (needed after changing the shell's code)
+#   dots doctor      check that everything is set up
+#   dots modules     list the modules, and which this machine uses
+#   dots keybinds    Hyprland's keybinds as a Markdown table (docs/keybinds.md is made with it)
+#
+# Modules are the folders in modules/: their packages (packages.txt, aur.txt) and setup
+# (setup.sh). Which ones this machine gets: ~/.config/dots/modules, one name per line (not in
+# the repo, so each machine has its own); without that file, all of them.
+set -euo pipefail
+
+repo=$(cd "$(dirname "$(readlink -f "$0")")/../../.." && pwd)
+cd "$repo"
+. modules/lib.sh
+
+# In the order they're set up: core first (configs, colors), the apps after it.
+all_modules=(core system apps dev gaming discord spotify zen haunt capture phone)
+declare -A about=(
+    [core]="Hyprland, the shell, fonts and themes, the login screen, the colors"
+    [system]="this laptop's GPU rule, boot options, greetd and services (sudo)"
+    [apps]="terminal, editor, files, pictures, video, music, browser"
+    [dev]="languages, package managers and Docker"
+    [gaming]="Steam, Proton, Lutris, Heroic, MangoHud; Millennium's theme"
+    [discord]="Vesktop with Vencord and the Ghost plugin"
+    [spotify]="Spotify with Spicetify and the Ghost theme"
+    [zen]="Zen in the wallpaper's colors"
+    [haunt]="what the Haunt Git client needs to run and build"
+    [capture]="screen recording, color picker, text and QR codes from the screen"
+    [phone]="KDE Connect: your phone's notifications, clipboard and files"
+)
+machine_modules="$HOME/.config/dots/modules"
+
+# Lines of a list file without comments and blank lines (nothing if it doesn't exist).
+entries() {
+    [[ -f $1 ]] || return 0
+    grep -v -e '^[[:space:]]*$' -e '^[[:space:]]*#' "$1" | sed 's/[[:space:]]*$//'
+}
+
+# This machine's modules, in setup order.
+machine() {
+    if [[ -f $machine_modules ]]; then
+        local chosen
+        chosen=$(entries "$machine_modules")
+        for m in "${all_modules[@]}"; do
+            grep -qx "$m" <<<"$chosen" && echo "$m"
+        done
+    else
+        printf '%s\n' "${all_modules[@]}"
+    fi
+}
+
+is_module() {
+    [[ -n ${about[$1]+set} ]]
+}
+
+cmd_install() {
+    local theme=() wanted=() m
+    while (($#)); do
+        case $1 in
+            --theme) theme=("${2:?--theme needs a wallpaper or a \"#rrggbb\" color}"); shift 2 ;;
+            *) is_module "$1" || fail "no module \"$1\" (dots modules lists them)"; wanted+=("$1"); shift ;;
+        esac
+    done
+    local modules=()
+    if ((${#wanted[@]})); then
+        # In setup order, whatever order they were named in.
+        for m in "${all_modules[@]}"; do
+            printf '%s\n' "${wanted[@]}" | grep -qx "$m" && modules+=("$m")
+        done
+    else
+        mapfile -t modules < <(machine)
+    fi
+    echo "Modules: ${modules[*]}"
+
+    step "Packages"
+    local pacman_pkgs=() aur_pkgs=()
+    for m in "${modules[@]}"; do
+        mapfile -t -O "${#pacman_pkgs[@]}" pacman_pkgs < <(entries "modules/$m/packages.txt")
+        mapfile -t -O "${#aur_pkgs[@]}" aur_pkgs < <(entries "modules/$m/aur.txt")
+    done
+    # As arguments, not on stdin: pacman and paru read their "Proceed?" answers from stdin.
+    # Several modules may list the same package; --needed skips what's installed.
+    if ((${#pacman_pkgs[@]})); then
+        mapfile -t pacman_pkgs < <(printf '%s\n' "${pacman_pkgs[@]}" | sort -u)
+        sudo pacman -S --needed "${pacman_pkgs[@]}"
+    fi
+    if ((${#aur_pkgs[@]})); then
+        # rustup installs no toolchain by itself; some AUR packages build with Rust (millennium).
+        if command -v rustup >/dev/null && ! rustup toolchain list | grep -q stable; then
+            rustup default stable
+        fi
+        mapfile -t aur_pkgs < <(printf '%s\n' "${aur_pkgs[@]}" | sort -u)
+        paru -S --needed "${aur_pkgs[@]}"
+    fi
+
+    for m in "${modules[@]}"; do
+        [[ -x modules/$m/setup.sh ]] || continue
+        if [[ $m == core ]]; then
+            "modules/$m/setup.sh" "${theme[@]}"
+        else
+            "modules/$m/setup.sh"
+        fi
+    done
+    if [[ ${#theme[@]} -gt 0 && ! " ${modules[*]} " =~ " core " ]]; then
+        cmd_theme "${theme[@]}"
+    fi
+
+    step "Done"
+    echo "Log out and back in if this was the first run or env.lua changed (GPU settings apply at Hyprland start)."
+}
+
+cmd_update() {
+    # Not with uncommitted changes: pulling would need a stash, and stashing takes files like
+    # hyprland.lua away from the running desktop for a moment.
+    if [[ -n $(git status --porcelain) ]]; then
+        fail "the repo has uncommitted changes; commit them first (git status shows them)"
+    fi
+    step "Pulling the repo"
+    git pull --rebase
+    # The new version of this script does the rest.
+    exec "$repo/bin/.local/bin/dots" install "$@"
+}
+
+cmd_theme() {
+    (($#)) || fail "dots theme needs a wallpaper or a \"#rrggbb\" color"
+    sh matugen/.config/matugen/wallpaper.sh "$1"
+}
+
+cmd_modules() {
+    local chosen m mark
+    chosen=$(machine)
+    if [[ -f $machine_modules ]]; then
+        echo "This machine's modules come from $machine_modules (* = used):"
+    else
+        echo "No $machine_modules: this machine uses all of them (* = used):"
+    fi
+    for m in "${all_modules[@]}"; do
+        mark=" "
+        grep -qx "$m" <<<"$chosen" && mark="*"
+        printf '  %s %-8s %s\n' "$mark" "$m" "${about[$m]}"
+    done
+}
+
+cmd_doctor() {
+    local failed=0 pkg missing m
+    ok() { printf '  \033[1;32m✓\033[0m %s\n' "$1"; }
+    bad() { printf '  \033[1;31m✗\033[0m %s\n' "$1"; failed=1; }
+
+    step "Configs linked into your home folder"
+    for pkg in */; do
+        pkg=${pkg%/}
+        [[ $pkg == system || $pkg == tests || $pkg == modules || $pkg == docs ]] && continue
+        # In simulation, stow prints nothing but its notice when everything is linked already.
+        if stow -n -v -t "$HOME" "$pkg" 2>&1 | grep -qv "in simulation mode"; then
+            bad "$pkg: not linked or in conflict (dots install core links it)"
+        else
+            ok "$pkg"
+        fi
+    done
+
+    step "Packages of this machine's modules"
+    for m in $(machine); do
+        missing=$({ entries "modules/$m/packages.txt"; entries "modules/$m/aur.txt"; } | xargs -r pacman -T || true)
+        if [[ -n $missing ]]; then
+            bad "$m: missing $(echo $missing) (dots install $m)"
+        else
+            ok "$m"
+        fi
+    done
+
+    step "Desktop"
+    if pgrep -x Hyprland >/dev/null; then
+        if [[ -z $(hyprctl configerrors 2>/dev/null | grep -v '^$') ]]; then ok "Hyprland config loads without errors"
+        else bad "Hyprland reports config errors (hyprctl configerrors)"; fi
+    else
+        ok "Hyprland isn't running here; skipped its config check"
+    fi
+    if pgrep -x qs >/dev/null; then ok "the shell (Quickshell) is running"
+    else bad "the shell isn't running (hypr/shell.sh starts it at login)"; fi
+    if [[ -f $HOME/.local/state/quickshell/colors.json ]]; then ok "colors generated"
+    else bad "no colors yet (dots theme <wallpaper>)"; fi
+
+    step "Login screen"
+    if [[ -d /etc/greetd/quickshell ]] && diff -rq --exclude=.qmlls.ini quickshell/.config/quickshell /etc/greetd/quickshell >/dev/null 2>&1; then
+        ok "its copy of the shell is up to date"
+    else
+        bad "its copy of the shell is out of date (dots greeter)"
+    fi
+
+    step "Services"
+    if machine | grep -qx system; then
+        for unit in greetd.service NetworkManager.service bluetooth.service power-profiles-daemon.service; do
+            if systemctl is-enabled "$unit" >/dev/null 2>&1; then ok "$unit"; else bad "$unit isn't enabled (dots install system)"; fi
+        done
+    fi
+    if machine | grep -qx dev; then
+        if systemctl is-enabled docker.socket >/dev/null 2>&1; then ok "docker.socket"; else bad "docker.socket isn't enabled (dots install dev)"; fi
+    fi
+
+    echo
+    if ((failed)); then
+        echo "Some checks failed; each says what fixes it."
+        return 1
+    fi
+    echo "Everything is set up."
+}
+
+# Every bind with a description, grouped like the settings window does (one row per
+# description, its key combinations together), as a Markdown table.
+cmd_keybinds() {
+    hyprctl binds -j | node -e '
+        const binds = JSON.parse(require("fs").readFileSync(0, "utf8"));
+        // Hyprland modifier bits, in the order they are written.
+        const mods = [[64, "Super"], [4, "Ctrl"], [8, "Alt"], [1, "Shift"]];
+        const names = { "mouse:272": "Left drag", "mouse:273": "Right drag", Return: "Enter",
+                        space: "Space", period: ".", grave: "`", SUPER_L: "Super (tap)" };
+        const combo = b => [...mods.filter(([bit]) => b.modmask & bit).map(([, n]) => n),
+                            names[b.key] ?? (b.key.length === 1 ? b.key.toUpperCase() : b.key)]
+            .filter((k, i, a) => !(k === "Super" && a.includes("Super (tap)"))).join(" + ");
+        const groups = new Map();
+        for (const b of binds) {
+            if (!b.has_description) continue;
+            if (!groups.has(b.description)) groups.set(b.description, []);
+            const c = combo(b);
+            if (!groups.get(b.description).includes(c)) groups.get(b.description).push(c);
+        }
+        console.log("| Keys | What it does |\n|---|---|");
+        for (const [description, combos] of groups) {
+            const keys = combos.length > 3 ? combos[0] + " … " + combos[combos.length - 1] : combos.join(" / ");
+            console.log(`| ${keys.replace(/\|/g, "\\|")} | ${description} |`);
+        }
+    '
+}
+
+case ${1:-help} in
+    install) shift; cmd_install "$@" ;;
+    update) shift; cmd_update "$@" ;;
+    theme) shift; cmd_theme "$@" ;;
+    greeter) modules/core/greeter.sh ;;
+    doctor) cmd_doctor ;;
+    modules) cmd_modules ;;
+    keybinds) cmd_keybinds ;;
+    help | -h | --help) sed -n '2,/^set -euo/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//' ;;
+    *) fail "unknown command \"$1\" (dots help lists them)" ;;
+esac

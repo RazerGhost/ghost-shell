@@ -1,0 +1,15 @@
+# Haunt, the user's Git client: fuse2 runs its AppImage, the rest are Tauri's build
+# dependencies.
+# pacman packages; # lines and blank lines are skipped.
+
+fuse2
+webkit2gtk-4.1
+base-devel
+curl
+wget
+file
+openssl
+appmenu-gtk-module
+libappindicator
+librsvg
+xdotool

@@ -1,6 +1,6 @@
 #!/bin/sh
 # Copies matugen's colors for Zen (templates/zen-colors.css) into Zen's profile as
-# chrome/matugen.css. setup/zen.sh (install.sh) imports it from userChrome.css. Nothing to do
+# chrome/matugen.css. modules/zen/setup.sh imports it from userChrome.css. Nothing to do
 # before Zen has made a profile (its first start).
 zen="$HOME/.config/zen"
 # The profile Zen opens: Default= in installs.ini (profiles.ini's Default= can be another one).

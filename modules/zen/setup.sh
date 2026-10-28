@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Zen: the wallpaper's colors through userChrome.css.
-# Part of install.sh; can also run on its own: ./setup/zen.sh. Safe to re-run.
+# Run by `dots install`; alone: `dots install zen`. Safe to re-run.
 set -euo pipefail
-cd "$(dirname "$0")/.."
-. setup/lib.sh
+cd "$(dirname "$0")/../.."
+. modules/lib.sh
 
 step "Zen: the wallpaper's colors"
 # matugen's hook (hooks/zen.sh) copies the colors into the profile as chrome/matugen.css on every
@@ -12,7 +12,7 @@ step "Zen: the wallpaper's colors"
 zen="$HOME/.config/zen"
 profile=$(sed -n 's/^Default=//p' "$zen/installs.ini" 2>/dev/null | head -n 1)
 if [[ -z $profile || ! -d $zen/$profile ]]; then
-    echo "Skipped: start Zen once, then re-run ./setup/zen.sh."
+    echo "Skipped: start Zen once, then run `dots install zen`."
     exit 0
 fi
 chrome="$zen/$profile/chrome"

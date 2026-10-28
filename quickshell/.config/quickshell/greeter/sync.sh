@@ -2,15 +2,15 @@
 # Copies what the login screen shows into the folder it reads, /var/lib/qs-greeter/shared/:
 # your settings (its look options), your colors, and the lock screen's picture (the first
 # argument). The login screen runs as greetd's "greeter" user, which can't
-# read your home folder; update-greeter.sh made that folder yours, so no sudo is needed here.
+# read your home folder; modules/core/greeter.sh made that folder yours, so no sudo is needed here.
 # The shell runs this whenever one of those changes (lock/LoginScreenSync.qml), and
-# update-greeter.sh runs it too.
+# modules/core/greeter.sh runs it too.
 set -eu
 
 shared=/var/lib/qs-greeter/shared
 state="$HOME/.local/state/quickshell"
 
-# Not set up yet (update-greeter.sh hasn't run): nothing to do.
+# Not set up yet (`dots greeter` hasn't run): nothing to do.
 [ -w "$shared" ] || exit 0
 
 # Write to a temporary name first, so the login screen never reads a half-copied file.
@@ -32,7 +32,7 @@ if [ -f "$HOME/.config/hypr/shell-settings.lua" ]; then
 fi
 
 # The lock screen's picture, from the shell (lock/LoginScreenSync.qml passes Wallpaper.lockPath;
-# "" for none). Without an argument (update-greeter.sh), the login screen keeps its picture until
+# "" for none). Without an argument (modules/core/greeter.sh), the login screen keeps its picture until
 # the shell runs this again at its next start.
 [ $# -ge 1 ] || exit 0
 picture=$1

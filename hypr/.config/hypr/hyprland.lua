@@ -29,3 +29,10 @@ ok, err = pcall(require, "shell-settings")
 if not ok then
     print("hyprland.lua: shell-settings.lua not loaded, using input.lua and look.lua (" .. tostring(err) .. ")")
 end
+
+-- local.lua is yours for this machine (binds, monitors, any override) and isn't in git, so
+-- `dots update` never conflicts with it. Loaded last, so it wins over everything above.
+ok, err = pcall(require, "local")
+if not ok and not tostring(err):find("module 'local' not found", 1, true) then
+    print("hyprland.lua: local.lua has an error (" .. tostring(err) .. ")")
+end

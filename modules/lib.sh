@@ -1,4 +1,4 @@
-# Shared by install.sh and the setup/ scripts (sourced, not run).
+# Shared by bin/dots and the modules' setup scripts (sourced, not run).
 
 step() { printf '\n\033[1;34m==> %s\033[0m\n' "$*"; }
 fail() { printf '\033[1;31merror:\033[0m %s\n' "$*" >&2; exit 1; }

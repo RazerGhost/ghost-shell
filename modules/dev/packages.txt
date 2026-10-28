@@ -1,0 +1,13 @@
+# Development: languages, package managers and Docker.
+# pacman packages; # lines and blank lines are skipped.
+
+git
+nodejs
+npm
+pnpm
+rustup
+bun
+deno
+docker
+docker-compose
+docker-buildx

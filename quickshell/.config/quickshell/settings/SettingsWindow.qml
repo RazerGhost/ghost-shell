@@ -1,6 +1,6 @@
 // The settings window: a normal app window (user's choice, rather than an island menu) with the
 // categories on the left and a title bar like the other apps' (maximize and close, the same
-// buttons as GTK apps get from install.sh's button-layout; Hyprland ignores minimize requests). Opened with Super+I, the gear in quick settings, or
+// buttons as GTK apps get from the core module's button-layout; Hyprland ignores minimize requests). Opened with Super+I, the gear in quick settings, or
 // `qs ipc call settings open` (shell.qml). Choices are saved by services/Settings.qml.
 pragma Singleton
 

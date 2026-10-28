@@ -9,7 +9,7 @@ import qs.services
 // The login screen, run by greetd at boot (see greeter.qml and system/etc/greetd/). It looks
 // like the lock screen: type the password and Enter starts Hyprland for that user.
 //
-// It runs as greetd's "greeter" user, which can't read your home folder, so update-greeter.sh
+// It runs as greetd's "greeter" user, which can't read your home folder, so modules/core/greeter.sh
 // gives it a copy of this shell and your user name, and greeter/sync.sh keeps a copy of your
 // settings, colors and the lock screen's picture where it can read them.
 Scope {
@@ -32,7 +32,7 @@ Scope {
             return;
         }
         if (user === "") {
-            message = "No user set up: run update-greeter.sh";
+            message = "No user set up: run dots greeter";
             messageIsError = true;
             tried();
             return;
@@ -45,7 +45,7 @@ Scope {
         Greetd.createSession(user);
     }
 
-    // Written by update-greeter.sh: { "user": "<your user name>" }.
+    // Written by modules/core/greeter.sh: { "user": "<your user name>" }.
     FileView {
         path: Quickshell.env("HOME") + "/.local/state/quickshell/greeter.json"
         adapter: JsonAdapter {

@@ -1,0 +1,10 @@
+# Capture tools for the shell: screen recording (hardware encoding on AMD and NVIDIA), the
+# color picker, text from the screen (OCR) and QR codes.
+# pacman packages; # lines and blank lines are skipped.
+
+gpu-screen-recorder
+hyprpicker
+tesseract
+tesseract-data-eng
+zbar
+qrencode

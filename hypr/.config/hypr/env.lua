@@ -5,7 +5,7 @@
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
 
--- Quickshell's icon theme: Colloid, the same as GTK apps (install.sh). Quickshell doesn't read
+-- Quickshell's icon theme: Colloid, the same as GTK apps (the core module's setup). Quickshell doesn't read
 -- GTK's setting; without this it found only hicolor icons (no fallback app icon either).
 hl.env("QS_ICON_THEME", "Colloid-Dark")
 

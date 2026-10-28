@@ -1,0 +1,5 @@
+# Your phone: notifications, clipboard, files and battery through KDE Connect (needs the KDE
+# Connect app on the phone).
+# pacman packages; # lines and blank lines are skipped.
+
+kdeconnect

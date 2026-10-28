@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# System setup (needs sudo): the GPU udev rule, early KMS and no Plymouth, greetd, the
-# services the shell reads, Docker.
-# Part of install.sh; can also run on its own: ./setup/system.sh. Safe to re-run.
+# System setup for this laptop (needs sudo): the GPU udev rule, early KMS and no Plymouth,
+# greetd, and the services the shell reads.
+# Run by `dots install`; alone: `dots install system`. Safe to re-run.
 set -euo pipefail
-cd "$(dirname "$0")/.."
-. setup/lib.sh
+cd "$(dirname "$0")/../.."
+. modules/lib.sh
 
 step "GPU udev rule (stable /dev/dri/amd-igpu and /dev/dri/nvidia-dgpu)"
 rule=system/etc/udev/rules.d/61-gpu-symlinks.rules
@@ -74,10 +74,3 @@ step "Services the Quickshell bar reads"
 # Network, Bluetooth and power profile modules talk to these over D-Bus.
 # UPower (battery) is started on demand by D-Bus, so it needs no enabling.
 sudo systemctl enable --now NetworkManager.service bluetooth.service power-profiles-daemon.service
-
-step "Dev tools: Docker"
-# docker.socket starts Docker on first use instead of at every boot.
-sudo systemctl enable --now docker.socket
-# The docker group lets you run docker without sudo. Membership is equivalent to root access
-# (containers can mount /), so only your own user is added. It applies after logging in again.
-id -nG "$USER" | grep -qw docker || sudo usermod -aG docker "$USER"

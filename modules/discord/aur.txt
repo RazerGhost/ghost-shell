@@ -1,0 +1,2 @@
+# AUR packages for this module (paru).
+vesktop-bin

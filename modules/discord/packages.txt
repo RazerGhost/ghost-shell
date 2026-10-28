@@ -1,0 +1,8 @@
+# Discord (Vesktop) with Vencord built from source with the Ghost plugin.
+# pacman packages; # lines and blank lines are skipped.
+
+# Building Vencord and the plugin
+git
+nodejs
+npm
+pnpm

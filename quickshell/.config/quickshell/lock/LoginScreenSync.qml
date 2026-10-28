@@ -5,7 +5,7 @@ import qs.services
 
 // Keeps the login screen's copy of your settings, colors and lock screen picture up to date: runs
 // greeter/sync.sh at startup and whenever one of those files changes (a setting, a new wallpaper,
-// matugen's new colors). The script does nothing until update-greeter.sh has set things up.
+// matugen's new colors). The script does nothing until `dots greeter` has set things up.
 Scope {
     id: root
 

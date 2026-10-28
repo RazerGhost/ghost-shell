@@ -1,19 +1,20 @@
 #!/usr/bin/env bash
-# The desktop: links the configs (stow), GTK's look, the wallpaper folder and the colors.
-# Usage: ./setup/desktop.sh [wallpaper | "#rrggbb"] (see install.sh).
-# Part of install.sh; can also run on its own: ./setup/desktop.sh. Safe to re-run.
+# The desktop: links the configs (stow), GTK's look, the wallpaper folder, the colors, and the
+# login screen's copy of the shell.
+# Usage: dots install core [--theme <wallpaper | "#rrggbb">]
+# Run by `dots install`; alone: `dots install core`. Safe to re-run.
 set -euo pipefail
-cd "$(dirname "$0")/.."
-. setup/lib.sh
+cd "$(dirname "$0")/../.."
+. modules/lib.sh
 
 step "Linking configs with stow"
-# Every top-level directory is a Stow package, except system/ (setup/system.sh installs it),
-# tests/ and setup/.
+# Every top-level directory is a Stow package, except system/ (the system module installs it),
+# tests/, modules/ and docs/.
 # -R re-links, so files added to an already-stowed package get linked too.
 # If stow reports a conflict, move the existing file aside and re-run.
 for pkg in */; do
     pkg=${pkg%/}
-    [[ $pkg == system || $pkg == tests || $pkg == setup ]] && continue
+    [[ $pkg == system || $pkg == tests || $pkg == modules || $pkg == docs ]] && continue
     echo "$pkg"
     stow -R -t "$HOME" "$pkg"
 done
@@ -41,3 +42,8 @@ step "Colors (matugen)"
 # everything is colored from it; with "#rrggbb": colors from that seed; without either: colors
 # again from the current wallpaper (or the default seed on the first run).
 sh matugen/.config/matugen/wallpaper.sh "$@"
+
+step "Login screen (Quickshell greeter)"
+# After the colors, so the login screen gets the current ones. Settings, colors and the wallpaper
+# reach it by themselves afterwards; after changing the shell's code, `dots greeter` updates it.
+modules/core/greeter.sh

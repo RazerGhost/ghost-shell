@@ -1,0 +1,11 @@
+# Everyday apps: terminal, editor, files, pictures, video and music, and the browser.
+# pacman packages; # lines and blank lines are skipped.
+
+ghostty
+zed
+nautilus
+gvfs
+loupe
+celluloid
+yazi
+micro

@@ -17,3 +17,6 @@ window-decoration = client
 
 # See-through, like the shell's glass panels: Hyprland blurs what's behind (look.lua).
 background-opacity = 0.85
+
+# Your own settings for this machine, not in git (the ? makes it optional).
+config-file = ?local

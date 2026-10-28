@@ -7,3 +7,8 @@ hypr/.config/hypr/colors.lua
 hypr/.config/hypr/shell-settings.lua
 ghostty/.config/ghostty/themes/
 zed/.config/zed/themes/
+
+# Machine-local overrides (see README: "Your own changes")
+hypr/.config/hypr/local.lua
+ghostty/.config/ghostty/local
+fish/.config/fish/conf.d/local.fish

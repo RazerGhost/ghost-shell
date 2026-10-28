@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Steam: Millennium, and its Material-Theme in the wallpaper's colors.
-# Part of install.sh; can also run on its own: ./setup/steam.sh. Safe to re-run.
+# Gaming: Millennium for Steam, and its Material-Theme in the wallpaper's colors.
+# Run by `dots install`; alone: `dots install gaming`. Safe to re-run.
 set -euo pipefail
-cd "$(dirname "$0")/.."
-. setup/lib.sh
+cd "$(dirname "$0")/../.."
+. modules/lib.sh
 
 step "Steam: Millennium"
 # Millennium (themes and plugins for Steam) loads through a library Steam picks up from its own
@@ -14,7 +14,7 @@ if [[ -d $steam_dir/ubuntu12_64 ]]; then
     ln -sf /usr/lib/millennium/libmillennium_bootstrap_x86.so "$steam_dir/ubuntu12_32/libXtst.so.6"
     ln -sf /usr/lib/millennium/libmillennium_bootstrap_hhx64.so "$steam_dir/ubuntu12_64/libXtst.so.6"
 else
-    echo "Skipped: start Steam once, then re-run ./setup/steam.sh."
+    echo "Skipped: start Steam once, then run `dots install gaming`."
 fi
 
 step "Steam: Material-Theme in the wallpaper's colors"
@@ -44,5 +44,5 @@ if [[ -f $millennium_config ]]; then
     '
     echo "Restart Steam to load the theme."
 else
-    echo "Skipped selecting it: start Steam once (Millennium writes its settings), then re-run ./setup/steam.sh."
+    echo "Skipped selecting it: start Steam once (Millennium writes its settings), then run `dots install gaming`."
 fi

@@ -1,6 +1,6 @@
 #!/bin/sh
 # Sets the wallpaper and the colors that come from it. Used by the shell's wallpaper picker
-# (quickshell's services/Wallpaper.qml) and by install.sh (setup/desktop.sh):
+# (quickshell's services/Wallpaper.qml) and by `dots theme` and the core module's setup:
 #   wallpaper.sh <image>     the image becomes the wallpaper, and matugen colors everything from it
 #   wallpaper.sh '#rrggbb'   colors from a seed color instead; the wallpaper stays as it is
 #   wallpaper.sh             colors again from the current wallpaper (renders templates added

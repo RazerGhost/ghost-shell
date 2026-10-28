@@ -1,6 +1,6 @@
 #!/bin/sh
 # Puts matugen's Spotify colors into the Ghost Spicetify theme and switches Spotify to them.
-# Run by matugen after it renders templates/spicetify-ghost.ini, and by install.sh after it
+# Run by matugen after it renders templates/spicetify-ghost.ini, and by the spotify module's setup after it
 # (re)installs Ghost, whose installer replaces color.ini with the theme's own schemes.
 # Does nothing until Spicetify and Ghost are set up.
 

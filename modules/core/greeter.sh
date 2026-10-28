@@ -6,11 +6,12 @@
 #   /var/lib/qs-greeter/      its home, with your user name
 #   /var/lib/qs-greeter/shared/  yours: copies of your settings, colors and lock screen picture,
 #                                which the shell keeps up to date (greeter/sync.sh)
-# install.sh runs it. Run it again after changing the shell's code (the login screen runs its own
-# copy); settings, colors and the wallpaper reach it by themselves.
+# The core module runs it; `dots greeter` runs it alone, which is needed after changing the
+# shell's code (the login screen runs its own copy). Settings, colors and the wallpaper reach it
+# by themselves.
 set -euo pipefail
-cd "$(dirname "$0")"
-. setup/lib.sh
+cd "$(dirname "$0")/../.."
+. modules/lib.sh
 
 greeter_home=/var/lib/qs-greeter
 greeter_state=$greeter_home/.local/state/quickshell

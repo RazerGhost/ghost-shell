@@ -1,5 +1,5 @@
 # greetd: login manager. Shows a greeter on tty1 at boot; after login it runs Hyprland.
-# install.sh installs this file and runs update-greeter.sh, which sets up the greeter.
+# The system module installs this file; the core module's greeter.sh sets up the greeter.
 #
 # The greeter is Quickshell's login screen inside a small Hyprland (/etc/greetd/hypr/), run as
 # the "greeter" user with /var/lib/qs-greeter as its home (copies of your colors and wallpaper).

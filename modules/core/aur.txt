@@ -1,0 +1,4 @@
+# AUR packages for this module (paru).
+# The shell's icon font, and its icon theme
+ttf-material-symbols-variable
+colloid-icon-theme-git

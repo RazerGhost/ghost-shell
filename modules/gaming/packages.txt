@@ -1,0 +1,11 @@
+# Gaming: CachyOS's gaming set (added from CachyOS Hello): Steam, Proton and Wine
+# (proton-cachyos, wine-cachyos, umu-launcher, winetricks, protontricks), Lutris, Heroic,
+# Faugus, MangoHud with GOverlay, gamescope; and Millennium with Material-Theme for Steam.
+# pacman packages; # lines and blank lines are skipped.
+
+cachyos-gaming-meta
+cachyos-gaming-applications
+# Listed on its own too: the setup links Millennium into it
+steam
+# Builds Millennium (AUR) from source
+rustup

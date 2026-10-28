@@ -1,0 +1,59 @@
+# The desktop itself: Hyprland, the Quickshell shell and everything it runs or reads, fonts
+# and themes, the login screen, and the tools the setup uses.
+# pacman packages; # lines and blank lines are skipped.
+
+# Hyprland and its helpers
+hyprland
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+hyprpolkitagent
+hypridle
+hyprlock
+hyprsunset
+nvidia-prime
+
+# The Quickshell shell, and what it runs or reads
+quickshell
+qt6-imageformats
+wireplumber
+upower
+power-profiles-daemon
+networkmanager
+bluez
+bluez-tools
+brightnessctl
+playerctl
+grim
+slurp
+wl-clipboard
+cliphist
+wtype
+libnotify
+xdg-utils
+matugen
+unicode-emoji
+cachyos-wallpapers
+# USB sticks and SD cards (the shell's drives menu)
+udiskie
+# The launcher's calculator (units, currencies)
+libqalculate
+
+# Fonts and themes
+inter-font
+ttf-meslo-nerd
+noto-fonts-emoji
+adw-gtk-theme
+
+# Login screen (greetd; tuigreet is the fallback)
+greetd
+greetd-tuigreet
+
+# Tools the setup uses (paru, stow, git, node for JSON edits, lspci) and the shell's update count
+# (checkupdates from pacman-contrib)
+paru
+pacman-contrib
+stow
+git
+nodejs
+github-cli
+pciutils
