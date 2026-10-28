@@ -171,8 +171,10 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
 
 ### Dock (built; waiting on the user's test results)
 Added at the user's request (2026-10-28), between Phases 6 and 7.
-- `dock/Dock.qml` + `DockBar.qml` + `DockItem.qml`: the island shape turned over along the bottom
-  edge (user's choice), with pinned apps then other running ones (`DockApps.js`, tested), a dot per
+- `dock/Dock.qml` + `DockBar.qml` + `DockItem.qml`: a macOS-style bar floating above the bottom
+  edge (user's choice, after first trying the island shape turned over), whose icons magnify near
+  the pointer (a bell curve over the icons' resting positions, so they don't wobble while the bar
+  widens). Pinned apps then other running ones (`DockApps.js`, tested), a dot per
   open window (accent for the focused app) and the name on hover. Click opens the app or switches
   to it, again to cycle its windows, on the focused app's only window it minimizes (Windows
   taskbar). Right-click: new window, pin/unpin, close. Pins are desktop entry ids in
@@ -181,6 +183,9 @@ Added at the user's request (2026-10-28), between Phases 6 and 7.
 - Shown on an empty desktop; slides down while a window on that monitor's workspace overlaps it
   or one is fullscreen (user's choice); touching the bottom edge brings it back. Hyprland sends
   no move/resize events, so window positions are re-read every second and on window events.
+  While shown, the input mask is a fixed area where the dock ends up, down to the screen edge:
+  masking to the sliding bar made the dock hide again right after revealing (the bar was still
+  below the screen, so the pointer counted as having left).
 - It reserves no space (`ExclusionMode.Ignore`); maximized windows cover it.
 
 ### Phase 7: Settings app
@@ -431,6 +436,7 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   Monitor `lastIpcObject.reserved` is `[left, top, right, bottom]` (after `refreshMonitors()`);
   `hyprctl getoption general:gaps_out -j` gives `{ "css": "20 20 20 20" }` (top right bottom left).
   `hyprctl clients -j` has `focusHistoryID` (0 = focused, then most recently used).
+- `hl.dsp.cursor.move({ x, y })` moves the pointer: useful for testing hover behaviour.
 - A singleton is only created when something uses it, so an `IpcHandler` inside one doesn't exist
   until then ("Target not found"); put handlers in always-loaded components.
 - Scrolling: `WheelHandler` received no wheel events on the island's layer surface; a
