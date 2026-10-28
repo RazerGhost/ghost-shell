@@ -66,7 +66,7 @@ new setup step.
 
 ### Phase 2: Island + control center + launcher + OSD (done, verified on the laptop 2026-10-28,
   except the media card: untested until Spotify is installed)
-- Island (`bar/Island.qml`, `IslandShape.qml`): closed = workspaces, clock, `StatusIcons`; the
+- Island (`bar/Island.qml` for the state, `IslandWindow.qml` per monitor, `IslandShape.qml`): closed = workspaces, clock, `StatusIcons`; the
   clock sits in the exact middle (both sides get the same width). Workspace dots always show at
   least 5 (`WorkspaceSlots.js`, tested in `tests/tst_workspaces.qml`): click one to go there, even
   if it's empty; scroll over them to step through. Status icons: Wi-Fi as three arcs with the
