@@ -17,5 +17,6 @@ ShellRoot {
     Lock {}
     Osd {}
     SnapPicker {}
+    SnapAssist {}
     Switcher {}
 }

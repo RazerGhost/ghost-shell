@@ -18,6 +18,22 @@ const layouts = {
     "right-two-thirds": { cols: 3, rows: 1, col: 1, row: 0, span: 2 },
 };
 
+// The layout that fills the rest of the screen next to `name`, for Snap Assist; "" when there's
+// no single one (quarters, the center third).
+const complements = {
+    "left": "right",
+    "right": "left",
+    "left-third": "right-two-thirds",
+    "right-third": "left-two-thirds",
+    "left-two-thirds": "right-third",
+    "right-two-thirds": "left-third",
+};
+
+function complement(name) {
+    layout(name); // throws for unknown names
+    return complements[name] || "";
+}
+
 function names() {
     return Object.keys(layouts);
 }

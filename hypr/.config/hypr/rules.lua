@@ -67,6 +67,15 @@ hl.layer_rule({
     animation    = "popin 90%",
 })
 
+-- Snap Assist (the other windows, offered for the space next to a snapped one): blurred, fades in.
+hl.layer_rule({
+    name  = "qs-snap-assist",
+    match = { namespace = "^qs-snap-assist$" },
+    blur         = true,
+    ignore_alpha = 0.3,
+    animation    = "fade",
+})
+
 -- Alt+Tab switcher: blurred, pops in.
 hl.layer_rule({
     name  = "qs-switcher",

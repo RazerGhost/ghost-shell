@@ -41,6 +41,22 @@ TestCase {
         compare(r.y, 20);
     }
 
+    function test_complement() {
+        compare(SnapLayout.complement("left"), "right");
+        compare(SnapLayout.complement("left-third"), "right-two-thirds");
+        compare(SnapLayout.complement("right-two-thirds"), "left-third");
+        compare(SnapLayout.complement("top-left"), "");
+        compare(SnapLayout.complement("center-third"), "");
+    }
+
+    function test_complementsFillTheScreen() {
+        // A layout and its complement leave exactly one gap between them.
+        const a = SnapLayout.rect("left-third", area, gapsOut, 5);
+        const b = SnapLayout.rect("right-two-thirds", area, gapsOut, 5);
+        compare(b.x - (a.x + a.width), 10);
+        compare(b.x + b.width, 1900);
+    }
+
     function test_unknownThrows() {
         let threw = false;
         try {

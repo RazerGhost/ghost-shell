@@ -24,7 +24,7 @@ Column {
         readonly property var cell: SnapLayout.layout(layout)
 
         function pick(): void {
-            Snap.snap(root.target, layout);
+            Snap.snap(root.target, layout, false);
             root.done();
         }
 

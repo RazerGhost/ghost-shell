@@ -23,7 +23,12 @@ Singleton {
     // Callbacks waiting for `hyprctl clients -j` (see geometry()).
     property var pending: []
 
-    function snap(window: HyprlandToplevel, layout: string): void {
+    // A window was snapped by the user (not by Snap Assist); snap/SnapAssist.qml offers the
+    // other windows for the rest of the screen.
+    signal snapped(HyprlandToplevel window, string layout)
+
+    // assisted: Snap Assist placing the second window, which shouldn't start another round.
+    function snap(window: HyprlandToplevel, layout: string, assisted: bool): void {
         if (!window?.monitor) {
             console.warn("Snap: no window or monitor to snap");
             return;
@@ -32,13 +37,18 @@ Singleton {
         // A maximized or fullscreen window has to leave that state first.
         Windows.run(window, "fullscreen", `mode = "maximized", action = "unset"`);
         Windows.run(window, "fullscreen", `mode = "fullscreen", action = "unset"`);
-        if (saved[window.address]) {
+        const done = () => {
             place(window, layout);
+            if (!assisted)
+                snapped(window, layout);
+        };
+        if (saved[window.address]) {
+            done();
             return;
         }
         geometry(window, current => {
             saved[window.address] = current;
-            place(window, layout);
+            done();
         });
     }
 
@@ -58,7 +68,14 @@ Singleton {
     }
 
     function place(window: HyprlandToplevel, layout: string): void {
-        const monitor = window.monitor;
+        const r = rect(window.monitor, layout);
+        Windows.run(window, "float", `action = "enable"`);
+        Windows.run(window, "resize", `x = ${r.width}, y = ${r.height}`);
+        Windows.run(window, "move", `x = ${r.x}, y = ${r.y}`);
+    }
+
+    // Where `layout` is on `monitor`, in global logical pixels.
+    function rect(monitor: HyprlandMonitor, layout: string): var {
         // Space bars reserve (the island), as [left, top, right, bottom]; Hyprland sends it with
         // the monitor's details, which refreshMonitors() keeps current.
         const reserved = monitor.lastIpcObject?.reserved ?? [0, 0, 0, 0];
@@ -68,10 +85,7 @@ Singleton {
             width: monitor.width / monitor.scale - reserved[0] - reserved[2],
             height: monitor.height / monitor.scale - reserved[1] - reserved[3]
         };
-        const r = SnapLayout.rect(layout, area, gapsOut, gapsIn);
-        Windows.run(window, "float", `action = "enable"`);
-        Windows.run(window, "resize", `x = ${r.width}, y = ${r.height}`);
-        Windows.run(window, "move", `x = ${r.x}, y = ${r.y}`);
+        return SnapLayout.rect(layout, area, gapsOut, gapsIn);
     }
 
     // The window's current position and size, straight from Hyprland: Quickshell's copy

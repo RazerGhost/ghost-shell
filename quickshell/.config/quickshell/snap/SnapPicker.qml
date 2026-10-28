@@ -37,7 +37,7 @@ Scope {
 
         // qs ipc call snap active left (or right, top-left, left-third, ...): snap the focused window.
         function active(layout: string): void {
-            Snap.snap(Windows.active, layout);
+            Snap.snap(Windows.active, layout, false);
         }
 
         // qs ipc call snap down (Super+Down): un-snap the focused window, or minimize it.
