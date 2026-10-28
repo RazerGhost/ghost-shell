@@ -90,7 +90,7 @@ Singleton {
     readonly property QtObject media: QtObject {
         readonly property int activityArt: 22   // cover in the closed island
         readonly property int barHeight:   14   // the bouncing bars next to it
-        readonly property int barTick:     220  // ms between bar heights
+        readonly property int barSmoothing: 80  // ms the bars take to follow the sound level
         readonly property int hoverDelay:  250  // ms of hover before the player opens, and of
                                                 // absence before it closes again
         readonly property int menuArt:     160  // cover in the media menu

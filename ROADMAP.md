@@ -281,7 +281,7 @@ choice).
   (`MinimizedList`, also in the window menu); no separate indicator, to keep the island
   consistent (user's choice).
 - **Media in the island:** while music plays, a "live activity" (`bar/MediaActivity.qml`: cover +
-  bouncing bars, an effect, not real levels) replaces the clock, so the island stays centered (no
+  bars following the speakers' sound level, `PwNodePeakMonitor`) replaces the clock, so the island stays centered (no
   alternating: user's choice). Hovering it opens a small player (`MediaCard`, no keyboard focus,
   closes when the pointer leaves the island) and brings the time back in the middle. Clicking the
   activity or the small player opens the media menu (`controlcenter/MediaPanel.qml`: cover, track,
