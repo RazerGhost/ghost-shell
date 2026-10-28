@@ -76,7 +76,7 @@ Scope {
         onVisibleChanged: {
             if (visible) {
                 search.text = "";
-                search.forceActiveFocus();
+                search.focusInput();
             }
         }
 
@@ -95,71 +95,35 @@ Scope {
                 anchors.margins: Theme.spacing.m
                 spacing: Theme.spacing.s
 
-                // Search field
-                Rectangle {
+                SearchField {
+                    id: search
+
                     width: parent.width
-                    implicitHeight: Theme.island.height + Theme.spacing.s
-                    radius: Theme.radius.full
-                    color: Colors.m3surfaceContainerHighest
+                    placeholder: "Search apps"
+                    fontSize: Theme.font.large
 
-                    MaterialIcon {
-                        id: searchIcon
-                        anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacing.m
-                        anchors.verticalCenter: parent.verticalCenter
-                        icon: "search"
-                        color: Colors.m3onSurfaceVariant
-                    }
-
-                    TextInput {
-                        id: search
-
-                        anchors.left: searchIcon.right
-                        anchors.right: parent.right
-                        anchors.leftMargin: Theme.spacing.s
-                        anchors.rightMargin: Theme.spacing.m
-                        anchors.verticalCenter: parent.verticalCenter
-                        color: Colors.m3onSurface
-                        selectionColor: Colors.m3primary
-                        selectedTextColor: Colors.m3onPrimary
-                        font.family: Theme.font.sans
-                        font.pixelSize: Theme.font.large
-                        clip: true
-
-                        Accessible.role: Accessible.EditableText
-                        Accessible.name: "Search apps"
-
-                        // New results: select the best match again.
-                        onTextChanged: list.currentIndex = 0
-
-                        Keys.onPressed: event => {
-                            switch (event.key) {
-                            case Qt.Key_Escape:
-                                root.open = false;
-                                break;
-                            case Qt.Key_Down:
-                                list.incrementCurrentIndex();
-                                break;
-                            case Qt.Key_Up:
-                                list.decrementCurrentIndex();
-                                break;
-                            case Qt.Key_Return:
-                            case Qt.Key_Enter:
-                                if (list.currentItem)
-                                    root.launch(list.currentItem.modelData);
-                                break;
-                            default:
-                                return; // let the TextInput handle typing
-                            }
-                            event.accepted = true;
+                    // New results: select the best match again.
+                    onTextChanged: list.currentIndex = 0
+                    onKeyPressed: event => {
+                        switch (event.key) {
+                        case Qt.Key_Escape:
+                            root.open = false;
+                            break;
+                        case Qt.Key_Down:
+                            list.incrementCurrentIndex();
+                            break;
+                        case Qt.Key_Up:
+                            list.decrementCurrentIndex();
+                            break;
+                        case Qt.Key_Return:
+                        case Qt.Key_Enter:
+                            if (list.currentItem)
+                                root.launch(list.currentItem.modelData);
+                            break;
+                        default:
+                            return; // typing goes to the field
                         }
-
-                        Text {
-                            visible: search.text === ""
-                            text: "Search apps"
-                            color: Colors.m3onSurfaceVariant
-                            font: search.font
-                        }
+                        event.accepted = true;
                     }
                 }
 

@@ -1,14 +1,15 @@
 import QtQuick
 import qs.theme
 
-// A rounded search field with a magnifier and a placeholder, for the island's menus (clipboard,
-// emoji). Keys it doesn't use for typing (arrows, Enter) come out as keyPressed: set
-// event.accepted to keep them from the field.
+// A rounded search field with a magnifier and a placeholder: the launcher and the island's
+// menus (clipboard, emoji). Keys it doesn't use for typing (arrows, Enter) come out as
+// keyPressed: set event.accepted to keep them from the field.
 Rectangle {
     id: root
 
     property alias text: input.text
     property string placeholder
+    property int fontSize: Theme.font.normal // the launcher's is larger
     // Something at the right end, inside the field (the clipboard's "Clear all").
     default property alias trailing: trailingSlot.data
 
@@ -43,7 +44,7 @@ Rectangle {
         selectionColor: Colors.m3primary
         selectedTextColor: Colors.m3onPrimary
         font.family: Theme.font.sans
-        font.pixelSize: Theme.font.normal
+        font.pixelSize: root.fontSize
         clip: true
 
         Accessible.role: Accessible.EditableText
