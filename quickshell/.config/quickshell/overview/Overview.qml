@@ -10,7 +10,8 @@ import qs.widgets
 import "../services/WorkspaceSlots.js" as WorkspaceSlots
 import "../services/WindowGrid.js" as WindowGrid
 
-// The overview, like Windows' Task View (user's choice): Super+Tab or a three-finger swipe up.
+// The overview, like Windows' Task View (user's choice): Super+Tab, a three-finger swipe up, or
+// the hot corner (HotCorner.qml).
 // The current workspace's windows as live previews; click one (or pick it with the arrow keys and
 // Enter) to switch to it, hover for × to close it. A strip at the bottom shows every workspace in use as a miniature: click one to go
 // there, drag a window onto one to move it there, + for a new one. Escape, Super+Tab again, a
@@ -38,6 +39,15 @@ Scope {
 
         function close(): void {
             root.open = false;
+        }
+    }
+
+    HotCorner {
+        onTriggered: {
+            if (!root.open) {
+                Hyprland.refreshToplevels();
+                root.open = true;
+            }
         }
     }
 

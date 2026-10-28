@@ -59,6 +59,8 @@ Singleton {
             property bool greeterShowName: true     // your user name above the password field
             property bool greeterPowerButtons: true // suspend, restart and shut down
 
+            property bool hotCorner: true // the pointer in the top-left corner opens the overview
+
             // The town for the weather in the today menu (services/Weather.qml); "" = no weather.
             property string weatherLocation: ""
 

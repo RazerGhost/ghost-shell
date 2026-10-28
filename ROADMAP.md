@@ -290,8 +290,10 @@ other session: pinning the Vencord/Spicetify downloads in install.sh.
   variants are left out. The search field is shared with the clipboard menu (`SearchField`).
 
 ### Overview (done, verified on the laptop 2026-10-28)
-- `overview/Overview.qml`, like Windows' Task View (user's choice): Super+Tab or a three-finger
-  swipe up (down closes). The current workspace's windows as live previews in a grid that keeps
+- `overview/Overview.qml`, like Windows' Task View (user's choice): Super+Tab, a three-finger
+  swipe up (down closes), or the hot corner: the pointer resting 150 ms in the top-left corner
+  (`HotCorner.qml`, a 2x2 px surface; off while a window is fullscreen, e.g. games; Settings ->
+  Windows). The current workspace's windows as live previews in a grid that keeps
   their shapes (`services/WindowGrid.js`, tested, shared with Snap Assist): click or arrow keys
   and Enter to switch, × to close. A strip of the
   workspaces in use as miniatures (windows at their positions): click to go, drag a window onto

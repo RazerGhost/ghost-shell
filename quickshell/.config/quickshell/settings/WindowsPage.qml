@@ -100,6 +100,17 @@ Column {
         title: "Behaviour"
 
         SettingRow {
+            title: "Hot corner"
+            subtitle: "Resting the pointer in the top-left corner opens the overview"
+
+            Switch {
+                label: "Hot corner"
+                checked: Settings.values.hotCorner
+                onToggled: Settings.values.hotCorner = !checked
+            }
+        }
+
+        SettingRow {
             title: "Reopen floating apps where they were"
             subtitle: "A floating window comes back at the position and size it had when it closed"
 
