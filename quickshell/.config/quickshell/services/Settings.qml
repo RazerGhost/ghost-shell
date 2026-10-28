@@ -59,8 +59,8 @@ Singleton {
             property string browser: "zen"
             property string fileManager: "org.gnome.Nautilus"
             property string imageViewer: "org.gnome.Loupe" // screenshots open in it
-            property string videoPlayer: "org.gnome.Showtime"
-            property string audioPlayer: "org.gnome.Decibels"
+            property string videoPlayer: "io.github.celluloid_player.Celluloid"
+            property string audioPlayer: "io.github.celluloid_player.Celluloid"
         }
     }
 }

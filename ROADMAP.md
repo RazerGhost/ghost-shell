@@ -209,8 +209,9 @@ config files became settings.
     tested) switch at the start and end times; switching by hand lasts until the next of those.
   - **Idle and power:** minutes before dim, lock, screen off and suspend, on battery and plugged
     in separately (`idle/Idle.qml`, see decisions).
-  - **Default apps:** terminal, browser and file manager (installed apps of that .desktop
-    category). The keybinds open the chosen ones; the browser and file manager also become the
+  - **Default apps:** terminal, browser, file manager, image viewer (Loupe), video and audio
+    player (Celluloid for both, user's choice over Showtime + Decibels) (installed apps of the
+    matching .desktop categories). The keybinds open the chosen ones; the browser and file manager also become the
     system defaults (`xdg-settings`, `xdg-mime`).
   - **Keybinds:** read from Hyprland (`hyprctl binds -j`, every bind in `binds.lua` has a
     description), grouped per description (`settings/Keybinds.js`, tested).
