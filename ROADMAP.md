@@ -173,6 +173,11 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
   its reserved area (the island) and Hyprland's gaps, read with `hyprctl getoption`. The first
   snap saves the window's position and size (from `hyprctl clients -j`); Super+Down puts a
   snapped window back there, and minimizes any other window (Windows behaviour).
+- **Apps with a minimum size** (Discord won't go below 972 px, a half is 920): the window stays
+  against its layout's outer side and overlaps towards the middle (`SnapLayout.fit`), and the
+  snapped windows next to it shrink to end a gap short of it (`SnapLayout.trim`; user's request),
+  whichever of the two is snapped first. Snap.qml remembers where each window really ended up,
+  since such windows no longer match a layout's rectangle.
 - **Snap Assist** (`snap/SnapAssist.qml`): after snapping to a half or a third, the space next to
   it shows the other windows on that workspace (live previews, most recent first); clicking one
   snaps it into that space (`SnapLayout.complement`, tested). Escape or a click elsewhere skips.

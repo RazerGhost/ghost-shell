@@ -77,16 +77,30 @@ function rect(name, area, gapsOut, gapsIn) {
     };
 }
 
-// The layout a window exactly fills (geometry: { at: [x, y], size: [w, h] }), or "" when it isn't
-// snapped (moved or resized by hand since). Snap.qml remembers a window's spot only then.
-function snappedLayout(geometry, area, gapsOut, gapsIn) {
-    for (const name of names()) {
-        const r = rect(name, area, gapsOut, gapsIn);
-        if (r.x === geometry.at[0] && r.y === geometry.at[1]
-                && r.width === geometry.size[0] && r.height === geometry.size[1])
-            return name;
+// `r` cut back to end `gap` short of `other` (both { x, y, width, height }) where other reaches
+// into it from beside, above or below: the window next to one that won't shrink takes the space
+// that's left. Returns r itself when other doesn't come closer than `gap`.
+function trim(r, other, gap) {
+    const overlapX = Math.min(r.x + r.width, other.x + other.width) - Math.max(r.x, other.x);
+    const overlapY = Math.min(r.y + r.height, other.y + other.height) - Math.max(r.y, other.y);
+    // Kept a gap apart on either axis (diagonal neighbours always are): nothing to cut.
+    if (overlapX <= -gap || overlapY <= -gap)
+        return r;
+    // Cut along the axis where they overlap least: side by side or stacked.
+    const sideways = overlapX < overlapY;
+    const t = Object.assign({}, r);
+    if (sideways && other.x < r.x) {
+        t.x = other.x + other.width + gap;
+        t.width = r.x + r.width - t.x;
+    } else if (sideways) {
+        t.width = other.x - gap - r.x;
+    } else if (other.y < r.y) {
+        t.y = other.y + other.height + gap;
+        t.height = r.y + r.height - t.y;
+    } else {
+        t.height = other.y - gap - r.y;
     }
-    return "";
+    return t;
 }
 
 // Where a window goes when it won't shrink to its layout's rectangle `r` (an app's minimum size,

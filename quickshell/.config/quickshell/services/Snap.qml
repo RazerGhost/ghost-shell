@@ -1,6 +1,6 @@
 // Snapping windows into halves, quarters and thirds of their monitor, Windows 11 style:
-// Super+Left/Right (`qs ipc call snap active left`, handled in snap/SnapPicker.qml) and the
-// snap menu (Super+Z). The window floats and gets the exact rectangle from SnapLayout.js, with
+// Super+Left/Right (`qs ipc call snap active left`, handled in snap/WindowMenu.qml) and the
+// window menu (Alt+Space or Super+Z). The window floats and gets the exact rectangle from SnapLayout.js, with
 // Hyprland's own gaps.
 pragma Singleton
 
@@ -21,11 +21,14 @@ Singleton {
     // Super+Down puts it back there. Snapping a snapped window elsewhere keeps the original; a
     // window moved by hand since gets its new spot remembered. Forgotten when the window closes.
     property var saved: ({})
-    // The layout each window was last snapped to, by address, so a change of gaps can place the
-    // ones still there again (see the gaps Process below).
-    property var layouts: ({})
+    // Where each window was last snapped, by address: { layout, x, y, width, height }, the size it
+    // really took (an app may refuse to shrink). A window still exactly there counts as snapped:
+    // a change of gaps places it again, and the windows next to it make room for it.
+    property var snaps: ({})
     // Callbacks waiting for `hyprctl clients -j` (see geometry()).
     property var pending: []
+    // Callbacks waiting for windows to take their new size (see afterResize()).
+    property var settling: []
 
     // A window was snapped by the user (not by Snap Assist); snap/SnapAssist.qml offers the
     // other windows for the rest of the screen.
@@ -42,13 +45,13 @@ Singleton {
         Windows.run(window, "fullscreen", `mode = "maximized", action = "unset"`);
         Windows.run(window, "fullscreen", `mode = "fullscreen", action = "unset"`);
         const done = () => {
-            place(window, layout);
+            place(window, layout, null);
             if (!assisted)
                 snapped(window, layout);
         };
         geometry(window, current => {
-            if (!saved[window.address] || SnapLayout.snappedLayout(current, area(window.monitor), gapsOut, gapsIn) === "")
-                saved[window.address] = current;
+            if (!saved[window.address] || !stillSnapped(current))
+                saved[window.address] = { at: current.at, size: current.size };
             done();
         });
     }
@@ -64,39 +67,86 @@ Singleton {
             return;
         }
         delete saved[window.address];
-        delete layouts[window.address];
+        delete snaps[window.address];
         Windows.run(window, "resize", `x = ${before.size[0]}, y = ${before.size[1]}`);
         Windows.run(window, "move", `x = ${before.at[0]}, y = ${before.at[1]}`);
     }
 
-    function place(window: HyprlandToplevel, layout: string): void {
-        layouts[window.address] = layout;
-        const r = rect(window.monitor, layout);
+    // done: called once the window is in its spot (replaceSnapped places windows one by one).
+    function place(window: HyprlandToplevel, layout: string, done: var): void {
         Windows.run(window, "float", `action = "enable"`);
-        Windows.run(window, "resize", `x = ${r.width}, y = ${r.height}`);
-        Windows.run(window, "move", `x = ${r.x}, y = ${r.y}`);
-        // An app with a minimum size (Discord) may stay bigger than asked: then keep it against
-        // the layout's outer side instead of sticking out past the screen (SnapLayout.fit).
-        geometry(window, current => {
-            if (current.size[0] <= r.width && current.size[1] <= r.height)
-                return;
-            const spot = SnapLayout.fit(layout, r, current.size[0], current.size[1]);
-            Windows.run(window, "move", `x = ${spot.x}, y = ${spot.y}`);
+        geometry(window, (current, clients) => {
+            // Next to a snapped window that won't shrink, take the space it leaves.
+            const others = neighbours(current, clients);
+            const r = others.reduce((t, n) => SnapLayout.trim(t, n.rect, gapsIn * 2), rect(window.monitor, layout));
+            Windows.run(window, "resize", `x = ${r.width}, y = ${r.height}`);
+            Windows.run(window, "move", `x = ${r.x}, y = ${r.y}`);
+            afterResize(() => geometry(window, placed => {
+                // An app with a minimum size (Discord) may stay bigger than asked: then it stays
+                // against the layout's outer side (SnapLayout.fit) and its neighbours make room.
+                const spot = SnapLayout.fit(layout, r, placed.size[0], placed.size[1]);
+                if (spot.x !== r.x || spot.y !== r.y)
+                    Windows.run(window, "move", `x = ${spot.x}, y = ${spot.y}`);
+                const final = { x: spot.x, y: spot.y, width: placed.size[0], height: placed.size[1] };
+                snaps[window.address] = Object.assign({ layout: layout }, final);
+                if (final.width > r.width || final.height > r.height)
+                    for (const n of others)
+                        makeRoom(n.window, n.layout, final);
+                done?.();
+            }));
         });
     }
 
-    // The gaps changed (settings window): windows still exactly where they were snapped with the
-    // old gaps move to the same layout with the new ones. Ones moved by hand since stay put.
-    function replaceSnapped(oldOut: var, oldIn: int): void {
-        for (const window of Windows.recent) {
-            const layout = layouts[window.address];
-            const info = window.lastIpcObject;
-            if (!layout || !info?.at || !window.monitor)
+    // `window` (snapped to `layout`) shrinks to end a gap short of `other`, a window that won't.
+    function makeRoom(window: HyprlandToplevel, layout: string, other: var): void {
+        const r = SnapLayout.trim(rect(window.monitor, layout), other, gapsIn * 2);
+        Windows.run(window, "resize", `x = ${r.width}, y = ${r.height}`);
+        Windows.run(window, "move", `x = ${r.x}, y = ${r.y}`);
+        afterResize(() => geometry(window, placed => snaps[window.address] = {
+            layout: layout, x: placed.at[0], y: placed.at[1], width: placed.size[0], height: placed.size[1]
+        }));
+    }
+
+    // Whether a window (a `hyprctl clients` entry) is still exactly where it was snapped.
+    function stillSnapped(client: var): bool {
+        const s = snaps[client.address.slice(2)];
+        return !!s && s.x === client.at[0] && s.y === client.at[1]
+            && s.width === client.size[0] && s.height === client.size[1];
+    }
+
+    // The other snapped windows on `client`'s workspace, as { window, layout, rect }.
+    function neighbours(client: var, clients: var): var {
+        const result = [];
+        for (const c of clients) {
+            if (c.address === client.address || c.workspace.id !== client.workspace.id || !stillSnapped(c))
                 continue;
-            const geometry = { at: info.at, size: info.size };
-            if (SnapLayout.snappedLayout(geometry, area(window.monitor), oldOut, oldIn) === layout)
-                place(window, layout);
+            const window = Windows.recent.find(t => "0x" + t.address === c.address);
+            if (window)
+                result.push({
+                    window: window,
+                    layout: snaps[window.address].layout,
+                    rect: { x: c.at[0], y: c.at[1], width: c.size[0], height: c.size[1] }
+                });
         }
+        return result;
+    }
+
+    // The gaps changed (settings window): windows still exactly where they were snapped move to
+    // the same layout with the new gaps, one after another so each sees its neighbours' new
+    // spots. Ones moved by hand since stay put.
+    function replaceSnapped(): void {
+        const queue = Windows.recent.filter(t => snaps[t.address] && t.monitor);
+        const next = () => {
+            const window = queue.shift();
+            if (window)
+                geometry(window, current => {
+                    if (stillSnapped(current))
+                        place(window, snaps[window.address].layout, next);
+                    else
+                        next();
+                });
+        };
+        next();
     }
 
     // Where `layout` is on `monitor`, in global logical pixels.
@@ -124,16 +174,35 @@ Singleton {
         function onRawEvent(event): void {
             if (event.name === "closewindow") {
                 delete root.saved[event.data];
-                delete root.layouts[event.data];
+                delete root.snaps[event.data];
             }
         }
     }
 
-    // The window's current position and size, straight from Hyprland: Quickshell's copy
-    // (lastIpcObject) is only as fresh as its last refresh.
+    // The window's current details (at, size, workspace, address), straight from Hyprland:
+    // Quickshell's copy (lastIpcObject) is only as fresh as its last refresh. The callback also
+    // gets every window's, for neighbours().
     function geometry(window: HyprlandToplevel, callback: var): void {
         pending.push({ address: "0x" + window.address, callback: callback });
         clients.running = true;
+    }
+
+    // Runs `callback` once the app has had time to take its new size: right after a resize,
+    // Hyprland still reports the size it asked for, not the one an app with a minimum size keeps.
+    function afterResize(callback: var): void {
+        settling.push(callback);
+        settle.restart();
+    }
+
+    Timer {
+        id: settle
+        interval: 300
+        onTriggered: {
+            const waiting = root.settling;
+            root.settling = [];
+            for (const callback of waiting)
+                callback();
+        }
     }
 
     Process {
@@ -153,7 +222,7 @@ Singleton {
                 for (const request of waiting) {
                     const client = list.find(c => c.address === request.address);
                     if (client)
-                        request.callback({ at: client.at, size: client.size });
+                        request.callback(client, list);
                 }
             }
         }
@@ -189,11 +258,9 @@ Singleton {
                 // Two JSON objects, one per line: { "option": ..., "css": "20 20 20 20" }.
                 try {
                     const [out, inner] = text.trim().split("\n").map(line => JSON.parse(line));
-                    const oldOut = root.gapsOut;
-                    const oldIn = root.gapsIn;
                     root.gapsOut = SnapLayout.parseGaps(out.css);
                     root.gapsIn = SnapLayout.parseGaps(inner.css).top;
-                    root.replaceSnapped(oldOut, oldIn);
+                    root.replaceSnapped();
                 } catch (e) {
                     console.warn("Snap: couldn't read Hyprland's gaps, using defaults: " + e.message);
                 }

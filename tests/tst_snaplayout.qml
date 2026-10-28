@@ -20,7 +20,7 @@ TestCase {
     function test_fitTooBigWindow() {
         const left = SnapLayout.rect("left", area, gapsOut, 5);    // x 20, 935 wide
         const right = SnapLayout.rect("right", area, gapsOut, 5);  // x 965, 935 wide
-        // Discord won't go below 972 px: the left half keeps its edge, the right half grows left.
+        // A window that won't go below 972 px: the left half keeps its edge, the right half grows left.
         compare(SnapLayout.fit("left", left, 972, 1004), { x: 20, y: 56 });
         compare(SnapLayout.fit("right", right, 972, 1004), { x: 965 - 37, y: 56 });
         // The center third grows both ways.
@@ -33,12 +33,25 @@ TestCase {
         compare(SnapLayout.fit("right", right, 935, 1004), { x: 965, y: 56 });
     }
 
-    function test_snappedLayout() {
-        compare(SnapLayout.snappedLayout({ at: [965, 56], size: [935, 1004] }, area, gapsOut, 5), "right");
-        compare(SnapLayout.snappedLayout({ at: [20, 56], size: [935, 1004] }, area, gapsOut, 5), "left");
-        // Moved a pixel by hand, or a free window: not snapped.
-        compare(SnapLayout.snappedLayout({ at: [966, 56], size: [935, 1004] }, area, gapsOut, 5), "");
-        compare(SnapLayout.snappedLayout({ at: [300, 200], size: [800, 600] }, area, gapsOut, 5), "");
+    function test_trimNextToTooBigWindow() {
+        const left = SnapLayout.rect("left", area, gapsOut, 5);
+        const right = SnapLayout.rect("right", area, gapsOut, 5);
+        // A window that won't go below 972 px (Discord) on the left ends at 992: the right half starts a gap later.
+        const tooWideLeft = { x: 20, y: 56, width: 972, height: 1004 };
+        compare(SnapLayout.trim(right, tooWideLeft, 10), { x: 1002, y: 56, width: 898, height: 1004 });
+        // The same window on the right starts at 928: the left half ends a gap before.
+        const tooWideRight = { x: 928, y: 56, width: 972, height: 1004 };
+        compare(SnapLayout.trim(left, tooWideRight, 10), { x: 20, y: 56, width: 898, height: 1004 });
+        // A neighbour that fits leaves the rectangle as it is.
+        compare(SnapLayout.trim(right, left, 10), right);
+        // Stacked quarters: a too-tall top quarter pushes the bottom one down.
+        const bottom = SnapLayout.rect("bottom-left", area, gapsOut, 5);
+        const tallTop = { x: 20, y: 56, width: 935, height: 530 };
+        compare(SnapLayout.trim(bottom, tallTop, 10).y, 596);
+        compare(SnapLayout.trim(bottom, tallTop, 10).height, bottom.y + bottom.height - 596);
+        // Diagonal quarters don't touch.
+        const topRight = SnapLayout.rect("top-right", area, gapsOut, 5);
+        compare(SnapLayout.trim(bottom, topRight, 10), bottom);
     }
 
     function test_halves() {
