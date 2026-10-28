@@ -63,7 +63,7 @@ MouseArea {
         Behavior on anchors.verticalCenterOffset {
             NumberAnimation { duration: Theme.anim.fast; easing.type: Theme.anim.easing }
         }
-        source: Quickshell.iconPath(root.entry?.icon || root.windows[0]?.wayland?.appId || "", "application-x-executable")
+        source: Quickshell.iconPath(root.entry?.icon || root.windows[0]?.wayland?.appId || "application-x-executable", "application-x-executable")
     }
 
     // Open windows: one dot each, up to three, between the icon and the bar's edge.

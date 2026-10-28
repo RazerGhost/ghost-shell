@@ -23,7 +23,6 @@ Singleton {
 
     readonly property QtObject font: QtObject {
         readonly property string sans: "Inter"
-        readonly property string mono: "MesloLGS Nerd Font"
         readonly property string icon: "Material Symbols Rounded"
 
         readonly property int small:  11
