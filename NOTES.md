@@ -42,7 +42,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   checked in its binary). `Region` nests (children combine, or cut with
   `intersection: Intersection.Subtract`), has `shape: RegionShape.Ellipse` and per-corner radii,
   so the island's concave fillets are a strip minus two circles. A surface using it shouldn't
-  also have a `blur` layer rule.
+  also have a `blur` layer rule. An empty region (Quickshell sends it as NULL, or one that lies
+  outside the surface) made Hyprland 0.57 blur the whole surface, though the protocol says NULL
+  removes the effect (seen with the hidden dock): keep a 1x1 region in a transparent corner.
 - Window groups (tabs) in 0.57: `hl.dsp.group.toggle/next/prev/active({ index })/lock/
   move_window({ forward })`; into or out of a group is `hl.dsp.window.move({ into_group = "l"|"r"|"u"|"d" })`
   (`into_or_create_group`, `out_of_group = true`); `group.move_window` only reorders tabs. A

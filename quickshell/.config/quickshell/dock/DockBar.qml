@@ -78,6 +78,15 @@ PanelWindow {
             item: previews.visible ? previews : null
             radius: previews.radius
         }
+
+        // While the dock is hidden its bar is below the window, so the region would be empty,
+        // and Hyprland 0.57 then blurs the whole window (a 1920x308 panel), though the protocol
+        // says nothing should be blurred. One pixel in the window's transparent corner keeps it
+        // from being empty.
+        Region {
+            width: 1
+            height: 1
+        }
     }
 
     WlrLayershell.namespace: "qs-dock"
