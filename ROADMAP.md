@@ -257,7 +257,7 @@ From a survey of every Quickshell 0.3.2 type and the quickshell-examples repo (u
   (nothing measurable to gain); hibernate, i3/X11, sockets (not relevant). Bluetooth device
   batteries were already in the Bluetooth page.
 
-### Overview (built 2026-10-28; waiting on the user's test results)
+### Overview (done, verified on the laptop 2026-10-28)
 - `overview/Overview.qml`, like Windows' Task View (user's choice): Super+Tab or a three-finger
   swipe up (down closes). The current workspace's windows as live previews in a grid that keeps
   their shapes (`OverviewLayout.js`, tested): click to switch, × to close. A strip of the
