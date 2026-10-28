@@ -60,6 +60,7 @@ Singleton {
 
             property bool hotCorner: true // the pointer in the top-left corner opens the overview
 
+            property bool batterySaver: true // power saver from the low battery warning until plugged in
             property bool clock24Hour: true // the island's and the lock screen's clock ("9:41 PM" off)
 
             // The town for the weather in the today menu (services/Weather.qml); "" = no weather.

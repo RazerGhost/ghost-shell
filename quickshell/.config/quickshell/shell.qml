@@ -37,6 +37,9 @@ ShellRoot {
     Idle {}
     HyprlandSettings {}
 
+    // Low battery warnings: a singleton, so it only runs once something uses it.
+    Component.onCompleted: BatteryAlerts.check()
+
     // The system's default apps follow the settings (services/Apps.qml).
     Connections {
         target: Settings

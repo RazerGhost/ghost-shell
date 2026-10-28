@@ -172,6 +172,8 @@ Singleton {
 
     readonly property QtObject battery: QtObject {
         readonly property real low: 0.15 // at or below this (and discharging) the battery turns red
+        readonly property real warn: 0.20     // a "battery low" notification (services/BatteryAlerts.qml)
+        readonly property real critical: 0.10 // a critical one, which stays until dismissed
         // The battery pill in the island (bar/BatteryPill.qml).
         readonly property int width:  22
         readonly property int height: 11

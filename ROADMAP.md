@@ -362,6 +362,12 @@ a 24-hour setting now shared by the island and the lock screen: `clock24Hour`, w
 The search field (focused when Settings opens) matches page titles and a list of words per page,
 so it finds the page for any setting; Enter opens the first match. The sidebar scrolls.
 
+### Battery alerts (built 2026-10-28; waiting on the user's test results)
+- `services/BatteryAlerts.qml`: a notification at 20 % and a critical one (stays until dismissed)
+  at 10 %, each once per discharge (`BatteryAlerts.js`, tested). The 20 % one also switches to
+  power saver, back to the previous mode when plugged in (Settings -> Power -> Low battery, on by
+  default). Not seen live yet: the laptop was plugged in.
+
 ## Decisions made
 
 - **External monitors:** keep the RTX in `AQ_DRM_DEVICES` (second, after the iGPU), so outputs wired

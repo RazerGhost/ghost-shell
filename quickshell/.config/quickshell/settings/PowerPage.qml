@@ -4,8 +4,9 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// Power: after how long without input the screen dims, locks, turns off and the
-// laptop suspends; separately on battery and plugged in (idle/Idle.qml does it).
+// Power: the low battery warning's power saver, and after how long without input the screen dims,
+// locks, turns off and the laptop suspends; separately on battery and plugged in (idle/Idle.qml
+// does it).
 Column {
     id: root
 
@@ -69,5 +70,20 @@ Column {
     Steps {
         title: "Plugged in"
         power: "Ac"
+    }
+
+    SettingGroup {
+        title: "Low battery"
+
+        SettingRow {
+            title: "Power saver when the battery is low"
+            subtitle: "From the 20 % warning until you plug in; then back to the mode you had"
+
+            Switch {
+                label: "Power saver when the battery is low"
+                checked: Settings.values.batterySaver
+                onToggled: Settings.values.batterySaver = !checked
+            }
+        }
     }
 }
