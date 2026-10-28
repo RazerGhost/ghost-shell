@@ -10,7 +10,7 @@ import qs.widgets
 import "Fuzzy.js" as Fuzzy
 
 // App launcher: type to fuzzy-search installed apps, arrow keys to pick, Enter to launch,
-// Escape or a click outside to close. Toggled with `qs ipc call launcher toggle` (Super+R).
+// Escape or a click outside to close. Toggled with `qs ipc call launcher toggle` (tap Super or Super+Space).
 Scope {
     id: root
 
@@ -26,6 +26,21 @@ Scope {
 
         function toggle(): void {
             root.open = !root.open;
+        }
+    }
+
+    // The default apps, for the keybinds: qs ipc call apps open terminal|browser|fileManager,
+    // qs ipc call apps terminal yazi. Here because the Apps singleton only exists once used.
+    IpcHandler {
+        target: "apps"
+
+        function open(kind: string): void {
+            Apps.open(kind);
+        }
+
+        // `command` is split on spaces: no quoting.
+        function terminal(command: string): void {
+            Apps.runInTerminal(command.split(" "));
         }
     }
 

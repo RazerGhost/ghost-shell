@@ -120,9 +120,9 @@ new setup step.
   `qs ipc call lock lock` (Super+L, power menu, hypridle); `qs ipc call lock preview` shows it
   without locking, to check the look. Fallback: Super+Shift+L runs hyprlock with its sample config
   (`/usr/share/hypr/hyprlock.conf`).
-- Idle (`hypr/hypridle.conf`, user's "balanced" choice): dim at 4 min, lock at 5, screen off at
-  5.5, suspend at 15 only on battery (`condition_cmd` checks `ACAD/online`). Locks before every
-  suspend (`inhibit_sleep = 3` waits for the lock).
+- Idle (user's "balanced" choice, adjustable since Phase 7): dim at 4 min, lock at 5, screen off
+  at 6, suspend at 15 only on battery. Locks before every suspend (`hypr/hypridle.conf`,
+  `inhibit_sleep = 3` waits for the lock).
 - Greeter (`greeter.qml` entry + `greeter/Greeter.qml`, `Quickshell.Services.Greetd`): the lock
   screen's look plus the user's name; Enter logs in and launches `start-hyprland`. greetd runs it
   as the `greeter` user inside a small Hyprland (`system/etc/greetd/hypr/hyprland.lua`, which
@@ -189,21 +189,26 @@ Added at the user's request (2026-10-28), between Phases 6 and 7.
   below the screen, so the pointer counted as having left).
 - It reserves no space (`ExclusionMode.Ignore`); maximized windows cover it.
 
-### Phase 7: Settings app
-Added at the user's request (2026-10-28), after night light went manual-only: things that are
-fixed in config files should become settings.
-- A larger settings window (opened from a gear button in quick settings, and an IPC call),
-  categorized like the island menus. Candidates: night light (manual or a schedule, times,
-  temperature), idle timings (dim, lock, screen off, suspend; battery vs. plugged in), a Do Not
-  Disturb schedule, the wallpaper (the picker), a readable list of keybinds, default apps
-  (browser, terminal). The login screen's look and options too (the user wants more
-  customization there later), which update-greeter.sh would carry over.
-- Choices saved in one settings file outside the shell directory (like
-  `~/.local/state/quickshell/*.json`), read by the services. Settings that live in other
-  programs' configs (hypridle, hyprsunset) need those files generated from it, or the program
-  restarted with new values: decide per setting, and check how each program reloads.
-- Ask the user which settings matter most before building, and whether it's an island menu
-  (wide, like the wallpaper picker) or a normal window.
+### Phase 7: Settings app (built 2026-10-28; waiting on the user's test results)
+Added at the user's request, after night light went manual-only: things that were fixed in
+config files became settings.
+- A normal window (user's choice over a wide island menu; `settings/SettingsWindow.qml`, a
+  Quickshell `FloatingWindow`) with categories in a sidebar. Opened with Super+I, the gear in
+  quick settings or `qs ipc call settings open`.
+- Saved in `~/.local/state/quickshell/settings.json` (`services/Settings.qml`; every change is
+  written right away and applies live, nothing restarts). Pages (user's choice of settings):
+  - **Night light:** on/off, warmth (2500-6000 K), and a daily schedule.
+  - **Do Not Disturb:** on/off and a daily schedule. Both schedules (`services/Schedule.js`,
+    tested) switch at the start and end times; switching by hand lasts until the next of those.
+  - **Idle and power:** minutes before dim, lock, screen off and suspend, on battery and plugged
+    in separately (`idle/Idle.qml`, see decisions).
+  - **Default apps:** terminal, browser and file manager (installed apps of that .desktop
+    category). The keybinds open the chosen ones; the browser and file manager also become the
+    system defaults (`xdg-settings`, `xdg-mime`).
+  - **Keybinds:** read from Hyprland (`hyprctl binds -j`, every bind in `binds.lua` has a
+    description), grouped per description (`settings/Keybinds.js`, tested).
+- Later: the login screen's look and options (user's choice to do them after this), which
+  `update-greeter.sh` would carry over.
 
 ## Decisions made
 
@@ -247,7 +252,8 @@ fixed in config files should become settings.
 - **Keybinds: Windows-style** (user's choice, 2026-10-28): tap Super or Super+Space launcher,
   Super+Enter terminal, Super+E files, Super+B browser, Super+W / Alt+F4 close, Super+Up maximize,
   Super+Down minimize, Alt+Space window menu, Alt+Tab switcher, Super+Left/Right snap, Super+Z snap picker, Super+N quick settings, Super+C calendar, Super+Shift+S screenshot, Super+V clipboard, Super+L lock (Super+Shift+L hyprlock fallback),
-  Ctrl+Alt+Delete power menu, Super+Ctrl+arrows focus. Full list in `hypr/binds.lua`.
+  Ctrl+Alt+Delete power menu, Super+Ctrl+arrows focus, Super+I settings. Full list in
+  `hypr/binds.lua` and the settings window.
 - **Window buttons:** Hyprland draws no title bars, so instead of hyprbars: keybinds plus a window
   menu in the island (`controlcenter/WindowPanel.qml`, Alt+Space or right-click the island's top
   row): minimize, maximize, snap, fullscreen, close, move to workspace 1-5, and the minimized
@@ -286,11 +292,20 @@ fixed in config files should become settings.
 - **Notifications from the island** (user's choice over corner cards). Pop-ups wait while a menu
   is open. Notifications carry no timestamp, so the service records arrival times; after a shell
   restart (not a reload) the history is empty.
-- **Night light is manual** (user's choice, after first having a 20:00-07:00 schedule turned it on
-  at every evening login): `hyprsunset.conf` has one all-day neutral profile, and only the tile
-  turns it warm. hyprsunset can't report a manual override, so the tile state comes from its
-  profile at startup (`on-switch = qs ipc call nightlight refresh`) and from the tile itself. The
-  conf file shows how to add a schedule back.
+- **Night light is manual by default** (user's choice, after a fixed 20:00-07:00 schedule turned
+  it on at every evening login); a schedule is a setting since Phase 7. Quickshell runs it, not
+  hyprsunset: `hyprsunset.conf` has one all-day neutral profile, and `services/NightLight.qml`
+  keeps the on/off state (hyprsunset only reports the last temperature it was given, not whether
+  it's on) and sets hyprsunset to match at startup.
+- **Idle timing lives in Quickshell** (Phase 7): `idle/Idle.qml` uses one `IdleMonitor` per step,
+  so the times change live and switch between battery and plugged in at once. hypridle couldn't
+  do that without regenerating its config and restarting; it now only locks before suspend.
+  Wayland idle inhibitors (a playing video in the browser) hold the steps off; D-Bus inhibitors
+  (`systemd-inhibit`, which hypridle also honoured) don't.
+- **App keybinds go through the shell** (Phase 7): Super+Enter/B/E and Super+Shift+E call
+  `qs ipc call apps ...`, which opens the default app chosen in settings. If the shell isn't
+  running the call fails and the bind falls back to Ghostty / Zen / Nautilus, so there's always a
+  terminal.
 - **Island window height** is 840 px (was 680) so the "today" menu with notifications fits.
 - **Island menu widths:** menus are `Theme.island.panelWidth` (380) wide; the wallpaper picker
   spans the screen, so the island's window is as wide as the screen. Regular menus keep their

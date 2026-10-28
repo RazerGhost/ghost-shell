@@ -149,6 +149,15 @@ Singleton {
         readonly property int rowHeight: 52
     }
 
+    readonly property QtObject settings: QtObject {
+        readonly property int width:     880 // the settings window when it opens
+        readonly property int height:    620
+        readonly property int sidebar:   230 // the category list
+        readonly property int content:   600 // the pages' maximum width
+        readonly property int rowHeight: 64
+        readonly property int stepper:   96  // the value between a stepper's - and +
+    }
+
     readonly property QtObject osd: QtObject {
         readonly property int width:   280
         readonly property int height:  52

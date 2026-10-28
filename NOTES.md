@@ -142,6 +142,22 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   A surface that closes and then focuses a window must be `OnDemand` (it still gets the keyboard
   when it appears, unless the pointer is constrained), or the focus call races the unmap.
 - Quickshell reads its icon theme from `QS_ICON_THEME` (set in `env.lua`), not GTK's setting.
+- `IdleMonitor { enabled; timeout (seconds); respectInhibitors (default true); isIdle }`
+  (`Quickshell.Wayland`, ext-idle-notify). `timeout: 0` reports idle at once, so use `enabled:
+  false` for "never". `enabled` reads false until the monitor is set up; changing `timeout` later
+  works. Only Wayland idle inhibitors count, not D-Bus ones.
+- `FloatingWindow { title; implicitWidth/Height; minimumSize; color }` is a normal toplevel
+  (class `org.quickshell`); Hyprland draws no decorations for it. Closing it (Super+W) sets
+  `visible` to false; setting it true again reopens it.
+- A `JsonAdapter` in a `FileView` loads after the shell starts, even with `blockLoading` (that
+  only affects `text()`/`data()`): bindings see the defaults first, then the saved values.
+  `onAdapterUpdated: writeAdapter()` saves every change.
+- `DesktopEntry.categories` (list), `DesktopEntries.byId(id)`.
+- `hl.bind(keys, action, { description = "..." })`; `hyprctl binds -j` gives `modmask` (Super 64,
+  Ctrl 4, Alt 8, Shift 1), `key`, `description`, `has_description`.
+- `qs ipc call` exits 0 even for an unknown target, but non-zero when no shell is running.
+- `hyprctl hyprsunset temperature` prints the last temperature set, also after `identity`, so it
+  doesn't tell whether night light is on.
 - A singleton is only created when something uses it, so an `IpcHandler` inside one doesn't exist
   until then ("Target not found"); put handlers in always-loaded components.
 - Scrolling: `WheelHandler` received no wheel events on the island's layer surface; a

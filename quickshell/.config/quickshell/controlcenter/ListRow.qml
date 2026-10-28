@@ -84,6 +84,7 @@ MouseArea {
 
         Text {
             width: parent.width
+            visible: text !== ""
             text: root.subtitle
             color: Colors.m3onSurfaceVariant
             font.family: Theme.font.sans

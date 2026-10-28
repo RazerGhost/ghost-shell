@@ -1,17 +1,31 @@
 // The notification server: Quickshell receives every app's notifications (there's no other
 // notification daemon). New ones queue up as pop-ups, shown one at a time by the island, and
 // stay in the history (the "today" menu) until dismissed. Do Not Disturb skips the pop-ups,
-// except critical ones; the history still collects everything.
+// except critical ones; the history still collects everything. With a schedule (settings
+// window) it turns on at the start time and off at the end time; toggling in between lasts
+// until the next of those, like night light.
 pragma Singleton
 
 import QtQuick
 import Quickshell
 import Quickshell.Services.Notifications
+import "Schedule.js" as Schedule
 
 Singleton {
     id: root
 
-    property bool doNotDisturb: false
+    property bool doNotDisturb: scheduledDnd
+
+    // Whether the schedule says on right now (false without a schedule).
+    readonly property bool scheduledDnd: Settings.values.dndScheduled
+        && Schedule.active(Schedule.minutesOf(clock.date), Settings.values.dndStart, Settings.values.dndEnd)
+    // Assigning doNotDisturb (the tile) breaks its binding, so follow the schedule from here on.
+    onScheduledDndChanged: doNotDisturb = scheduledDnd
+
+    SystemClock {
+        id: clock
+        precision: SystemClock.Minutes
+    }
 
     // Pop-ups still to show, oldest first. A notification that's dismissed meanwhile turns
     // into null here (its object is destroyed), so readers skip nulls.

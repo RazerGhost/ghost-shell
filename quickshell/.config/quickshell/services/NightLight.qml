@@ -1,62 +1,55 @@
 // Night light through hyprsunset: warmer colors to go easy on the eyes in the evening.
 //
-// hyprsunset follows a schedule (hypr/hyprsunset.conf) and tells us when it switches profile
-// (`qs ipc call nightlight refresh`). It can't report a manual override, so `on` is read from
-// the active profile at startup and on every switch, and set directly when toggled here.
+// The quick settings tile turns it on and off; with a schedule (settings window) it also turns
+// on at the start time and off at the end time. Toggling in between lasts until the next of
+// those. hyprsunset can't report whether it's on (only the last temperature it was given), so
+// the state lives here, and the shell sets hyprsunset to match when it starts.
 pragma Singleton
 
 import QtQuick
 import Quickshell
-import Quickshell.Io
-import "NightLightProfile.js" as NightLightProfile
+import "Schedule.js" as Schedule
 
 Singleton {
     id: root
 
     property bool on: false
-    // Same as the evening profile in hypr/hyprsunset.conf.
-    readonly property int temperature: 4000
+    readonly property int temperature: Settings.values.nightLightTemperature
+
+    // Whether the schedule says on right now (false without a schedule).
+    readonly property bool scheduledOn: Settings.values.nightLightScheduled
+        && Schedule.active(Schedule.minutesOf(clock.date), Settings.values.nightLightStart, Settings.values.nightLightEnd)
 
     function toggle(): void {
-        on = !on;
+        set(!on);
+    }
+
+    function set(value: bool): void {
+        on = value;
         Quickshell.execDetached(on ? ["hyprctl", "hyprsunset", "temperature", String(temperature)]
                                    : ["hyprctl", "hyprsunset", "identity"]);
     }
 
-    Process {
-        id: read
-        command: ["hyprctl", "hyprsunset", "profile"]
-        running: true
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    root.on = NightLightProfile.warm(text);
-                    retry.attempts = 0;
-                } catch (e) {
-                    // hyprsunset starts alongside the shell at login and may not be up yet.
-                    if (retry.attempts < 5) {
-                        retry.attempts++;
-                        retry.start();
-                    } else {
-                        console.warn("NightLight: hyprsunset isn't answering: " + e.message);
-                    }
-                }
-            }
-        }
+    // Reaching the start or end time, or changing the schedule, switches it.
+    onScheduledOnChanged: set(scheduledOn)
+    // A new temperature applies right away while it's on.
+    onTemperatureChanged: {
+        if (on)
+            set(true);
     }
+
+    // At startup, follow the schedule (off without one). hyprsunset starts alongside the shell
+    // at login and may not be up yet, so it's told again a little later.
+    Component.onCompleted: set(scheduledOn)
 
     Timer {
-        id: retry
-        property int attempts: 0
-        interval: 2000
-        onTriggered: read.running = true
+        running: true
+        interval: 3000
+        onTriggered: root.set(root.on)
     }
 
-    IpcHandler {
-        target: "nightlight"
-
-        function refresh(): void {
-            read.running = true;
-        }
+    SystemClock {
+        id: clock
+        precision: SystemClock.Minutes
     }
 }

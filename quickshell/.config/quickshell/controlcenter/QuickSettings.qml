@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell.Services.UPower
 import qs.services
+import qs.settings
 import qs.theme
 import qs.widgets
 
@@ -168,6 +169,16 @@ Item {
 
                 Tray {
                     anchors.verticalCenter: parent.verticalCenter
+                }
+
+                IconButton {
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon: "settings"
+                    label: "Settings"
+                    onClicked: {
+                        SettingsWindow.open = true;
+                        root.openMenu("");
+                    }
                 }
 
                 IconButton {
