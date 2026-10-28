@@ -243,7 +243,8 @@ From a survey of every Quickshell 0.3.2 type and the quickshell-examples repo (u
 - **Quickshell is the polkit agent** (`polkit/PolkitPrompt.qml`): apps' password prompts are a
   card over the dimmed screen. `hyprpolkitagent` had failed at every login (started before
   Wayland was up), so there was no agent at all; it's no longer started (`autostart.lua`), but
-  stays installed: if the shell is down, `systemctl --user start hyprpolkitagent` brings it back.
+  stays installed: if the shell is down, `systemctl --user start hyprpolkitagent` brings it back. Verified
+  on the laptop: `pkexec true` with the password works.
 - Skipped, with reasons: global shortcuts instead of `qs ipc` binds (a call takes ~27 ms, not
   noticeable, and the binds would lose their fallback when the shell is down); `LazyLoader`
   (nothing measurable to gain); hibernate, i3/X11, sockets (not relevant). Bluetooth device
