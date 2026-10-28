@@ -235,9 +235,13 @@ fixed in config files should become settings.
 - **Island window:** fixed at the open menu's maximum size (resizing a layer surface every frame
   would stutter); `mask: Region { item: island }` limits input to the shape and `exclusiveZone`
   reserves only the closed height. The shape is one `ShapePath` (no seams between body and curves).
-- **Island keyboard focus is always `OnDemand`.** Switching it between `None` and `Exclusive` while
-  the surface was mapped made Hyprland clear the `HyprlandFocusGrab` right after it started, so the
-  menu closed immediately. (The launcher maps a new surface with `Exclusive`, which works.)
+- **Island keyboard focus: `OnDemand` while a menu is open, `None` while closed.** Always
+  `OnDemand` stole the keyboard: Hyprland gives the keyboard to a layer surface that accepts it as
+  soon as the pointer moves over it (`InputManager.cpp`, `rawSurfaceFocus`), and a click back into
+  the window didn't take it back because Hyprland still counted that window as focused, so only
+  Alt+Tab refocused. Switching between `None` and `Exclusive` instead made Hyprland clear the
+  `HyprlandFocusGrab` right after it started (the menu closed at once); `None`/`OnDemand` keeps
+  menus open. (The launcher maps a new surface with `Exclusive`, which works.)
 - **Keybinds: Windows-style** (user's choice, 2026-10-28): tap Super or Super+Space launcher,
   Super+Enter terminal, Super+E files, Super+B browser, Super+W / Alt+F4 close, Super+Up maximize,
   Super+Down minimize, Alt+Space window menu, Alt+Tab switcher, Super+Left/Right snap, Super+Z snap picker, Super+N quick settings, Super+C calendar, Super+Shift+S screenshot, Super+V clipboard, Super+L lock (Super+Shift+L hyprlock fallback),

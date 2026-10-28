@@ -159,11 +159,12 @@ Scope {
 
             // Hyprland layer rules match on this (see hypr/rules.lua).
             WlrLayershell.namespace: "qs-island"
-            // OnDemand: the island gets the keyboard when the focus grab below hands it over or
-            // you click into it (Escape, typing a Wi-Fi password), and never steals it otherwise.
-            // Switching between None and Exclusive while the surface is mapped made Hyprland
-            // drop the focus grab right after it started, closing the menu straight away.
-            WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+            // The keyboard only while a menu is open (Escape, typing a Wi-Fi password). Closed,
+            // None: with OnDemand, merely moving the pointer over the island gave it the keyboard,
+            // and clicking back into the window didn't take it back (Hyprland still counted that
+            // window as focused). Not Exclusive when open: switching between None and Exclusive
+            // made Hyprland drop the focus grab right after it started, closing the menu at once.
+            WlrLayershell.keyboardFocus: window.open ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
             // Closes the menu when you click any other window or surface.
             HyprlandFocusGrab {
