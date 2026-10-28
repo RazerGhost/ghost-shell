@@ -64,6 +64,7 @@ Singleton {
             property string terminal: "com.mitchellh.ghostty"
             property string browser: "zen"
             property string fileManager: "org.gnome.Nautilus"
+            property string editor: "dev.zed.Zed"
             property string imageViewer: "org.gnome.Loupe" // screenshots open in it
             property string videoPlayer: "io.github.celluloid_player.Celluloid"
             property string audioPlayer: "io.github.celluloid_player.Celluloid"

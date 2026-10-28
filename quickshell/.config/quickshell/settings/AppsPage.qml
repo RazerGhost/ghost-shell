@@ -55,6 +55,11 @@ Column {
     }
 
     Choice {
+        title: "Editor · Super + Shift + Z, text files"
+        kind: "editor"
+    }
+
+    Choice {
         title: "Image viewer · pictures and screenshots"
         kind: "imageViewer"
     }

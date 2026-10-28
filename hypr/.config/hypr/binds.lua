@@ -2,7 +2,6 @@
 ---- KEYBINDINGS ----
 ---------------------
 
-local editor = "zeditor"
 -- hyprlock with its sample config: the fallback lock screen (Super+Shift+L, and Super+L when the
 -- shell isn't running).
 local fallbackLock = "hyprlock -c /usr/share/hypr/hyprlock.conf"
@@ -29,7 +28,7 @@ hl.bind(mainMod .. " + Return",  app("terminal", "ghostty"), { description = "Te
 hl.bind(mainMod .. " + E",       app("fileManager", "nautilus"), { description = "File manager" })
 hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd("qs ipc call apps terminal yazi || ghostty -e yazi"), { description = "Yazi (files in the terminal)" })
 hl.bind(mainMod .. " + B",       app("browser", "zen-browser"), { description = "Browser" })
-hl.bind(mainMod .. " + SHIFT + Z", hl.dsp.exec_cmd(editor), { description = "Zed" })
+hl.bind(mainMod .. " + SHIFT + Z", app("editor", "zeditor"), { description = "Editor" })
 hl.bind(mainMod .. " + I",       hl.dsp.exec_cmd("qs ipc call settings open"), { description = "Settings" })
 
 -- Island menus

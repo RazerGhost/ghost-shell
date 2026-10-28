@@ -15,6 +15,7 @@ Singleton {
         terminal: ["TerminalEmulator"],
         browser: ["WebBrowser"],
         fileManager: ["FileManager"],
+        editor: ["TextEditor"],
         imageViewer: ["Graphics", "Viewer"],
         videoPlayer: ["Video", "Player"],
         audioPlayer: ["Audio", ["Player", "Music"]]
@@ -24,6 +25,7 @@ Singleton {
     // open things with). The browser is set through xdg-settings instead (links and web pages).
     readonly property var fileTypes: ({
         fileManager: ["inode/directory"],
+        editor: ["text/plain"],
         imageViewer: ["image/png", "image/jpeg", "image/gif", "image/webp", "image/bmp", "image/tiff",
                       "image/avif", "image/heic", "image/svg+xml", "image/x-icon"],
         videoPlayer: ["video/mp4", "video/x-matroska", "video/webm", "video/quicktime", "video/x-msvideo",
@@ -40,7 +42,7 @@ Singleton {
             entry.execute();
     }
 
-    // The chosen app of a kind ("terminal", "browser", "fileManager"); null if it's not installed.
+    // The chosen app of a kind ("terminal", "browser", "editor", ...); null if it's not installed.
     function defaultApp(kind: string): DesktopEntry {
         return DesktopEntries.byId(Settings.values[kind]);
     }
