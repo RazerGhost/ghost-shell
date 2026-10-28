@@ -218,6 +218,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `onAdapterUpdated: writeAdapter()` saves every change. A `var` holding a JSON list reads back
   as an array-like, not a JavaScript Array: `Array.isArray` is false (verified); copy it with
   `Array.from` before checking it.
+- `FileView.setText()` writes asynchronously unless `blockWrites: true`; called from
+  `Component.onDestruction` during a shell reload, nothing was written (verified). Keep state
+  that must survive a reload in `PersistentProperties { reloadableId: "..." }` (its `reloaded`
+  signal fires only when an old instance's values were carried over).
 - `DesktopEntry.categories` (list), `DesktopEntries.byId(id)`.
 - `hl.bind(keys, action, { description = "..." })`; `hyprctl binds -j` gives `modmask` (Super 64,
   Ctrl 4, Alt 8, Shift 1), `key`, `description`, `has_description`.

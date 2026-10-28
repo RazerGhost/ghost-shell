@@ -62,6 +62,8 @@ Singleton {
           words: "backup restore btrfs snapper undo files home" },
         { id: "apps", section: "Apps", icon: "apps", title: "Default apps",
           words: "terminal browser file manager editor image viewer video audio player" },
+        { id: "screentime", section: "Apps", icon: "hourglass", title: "Screen time",
+          words: "usage time apps today week hours digital wellbeing" },
         { id: "keybinds", section: "Apps", icon: "keyboard", title: "Keybinds",
           words: "shortcuts keys" },
         { id: "clock", section: "Apps", icon: "partly_cloudy_day", title: "Weather and clock",
@@ -346,6 +348,11 @@ Singleton {
                 AppsPage {
                     width: parent.width
                     visible: root.page === "apps"
+                }
+
+                ScreenTimePage {
+                    width: parent.width
+                    visible: root.page === "screentime"
                 }
 
                 KeybindsPage {

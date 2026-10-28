@@ -200,6 +200,8 @@ Singleton {
         readonly property int rowHeight: 64
         readonly property int stepper:   96  // the value between a stepper's - and +
         readonly property int stepperWide: 170 // a stepper showing a screen mode ("1920 × 1080, 165 Hz")
+        readonly property int screenTimeChart: 120 // the last 7 days' bars, with the day names
+        readonly property int screenTimeBar: 28    // one day's bar at most
     }
 
     readonly property QtObject osd: QtObject {

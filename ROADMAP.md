@@ -468,6 +468,16 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   the filter restarts. The preset in quick settings' Sound page, the bands in Settings ->
   Equalizer. The equalizer's nodes are left out of the Sound page's outputs and apps.
 
+### Screen time (built 2026-10-29; waiting on the user's test results)
+- Settings -> Screen time (user's choice: a Settings page, only showing the time; no limits or
+  reminders): a day's total, the last 7 days as bars (hover for the time, click for that day)
+  and the day's apps with their time. `services/ScreenTime.qml` gives the focused window's app
+  10 s every 10 s, unless there's been no input for 2 minutes (`IdleMonitor`, so a video or a
+  game holding an idle inhibitor still counts); suspend and a locked screen count nothing.
+  Apps by desktop entry id (web apps by their own entry). `screentime.json` keeps 30 days
+  (`ScreenTime.js`, tested), saved every minute; across a shell reload the counts stay in
+  `PersistentProperties` (a write during a reload is cancelled).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
