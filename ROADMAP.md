@@ -256,6 +256,15 @@ From a survey of every Quickshell 0.3.2 type and the quickshell-examples repo (u
   (nothing measurable to gain); hibernate, i3/X11, sockets (not relevant). Bluetooth device
   batteries were already in the Bluetooth page.
 
+### Screenshot tool (built 2026-10-28; waiting on the user's test results)
+- `screenshot/Screenshot.qml`, like Windows' Snipping Tool (user's choice): Super+Shift+S freezes
+  the focused monitor (one `ScreencopyView` frame) and dims it, with a Region / Window / Screen
+  bar under the island (R / W / S keys too, Escape cancels). Print takes the whole screen at once.
+- Every screenshot is copied and saved to `~/Pictures/Screenshots` (user's choice: both), with a
+  notification showing it; clicking it opens the picture. The picture is cut from the frozen
+  frame, so it's exactly what was frozen (menus, tooltips). Without the shell, the binds fall back
+  to grim + slurp.
+
 ## Decisions made
 
 - **External monitors:** keep the RTX in `AQ_DRM_DEVICES` (second, after the iGPU), so outputs wired

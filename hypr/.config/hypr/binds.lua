@@ -68,10 +68,11 @@ hl.bind(mainMod .. " + CTRL + right", hl.dsp.focus({ direction = "right" }), { d
 hl.bind(mainMod .. " + CTRL + up",    hl.dsp.focus({ direction = "up" }), { description = "Move focus" })
 hl.bind(mainMod .. " + CTRL + down",  hl.dsp.focus({ direction = "down" }), { description = "Move focus" })
 
--- Screenshots (copied to clipboard)
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy'), { description = "Screenshot of a region" })
-hl.bind("Print",                   hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy'), { description = "Screenshot of a region" })
-hl.bind("SHIFT + Print",           hl.dsp.exec_cmd("grim - | wl-copy"), { description = "Screenshot of the screen" })
+-- Screenshots (quickshell's screenshot/Screenshot.qml): saved to ~/Pictures/Screenshots and copied.
+-- Super+Shift+S picks a region, window or the screen; Print takes the whole screen. Without the
+-- shell, grim + slurp still copy a region.
+hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd('qs ipc call screenshot region || grim -g "$(slurp)" - | wl-copy'), { description = "Screenshot (region, window or screen)" })
+hl.bind("Print",                   hl.dsp.exec_cmd("qs ipc call screenshot screen || grim - | wl-copy"), { description = "Screenshot of the screen" })
 
 -- Workspaces 1-10 (Super+0 = 10)
 for i = 1, 10 do

@@ -128,6 +128,11 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - wtype: Hyprland doesn't run its binds for wtype's virtual keyboard, so binds can't be tested
   with it. `wtype -M alt` only sets the modifier, without Alt key events; `-P Alt_L` / `-p Alt_L`
   send real ones.
+- Freezing and cropping the screen: `ScreencopyView { captureSource: <ShellScreen>; live: false }`
+  + `captureFrame()` gives one still frame (`hasContent` once it's in). A `ShaderEffectSource {
+  sourceItem; sourceRect }` cut from it, then `grabToImage(cb, Qt.size(w * scale, h * scale))` and
+  `result.saveToFile(path)`, saves just that part. The ShaderEffectSource must be visible (put it
+  behind, `z: -1`). Draw nothing over the screen until `hasContent`, or the frame includes it.
 - `ScreencopyView { captureSource: toplevel.wayland; live; constraintSize }` (`Quickshell.Wayland`)
   captures windows on other workspaces too.
 - `float({ action })` takes `"toggle"` (default), `"enable"`/`"on"`, `"disable"`/`"off"`; an

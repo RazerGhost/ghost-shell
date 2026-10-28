@@ -10,6 +10,7 @@ import qs.launcher
 import qs.lock
 import qs.osd
 import qs.polkit
+import qs.screenshot
 import qs.settings
 import qs.snap
 import qs.switcher
@@ -23,6 +24,7 @@ ShellRoot {
     Lock {}
     LoginScreenSync {}
     PolkitPrompt {}
+    Screenshot {}
     Osd {}
     SnapPicker {}
     SnapAssist {}
