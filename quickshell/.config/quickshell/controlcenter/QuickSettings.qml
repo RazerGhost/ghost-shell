@@ -106,6 +106,9 @@ Item {
         Row {
             id: toggles
 
+            // Above the sliders that follow, so a button's name (shown below it on hover) isn't
+            // hidden behind the volume slider.
+            z: 1
             width: parent.width
             // Spread evenly: the gaps share what the buttons leave.
             spacing: (width - Theme.tile.round * 4) / 3

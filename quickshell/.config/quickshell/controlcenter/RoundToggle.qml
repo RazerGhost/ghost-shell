@@ -53,7 +53,6 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.bottom
         anchors.topMargin: Theme.spacing.xs
-        z: 1
         width: name.implicitWidth + Theme.spacing.m * 2
         height: name.implicitHeight + Theme.spacing.xs * 2
         radius: Theme.radius.full
