@@ -5,36 +5,50 @@
 local terminal    = "ghostty"
 local editor      = "zeditor"
 local fileManager = "nautilus"
+local browser     = "zen-browser"
 
 local mainMod = "SUPER"
 
--- Apps & session
-hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(editor))
-hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(fileManager))
-hl.bind(mainMod .. " + Y", hl.dsp.exec_cmd(terminal .. " -e yazi"))
+-- Windows-style layout (user's choice). Super tapped on its own opens the launcher: a release
+-- bind on the Super key itself.
+
+-- Apps
+hl.bind(mainMod .. " + SUPER_L", hl.dsp.exec_cmd("qs ipc call launcher toggle"), { release = true })
+hl.bind(mainMod .. " + space",   hl.dsp.exec_cmd("qs ipc call launcher toggle"))
+hl.bind(mainMod .. " + Return",  hl.dsp.exec_cmd(terminal))
+hl.bind(mainMod .. " + E",       hl.dsp.exec_cmd(fileManager))
+hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(terminal .. " -e yazi"))
+hl.bind(mainMod .. " + B",       hl.dsp.exec_cmd(browser))
+hl.bind(mainMod .. " + Z",       hl.dsp.exec_cmd(editor))
+
+-- Island menus
+hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("qs ipc call island toggle settings")) -- quick settings
+hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("qs ipc call island toggle today"))    -- calendar
+
+-- Session
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
-hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
-hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("qs ipc call launcher toggle"))
-hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("qs ipc call island toggle settings")) -- quick settings
-hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("qs ipc call island toggle today"))    -- calendar and media
+-- Log out. Phase 3's session menu replaces this.
+hl.bind("CTRL + ALT + Delete", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
 
 -- Windows
-hl.bind(mainMod .. " + C", hl.dsp.window.close())
-hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
-hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
+hl.bind(mainMod .. " + W", hl.dsp.window.close())
+hl.bind("ALT + F4",        hl.dsp.window.close())
+hl.bind(mainMod .. " + up",   hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }))
+hl.bind(mainMod .. " + down", hl.dsp.window.float({ action = "toggle" })) -- float <-> tile
+hl.bind(mainMod .. " + F",    hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit")) -- dwindle only
 
--- Screenshots (copied to clipboard)
-hl.bind("Print",           hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy')) -- region
-hl.bind("SHIFT + Print",   hl.dsp.exec_cmd("grim - | wl-copy"))              -- full screen
+-- Focus with arrow keys (Super+Left/Right stay free for Phase 6's snapping)
+hl.bind(mainMod .. " + CTRL + left",  hl.dsp.focus({ direction = "left" }))
+hl.bind(mainMod .. " + CTRL + right", hl.dsp.focus({ direction = "right" }))
+hl.bind(mainMod .. " + CTRL + up",    hl.dsp.focus({ direction = "up" }))
+hl.bind(mainMod .. " + CTRL + down",  hl.dsp.focus({ direction = "down" }))
 
--- Focus with arrow keys
-hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
-hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
-hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
-hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
+-- Screenshots (copied to clipboard)
+hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy')) -- region
+hl.bind("Print",                   hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy')) -- region
+hl.bind("SHIFT + Print",           hl.dsp.exec_cmd("grim - | wl-copy"))              -- full screen
 
 -- Workspaces 1-10 (Super+0 = 10)
 for i = 1, 10 do
@@ -44,8 +58,8 @@ for i = 1, 10 do
 end
 
 -- Scratchpad
-hl.bind(mainMod .. " + S",         hl.dsp.workspace.toggle_special("magic"))
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
+hl.bind(mainMod .. " + grave",         hl.dsp.workspace.toggle_special("magic"))
+hl.bind(mainMod .. " + SHIFT + grave", hl.dsp.window.move({ workspace = "special:magic" }))
 
 -- Scroll through workspaces
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))

@@ -15,7 +15,8 @@ hl.config({
             inactive_border = "rgba(595959aa)",
         },
 
-        resize_on_border = false,
+        -- Drag a window's edge or corner to resize it (Super + right-drag works too).
+        resize_on_border = true,
         allow_tearing    = false,
 
         layout = "dwindle",

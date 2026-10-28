@@ -60,7 +60,7 @@ new setup step.
 **Added alongside Phase 1 at the user's request:**
 - `install.sh`: packages, GPU rule check, early KMS, Plymouth off, greetd, GTK dark mode, stow for
   every package, a matugen run. Safe to re-run.
-- Nautilus (Super+N), Yazi in Ghostty (Super+Y), adw-gtk3 theme.
+- Nautilus (now Super+E), Yazi in Ghostty (now Super+Shift+E), adw-gtk3 theme.
 - greetd + tuigreet as the login screen (a stopgap until Phase 5).
 - Ghostty window padding. Zen browser (`zen-browser-bin`) instead of Firefox.
 
@@ -74,14 +74,14 @@ new setup step.
   percentage inside (`bar/BatteryPill.qml`). Opens
   `controlcenter/TodayPanel.qml` (calendar, `MediaCard`) or `QuickSettings.qml` (tiles for Wi-Fi,
   Bluetooth, power mode, microphone; volume and brightness `LevelSlider`s; battery; `Tray`), with
-  `WifiPage` (scan, connect, password prompt) and `BluetoothPage` (scan, pair, connect). Super+A /
-  Super+D or `qs ipc call island toggle settings|today`.
+  `WifiPage` (scan, connect, password prompt) and `BluetoothPage` (scan, pair, connect). Super+N /
+  Super+C or `qs ipc call island toggle settings|today`.
 - Services: `Audio`, `Brightness`, `NetworkStatus`, `BluetoothStatus`, `Battery`. Widgets:
   `MaterialIcon`, `IconButton`, `Switch`, `LevelSlider`, `TextButton`.
-- Launcher (`launcher/`, Super+R): `Fuzzy.js` scoring, tested in `tests/tst_fuzzy.qml`. Terminal apps
+- Launcher (`launcher/`, tap Super or Super+Space): `Fuzzy.js` scoring, tested in `tests/tst_fuzzy.qml`. Terminal apps
   open in Ghostty.
 - OSD (`osd/Osd.qml`) for volume, mute, mic mute and brightness, on the focused monitor.
-- Windows open floating and centered by default (user's request); Super+V tiles one.
+- Windows open floating and centered by default (user's request); Super+Down tiles one.
 
 ### Phase 3: Notifications + rest of the control center + session menu
 - Quickshell as the notification server: popups (from the island?) plus history in the "today" menu.
@@ -89,8 +89,7 @@ new setup step.
 - Session/power menu: lock, logout, suspend, reboot, shutdown.
 
 ### Phase 4: Clipboard + wallpaper
-- Clipboard picker on Super+V using cliphist history. Move the float toggle (currently Super+V) to
-  another key and tell the user which.
+- Clipboard picker on Super+V using cliphist history (Super+V is kept free for it).
 - Wallpaper drawn by Quickshell on the background layer, with a picker over `~/Pictures/Wallpapers`
   that also runs matugen (`matugen image <path> -m dark --source-color-index 0`).
   `misc.force_default_wallpaper` in `look.lua` may need changing once Quickshell draws the wallpaper.
@@ -141,7 +140,7 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
   (`~/.local/state/quickshell/colors.json`). Quickshell reloads the whole shell when files in its config
   directory change; `Colors.qml` watches the file instead.
 - **Floating by default:** a `float = true, center = true` rule for every window in `rules.lua`; the
-  dwindle layout is kept for windows tiled with Super+V.
+  dwindle layout is kept for windows tiled with Super+Down.
 - **Brightness OSD through IPC:** sysfs backlight files send no inotify events, so the brightness
   binds run `qs ipc call brightness refresh` after `brightnessctl`. Volume and mic need nothing:
   the OSD watches PipeWire.
@@ -151,6 +150,16 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
 - **Island keyboard focus is always `OnDemand`.** Switching it between `None` and `Exclusive` while
   the surface was mapped made Hyprland clear the `HyprlandFocusGrab` right after it started, so the
   menu closed immediately. (The launcher maps a new surface with `Exclusive`, which works.)
+- **Keybinds: Windows-style** (user's choice, 2026-10-28): tap Super or Super+Space launcher,
+  Super+Enter terminal, Super+E files, Super+B browser, Super+W / Alt+F4 close, Super+Up maximize,
+  Super+Down float/tile, Super+N quick settings, Super+C calendar, Super+Shift+S screenshot,
+  Ctrl+Alt+Delete log out, Super+Ctrl+arrows focus. Super+Left/Right are kept free for snapping
+  (Phase 6) and Super+V for the clipboard (Phase 4). Full list in `hypr/binds.lua`.
+- **Window buttons:** Hyprland draws no title bars, so instead of hyprbars: keybinds plus a window
+  menu in the island for the focused window (close, maximize, float, move to workspace). Planned.
+- **Media in the island:** a "live activity" that takes the clock's place while music plays
+  (alternating with the time, so the island stays centered), expands on hover to show the track
+  and controls, and opens its own media menu on click. Planned; replaces the media card in "today".
 - **Bluetooth pairing agent:** Quickshell can't register a BlueZ agent, and devices like the
   Keychron M6 ask the host to confirm pairing (journal: "No agent available for request type 2").
   `bt-agent` (`bluez-tools`, user-approved) runs from `autostart.lua` as
