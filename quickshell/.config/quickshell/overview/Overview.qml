@@ -8,7 +8,7 @@ import qs.services
 import qs.theme
 import qs.widgets
 import "../services/WorkspaceSlots.js" as WorkspaceSlots
-import "OverviewLayout.js" as OverviewLayout
+import "../services/WindowGrid.js" as WindowGrid
 
 // The overview, like Windows' Task View (user's choice): Super+Tab or a three-finger swipe up.
 // The current workspace's windows as live previews; click one to switch to it, hover for × to
@@ -58,7 +58,7 @@ Scope {
         // This workspace's windows, in a stable order (by position) so they don't jump around.
         readonly property list<HyprlandToplevel> windows: windowsOn(workspace)
             .sort((a, b) => a.lastIpcObject.at[1] - b.lastIpcObject.at[1] || a.lastIpcObject.at[0] - b.lastIpcObject.at[0])
-        readonly property var rows: OverviewLayout.grid(
+        readonly property var rows: WindowGrid.grid(
             windows.map(t => ({ width: t.lastIpcObject.size[0], height: t.lastIpcObject.size[1] })),
             width - Theme.overview.margin * 2,
             height - Theme.island.height - Theme.overview.stripSpace - Theme.overview.margin * 2,

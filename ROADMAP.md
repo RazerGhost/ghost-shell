@@ -290,7 +290,7 @@ other session: pinning the Vencord/Spicetify downloads in install.sh.
 ### Overview (done, verified on the laptop 2026-10-28)
 - `overview/Overview.qml`, like Windows' Task View (user's choice): Super+Tab or a three-finger
   swipe up (down closes). The current workspace's windows as live previews in a grid that keeps
-  their shapes (`OverviewLayout.js`, tested): click to switch, × to close. A strip of the
+  their shapes (`services/WindowGrid.js`, tested, shared with Snap Assist): click to switch, × to close. A strip of the
   workspaces in use as miniatures (windows at their positions): click to go, drag a window onto
   one to move it, + for a new workspace. Keyboard on demand (focus race, see the switcher).
 

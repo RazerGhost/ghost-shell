@@ -1,5 +1,5 @@
-// Where the overview puts the window previews: a centered grid that keeps each window's shape.
-// Plain JavaScript, so it can be tested on its own (tests/tst_overviewlayout.qml).
+// A grid of window previews that keeps each window's shape: the overview and Snap Assist. Plain
+// JavaScript, so it can be tested on its own (tests/tst_windowgrid.qml).
 .pragma library
 
 // `windows` is [{ width, height }] (real sizes). Every column count is tried; the one where the
@@ -33,4 +33,25 @@ function grid(windows, areaWidth, areaHeight, gap, label) {
         }
     }
     return best;
+}
+
+// The window next to `index` in `rows` (from grid()) for an arrow key: "left"/"right" step
+// through the windows in order (wrapping around), "up"/"down" go to the row above or below, to
+// the window at about the same place (the last one if that row is shorter). Stays put at the
+// top and bottom.
+function neighbour(rows, index, direction) {
+    const flat = [].concat(...rows); // (no Array.flat in Qt's JavaScript)
+    const count = flat.length;
+    if (count === 0)
+        return -1;
+    if (direction === "left")
+        return (index - 1 + count) % count;
+    if (direction === "right")
+        return (index + 1) % count;
+    const row = rows.findIndex(r => r.some(cell => cell.index === index));
+    const column = rows[row].findIndex(cell => cell.index === index);
+    const target = rows[row + (direction === "down" ? 1 : -1)];
+    if (!target)
+        return index;
+    return target[Math.min(column, target.length - 1)].index;
 }

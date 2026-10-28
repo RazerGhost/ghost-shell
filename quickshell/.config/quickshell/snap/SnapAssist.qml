@@ -6,10 +6,11 @@ import qs.services
 import qs.theme
 import qs.widgets
 import "../services/SnapLayout.js" as SnapLayout
+import "../services/WindowGrid.js" as WindowGrid
 
 // Snap Assist, like Windows: after you snap a window to a half or a third, the space next to it
-// shows the other windows on that workspace. Click one to fill the space; Escape or a click
-// elsewhere skips it.
+// shows the other windows on that workspace, in a grid that fills it. Click one, or pick it with
+// the arrow keys and Enter, to fill the space; Escape or a click elsewhere skips it.
 Scope {
     id: root
 
@@ -77,11 +78,44 @@ Scope {
         }
 
         Rectangle {
+            id: frame
+
+            // The windows in a grid that fills the space and keeps their shapes (like the
+            // overview). The selection starts on the most recently used one.
+            readonly property var rows: WindowGrid.grid(
+                root.candidates.map(t => ({ width: t.lastIpcObject?.size?.[0] ?? 1600, height: t.lastIpcObject?.size?.[1] ?? 1000 })),
+                width - Theme.spacing.l * 2,
+                height - title.height - Theme.spacing.l * 3,
+                Theme.overview.gap, Theme.switcher.labelHeight)
+            property int selected: 0
+
             anchors.fill: parent
             radius: Theme.radius.xl
             color: Colors.surfaceTranslucent
             focus: true
+
+            // Arrow keys move the selection, Enter puts it in the space, Escape skips.
             Keys.onEscapePressed: root.open = false
+            Keys.onPressed: event => {
+                const directions = { [Qt.Key_Left]: "left", [Qt.Key_Right]: "right", [Qt.Key_Up]: "up", [Qt.Key_Down]: "down" };
+                if (directions[event.key]) {
+                    selected = WindowGrid.neighbour(rows, selected, directions[event.key]);
+                    event.accepted = true;
+                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                    if (root.candidates[selected])
+                        root.pick(root.candidates[selected]);
+                    event.accepted = true;
+                }
+            }
+
+            Connections {
+                target: root
+
+                function onOpenChanged(): void {
+                    frame.selected = 0;
+                    frame.forceActiveFocus();
+                }
+            }
 
             Text {
                 id: title
@@ -95,45 +129,51 @@ Scope {
                 font.weight: Font.DemiBold
             }
 
-            // The windows, as many per row as fit; scrolls when there are more.
-            Flickable {
-                anchors.top: title.bottom
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.margins: Theme.spacing.l
-                contentHeight: flow.implicitHeight
-                clip: true
-                boundsBehavior: Flickable.StopAtBounds
+            Column {
+                anchors.horizontalCenter: parent.horizontalCenter
+                y: title.y + title.height + Theme.spacing.l
+                   + (parent.height - title.y - title.height - Theme.spacing.l * 2 - implicitHeight) / 2
+                spacing: Theme.overview.gap
 
-                Flow {
-                    id: flow
-                    width: parent.width
-                    spacing: Theme.spacing.m
+                Repeater {
+                    model: frame.rows
 
-                    Repeater {
-                        model: root.candidates
+                    Row {
+                        id: row
 
-                        MouseArea {
-                            id: card
+                        required property var modelData
 
-                            required property HyprlandToplevel modelData
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        spacing: Theme.overview.gap
 
-                            width: Theme.switcher.thumbHeight * 16 / 10
-                            height: Theme.switcher.thumbHeight + Theme.switcher.labelHeight
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.pick(modelData)
+                        Repeater {
+                            model: row.modelData
 
-                            Accessible.role: Accessible.Button
-                            Accessible.name: "Put " + modelData.title + " here"
-                            Accessible.onPressAction: root.pick(modelData)
+                            MouseArea {
+                                id: card
 
-                            WindowPreview {
-                                anchors.fill: parent
-                                toplevel: card.modelData
-                                highlighted: card.containsMouse
-                                capturing: panel.visible
+                                required property var modelData
+                                readonly property HyprlandToplevel toplevel: root.candidates[modelData.index] ?? null
+
+                                width: modelData.width
+                                height: modelData.height + Theme.switcher.labelHeight
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onEntered: frame.selected = modelData.index
+                                onClicked: root.pick(toplevel)
+
+                                Accessible.role: Accessible.Button
+                                Accessible.name: "Put " + (toplevel?.title ?? "") + " here"
+                                Accessible.selected: frame.selected === modelData.index
+                                Accessible.onPressAction: root.pick(toplevel)
+
+                                WindowPreview {
+                                    anchors.fill: parent
+                                    toplevel: card.toplevel
+                                    previewHeight: card.modelData.height
+                                    highlighted: frame.selected === card.modelData.index
+                                    capturing: panel.visible
+                                }
                             }
                         }
                     }
