@@ -1,5 +1,6 @@
 # matugen: generates Material colors from the wallpaper and writes them through the templates below.
-# This is the single source of truth for colors in Quickshell, Hyprland, Ghostty, GTK and Yazi.
+# This is the single source of truth for colors in Quickshell, Hyprland, Ghostty, GTK, Yazi and
+# Spotify (the Ghost Spicetify theme).
 #
 # Run: matugen image <wallpaper> -m dark --source-color-index 0
 # (--source-color-index 0 skips the interactive prompt when an image yields several source colors)
@@ -36,3 +37,11 @@ output_path = ['~/.config/gtk-3.0/gtk.css', '~/.config/gtk-4.0/gtk.css']
 # Yazi reads its theme at startup; reopen it to see new colors.
 input_path  = 'templates/yazi-theme.toml'
 output_path = '~/.config/yazi/theme.toml'
+
+[templates.spicetify]
+# Spotify with the Ghost Spicetify theme. Rendered to its own file because Ghost's installer
+# replaces the theme's color.ini; the hook merges it in as the [matugen] scheme and selects it.
+# Set Ghost's Colours -> Accent to "Theme" to use primary instead of the album art's color.
+input_path  = 'templates/spicetify-ghost.ini'
+output_path = '~/.local/state/matugen/spicetify-ghost.ini'
+post_hook   = 'sh ~/.config/matugen/hooks/spicetify-ghost.sh'

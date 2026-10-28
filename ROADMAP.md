@@ -33,7 +33,7 @@ new setup step.
   Aesthetic reference: saneAspect's Hyprland/Quickshell builds (clean, rounded, Material-ish, subtle
   animations).
 - **Colors:** matugen from the wallpaper is the single source of truth for Quickshell, Hyprland borders,
-  Ghostty, GTK and Yazi. Dark mode by default.
+  Ghostty, GTK, Yazi and Spotify (Ghost theme). Dark mode by default.
 - **Icons:** Material Symbols (`Material Symbols Rounded`), outline at weight 300 (user's choice after comparing styles, 2026-10-28: filled made the few symbols with a solid variant look heavy; light sits closer to the Colloid app icons). **UI font:** Inter. **Mono:** MesloLGS Nerd Font.
 - **QML:** `shell.qml` entry, one folder per area (`bar/`, `launcher/`, `notifications/`, `osd/`,
   `controlcenter/`, `services/`, `theme/`, `widgets/` for shared components). Singletons for shared
@@ -318,6 +318,14 @@ From a survey of every Quickshell 0.3.2 type and the quickshell-examples repo (u
   seek bar, controls); clicking the middle opens whatever it shows. Player choice
   lives in `services/Media.qml`. Spotify (1.3.4) reports a frozen MPRIS position (equal to the
   track length) while playing, so its seek bar reads full; other players are untested.
+- **Spotify follows the wallpaper:** matugen renders `templates/spicetify-ghost.ini` (Ghost's
+  `color.ini` keys) to `~/.local/state/matugen/spicetify-ghost.ini`, and `hooks/spicetify-ghost.sh`
+  merges it into Ghost's `color.ini` as the `[matugen]` scheme, selects it and runs
+  `spicetify refresh` (Spotify shows it after a restart). Its own file because Ghost's installer
+  replaces `color.ini`; install.sh runs the hook again after installing Ghost. Ghost's accent still
+  follows the album art unless its setting Colours -> Accent is "Theme" (then it's `primary`).
+  Spotify runs on Wayland (`spotify/.config/spotify-flags.conf`, read by the AUR package's
+  launcher). Not yet tested on the laptop.
 - **Bluetooth pairing agent:** Quickshell can't register a BlueZ agent, and devices like the
   Keychron M6 ask the host to confirm pairing (journal: "No agent available for request type 2").
   `bt-agent` (`bluez-tools`, user-approved) runs from `autostart.lua` as

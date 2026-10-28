@@ -198,6 +198,9 @@ if [[ -f $HOME/.config/spotify/prefs ]]; then
         spicetify backup apply
     fi
     curl -fsSL https://raw.githubusercontent.com/RazerGhost/spicetify-ghost/main/install.sh | sh
+    # Ghost's installer just replaced its color.ini; put matugen's [matugen] scheme back in and
+    # select it (matugen runs the same hook on every wallpaper change).
+    sh "$HOME/.config/matugen/hooks/spicetify-ghost.sh"
 else
     echo "Skipped: open Spotify once and log in, then re-run this script."
 fi

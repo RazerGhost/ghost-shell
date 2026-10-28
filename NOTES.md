@@ -195,6 +195,7 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - Hooks run through `sh -c`. A non-zero exit is only logged; the run continues.
 - `matugen image <img> -m dark --source-color-index 0` (the index skips an interactive prompt),
   `matugen color hex "#rrggbb" -m dark`.
+- Creates missing parent folders of an `output_path` (`create_dir_all` in its template code).
 
 **Others**
 - Ghostty: `theme = Matugen` loads `~/.config/ghostty/themes/Matugen`; `SIGUSR2` reloads the config.
@@ -203,6 +204,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - GTK: libadwaita and adw-gtk3 read `@define-color accent_bg_color, window_bg_color, view_*,
   headerbar_*, sidebar_*, card_*, popover_*` from `~/.config/gtk-{3,4}.0/gtk.css`. Open apps need a
   restart.
+- Spotify (AUR `spotify`): `/usr/bin/spotify` is a script that reads extra flags from
+  `$XDG_CONFIG_HOME/spotify-flags.conf`, one per line, `#` comments skipped.
+- Spicetify 2.46: `spicetify refresh` rewrites the theme's CSS, JS, colors and assets without a full
+  apply; `spicetify config color_scheme <name>` picks a `color.ini` section.
 - Yazi 26.9: sections `[mgr] [tabs] [mode] [indicator] [status] [input] [pick] [cmp] [tasks] ...`. A
   partial `theme.toml` is merged with the defaults; Yazi reads it at startup.
 - tuigreet 0.11 (`greetd-tuigreet`): `--time --remember --asterisks --cmd <command>`.
