@@ -144,7 +144,7 @@ go back with Ctrl+Alt+F1 and unlock with your password.
 restarting): Ctrl+Alt+F2, log in, then switch greetd back to tuigreet and restart it:
 `sudo sed -i 's/^command = "env/# command = "env/; s/^# command = "tuigreet/command = "tuigreet/' /etc/greetd/config.toml && sudo systemctl restart greetd`.
 
-### Phase 6: Window switching + snap layouts (built; waiting on the user's test results)
+### Phase 6: Window switching + snap layouts (done, verified on the laptop 2026-10-28)
 Added at the user's request after researching Windows/macOS features (2026-10-28). The phase number
 isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
 - **Alt+Tab switcher** (built, `switcher/Switcher.qml`): every window on every workspace (user's
@@ -434,7 +434,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `matugen color hex "#rrggbb" -m dark`.
 
 **Others**
-- Ghostty: `theme = Matugen` loads `~/.config/ghostty/themes/Matugen`; `SIGUSR2` reloads open windows.
+- Ghostty: `theme = Matugen` loads `~/.config/ghostty/themes/Matugen`; `SIGUSR2` reloads the config.
+  Ghostty runs as one process for all windows (`--gtk-single-instance=true`), so new windows only
+  get config changes after that reload; `window-decoration = client` showed in new windows after it.
 - GTK: libadwaita and adw-gtk3 read `@define-color accent_bg_color, window_bg_color, view_*,
   headerbar_*, sidebar_*, card_*, popover_*` from `~/.config/gtk-{3,4}.0/gtk.css`. Open apps need a
   restart.
