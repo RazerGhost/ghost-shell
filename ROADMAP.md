@@ -407,6 +407,11 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   the dark menu (`ColorQuantizer` + `MediaAccent.js`, tested); grey or black and white covers keep
   the theme's accent. The cover is downloaded per track for it (`Media.artFile`).
 
+### Not doing (user's call, 2026-10-28)
+Hibernation, Btrfs snapshots, fingerprint login and dictation (from the Omarchy/Ryoku research):
+skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
+windows).
+
 ## Decisions made
 
 - **External monitors:** keep the RTX in `AQ_DRM_DEVICES` (second, after the iGPU), so outputs wired
