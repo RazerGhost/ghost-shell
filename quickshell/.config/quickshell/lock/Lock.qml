@@ -18,8 +18,7 @@ Scope {
     property bool busy
     // The password waiting for PAM to ask for it.
     property string pending
-    // The picture chosen for the lock screen in settings, or else the desktop's.
-    readonly property string wallpaper: Settings.values.lockWallpaper || Wallpaper.path
+    readonly property string wallpaper: Wallpaper.lockPath
 
     signal tried()
 

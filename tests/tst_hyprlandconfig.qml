@@ -33,24 +33,4 @@ TestCase {
         verify(lua.includes("gaps_in     = 5,"));
         verify(lua.includes("rounding = 10,"));
     }
-
-    function test_layouts() {
-        const lst = [
-            "! model",
-            "  pc105           Generic 105-key PC",
-            "",
-            "! layout",
-            "  us              English (US)",
-            "  nl              Dutch",
-            "  de              German",
-            "",
-            "! variant",
-            "  intl            us: English (US, intl., with dead keys)"
-        ].join("\n");
-        compare(HyprlandConfig.layouts(lst), [
-            { code: "nl", name: "Dutch" },
-            { code: "us", name: "English (US)" },
-            { code: "de", name: "German" }
-        ]);
-    }
 }

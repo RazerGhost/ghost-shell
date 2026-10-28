@@ -1,7 +1,7 @@
 #!/bin/sh
 # Copies what the login screen shows into the folder it reads, /var/lib/qs-greeter/shared/:
-# your settings (its look options), your colors, and the lock screen's picture (the one chosen in
-# settings, else the desktop's). The login screen runs as greetd's "greeter" user, which can't
+# your settings (its look options), your colors, and the lock screen's picture (the first
+# argument). The login screen runs as greetd's "greeter" user, which can't
 # read your home folder; update-greeter.sh made that folder yours, so no sudo is needed here.
 # The shell runs this whenever one of those changes (lock/LoginScreenSync.qml), and
 # update-greeter.sh runs it too.
@@ -31,11 +31,11 @@ if [ -f "$HOME/.config/hypr/shell-settings.lua" ]; then
     copy "$HOME/.config/hypr/shell-settings.lua" "$shared/shell-settings.lua"
 fi
 
-picture=$(node -e '
-    const read = file => { try { return require(file) } catch { return {} } };
-    const [settings, wallpaper] = process.argv.slice(1).map(read);
-    process.stdout.write(settings.lockWallpaper || wallpaper.path || "");
-' "$state/settings.json" "$state/wallpaper.json")
+# The lock screen's picture, from the shell (lock/LoginScreenSync.qml passes Wallpaper.lockPath;
+# "" for none). Without an argument (update-greeter.sh), the login screen keeps its picture until
+# the shell runs this again at its next start.
+[ $# -ge 1 ] || exit 0
+picture=$1
 
 if [ -n "$picture" ] && [ -f "$picture" ]; then
     target="$shared/picture.${picture##*.}"

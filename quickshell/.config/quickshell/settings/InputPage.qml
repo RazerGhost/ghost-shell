@@ -5,7 +5,7 @@ import qs.controlcenter
 import qs.services
 import qs.theme
 import qs.widgets
-import "HyprlandConfig.js" as HyprlandConfig
+import "XkbLayouts.js" as XkbLayouts
 
 // Keyboard and touchpad: the keyboard layout (also the login screen's), touchpad scrolling and
 // tapping, pointer speed. Applied through Hyprland (HyprlandSettings.qml).
@@ -13,7 +13,7 @@ Column {
     id: root
 
     // Every layout XKB knows, by name.
-    readonly property var layouts: HyprlandConfig.layouts(baseLst.text())
+    readonly property var layouts: XkbLayouts.layouts(baseLst.text())
     // The chosen one first; while searching, the matches.
     readonly property var shown: {
         const q = search.text.trim().toLowerCase();

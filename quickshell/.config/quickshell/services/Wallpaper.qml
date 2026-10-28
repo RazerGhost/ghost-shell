@@ -14,6 +14,8 @@ Singleton {
     readonly property string folder: Quickshell.env("HOME") + "/Pictures/Wallpapers"
     // The current wallpaper's path; "" until one is chosen (Hyprland's default shows then).
     readonly property string path: state.path
+    // The lock and login screens' picture: the one chosen in settings, or else the desktop's.
+    readonly property string lockPath: Settings.values.lockWallpaper || path
     // The picker strip is open (wallpaper/WallpaperPicker.qml): quick settings' button, or
     // `qs ipc call wallpaper picker`.
     property bool pickerOpen: false

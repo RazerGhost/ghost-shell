@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.services
 
 // Keeps the login screen's copy of your settings, colors and lock screen picture up to date: runs
 // greeter/sync.sh at startup and whenever one of those files changes (a setting, a new wallpaper,
@@ -21,7 +22,8 @@ Scope {
 
     Process {
         id: sync
-        command: ["sh", Quickshell.shellDir + "/greeter/sync.sh"]
+        // The picture is passed in: Wallpaper.lockPath knows which one the lock screen shows.
+        command: ["sh", Quickshell.shellDir + "/greeter/sync.sh", Wallpaper.lockPath]
         onExited: code => {
             if (code !== 0)
                 console.warn("LoginScreenSync: greeter/sync.sh exited with code " + code);
