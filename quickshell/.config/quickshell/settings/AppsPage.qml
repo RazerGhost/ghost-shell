@@ -5,8 +5,8 @@ import qs.services
 import qs.theme
 
 // Default apps: the terminal, browser and file manager the keybinds open (Super+Enter, Super+B,
-// Super+E). The browser and file manager also become the system's defaults for links and
-// folders.
+// Super+E), and the image viewer. The browser, file manager and image viewer also become the
+// system's defaults for links, folders and pictures.
 Column {
     spacing: Theme.spacing.l
 
@@ -52,5 +52,10 @@ Column {
     Choice {
         title: "File manager · Super + E"
         kind: "fileManager"
+    }
+
+    Choice {
+        title: "Image viewer · pictures and screenshots"
+        kind: "imageViewer"
     }
 }

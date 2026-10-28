@@ -30,6 +30,7 @@ inter-font
 ttf-meslo-nerd
 nvidia-prime
 nautilus
+loupe
 gvfs
 adw-gtk-theme
 yazi

@@ -120,6 +120,9 @@ gsettings set org.gnome.desktop.interface color-scheme prefer-dark
 gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark
 # Colloid icons (user's choice); Quickshell gets the same theme from QS_ICON_THEME in env.lua.
 gsettings set org.gnome.desktop.interface icon-theme Colloid-Dark
+# Pictures (screenshots too) open in Loupe; Settings -> Default apps can change it.
+xdg-mime default org.gnome.Loupe.desktop image/png image/jpeg image/gif image/webp image/bmp \
+    image/tiff image/avif image/heic image/svg+xml image/x-icon
 # Title bar buttons for apps that draw their own bar (GTK apps, Ghostty). No minimize: Hyprland
 # ignores apps' minimize requests (Super+Down or the window menu minimizes instead).
 gsettings set org.gnome.desktop.wm.preferences button-layout 'appmenu:maximize,close'
