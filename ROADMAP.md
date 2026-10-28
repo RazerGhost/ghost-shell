@@ -248,6 +248,10 @@ fixed in config files should become settings.
   `yes | bt-agent -c NoInputNoOutput`: without `--daemon` it reads answers from stdin, and in
   `--daemon` mode it rejects confirmations unless a PIN file matches. The Bluetooth page also sets
   the adapter `pairable` and the device `trusted` before `pair()`, and connects once paired.
+- **Apps reopen where they were** (`hypr/windows.lua`): on `window.close` a floating window's
+  position and size are saved per class in `~/.local/state/hypr/window-positions`; on
+  `window.open` they're applied, unless another window of that class is open (dialogs, second
+  windows) or the spot is off-screen. Fullscreen and minimized windows aren't saved.
 - **Attention like a flashing taskbar button:** apps can't steal focus (`misc.focus_on_activate`
   stays false); Hyprland marks them urgent and the island shows an `AttentionCard` (icon, title,
   click to switch) for 5 s, after any notification pop-up. `services/Windows.qml` keeps its own
@@ -394,6 +398,11 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `window.close`, `window.open`, `window.update_state` (see the wiki's events.md). `input.follow_mouse`:
   0 cursor never focuses, 1 hover focuses, 2 click focuses (pointer separate), 3 click doesn't
   focus. `hl.dsp.window.alter_zorder({ window?, mode = "top" | "bottom" })`.
+- Lua `HL.Window` (stubs in `/usr/share/hypr/stubs/hl.meta.lua`): `address` (with 0x, so
+  `"address:" .. w.address` selects it), `class`, `at.x/.y`, `size.x/.y`, `floating`, `fullscreen`
+  (0 = no), `workspace.name`, `focus_history_id`, `pinned`. `hl.get_windows()`, `hl.get_monitors()`
+  (`x`, `y`, `width`, `height`, `scale`). Lua's `io` and `os` work in the config. A window is still
+  readable in `window.close`.
 - `Hyprland.rawEvent(event)` gives every socket2 event (`event.name`, `event.data`, e.g.
   `urgent` with the address without 0x). Don't annotate the parameter's type in QML
   (`HyprlandIpcEvent` isn't a registered name; Qt logs an error per event).
