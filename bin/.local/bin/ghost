@@ -8,6 +8,8 @@
 #   ghost theme <wallpaper | "#rrggbb">
 #                     the wallpaper and the colors from it (the same as the shell's picker)
 #   ghost greeter     copy the shell to the login screen (needed after changing the shell's code)
+#   ghost webapp add <name> <url> [icon] | remove <name> | list
+#                     a site in its own window, in the launcher and the dock (modules/apps/webapp.sh)
 #   ghost doctor      check that everything is set up
 #   ghost modules     list the modules, and which this machine uses
 #   ghost keybinds    Hyprland's keybinds as a Markdown table (docs/keybinds.md is made with it)
@@ -27,7 +29,7 @@ declare -A about=(
     [core]="Hyprland, the shell, fonts and themes, the login screen, the colors"
     [system]="this laptop's GPU rule, boot options, greetd and services (sudo)"
     [snapshots]="Btrfs snapshots: the system's at every update, your home hourly (sudo)"
-    [apps]="terminal, editor, files, pictures, video, music, browser"
+    [apps]="terminal, editor, files, pictures, video, music, browser, web apps"
     [dev]="languages, package managers and Docker"
     [gaming]="Steam, Proton, Lutris, Heroic, MangoHud; Millennium's theme"
     [discord]="Vesktop with Vencord and the Ghost plugin"
@@ -237,6 +239,7 @@ case ${1:-help} in
     update) shift; cmd_update "$@" ;;
     theme) shift; cmd_theme "$@" ;;
     greeter) modules/core/greeter.sh ;;
+    webapp) shift; modules/apps/webapp.sh "$@" ;;
     doctor) cmd_doctor ;;
     modules) cmd_modules ;;
     keybinds) cmd_keybinds ;;

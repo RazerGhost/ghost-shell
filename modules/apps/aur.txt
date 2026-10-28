@@ -1,2 +1,4 @@
 # AUR packages for this module (paru).
 zen-browser-bin
+# Only for web apps (ghost webapp): Zen can't open a site as its own window.
+ungoogled-chromium-bin

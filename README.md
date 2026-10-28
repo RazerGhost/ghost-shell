@@ -54,6 +54,7 @@ After the first install, `ghost` (in `~/.local/bin`) does everything:
 | `ghost install [module...]` | packages and setup for some or all modules |
 | `ghost theme <wallpaper \| "#rrggbb">` | a new wallpaper and the colors from it |
 | `ghost greeter` | update the login screen's copy of the shell (after changing its code) |
+| `ghost webapp add <name> <url> [icon]` | a site in its own window, in the launcher and the dock (`remove <name>`, `list`) |
 | `ghost doctor` | check that everything is set up; each problem says what fixes it |
 | `ghost modules` | list the modules and which ones this machine uses |
 | `ghost keybinds` | the keybinds as a Markdown table |

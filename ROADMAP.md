@@ -447,6 +447,16 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   overrides monitors.lua's "preferred". Positions stay "auto": arranging several screens isn't
   built (only the laptop's screen to test with).
 
+### Web apps (built 2026-10-29; waiting on the user's test results)
+- `ghost webapp add <name> <url> [icon]` (`modules/apps/webapp.sh`; `remove`, `list`): a desktop
+  entry `webapp-<name>.desktop` that opens the site with `chromium --app` (ungoogled-chromium-bin,
+  user's choice: Zen has no window-without-tabs mode; Chromium runs only while a web app is
+  open). Its `StartupWMClass` is the class Chromium gives the window
+  (`chrome-<host>_<path with / as _>-Default`, checked on the laptop), so the dock and switcher
+  show the web app's own icon. The icon is the given file or URL, else the site's
+  `apple-touch-icon.png`, else its favicon from DuckDuckGo's icon service. All web apps share
+  one Chromium profile (one login per site).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
