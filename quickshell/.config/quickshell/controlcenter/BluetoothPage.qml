@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Bluetooth
 import qs.services
 import qs.theme
@@ -73,10 +74,12 @@ Column {
         boundsBehavior: Flickable.StopAtBounds
 
         // Connected first, then paired, then by name. Devices without a real name (just an
-        // address) are left out unless they're paired.
-        model: (BluetoothStatus.adapter?.devices.values ?? [])
-            .filter(d => d.paired || d.deviceName !== "")
-            .sort((a, b) => b.connected - a.connected || b.paired - a.paired || a.name.localeCompare(b.name))
+        // address) are left out unless they're paired. ScriptModel: see WifiPage.
+        model: ScriptModel {
+            values: (BluetoothStatus.adapter?.devices.values ?? [])
+                .filter(d => d.paired || d.deviceName !== "")
+                .sort((a, b) => b.connected - a.connected || b.paired - a.paired || a.name.localeCompare(b.name))
+        }
 
         delegate: ListRow {
             id: row

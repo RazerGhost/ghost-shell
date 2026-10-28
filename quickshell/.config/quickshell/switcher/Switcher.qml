@@ -103,7 +103,8 @@ Scope {
                 anchors.margins: Theme.spacing.l
                 orientation: ListView.Horizontal
                 spacing: Theme.spacing.m
-                model: root.open ? root.windows : []
+                // ScriptModel: a window opening or closing doesn't rebuild every live preview.
+                model: ScriptModel { values: root.open ? [...root.windows] : [] }
                 currentIndex: root.index
                 highlightMoveDuration: Theme.anim.fast
                 boundsBehavior: Flickable.StopAtBounds

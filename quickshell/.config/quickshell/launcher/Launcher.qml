@@ -172,7 +172,8 @@ Scope {
                     // Re-filtered on every keystroke; DesktopEntries.applications updates
                     // by itself when apps are installed or removed. Includes the apps' own
                     // shortcuts ("New Private Window").
-                    model: Fuzzy.results(DesktopEntries.applications.values, search.text)
+                    // ScriptModel: results that stay while typing keep their row.
+                    model: ScriptModel { values: Fuzzy.results(DesktopEntries.applications.values, search.text) }
                     highlightMoveDuration: Theme.anim.fast
                     boundsBehavior: Flickable.StopAtBounds
 

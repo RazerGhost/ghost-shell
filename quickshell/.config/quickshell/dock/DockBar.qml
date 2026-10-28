@@ -145,7 +145,9 @@ PanelWindow {
                 height: parent.height
 
                 Repeater {
-                    model: window.dock.items
+                    // Recomputed every second (window positions); ScriptModel keeps the icons
+                    // whose app didn't change instead of rebuilding them all.
+                    model: ScriptModel { values: window.dock.items }
 
                     Row {
                         id: slot

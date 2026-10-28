@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Networking
 import qs.services
 import qs.theme
@@ -182,10 +183,13 @@ Column {
         boundsBehavior: Flickable.StopAtBounds
 
         // Connected first, then saved networks, then by signal strength. Hidden networks
-        // (no name) are left out.
-        model: (NetworkStatus.wifiDevice?.networks.values ?? [])
-            .filter(n => n.name !== "")
-            .sort((a, b) => b.connected - a.connected || b.known - a.known || b.signalStrength - a.signalStrength)
+        // (no name) are left out. ScriptModel moves rows as signal strengths change instead of
+        // rebuilding the list (which jumped back to the top while scanning).
+        model: ScriptModel {
+            values: (NetworkStatus.wifiDevice?.networks.values ?? [])
+                .filter(n => n.name !== "")
+                .sort((a, b) => b.connected - a.connected || b.known - a.known || b.signalStrength - a.signalStrength)
+        }
 
         delegate: ListRow {
             required property WifiNetwork modelData

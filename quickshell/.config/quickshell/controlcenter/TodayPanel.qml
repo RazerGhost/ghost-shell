@@ -219,7 +219,8 @@ Column {
                 spacing: Theme.spacing.s
 
                 Repeater {
-                    model: Notifications.history
+                    // ScriptModel: a new notification adds one card instead of rebuilding all.
+                    model: ScriptModel { values: [...Notifications.history] }
 
                     NotificationCard {
                         required property var modelData
