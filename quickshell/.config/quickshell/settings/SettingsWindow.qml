@@ -48,6 +48,8 @@ Singleton {
           words: "night light warm blue light schedule screen monitor resolution refresh rate hz scale rotation rotate vrr adaptive sync" },
         { id: "lock", section: "Personalize", icon: "lock", title: "Lock screen",
           words: "login greeter picture blur darken clock date name power buttons" },
+        { id: "equalizer", section: "System", icon: "equalizer", title: "Equalizer",
+          words: "sound audio bass treble mids voice speakers headphones preset eq" },
         { id: "windows", section: "System", icon: "select_window", title: "Windows",
           words: "gaps tiling hot corner overview reopen floating position wobble wobbly jelly" },
         { id: "notifications", section: "System", icon: "notifications", title: "Notifications",
@@ -309,6 +311,11 @@ Singleton {
                 LockPage {
                     width: parent.width
                     visible: root.page === "lock"
+                }
+
+                EqualizerPage {
+                    width: parent.width
+                    visible: root.page === "equalizer"
                 }
 
                 WindowsPage {

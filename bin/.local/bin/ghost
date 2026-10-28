@@ -188,6 +188,8 @@ cmd_doctor() {
     fi
     if pgrep -x qs >/dev/null; then ok "the shell (Quickshell) is running"
     else bad "the shell isn't running (hypr/shell.sh starts it at login)"; fi
+    if systemctl --user is-active --quiet filter-chain.service; then ok "the equalizer is running"
+    else bad "the equalizer isn't running (systemctl --user enable --now filter-chain.service)"; fi
     if [[ -f $HOME/.local/state/quickshell/colors.json ]]; then ok "colors generated"
     else bad "no colors yet (ghost theme <wallpaper>)"; fi
 

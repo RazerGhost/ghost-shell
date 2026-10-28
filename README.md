@@ -104,7 +104,7 @@ loaded last and aren't in git, so `ghost update` never conflicts with them:
 
 | Folder | |
 |---|---|
-| `hypr/`, `quickshell/`, `ghostty/`, `fish/`, `matugen/`, `zed/`, `spotify/`, `paru/`, `bin/` | configs, linked into `$HOME` by Stow (each mirrors the home folder) |
+| `hypr/`, `quickshell/`, `ghostty/`, `fish/`, `matugen/`, `zed/`, `spotify/`, `pipewire/`, `paru/`, `bin/` | configs, linked into `$HOME` by Stow (each mirrors the home folder) |
 | `modules/` | packages and setup per module, `lib.sh` shared by them |
 | `system/` | files for `/` (udev rule, greetd, mkinitcpio), installed by the `system` module |
 | `tests/` | tests: `QT_QPA_PLATFORM=offscreen /usr/lib/qt6/bin/qmltestrunner -input tests` and `lua tests/tiling_test.lua` |

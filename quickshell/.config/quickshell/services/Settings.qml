@@ -87,6 +87,8 @@ Singleton {
             // Screens set up in Settings -> Display, by output name: { mode, scale, transform, vrr }
             // (settings/DisplayModes.js); the others use monitors.lua's "preferred".
             property var monitors: ({})
+            // Equalizer gains in dB per output, by PipeWire node name (services/Equalizer.qml).
+            property var equalizer: ({})
             property bool rememberPositions: true // floating apps reopen where they were (positions.lua)
 
             // Desktop entry ids of the apps Super+Enter, Super+B and Super+E open, and of the apps

@@ -7,22 +7,25 @@ import qs.theme
 import qs.widgets
 
 // Sound page of quick settings: the switch mutes the speakers; below it, where sound goes
-// (speakers, headphones), which microphone records, and a volume slider for each app that's
-// playing.
+// (speakers, headphones), the equalizer's preset for it, which microphone records, and a volume
+// slider for each app that's playing.
 Column {
     id: root
 
     signal back()
 
     // Speakers and headphones (hardware outputs), microphones (hardware inputs), and the apps
-    // that are playing sound (output streams).
+    // that are playing sound (output streams). The equalizer is neither: its input is a sink and
+    // its output a stream (ghost-equalizer, ghost-equalizer.output). By name: reading `properties`
+    // here is a binding loop (tracking a node fills them in).
     readonly property list<PwNode> outputs: devices(true)
     readonly property list<PwNode> inputs: devices(false)
     readonly property list<PwNode> apps: (Pipewire.nodes?.values ?? [])
-        .filter(n => n.audio && n.isStream && !n.isSink)
+        .filter(n => n.audio && n.isStream && !n.isSink && !n.name.startsWith("ghost-equalizer"))
 
     function devices(sink: bool): list<PwNode> {
-        return (Pipewire.nodes?.values ?? []).filter(n => n.audio && !n.isStream && n.isSink === sink);
+        return (Pipewire.nodes?.values ?? [])
+            .filter(n => n.audio && !n.isStream && n.isSink === sink && !n.name.startsWith("ghost-equalizer"));
     }
 
     // The app's own name from its .desktop file ("Vesktop") when one matches, else PipeWire's.
@@ -76,6 +79,38 @@ Column {
             Accessible.role: Accessible.RadioButton
             Accessible.checkable: true
             Accessible.checked: chosen
+        }
+    }
+
+    // The chosen output's preset; the bands themselves are in Settings -> Equalizer.
+    Item {
+        visible: Equalizer.running
+        width: root.width
+        implicitHeight: Theme.list.rowHeight
+
+        Text {
+            anchors.left: parent.left
+            anchors.leftMargin: Theme.spacing.m
+            anchors.verticalCenter: parent.verticalCenter
+            text: "Equalizer"
+            color: Colors.m3onSurface
+            font.family: Theme.font.sans
+            font.pixelSize: Theme.font.normal
+        }
+
+        Stepper {
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            label: "Equalizer preset"
+            valueWidth: Theme.settings.stepperWide
+            // "Custom" (bands set by hand) only shows while it's the current one.
+            values: (Equalizer.preset === "Custom" ? ["Custom"] : []).concat(Equalizer.presets.map(p => p.name))
+            value: Equalizer.preset
+            onPicked: v => {
+                const preset = Equalizer.presets.find(p => p.name === v);
+                if (preset)
+                    Equalizer.setGains(preset.gains);
+            }
         }
     }
 

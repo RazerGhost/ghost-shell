@@ -89,6 +89,16 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   until first accessed, then fill in asynchronously. Bindings are fine; a one-off read is not.
 - `Quickshell.Services.Pipewire`: `Pipewire.defaultAudioSink/Source` (`PwNode`), `node.audio.volume`
   (0-1, writable), `.muted` (writable). Needs `PwObjectTracker { objects: [...] }` to fill `audio`.
+  Don't filter a tracker's list on `node.properties`: tracking fills them in, so the list
+  recomputes in a binding loop, and with a filter-chain node in it Quickshell 0.3.2 segfaulted
+  every second or so (in its PipeWire code) until the node was gone. Filter by `node.name`.
+- PipeWire filter-chain (`filter-chain.service`, configs in
+  `~/.config/pipewire/filter-chain.conf.d/`) as a WirePlumber 0.5 smart filter
+  (`filter.smart = true` + `filter.smart.name` in `capture.props`): it's linked in front of the
+  default output without becoming the default; `Pipewire.defaultAudioSink` stays the speakers.
+  `pw-cli set-param <node.name> Props '{ params = [ "bass:Gain" 6.0 ] }'` changes a builtin
+  filter's control live (the node's name works in place of its id). A restarted filter starts
+  from its config's values. Verified on the laptop.
 - `Quickshell.Services.UPower`: `UPower.displayDevice` (`percentage` 0-1, `state`
   `UPowerDeviceState.Charging/...`, `isLaptopBattery`), `PowerProfiles.profile` (writable,
   `PowerProfile.PowerSaver/Balanced/Performance`, `PowerProfile.toString()`),
@@ -205,7 +215,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   it in its own file.
 - A `JsonAdapter` in a `FileView` loads after the shell starts, even with `blockLoading` (that
   only affects `text()`/`data()`): bindings see the defaults first, then the saved values.
-  `onAdapterUpdated: writeAdapter()` saves every change.
+  `onAdapterUpdated: writeAdapter()` saves every change. A `var` holding a JSON list reads back
+  as an array-like, not a JavaScript Array: `Array.isArray` is false (verified); copy it with
+  `Array.from` before checking it.
 - `DesktopEntry.categories` (list), `DesktopEntries.byId(id)`.
 - `hl.bind(keys, action, { description = "..." })`; `hyprctl binds -j` gives `modmask` (Super 64,
   Ctrl 4, Alt 8, Shift 1), `key`, `description`, `has_description`.

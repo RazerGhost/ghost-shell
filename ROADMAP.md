@@ -457,6 +457,17 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   `apple-touch-icon.png`, else its favicon from DuckDuckGo's icon service. All web apps share
   one Chromium profile (one login per site).
 
+### Equalizer (built 2026-10-29; waiting on the user's test results)
+- Five bands (bass 80 Hz, low mids 250 Hz, mids 1 kHz, presence 4 kHz, treble 10 kHz; ±12 dB)
+  between the apps and the output, with presets (Off, Laptop speakers, Voice, More bass, More
+  treble; `services/Equalizer.js`, tested). PipeWire's own filter-chain (user's choice over
+  EasyEffects: no new package), run by `filter-chain.service` (enabled by the core module) from
+  the `pipewire` Stow package's `ghost-equalizer.conf`, as a WirePlumber smart filter in front of
+  whichever output is the default. Each output keeps its own gains (`equalizer` in
+  settings.json); `services/Equalizer.qml` sets them with `pw-cli` when the output changes or
+  the filter restarts. The preset in quick settings' Sound page, the bands in Settings ->
+  Equalizer. The equalizer's nodes are left out of the Sound page's outputs and apps.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

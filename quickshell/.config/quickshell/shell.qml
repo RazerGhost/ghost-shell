@@ -38,10 +38,11 @@ ShellRoot {
     HyprlandSettings {}
 
     // Background services that are singletons, so they only run once something uses them: low
-    // battery warnings and the touchpad's mouse rule.
+    // battery warnings, the touchpad's mouse rule and the equalizer's gains.
     Component.onCompleted: {
         BatteryAlerts.check();
         Touchpad.enabled;
+        Equalizer.gains;
     }
 
     // The system's default apps follow the settings (services/Apps.qml).

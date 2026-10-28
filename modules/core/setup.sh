@@ -34,6 +34,10 @@ gsettings set org.gnome.desktop.interface icon-theme Colloid-Dark
 # maximize), so GTK greys the button out. Super+Down or the window menu minimizes.
 gsettings set org.gnome.desktop.wm.preferences button-layout 'appmenu:maximize,close'
 
+step "Equalizer (PipeWire filter-chain)"
+# Runs pipewire/.config/pipewire/filter-chain.conf.d/ghost-equalizer.conf; the shell sets its gains.
+systemctl --user enable --now filter-chain.service
+
 step "Wallpaper folder"
 # The wallpaper picker (quick settings) shows the pictures in here.
 mkdir -p "$HOME/Pictures/Wallpapers"
