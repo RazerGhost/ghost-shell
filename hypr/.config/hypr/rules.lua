@@ -14,6 +14,22 @@ hl.window_rule({
     center = true,
 })
 
+-- Games: Proton games (Steam names their windows steam_app_<id>) and gamescope may tear for
+-- lower latency (general.allow_tearing in look.lua).
+hl.window_rule({
+    name      = "games-tear",
+    match     = { class = "^(steam_app_.*|gamescope)$" },
+    immediate = true,
+})
+
+-- Nothing fullscreen gets dimmed, locked or put to sleep for idling (games, videos): the shell's
+-- idle steps respect this inhibitor.
+hl.window_rule({
+    name         = "fullscreen-stays-awake",
+    match        = { class = ".*" },
+    idle_inhibit = "fullscreen",
+})
+
 -- The browser's picture-in-picture video floats and stays on every workspace (pinned).
 hl.window_rule({
     name  = "float-picture-in-picture",

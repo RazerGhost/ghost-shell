@@ -18,7 +18,8 @@ hl.config({
         -- Drag a floating window's edge or corner to resize it (Super + right-drag works too).
         -- Tiled windows ignore it (Hyprland doesn't pass drags to Lua layouts): Super+Alt+arrows.
         resize_on_border = true,
-        allow_tearing    = false,
+        -- Games may tear for lower latency (only windows with the `immediate` rule, rules.lua).
+        allow_tearing    = true,
 
         -- Our own tiling layout (layout.lua): halves, thirds and quarters, picked from the
         -- window menu or arranged by the number of windows.
@@ -55,6 +56,9 @@ hl.config({
     },
 
     misc = {
+        -- Variable refresh rate for fullscreen windows (games, video) on the 165 Hz panel: smooth
+        -- without a fixed frame rate. Not for everything: VRR on the desktop can flicker.
+        vrr = 2,
         force_default_wallpaper = -1,
         disable_hyprland_logo   = false,
         -- If the lock screen (Quickshell) crashes, the session stays locked; this lets a new
