@@ -85,6 +85,15 @@ Singleton {
             focus(next);
     }
 
+    // Switch to a window: brought back first if it's minimized. What clicking a window anywhere
+    // does (Alt+Tab, the dock, the overview, the attention card, the media cover).
+    function show(window: HyprlandToplevel): void {
+        if (window.workspace?.name === minimizedWorkspace)
+            restore(window);
+        else
+            focus(window);
+    }
+
     function restore(window: HyprlandToplevel): void {
         run(window, "move", `workspace = ${Hyprland.focusedWorkspace?.id ?? 1}, follow = false`);
         focus(window);

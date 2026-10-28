@@ -37,10 +37,7 @@ Scope {
         open = false;
         if (!window)
             return;
-        if (window.workspace?.name === Windows.minimizedWorkspace)
-            Windows.restore(window);
-        else
-            Windows.focus(window);
+        Windows.show(window);
     }
 
     IpcHandler {

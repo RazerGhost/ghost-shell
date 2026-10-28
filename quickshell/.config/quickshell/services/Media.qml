@@ -23,10 +23,8 @@ Singleton {
     // Bring the player to the front. Through Hyprland, not MPRIS's raise(): apps may not take
     // the focus themselves here (they get an attention card instead).
     function show(): void {
-        if (window?.workspace?.name === Windows.minimizedWorkspace)
-            Windows.restore(window);
-        else if (window)
-            Windows.focus(window);
+        if (window)
+            Windows.show(window);
         else if (player?.canRaise)
             player.raise();
     }

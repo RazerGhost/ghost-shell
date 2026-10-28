@@ -307,7 +307,7 @@ PanelWindow {
                         window: root.attentionWindow
                         visible: root.attentionWindow !== null
                         onActivated: {
-                            Windows.focus(root.attentionWindow);
+                            Windows.show(root.attentionWindow);
                             Windows.attentionSeen();
                         }
                     }

@@ -29,10 +29,8 @@ MouseArea {
                 Apps.launch(entry);
         } else if (target === "minimize") {
             Windows.minimize(Windows.active);
-        } else if (target.workspace?.name === Windows.minimizedWorkspace) {
-            Windows.restore(target);
         } else {
-            Windows.focus(target);
+            Windows.show(target);
         }
     }
 

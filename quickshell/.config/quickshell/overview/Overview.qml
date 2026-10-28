@@ -165,7 +165,7 @@ Scope {
                                 Accessible.name: slot.toplevel?.title ?? ""
                                 Accessible.onPressAction: {
                                     root.open = false;
-                                    Windows.focus(slot.toplevel);
+                                    Windows.show(slot.toplevel);
                                 }
 
                                 Rectangle {
@@ -224,7 +224,7 @@ Scope {
                                     drag.target: card
                                     onClicked: {
                                         root.open = false;
-                                        Windows.focus(slot.toplevel);
+                                        Windows.show(slot.toplevel);
                                     }
                                     onReleased: {
                                         if (dragArea.drag.active)
