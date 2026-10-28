@@ -190,10 +190,8 @@ Added at the user's request (2026-10-28), between Phases 6 and 7.
   taskbar). Right-click: new window, pin/unpin, close. Pins are desktop entry ids in
   `~/.local/state/quickshell/dock.json` (defaults: Zen, Ghostty, Nautilus, Zed, Spotify, Vesktop,
   Steam). App launching is shared with the launcher (`services/Apps.qml`).
-- Shown on an empty desktop; slides down while a window on that monitor's workspace overlaps it
-  or one is fullscreen (user's choice); touching the bottom edge brings it back. Hyprland sends
-  no move/resize events, so window positions are re-read every second and on window events.
-  While shown, the input mask is a fixed area where the dock ends up, down to the screen edge:
+- Hidden until the pointer touches the bottom edge (user's choice since windows tile; it used
+  to show on an empty desktop and hide while a window overlapped it). While shown, the input mask is a fixed area where the dock ends up, down to the screen edge:
   masking to the sliding bar made the dock hide again right after revealing (the bar was still
   below the screen, so the pointer counted as having left).
 - It reserves no space (`ExclusionMode.Ignore`); maximized windows cover it.
@@ -333,8 +331,10 @@ other session: pinning the Vencord/Spicetify downloads in install.sh.
   (move the border), Super+Shift+arrows (swap with the neighbour). A tiled app with a minimum
   size is cut off at its box. Dialogs float by themselves; Super+Shift+Space or the window menu's
   Float/Tile floats any window, and floating windows stay above tiled ones (Hyprland can't
-  change that). Dragging a tiled window's border does nothing: Hyprland doesn't pass the drag to
-  Lua layouts. `input.float_switch_override_focus = 0`, or focusing a tiled window under a
+  change that). Super + right-drag on a tiled window moves the borders on the pointer's side
+  (user's request): Hyprland doesn't pass drags to Lua layouts, so `layout.lua` follows the
+  pointer with `hl.timer` + `hl.get_cursor_pos` while the button is held (`tiling.drag`, tested).
+  Dragging the border itself (without Super) does nothing on tiled windows. `input.float_switch_override_focus = 0`, or focusing a tiled window under a
   floating one jumped back to the window under the pointer. Windows already open when this came
   in keep floating until tiled.
 - **Click to focus and raise on focus** (Windows/macOS behaviour, user's choice after research):

@@ -30,7 +30,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `gaps_in` itself. Only tiled windows are targets; the context has no workspace field (take it
   from a target's window). `layout_msg` returns `true` or an error string, and Hyprland
   recalculates after it; `hl.dsp.layout("msg")` sends one to the focused workspace's layout.
-  Mouse-resizing a tiled window only calls `recalculate`, without the drag distance. Registering
+  Mouse-resizing a tiled window only calls `recalculate`, without the drag distance; instead,
+  `hl.timer(fn, { timeout = 16, type = "repeat" })` (stop with `:set_enabled(false)`) and
+  `hl.get_cursor_pos()` can follow the pointer between a press and a `release = true` bind, which
+  can share a key with a `mouse = true` bind when marked `non_consuming`. Registering
   a name twice is an error (`hyprctl eval` of the file again fails; `hyprctl reload` works).
   Verified on the laptop. A tiled app with a minimum size bigger than its box (Discord, 972 px)
   is cut off at the box, not moved.

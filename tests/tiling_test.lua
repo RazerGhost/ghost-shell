@@ -164,6 +164,27 @@ test("resize moves the border on the window's side, or the other one at the edge
     eq(T.resize(s, "b", "down", 0.3), false)
 end)
 
+test("drag moves a border from where it was at the start", function()
+    local s = T.sync(nil, { "a", "b", "c" }, nil)
+    local base = T.shares(s)
+    assert(T.drag(s, base, "a", "right", 0.1))
+    eq(s.columns[1].w, 0.6)
+    -- The next step starts from the drag's start again, not from the last step.
+    assert(T.drag(s, base, "a", "right", 0.05))
+    eq(s.columns[1].w, 0.55)
+    -- c's top border is the one between b and c.
+    assert(T.drag(s, base, "c", "top", -0.1))
+    eq(s.columns[2].h, { 0.4, 0.6 })
+    -- Never past the smallest share, and not at the screen's edge.
+    assert(T.drag(s, base, "b", "left", 0.9))
+    eq(s.columns[2].w, T.min_share)
+    eq(T.drag(s, base, "a", "left", 0.1), false)
+    eq(T.drag(s, base, "a", "top", 0.1), false)
+    -- The arrangement changed: the drag stops.
+    s = T.sync(s, { "a", "b", "c", "d" }, "c")
+    eq(T.drag(s, base, "a", "right", 0.1), false)
+end)
+
 test("move swaps with the neighbour in that direction", function()
     local s = T.sync(nil, { "a", "b", "c" }, nil)
     assert(T.move(s, "c", "left", area))

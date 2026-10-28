@@ -7,41 +7,16 @@ import qs.theme
 import qs.widgets
 
 // The dock on one monitor, macOS style (user's choice): a rounded bar floating a little above the
-// bottom edge. It's shown on an empty desktop
-// and slides down out of sight while a window covers its area (or one is fullscreen); touching
-// the bottom edge with the pointer brings it back.
+// bottom edge. It stays out of sight until the pointer touches the bottom edge (user's choice,
+// since windows tile and would cover it).
 PanelWindow {
     id: window
 
     required property var dock // Dock.qml: items, pinned, togglePin()
-    readonly property HyprlandMonitor monitor: Hyprland.monitorFor(screen)
 
     // The bar, centered at the bottom.
     readonly property real bodyWidth: row.implicitWidth + Theme.spacing.m * 2
     readonly property real bodyHeight: Theme.dock.height
-
-    // Whether a window on this monitor's workspace overlaps the dock (or is fullscreen).
-    // Positions come from Hyprland (Dock.qml keeps them fresh), in global coordinates.
-    readonly property bool covered: {
-        const ws = monitor?.activeWorkspace;
-        if (!ws)
-            return false;
-        const left = (monitor.x ?? 0) + (width - bodyWidth) / 2;
-        const right = left + bodyWidth;
-        const top = (monitor.y ?? 0) + height - bodyHeight - Theme.dock.margin;
-        for (const t of Hyprland.toplevels.values) {
-            const info = t.lastIpcObject;
-            if (t.workspace !== ws || !info?.at || info.hidden)
-                continue;
-            if (info.fullscreen > 0)
-                return true;
-            const [x, y] = info.at;
-            const [w, h] = info.size;
-            if (x < right && x + w > left && y + h > top)
-                return true;
-        }
-        return false;
-    }
 
     // The pointer is at the bottom edge or on the dock, or its menu is open. Stays true for a
     // moment after the pointer leaves, so the dock doesn't flicker away.
@@ -56,7 +31,7 @@ PanelWindow {
         }
     }
 
-    readonly property bool shown: !covered || revealed
+    readonly property bool shown: revealed
 
     Timer {
         id: hideDelay

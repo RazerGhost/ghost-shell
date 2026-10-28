@@ -314,6 +314,50 @@ function M.resize(state, id, direction, step)
     return true
 end
 
+-- A copy of the column widths and every column's row heights, for M.drag.
+function M.shares(state)
+    local shares = { w = {}, h = {} }
+    for c, column in ipairs(state.columns) do
+        shares.w[c] = column.w
+        shares.h[c] = { table.unpack(column.h) }
+    end
+    return shares
+end
+
+-- Mouse resizing: the border on `side` ("left", "right", "top", "bottom") of window `id`'s cell,
+-- moved by `delta` (a share of the screen) from where it was in `base` (M.shares at the start of
+-- the drag), stopping before a column or row gets smaller than M.min_share. Returns false when
+-- that side is the screen's edge, or the arrangement changed since `base`.
+function M.drag(state, base, id, side, delta)
+    local i = index_of(state.slots, id)
+    if not i or #base.w ~= #state.columns then
+        return false
+    end
+    for k, column in ipairs(state.columns) do
+        if #base.h[k] ~= column.rows then
+            return false
+        end
+    end
+    local c, r = cell_position(state.columns, i)
+    local horizontal = side == "left" or side == "right"
+    local from = horizontal and base.w or base.h[c]
+    local a = (side == "right" or side == "bottom") and (horizontal and c or r) or (horizontal and c or r) - 1
+    if a < 1 or a >= #from then
+        return false
+    end
+    local d = math.max(M.min_share - from[a], math.min(delta, from[a + 1] - M.min_share))
+    local shares = { table.unpack(from) }
+    shares[a], shares[a + 1] = from[a] + d, from[a + 1] - d
+    if horizontal then
+        for k, column in ipairs(state.columns) do
+            column.w = shares[k]
+        end
+    else
+        state.columns[c].h = shares
+    end
+    return true
+end
+
 -- Swaps window `id` with the cell next to it in `direction`, measured on the boxes of
 -- M.boxes (so it works across columns with different rows). Returns false if there's none.
 function M.move(state, id, direction, area)

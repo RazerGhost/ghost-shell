@@ -16,8 +16,9 @@ Singleton {
         .filter(t => t.workspace?.name === minimizedWorkspace)
 
     // Every window, most recently used first, by Hyprland's focus history (0 = the focused
-    // window). The history is part of each window's details: call Hyprland.refreshToplevels()
-    // first when the order has to be fresh.
+    // window). The history is part of each window's details, refreshed on window events (below);
+    // positions and sizes change without an event, so call Hyprland.refreshToplevels() first when
+    // they have to be fresh.
     readonly property list<HyprlandToplevel> recent: (Hyprland.toplevels?.values ?? [])
         .filter(t => t.wayland !== null)
         .sort((a, b) => (a.lastIpcObject?.focusHistoryID ?? 999) - (b.lastIpcObject?.focusHistoryID ?? 999))
@@ -52,6 +53,10 @@ Singleton {
         // "urgent>>55e5..." (the window's address, without 0x). No type on `event`: its C++ type
         // isn't registered under a QML name, and annotating it makes Qt complain on every event.
         function onRawEvent(event): void {
+            // Keep every window's details (focus order, floating, fullscreen, workspace) current.
+            if (["openwindow", "closewindow", "activewindowv2", "movewindowv2", "changefloatingmode", "fullscreen", "workspacev2"]
+                    .includes(event.name))
+                Hyprland.refreshToplevels();
             if (event.name !== "urgent")
                 return;
             const window = (Hyprland.toplevels?.values ?? []).find(t => t.address === event.data);

@@ -1,13 +1,12 @@
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Io
 import qs.services
 import "DockApps.js" as DockApps
 
 // The dock: an island along the bottom edge with your pinned apps and the other running ones
-// (dock/DockBar.qml draws it on each monitor). It slides away when a window covers it and
-// comes back when the pointer touches the bottom edge.
+// (dock/DockBar.qml draws it on each monitor). Hidden until the pointer touches the bottom edge
+// (user's choice, since windows tile).
 Scope {
     id: root
 
@@ -35,25 +34,6 @@ Scope {
             id: state
             property list<string> pinned: ["zen", "com.mitchellh.ghostty", "org.gnome.Nautilus", "dev.zed.Zed",
                                            "spotify", "vesktop", "steam"]
-        }
-    }
-
-    // Window positions for hiding the dock. Hyprland sends no event when a window is moved or
-    // resized, so re-read them once a second, and right away when windows open, close or change.
-    Timer {
-        interval: 1000
-        running: true
-        repeat: true
-        onTriggered: Hyprland.refreshToplevels()
-    }
-
-    Connections {
-        target: Hyprland
-
-        function onRawEvent(event): void {
-            if (["openwindow", "closewindow", "movewindowv2", "changefloatingmode", "fullscreen", "workspacev2"]
-                    .includes(event.name))
-                Hyprland.refreshToplevels();
         }
     }
 

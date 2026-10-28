@@ -105,6 +105,10 @@ hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }), { descr
 -- Move/resize windows with mouse
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true, description = "Move window" })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true, description = "Resize window" })
+-- Tiled windows: layout.lua follows the pointer while the button is held (Hyprland's resize above
+-- only reaches floating ones). It returns at once over a floating window.
+hl.bind(mainMod .. " + mouse:273", function() ShellLayout.start_drag() end, { non_consuming = true })
+hl.bind(mainMod .. " + mouse:273", function() ShellLayout.end_drag() end, { release = true, non_consuming = true })
 
 -- Volume & brightness
 -- Quickshell's OSD sees volume changes through PipeWire by itself. It can't watch the backlight,
