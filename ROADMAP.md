@@ -152,7 +152,10 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
   Hyprland's `focusHistoryID`. Alt+Tab / Alt+Shift+Tab are Hyprland binds calling
   `qs ipc call switcher next|previous`; the switcher takes the keyboard and switches when it sees
   Alt released; Escape or a click elsewhere cancels; minimized windows are restored. Tested with
-  wtype holding a real Alt key. Caveat: a very quick Alt+Tab tap may release Alt before the
+  wtype holding a real Alt key. The switcher takes the keyboard `OnDemand`, not `Exclusive`:
+  while an exclusive surface exists Hyprland refuses to focus windows (`FocusState.cpp`), and
+  closing the switcher raced the focus call, so only ~2 in 10 switches moved the focus (the
+  window was raised but not focused); with `OnDemand` 30/30 did. Caveat: a very quick Alt+Tab tap may release Alt before the
   switcher has the keyboard; then it stays open until Alt is tapped again (or Escape).
 - **Snapping** (built): Super+Left/Right snap the focused window to halves; Super+Z (Zed moved to
   Super+Shift+Z) shows a picker (`snap/SnapPicker.qml`, its own card at the top center of the

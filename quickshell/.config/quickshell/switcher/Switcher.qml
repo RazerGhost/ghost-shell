@@ -74,8 +74,11 @@ Scope {
 
         WlrLayershell.namespace: "qs-switcher"
         WlrLayershell.layer: WlrLayer.Overlay
-        // The keyboard, so the switcher sees Alt being released.
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+        // The keyboard, so the switcher sees Alt being released: an OnDemand surface gets it when
+        // it appears. Not Exclusive: while an exclusive surface exists Hyprland refuses to focus
+        // any window, and closing the switcher raced the focus call, so Alt+Tab often left the
+        // old window focused (with the new one only raised).
+        WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
 
         HyprlandFocusGrab {
             windows: [window]
