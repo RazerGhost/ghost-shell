@@ -96,12 +96,24 @@ for i = 1, 10 do
 end
 
 -- Scratchpad
-hl.bind(mainMod .. " + grave",         hl.dsp.workspace.toggle_special("magic"), { description = "Show or hide the scratchpad" })
+hl.bind(mainMod .. " + grave",         hl.dsp.workspace.toggle_special("magic"), { description = "Show or hide the scratchpad (a terminal when empty)" })
 hl.bind(mainMod .. " + SHIFT + grave", hl.dsp.window.move({ workspace = "special:magic" }), { description = "Move window to the scratchpad" })
 
 -- Scroll through workspaces
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }), { description = "Next or previous workspace" })
 hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }), { description = "Next or previous workspace" })
+
+-- Magnifier, like Windows': zoom in around the pointer in steps, out again, and back to normal.
+local function zoom(factor)
+    return function()
+        local now = hl.get_config("cursor.zoom_factor") or 1
+        local next = factor and math.max(1, math.min(8, now * factor)) or 1
+        hl.config({ cursor = { zoom_factor = next } })
+    end
+end
+hl.bind(mainMod .. " + equal",  zoom(1.5),     { repeating = true, description = "Zoom in (magnifier)" })
+hl.bind(mainMod .. " + minus",  zoom(1 / 1.5), { repeating = true, description = "Zoom out (magnifier)" })
+hl.bind(mainMod .. " + Escape", zoom(nil),     { description = "Zoom back to normal" })
 
 -- Move/resize windows with mouse. Hyprland's own drag and resize only reach floating windows;
 -- for tiled ones drag.lua follows the pointer while the button is held (it does nothing over a

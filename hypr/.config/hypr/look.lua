@@ -33,6 +33,9 @@ hl.config({
         active_opacity   = 1.0,
         inactive_opacity = 1.0,
 
+        -- The workspace below the scratchpad (Super+`), dimmed while it's shown.
+        dim_special = 0.3,
+
         shadow = {
             enabled      = true,
             range        = 4,

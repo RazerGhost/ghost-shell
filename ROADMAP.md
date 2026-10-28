@@ -389,6 +389,12 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   `kdeconnectindicatordark`) fall back to the app's icon from its desktop file, by fuzzy lookup
   or exact name, else a generic one.
 
+### Magnifier and drop-down terminal (built 2026-10-28; waiting on the user's test results)
+- Super+Plus / Super+Minus zoom around the pointer in steps of 1.5x (up to 8x), Super+Escape back
+  to normal (`cursor.zoom_factor`, set from Lua binds).
+- The scratchpad (Super+`) starts a terminal when it's empty (`on_created_empty`), over the
+  dimmed workspace below (`decoration.dim_special`).
+
 ## Decisions made
 
 - **External monitors:** keep the RTX in `AQ_DRM_DEVICES` (second, after the iGPU), so outputs wired

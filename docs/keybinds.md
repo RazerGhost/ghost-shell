@@ -39,8 +39,11 @@ the same list.
 | Print | Screenshot of the screen |
 | Super + 1 … Super + 0 | Go to workspace 1-10 |
 | Super + Shift + 1 … Super + Shift + 0 | Move window to workspace 1-10 |
-| Super + ` | Show or hide the scratchpad |
+| Super + ` | Show or hide the scratchpad (a terminal when empty) |
 | Super + Shift + ` | Move window to the scratchpad |
 | Super + mouse_down / Super + mouse_up | Next or previous workspace |
+| Super + equal | Zoom in (magnifier) |
+| Super + minus | Zoom out (magnifier) |
+| Super + Escape | Zoom back to normal |
 | Super + Left drag | Move window |
 | Super + Right drag | Resize window |

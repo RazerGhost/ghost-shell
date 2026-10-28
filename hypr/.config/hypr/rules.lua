@@ -14,6 +14,13 @@ hl.window_rule({
     center = true,
 })
 
+-- The scratchpad (Super+`) doubles as a drop-down terminal: opened empty, it starts one. It
+-- tiles over the dimmed workspace below (decoration.dim_special, look.lua).
+hl.workspace_rule({
+    workspace        = "special:magic",
+    on_created_empty = "ghostty",
+})
+
 -- Games: Proton games (Steam names their windows steam_app_<id>) and gamescope may tear for
 -- lower latency (general.allow_tearing in look.lua).
 hl.window_rule({
