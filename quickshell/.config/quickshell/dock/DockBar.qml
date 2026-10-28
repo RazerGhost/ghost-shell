@@ -250,6 +250,19 @@ PanelWindow {
                 onClicked: menu.run(() => Apps.launch(menu.entry))
             }
 
+            // The app's own shortcuts from its .desktop file ("New Private Window", Steam's
+            // "Library"). Its "New Window" is the row above already.
+            Repeater {
+                model: (menu.entry?.actions ?? []).filter(a => a.name.toLowerCase() !== "new window")
+
+                MenuRow {
+                    required property DesktopAction modelData
+                    icon: "open_in_new"
+                    text: modelData.name
+                    onClicked: menu.run(() => modelData.execute())
+                }
+            }
+
             MenuRow {
                 visible: menu.entry !== null
                 icon: menu.item?.pinned ? "keep_off" : "keep"

@@ -16,8 +16,12 @@ Scope {
 
     property bool open: false
 
-    function launch(entry: DesktopEntry): void {
-        Apps.launch(entry);
+    // A result: an app, or one of its shortcuts ({ entry, action }; action null for the app).
+    function launch(result: var): void {
+        if (result.action)
+            result.action.execute();
+        else
+            Apps.launch(result.entry);
         open = false;
     }
 
@@ -166,8 +170,9 @@ Scope {
                     implicitHeight: Math.min(count, Theme.launcher.rows) * Theme.launcher.rowHeight
                     clip: true
                     // Re-filtered on every keystroke; DesktopEntries.applications updates
-                    // by itself when apps are installed or removed.
-                    model: Fuzzy.filter(DesktopEntries.applications.values, search.text)
+                    // by itself when apps are installed or removed. Includes the apps' own
+                    // shortcuts ("New Private Window").
+                    model: Fuzzy.results(DesktopEntries.applications.values, search.text)
                     highlightMoveDuration: Theme.anim.fast
                     boundsBehavior: Flickable.StopAtBounds
 
@@ -181,8 +186,9 @@ Scope {
                     delegate: MouseArea {
                         id: row
 
-                        required property DesktopEntry modelData
+                        required property var modelData // { entry, action }
                         required property int index
+                        readonly property DesktopEntry entry: modelData.entry
 
                         width: ListView.view.width
                         height: Theme.launcher.rowHeight
@@ -192,7 +198,7 @@ Scope {
                         onClicked: root.launch(modelData)
 
                         Accessible.role: Accessible.ListItem
-                        Accessible.name: modelData.name
+                        Accessible.name: modelData.action ? modelData.action.name + ", " + entry.name : entry.name
                         Accessible.onPressAction: root.launch(modelData)
 
                         IconImage {
@@ -202,7 +208,7 @@ Scope {
                             anchors.verticalCenter: parent.verticalCenter
                             implicitSize: Theme.icon.launcher
                             // Falls back to a generic icon when the theme has no match.
-                            source: Quickshell.iconPath(row.modelData.icon, "application-x-executable")
+                            source: Quickshell.iconPath(row.entry.icon, "application-x-executable")
                         }
 
                         Column {
@@ -214,7 +220,7 @@ Scope {
 
                             Text {
                                 width: parent.width
-                                text: row.modelData.name
+                                text: row.modelData.action?.name ?? row.entry.name
                                 color: Colors.m3onSurface
                                 font.family: Theme.font.sans
                                 font.pixelSize: Theme.font.normal
@@ -225,7 +231,8 @@ Scope {
                             Text {
                                 width: parent.width
                                 visible: text !== ""
-                                text: row.modelData.genericName || row.modelData.comment
+                                // For a shortcut, the app it belongs to.
+                                text: row.modelData.action ? row.entry.name : row.entry.genericName || row.entry.comment
                                 color: Colors.m3onSurfaceVariant
                                 font.family: Theme.font.sans
                                 font.pixelSize: Theme.font.small
