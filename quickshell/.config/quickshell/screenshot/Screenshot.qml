@@ -293,7 +293,7 @@ Scope {
                             anchors.fill: parent
                             radius: Theme.radius.full
                             color: modeButton.selected ? Colors.m3primaryContainer : Colors.m3onSurface
-                            opacity: modeButton.selected ? 1 : modeButton.containsMouse ? 0.08 : 0
+                            opacity: modeButton.selected ? 1 : modeButton.containsMouse ? Theme.state.hover : 0
                         }
 
                         Row {

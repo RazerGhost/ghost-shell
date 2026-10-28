@@ -53,6 +53,12 @@ Singleton {
         readonly property list<real> emphasized: [0.05, 0.7, 0.1, 1, 1, 1]
     }
 
+    // Material "state layers": the content color laid over a control at this opacity.
+    readonly property QtObject state: QtObject {
+        readonly property real hover:  0.08 // the pointer is over it
+        readonly property real active: 0.14 // its menu is open (the island's buttons)
+    }
+
     // Backgrounds of the island, launcher and OSD; Hyprland blurs what's behind them.
     readonly property real surfaceOpacity: 0.85
 

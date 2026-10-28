@@ -161,7 +161,7 @@ Singleton {
                         anchors.fill: parent
                         radius: Theme.radius.full
                         color: entry.selected ? Colors.m3primaryContainer : Colors.m3onSurface
-                        opacity: entry.selected ? 1 : entry.containsMouse ? 0.08 : 0
+                        opacity: entry.selected ? 1 : entry.containsMouse ? Theme.state.hover : 0
 
                         Behavior on opacity {
                             NumberAnimation { duration: Theme.anim.fast }

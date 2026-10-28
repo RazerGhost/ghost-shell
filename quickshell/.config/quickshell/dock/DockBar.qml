@@ -127,7 +127,7 @@ PanelWindow {
             color: Colors.surfaceTranslucent
 
             Behavior on y {
-                NumberAnimation { duration: Theme.anim.morph; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.emphasized }
+                MorphAnimation {}
             }
         }
 
@@ -220,7 +220,7 @@ PanelWindow {
                     anchors.fill: parent
                     radius: Theme.radius.m
                     color: Colors.m3onSurface
-                    opacity: entryRow.containsMouse ? 0.08 : 0
+                    opacity: entryRow.containsMouse ? Theme.state.hover : 0
                 }
 
                 Row {

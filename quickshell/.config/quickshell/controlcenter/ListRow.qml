@@ -34,7 +34,7 @@ MouseArea {
         anchors.fill: parent
         radius: Theme.radius.m
         color: Colors.m3onSurface
-        opacity: root.containsMouse ? 0.08 : 0
+        opacity: root.containsMouse ? Theme.state.hover : 0
 
         Behavior on opacity {
             NumberAnimation { duration: Theme.anim.fast }

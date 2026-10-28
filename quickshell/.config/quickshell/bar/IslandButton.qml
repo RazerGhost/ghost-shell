@@ -27,7 +27,7 @@ MouseArea {
         anchors.fill: parent
         radius: Theme.radius.full
         color: Colors.m3onSurface
-        opacity: root.active ? 0.14 : root.containsMouse ? 0.08 : 0
+        opacity: root.active ? Theme.state.active : root.containsMouse ? Theme.state.hover : 0
 
         Behavior on opacity {
             NumberAnimation { duration: Theme.anim.fast }

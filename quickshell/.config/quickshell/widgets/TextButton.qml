@@ -25,7 +25,7 @@ Rectangle {
         anchors.fill: parent
         radius: parent.radius
         color: label.color
-        opacity: mouse.containsMouse ? 0.12 : 0
+        opacity: mouse.containsMouse ? Theme.state.hover : 0
     }
 
     Text {

@@ -26,7 +26,7 @@ Item {
         anchors.fill: parent
         radius: Theme.radius.full
         color: glyph.color
-        opacity: mouse.containsMouse ? 0.12 : 0
+        opacity: mouse.containsMouse ? Theme.state.hover : 0
 
         Behavior on opacity {
             NumberAnimation { duration: Theme.anim.fast }

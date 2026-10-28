@@ -172,13 +172,13 @@ PanelWindow {
         radius: root.expanded ? Theme.island.openRadius : Theme.island.height / 2
 
         Behavior on bodyWidth {
-            NumberAnimation { duration: Theme.anim.morph; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.emphasized }
+            MorphAnimation {}
         }
         Behavior on bodyHeight {
-            NumberAnimation { duration: Theme.anim.morph; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.emphasized }
+            MorphAnimation {}
         }
         Behavior on radius {
-            NumberAnimation { duration: Theme.anim.morph; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.emphasized }
+            MorphAnimation {}
         }
 
         // Everything inside the island, clipped to its current size so the menus are
@@ -242,7 +242,7 @@ PanelWindow {
                         implicitHeight: Theme.island.height
 
                         Behavior on implicitWidth {
-                            NumberAnimation { duration: Theme.anim.morph; easing.type: Easing.BezierSpline; easing.bezierCurve: Theme.anim.emphasized }
+                            MorphAnimation {}
                         }
 
                         Clock {

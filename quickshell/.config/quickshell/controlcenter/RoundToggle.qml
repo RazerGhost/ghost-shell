@@ -35,7 +35,7 @@ Rectangle {
         anchors.fill: parent
         radius: parent.radius
         color: root.contentColor
-        opacity: mouse.containsMouse ? 0.08 : 0
+        opacity: mouse.containsMouse ? Theme.state.hover : 0
 
         Behavior on opacity {
             NumberAnimation { duration: Theme.anim.fast }
