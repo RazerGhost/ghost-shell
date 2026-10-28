@@ -168,15 +168,14 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
 - **Snapping** (built): Super+Left/Right snap the focused window to halves; Super+Z (Zed moved to
   Super+Shift+Z) shows a picker, its own card at the top center of the window, not in the island
   (user's choice); since 2026-10-28 it's the window menu (`snap/WindowMenu.qml`, also Alt+Space)
-  with halves, quarters, thirds and two-thirds below the window's actions. The
-  window floats and gets an exact rectangle (`services/SnapLayout.js`, tested): the monitor minus
-  its reserved area (the island) and Hyprland's gaps, read with `hyprctl getoption`. The first
-  snap saves the window's position and size (from `hyprctl clients -j`); Super+Down puts a
-  snapped window back there, and minimizes any other window (Windows behaviour).
-- **Snap Assist** (`snap/SnapAssist.qml`): after snapping to a half or a third, the space next to
-  it shows the other windows on that workspace (live previews, most recent first); clicking one
-  snaps it into that space (`SnapLayout.complement`, tested). Escape or a click elsewhere skips.
-  Not for quarters or the center third.
+  with halves, quarters, thirds and two-thirds below the window's actions. Since the move back
+  to tiling (see "Tiling with our own layout"), a spot arranges the whole workspace around the
+  window. Super+Down minimizes.
+- **Snap Assist** (`snap/SnapAssist.qml`): when a snap leaves a spot empty (a lone window in a
+  half, two windows in thirds), that spot shows the windows not tiled on the workspace: floating
+  ones there, minimized ones and ones on other workspaces (live previews, most recent first;
+  user's choice). Clicking one (or arrow keys and Enter) tiles it into the spot; the next empty
+  spot asks again. Escape or a click elsewhere skips.
 - Later candidates from the same research, not planned yet: a macOS-style dock, an Exposé overview
   (3-finger swipe up / hot corner, reusing the switcher's thumbnails), an emoji picker, a snipping
   overlay. Not possible on Wayland: a global app menu. Hard: real minimize, Stage Manager.
@@ -222,8 +221,7 @@ config files became settings.
     speed) and **Windows** (gaps, border, corners, apps reopening where they were): Hyprland
     options, written to the generated `hypr/shell-settings.lua` (gitignored, loaded last by
     hyprland.lua; `settings/HyprlandSettings.qml` + tested `HyprlandConfig.js`) and applied with
-    `hyprctl reload` only when the content changes. The gaps only apply to snapped windows
-    (everything floats); snapped windows move along when they change. The login screen
+    `hyprctl reload` only when the content changes. The gaps apply to tiled windows. The login screen
     gets the file through the shared folder (keyboard layout).
   - **Keybinds:** read from Hyprland (`hyprctl binds -j`, every bind in `binds.lua` has a
     description), grouped per description (`settings/Keybinds.js`, tested).
@@ -323,10 +321,22 @@ other session: pinning the Vencord/Spicetify downloads in install.sh.
 - **matugen's Quickshell JSON lives outside the shell directory**
   (`~/.local/state/quickshell/colors.json`). Quickshell reloads the whole shell when files in its config
   directory change; `Colors.qml` watches the file instead.
-- **Everything floats, Windows/macOS style** (user's choice, 2026-10-28): a `float = true, center
-  = true` rule for every window in `rules.lua`, and no tiling keys (Super+T, P, J are gone).
-  Hyprland always draws tiled windows below floating ones, so a focused tiled window could stay
-  hidden. Snapping replaces tiling; the window menu's "Float/tile" became "Snap".
+- **Tiling with our own layout** (user's choice, 2026-10-28, replacing "everything floats"):
+  snapping floating windows meant redoing what a tiling layout does (gaps, neighbours), and apps
+  with a minimum size (Discord, 972 px against a 920 px half) only report their real size some
+  time after a resize, with no event, so adjusting the neighbours was unreliable. Now every
+  workspace tiles in a Lua layout (`hypr/layout.lua`, arrangements in `hypr/tiling.lua`, tested
+  with `lua tests/tiling_test.lua`): by the number of windows (one full, two halves, three as one
+  big and two stacked, more in a grid) until a spot is picked, then the chosen arrangement (halves,
+  thirds, 1/3 + 2/3, quarters) keeps its shape: new windows fill empty spots or stack in the last
+  column. The window menu's spots and "Arrange automatically", Super+Left/Right, Super+Alt+arrows
+  (move the border), Super+Shift+arrows (swap with the neighbour). A tiled app with a minimum
+  size is cut off at its box. Dialogs float by themselves; Super+Shift+Space or the window menu's
+  Float/Tile floats any window, and floating windows stay above tiled ones (Hyprland can't
+  change that). Dragging a tiled window's border does nothing: Hyprland doesn't pass the drag to
+  Lua layouts. `input.float_switch_override_focus = 0`, or focusing a tiled window under a
+  floating one jumped back to the window under the pointer. Windows already open when this came
+  in keep floating until tiled.
 - **Click to focus and raise on focus** (Windows/macOS behaviour, user's choice after research):
   `input.follow_mouse = 2` (hover still scrolls, a click focuses) and `hypr/windows.lua` raises
   every newly focused window (`hl.on("window.active", ...)` + `alter_zorder({ mode = "top" })`);
@@ -347,14 +357,15 @@ other session: pinning the Vencord/Spicetify downloads in install.sh.
 - **Keybinds: Windows-style** (user's choice, 2026-10-28): tap Super or Super+Space launcher,
   Super+Enter terminal, Super+E files, Super+B browser, Super+W / Alt+F4 close, Super+Up maximize,
   Super+Down minimize, Alt+Space or Super+Z window menu (with snap layouts), Alt+Tab switcher,
-  Super+Tab overview, Super+Left/Right snap, Super+N quick settings, Super+C calendar,
+  Super+Tab overview, Super+Left/Right snap, Super+Alt+arrows resize, Super+Shift+arrows swap,
+  Super+Shift+Space float or tile, Super+N quick settings, Super+C calendar,
   Super+Shift+S screenshot (Print: whole screen), Super+V clipboard, Super+. emoji, Super+L lock
   (Super+Shift+L hyprlock fallback), Ctrl+Alt+Delete power menu, Super+Ctrl+arrows focus, Super+I
   settings, Super+Shift+Z editor. Full list in `hypr/binds.lua` and the settings window.
 - **Window buttons:** Hyprland draws no title bars, so instead of hyprbars: keybinds plus a window
   menu on the window itself (`snap/WindowMenu.qml`, Alt+Space or Super+Z; user's choice
   2026-10-28, it used to be an island menu next to a separate snap picker): minimize, maximize,
-  fullscreen, close, move to workspace 1-5, and the snap layouts. Minimized windows are restored
+  fullscreen, float or tile, close, move to workspace 1-5, and the snap layouts. Minimized windows are restored
   from the workspace dots' hover.
 - **Minimize:** Hyprland has none. A minimized window moves to the hidden `special:minimized`
   workspace (Super+Down, the window menu, the dock); the next most recent window on that workspace

@@ -2,15 +2,8 @@
 ---- WINDOWS AND WORKSPACES ----
 --------------------------------
 
--- Every window floats, like on Windows and macOS: Hyprland draws tiled windows below all
--- floating ones, so a tiled window could never come to the front. Snapping (Super+Left/Right,
--- Super+Z) places windows side by side instead. New windows open centered.
-hl.window_rule({
-    name   = "float-by-default",
-    match  = { class = ".*" },
-    float  = true,
-    center = true,
-})
+-- Windows tile (layout.lua); Hyprland floats dialogs by itself, and the window menu or
+-- Super+Shift+Space floats any other window. Floating windows stay above tiled ones.
 
 -- Fix XWayland dragging issues
 hl.window_rule({

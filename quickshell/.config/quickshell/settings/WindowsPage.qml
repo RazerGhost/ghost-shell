@@ -3,10 +3,8 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// Windows: the gaps around snapped windows (every window floats, so Hyprland's gaps only matter
-// where the shell places windows: snapping, which moves snapped windows along when they change),
-// their border and corners, and whether apps reopen where they were. Applied through Hyprland
-// (HyprlandSettings.qml).
+// Windows: the gaps around tiled windows, their border and corners, and whether floating apps
+// reopen where they were. Applied through Hyprland (HyprlandSettings.qml).
 Column {
     id: page
 
@@ -18,8 +16,7 @@ Column {
         title: "Look"
 
         SettingRow {
-            title: "Gaps between snapped windows"
-            subtitle: "Windows you place yourself stay where you put them"
+            title: "Gaps between windows"
 
             Stepper {
                 label: "Gaps between windows"
@@ -31,8 +28,7 @@ Column {
         }
 
         SettingRow {
-            title: "Gaps around snapped windows"
-            subtitle: "At the screen's edges"
+            title: "Gaps at the screen's edges"
 
             Stepper {
                 label: "Gaps at the screen's edges"
@@ -73,11 +69,11 @@ Column {
         title: "Behaviour"
 
         SettingRow {
-            title: "Reopen apps where they were"
-            subtitle: "An app's window comes back at the position and size it had when it closed"
+            title: "Reopen floating apps where they were"
+            subtitle: "A floating window comes back at the position and size it had when it closed"
 
             Switch {
-                label: "Reopen apps where they were"
+                label: "Reopen floating apps where they were"
                 checked: Settings.values.rememberPositions
                 onToggled: Settings.values.rememberPositions = !checked
             }

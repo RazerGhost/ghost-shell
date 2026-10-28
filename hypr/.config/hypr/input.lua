@@ -13,6 +13,10 @@ hl.config({
         -- Click to focus, like Windows and macOS: the window under the pointer still gets
         -- scrolling and hover, but only a click moves the keyboard focus.
         follow_mouse = 2,
+        -- Focus goes where it's sent: by default, switching focus between a tiled and a floating
+        -- window moves it to whichever window is under the pointer instead (the shell's
+        -- switcher and snapping focused the wrong window).
+        float_switch_override_focus = 0,
         sensitivity  = 0,
 
         touchpad = {

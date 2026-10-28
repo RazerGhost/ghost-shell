@@ -5,45 +5,52 @@ import Quickshell.Wayland
 import qs.services
 import qs.theme
 import qs.widgets
-import "../services/SnapLayout.js" as SnapLayout
 import "../services/WindowGrid.js" as WindowGrid
 
-// Snap Assist, like Windows: after you snap a window to a half or a third, the space next to it
-// shows the other windows on that workspace, in a grid that fills it. Click one, or pick it with
-// the arrow keys and Enter, to fill the space; Escape or a click elsewhere skips it.
+// Snap Assist, like Windows: when you snap a window and its workspace's arrangement has an empty
+// spot left (a lone window snapped to a half, two windows in thirds), that spot shows the windows
+// that aren't tiled there: floating ones on the workspace, minimized ones and ones on other
+// workspaces, in a grid that fills it. Click one, or pick it with the arrow keys and Enter, to bring it into the spot; the next
+// empty spot asks again. Escape or a click elsewhere skips it.
 Scope {
     id: root
 
     property bool open: false
-    // The layout the picked window gets, and where it is (global logical pixels).
-    property string layout
+    // The empty spot (global logical pixels, inside the gaps).
     property var area: ({ x: 0, y: 0, width: 0, height: 0 })
     property HyprlandMonitor monitor: null
     property HyprlandToplevel snappedWindow: null
 
-    // The other windows on the snapped one's workspace, most recently used first.
+    // Every window not tiled on the snapped one's workspace: floating ones there, minimized ones,
+    // ones on other workspaces (not other special workspaces like the scratchpad), most recently
+    // used first.
     readonly property list<HyprlandToplevel> candidates: open
-        ? Windows.recent.filter(t => t !== snappedWindow && t.workspace === snappedWindow?.workspace)
+        ? Windows.recent.filter(t => t !== snappedWindow && (t.workspace === snappedWindow?.workspace
+            ? t.lastIpcObject?.floating === true
+            : t.workspace?.id > 0 || t.workspace?.name === Windows.minimizedWorkspace))
         : []
 
+    // The picked window moves to the workspace and tiles: the layout puts a new window in the
+    // first empty spot. Then the layout is asked for the next one.
     function pick(window: HyprlandToplevel): void {
         open = false;
-        Snap.snap(window, layout, true);
+        const workspace = snappedWindow?.workspace?.id;
+        if (!window || !workspace)
+            return;
+        Windows.moveToWorkspace(window, workspace);
+        Windows.run(window, "float", `action = "disable"`);
         Windows.focus(window);
+        Snap.askEmpty(snappedWindow);
     }
 
     Connections {
         target: Snap
 
-        function onSnapped(window: HyprlandToplevel, layout: string): void {
-            const rest = SnapLayout.complement(layout);
-            if (rest === "")
-                return;
+        function onEmptyCells(window: HyprlandToplevel, cells: var): void {
             Hyprland.refreshToplevels(); // fresh focus order for the list
             root.snappedWindow = window;
             root.monitor = window.monitor;
-            root.layout = rest;
-            root.area = Snap.rect(window.monitor, rest);
+            root.area = cells[0];
             root.open = true;
         }
     }

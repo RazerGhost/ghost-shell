@@ -2,10 +2,13 @@ import QtQuick
 import Quickshell.Hyprland
 import qs.services
 import qs.theme
+import qs.widgets
 import "../services/SnapLayout.js" as SnapLayout
 
 // The snap layouts, like Windows 11's: small pictures of the screen with the target area lit,
-// in two rows of groups. Click one to put `target` there.
+// in two rows of groups. Click one to put `target` there; the workspace's other windows tile
+// around it (hypr/.config/hypr/tiling.lua). "Arrange automatically" goes back to arranging them
+// by their number.
 Column {
     id: root
 
@@ -24,7 +27,7 @@ Column {
         readonly property var cell: SnapLayout.layout(layout)
 
         function pick(): void {
-            Snap.snap(root.target, layout, false);
+            Snap.snap(root.target, layout);
             root.done();
         }
 
@@ -115,6 +118,15 @@ Column {
             title: "Two thirds"
             LayoutButton { layout: "left-two-thirds" }
             LayoutButton { layout: "right-two-thirds" }
+        }
+    }
+
+    TextButton {
+        text: "Arrange automatically"
+        enabled: root.target !== null
+        onClicked: {
+            Snap.arrangeAutomatically(root.target);
+            root.done();
         }
     }
 }

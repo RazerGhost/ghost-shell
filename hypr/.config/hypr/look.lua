@@ -19,7 +19,9 @@ hl.config({
         resize_on_border = true,
         allow_tearing    = false,
 
-        layout = "dwindle",
+        -- Our own tiling layout (layout.lua): halves, thirds and quarters, picked from the
+        -- window menu or arranged by the number of windows.
+        layout = "lua:shell",
     },
 
     decoration = {
@@ -46,18 +48,6 @@ hl.config({
 
     animations = {
         enabled = true,
-    },
-
-    dwindle = {
-        preserve_split = true,
-    },
-
-    master = {
-        new_status = "master",
-    },
-
-    scrolling = {
-        fullscreen_on_one_column = true,
     },
 
     misc = {

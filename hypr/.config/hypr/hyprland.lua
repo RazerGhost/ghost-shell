@@ -7,6 +7,7 @@
 require("monitors")
 require("env")
 require("autostart")
+require("layout") -- before look.lua, which picks it
 require("look")
 require("input")
 require("binds")

@@ -8,7 +8,8 @@ import qs.theme
 
 // The window menu (Alt+Space or Super+Z), a card at the top of the focused window, so it's clear
 // which window it's about: its title bar actions and workspace (WindowActions.qml), and the snap
-// layouts, Windows 11 style (SnapLayouts.qml). Super+Left/Right snap to halves directly.
+// layouts, Windows 11 style (SnapLayouts.qml), which arrange the tiled windows around it.
+// Super+Left/Right snap to halves directly.
 Scope {
     id: root
 
@@ -38,12 +39,13 @@ Scope {
 
         // qs ipc call snap active left (or right, top-left, left-third, ...): snap the focused window.
         function active(layout: string): void {
-            Snap.snap(Windows.active, layout, false);
+            Snap.snap(Windows.active, layout);
         }
 
-        // qs ipc call snap down (Super+Down): un-snap the focused window, or minimize it.
+        // qs ipc call snap down (Super+Down): minimize the focused window.
         function down(): void {
-            Snap.restoreOrMinimize(Windows.active);
+            if (Windows.active)
+                Windows.minimize(Windows.active);
         }
 
         // qs ipc call snap picker: show or hide the window menu for the focused window.

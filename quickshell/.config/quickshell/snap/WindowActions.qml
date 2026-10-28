@@ -7,7 +7,8 @@ import qs.theme
 import qs.widgets
 
 // The top of the window menu (WindowMenu.qml): the window's icon and title, what title bar
-// buttons would do (minimize, maximize, fullscreen, close) and moving it to another workspace.
+// buttons would do (minimize, maximize, fullscreen, close), floating or tiling it, and moving it
+// to another workspace.
 // The snap layouts come below it.
 Column {
     id: root
@@ -110,6 +111,12 @@ Column {
         Action { icon: "minimize"; text: "Minimize"; onTriggered: root.act(Windows.minimize) }
         Action { icon: "open_in_full"; text: "Maximize"; onTriggered: root.act(Windows.toggleMaximized) }
         Action { icon: "fullscreen"; text: "Fullscreen"; onTriggered: root.act(Windows.toggleFullscreen) }
+        Action {
+            readonly property bool floating: root.target?.lastIpcObject?.floating ?? false
+            icon: floating ? "grid_view" : "picture_in_picture"
+            text: floating ? "Tile" : "Float"
+            onTriggered: root.act(Snap.toggleFloating)
+        }
         Action { icon: "close"; text: "Close"; onTriggered: root.act(Windows.close) }
     }
 

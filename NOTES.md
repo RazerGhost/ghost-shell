@@ -22,6 +22,23 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `non_consuming`, `description`, ...
 - `hl.env` runs before the compositor starts; `AQ_DRM_DEVICES` is a colon-separated list with the
   primary GPU first. `/dev/dri/by-path` can't be used in it because those paths contain colons.
+- Custom layouts (stubs in `/usr/share/hypr/stubs/hl.meta.lua`, examples in the Hyprland repo's
+  `example/layouts/`): `hl.layout.register(name, { recalculate = function(ctx), layout_msg =
+  function(ctx, msg) })`, used as `lua:name` (`general.layout` or a workspace rule's `layout`).
+  `ctx.area` is the workspace minus reserved space and `gaps_out`; `ctx.targets[i]` has `index`,
+  `window` (address `0x...`, `workspace.id`, `active`, `floating`) and `:place(box)`, which adds
+  `gaps_in` itself. Only tiled windows are targets; the context has no workspace field (take it
+  from a target's window). `layout_msg` returns `true` or an error string, and Hyprland
+  recalculates after it; `hl.dsp.layout("msg")` sends one to the focused workspace's layout.
+  Mouse-resizing a tiled window only calls `recalculate`, without the drag distance. Registering
+  a name twice is an error (`hyprctl eval` of the file again fails; `hyprctl reload` works).
+  Verified on the laptop. A tiled app with a minimum size bigger than its box (Discord, 972 px)
+  is cut off at the box, not moved.
+- Hyprland runs Lua 5.5. `hyprctl eval '<lua>'` runs code in the config's state; `hyprctl repl
+  'return x'` prints a value, but prints "unknown request" for an empty string.
+- `input.float_switch_override_focus` (default 1): when focus moves between a tiled and a floating
+  window, it goes to the window under the pointer instead. Focusing a tiled window under a
+  floating one by dispatch failed until it was 0.
 
 **Quickshell 0.3.2**
 - Imports: `import qs.<folder>` relative to `shell.qml`; no `qmldir` needed. Singletons:

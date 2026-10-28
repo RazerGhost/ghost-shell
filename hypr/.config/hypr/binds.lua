@@ -48,19 +48,25 @@ hl.bind("CTRL + ALT + Delete", hl.dsp.exec_cmd("qs ipc call island toggle power"
 hl.bind(mainMod .. " + W", hl.dsp.window.close(), { description = "Close window" })
 hl.bind("ALT + F4",        hl.dsp.window.close(), { description = "Close window" })
 hl.bind(mainMod .. " + up",   hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }), { description = "Maximize" })
--- Super+Down, like Windows: a snapped window goes back to its size from before snapping; any other
--- window is minimized (Hyprland has no minimize, so it goes to a hidden special workspace that the
--- island lists; see quickshell's services/Windows.qml and Snap.qml).
-hl.bind(mainMod .. " + down", hl.dsp.exec_cmd("qs ipc call snap down"), { description = "Unsnap or minimize" })
+-- Super+Down minimizes (Hyprland has no minimize, so the window goes to a hidden special
+-- workspace that the island lists; see quickshell's services/Windows.qml).
+hl.bind(mainMod .. " + down", hl.dsp.exec_cmd("qs ipc call snap down"), { description = "Minimize" })
 -- Window menu on the window (like Windows' Alt+Space): minimize, maximize, fullscreen, close,
 -- the snap layouts and moving it to another workspace. Super+Z opens the same menu.
 hl.bind("ALT + space", hl.dsp.exec_cmd("qs ipc call snap picker"), { description = "Window menu and snap layouts" })
 hl.bind(mainMod .. " + F",    hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }), { description = "Fullscreen" })
 
--- Snapping (Windows 11 style): halves directly, every layout in a picker over the window.
+-- Tiling (layout.lua). Super+Left/Right put the window in a half, every other spot is in the
+-- window menu; both go through the shell, which offers windows for a spot left empty (Snap Assist).
 hl.bind(mainMod .. " + left",  hl.dsp.exec_cmd("qs ipc call snap active left"), { description = "Snap left" })
 hl.bind(mainMod .. " + right", hl.dsp.exec_cmd("qs ipc call snap active right"), { description = "Snap right" })
 hl.bind(mainMod .. " + Z",     hl.dsp.exec_cmd("qs ipc call snap picker"), { description = "Window menu and snap layouts" })
+-- Move the window's border, or swap it with the window next to it.
+for _, direction in ipairs({ "left", "right", "up", "down" }) do
+    hl.bind(mainMod .. " + ALT + " .. direction, hl.dsp.layout("resize " .. direction), { repeating = true, description = "Resize the tiled window" })
+    hl.bind(mainMod .. " + SHIFT + " .. direction, hl.dsp.layout("move " .. direction), { description = "Swap with the window next to it" })
+end
+hl.bind(mainMod .. " + SHIFT + space", hl.dsp.window.float({ action = "toggle" }), { description = "Float or tile" })
 
 -- Alt+Tab switcher: Tab steps through the windows, releasing Alt switches (Quickshell sees that).
 hl.bind("ALT + Tab",         hl.dsp.exec_cmd("qs ipc call switcher next"), { description = "Switch windows" })
