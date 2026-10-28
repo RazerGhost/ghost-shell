@@ -201,21 +201,19 @@ PanelWindow {
             }
             Keys.onEscapePressed: root.island.panel = ""
 
-            // Workspaces | time | status icons, evenly spaced and symmetric (user's choice): the
-            // dots and the status icons get the same width (the narrower group spreads out), so
-            // the time sits exactly in the screen's middle, under the webcam. The time and the
-            // status icons are buttons with padding inside; the dots get the same padding around
-            // them, so every gap is two paddings.
+            // Workspaces | time | status icons, symmetric (user's choice): both sides are as wide
+            // as the wider group, each group centered on its side, so the time sits exactly in the
+            // screen's middle, under the webcam. Groups keep their own spacing: spreading the
+            // narrower one to match left odd gaps (two dots far apart).
             Row {
                 id: topRow
 
-                readonly property real sideWidth: Math.max(workspaces.naturalWidth, statusIcons.naturalWidth)
+                readonly property real sideWidth: Math.max(workspaces.implicitWidth, statusIcons.implicitWidth)
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 height: Theme.island.height
 
-                // Both sides are exactly sideWidth (plus the buttons' padding), with their group
-                // centered: a single dot can't spread to the icons' width.
+                // Both sides are exactly sideWidth plus the buttons' padding.
                 Item {
                     width: topRow.sideWidth + Theme.spacing.m * 2
                     height: parent.height
@@ -224,7 +222,6 @@ PanelWindow {
                         id: workspaces
                         anchors.centerIn: parent
                         screen: root.modelData
-                        fillWidth: topRow.sideWidth
                     }
                 }
 
@@ -285,7 +282,6 @@ PanelWindow {
 
                         StatusIcons {
                             id: statusIcons
-                            fillWidth: topRow.sideWidth
                         }
                     }
                 }
