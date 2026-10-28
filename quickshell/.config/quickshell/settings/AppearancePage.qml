@@ -42,6 +42,20 @@ Column {
         }
 
         SettingRow {
+            title: "Blur style"
+            subtitle: "Behind the glass, menus and see-through windows"
+
+            Stepper {
+                label: "Blur style"
+                values: ["kawase", "frost", "acrylic", "prism", "aurora", "haze"]
+                value: Settings.values.blurStyle
+                format: v => ({ kawase: "Classic", frost: "Frost", acrylic: "Acrylic", prism: "Prism",
+                                aurora: "Aurora", haze: "Haze" })[v] ?? v
+                onPicked: v => Settings.values.blurStyle = v
+            }
+        }
+
+        SettingRow {
             visible: Settings.values.glass
             title: "See-through"
             subtitle: "How solid the glass is"

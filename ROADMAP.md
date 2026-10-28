@@ -418,6 +418,12 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   ..."; `SnapshotList.js`, tested against the real list), the home ones with "Open" (their files
   in the file manager), "Take one now", and Btrfs Assistant for restoring.
 
+### Hyprland 0.57 additions (built 2026-10-28; waiting on the user's test results)
+- Apps' minimize buttons (see the Minimize decision). Settings -> Appearance -> Blur style
+  (Hyprland's non-animated blur variants: Classic, Frost, Acrylic, Prism, Aurora, Haze) and
+  Settings -> Windows -> Wobbly windows (off by default), through `shell-settings.lua`
+  (`HyprlandConfig.js`, tested). The spring curve key renamed to `damping`.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
@@ -490,7 +496,9 @@ windows).
   2026-10-28, it used to be an island menu next to a separate snap picker): minimize, maximize,
   fullscreen, float or tile, close, move to workspace 1-5, and the snap layouts. Minimized windows are restored
   from the workspace dots' hover.
-- **Minimize:** Hyprland has none. A minimized window moves to the hidden `special:minimized`
+- **Minimize:** Hyprland has none (since 0.57 it tells Lua when an app asks: `windows.lua` sends
+  those requests to the same hidden workspace, so apps' own minimize buttons work, and the GTK
+  title bars show one again). A minimized window moves to the hidden `special:minimized`
   workspace (Super+Down, the window menu, the dock); the next most recent window on that workspace
   gets the focus, and `Windows.active` ignores minimized windows (Hyprland can still report one as
   active, which made a second dock click minimize again instead of restoring). Restoring moves

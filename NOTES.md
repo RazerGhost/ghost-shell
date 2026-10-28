@@ -39,6 +39,12 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   is cut off at the box, not moved.
 - Hyprland runs Lua 5.5. `hyprctl eval '<lua>'` runs code in the config's state; `hyprctl repl
   'return x'` prints a value, but prints "unknown request" for an empty string.
+- Hyprland 0.57 (running since 2026-10-28): `hl.on("window.minimize", function(window, minimize))`
+  fires for apps' minimize buttons and foreign-toplevel requests (a toplevel's `minimized = true`
+  in Quickshell's `ToplevelManager` triggers it; verified). `decoration.blur.variant` takes names:
+  kawase (0), frost, ripple, drops, water, fluid_jar, prism, heat_shimmer, acrylic, aurora, haze
+  (ripple, drops and water animate). `decoration.wobble.enabled`. Spring curves use `damping`
+  (`dampening` still read as a fallback).
 - `input.float_switch_override_focus` (default 1): when focus moves between a tiled and a floating
   window, it goes to the window under the pointer instead. Focusing a tiled window under a
   floating one by dispatch failed until it was 0.

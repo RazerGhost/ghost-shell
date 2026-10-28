@@ -43,13 +43,13 @@ Singleton {
     // search matches a page's title and these words, so it finds the page for any setting on it.
     readonly property var pages: [
         { id: "appearance", section: "Personalize", icon: "palette", title: "Appearance",
-          words: "wallpaper colors theme glass blur transparent see-through border corners rounding" },
+          words: "wallpaper colors theme glass blur style frost acrylic transparent see-through border corners rounding" },
         { id: "display", section: "Personalize", icon: "brightness_6", title: "Display",
           words: "night light warm blue light schedule screen" },
         { id: "lock", section: "Personalize", icon: "lock", title: "Lock screen",
           words: "login greeter picture blur darken clock date name power buttons" },
         { id: "windows", section: "System", icon: "select_window", title: "Windows",
-          words: "gaps tiling hot corner overview reopen floating position" },
+          words: "gaps tiling hot corner overview reopen floating position wobble wobbly jelly" },
         { id: "notifications", section: "System", icon: "notifications", title: "Notifications",
           words: "do not disturb dnd quiet schedule" },
         { id: "power", section: "System", icon: "battery_charging_full", title: "Power",

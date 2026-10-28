@@ -7,7 +7,8 @@ TestCase {
 
     readonly property var defaults: ({
         keyboardLayout: "us", pointerSpeed: 0, naturalScroll: false, tapToClick: true,
-        gapsIn: 5, gapsOut: 20, borderSize: 2, rounding: 10, rememberPositions: true
+        gapsIn: 5, gapsOut: 20, borderSize: 2, rounding: 10, rememberPositions: true,
+        blurStyle: "kawase", wobble: false
     })
 
     function test_luaHasTheValues() {
@@ -26,6 +27,15 @@ TestCase {
         verify(!lua.includes("os.execute"));
         compare(HyprlandConfig.layoutCode("us,nl"), "us,nl");
         compare(HyprlandConfig.layoutCode("US"), "us");
+    }
+
+    function test_blurAndWobble() {
+        const lua = HyprlandConfig.lua(Object.assign({}, defaults, { blurStyle: "frost", wobble: true }));
+        verify(lua.includes('blur = { variant = "frost" },'));
+        verify(lua.includes("wobble = { enabled = true },"));
+        // A hand-edited style can't break the Lua or pick an animated variant.
+        verify(HyprlandConfig.lua(Object.assign({}, defaults, { blurStyle: 'x" }' })).includes('variant = "kawase"'));
+        verify(HyprlandConfig.lua(Object.assign({}, defaults, { blurStyle: "water" })).includes('variant = "kawase"'));
     }
 
     function test_badNumbersFallBack() {

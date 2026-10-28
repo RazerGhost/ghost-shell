@@ -22,3 +22,20 @@ hl.on("window.title", function(window)
     hl.dispatch(hl.dsp.window.resize({ window = target, x = 1000, y = 600 }))
     hl.dispatch(hl.dsp.window.center({ window = target }))
 end)
+
+-- Minimize buttons in apps (GTK title bars, Ghostty) and taskbar-style requests: Hyprland 0.57
+-- tells Lua about them. Minimized windows go to the same hidden workspace the shell uses
+-- (quickshell's services/Windows.qml), and come back to the workspace you're on.
+hl.on("window.minimize", function(window, minimize)
+    if not window then
+        return
+    end
+    local target = "address:" .. window.address
+    if minimize then
+        hl.dispatch(hl.dsp.window.move({ window = target, workspace = "special:minimized", follow = false }))
+    else
+        local ws = hl.get_active_workspace()
+        hl.dispatch(hl.dsp.window.move({ window = target, workspace = tostring(ws and ws.id or 1), follow = false }))
+        hl.dispatch(hl.dsp.focus({ window = target }))
+    end
+end)

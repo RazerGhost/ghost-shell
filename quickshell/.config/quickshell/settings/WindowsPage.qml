@@ -45,6 +45,17 @@ Column {
         title: "Behaviour"
 
         SettingRow {
+            title: "Wobbly windows"
+            subtitle: "Windows wobble like jelly while you move or resize them"
+
+            Switch {
+                label: "Wobbly windows"
+                checked: Settings.values.wobble
+                onToggled: Settings.values.wobble = !checked
+            }
+        }
+
+        SettingRow {
             title: "Hot corner"
             subtitle: "Resting the pointer in the top-left corner opens the overview"
 

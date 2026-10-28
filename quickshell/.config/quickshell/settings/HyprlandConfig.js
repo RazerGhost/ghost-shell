@@ -8,6 +8,14 @@ function layoutCode(code) {
     return /^[a-z0-9_]+(,[a-z0-9_]+)*$/.test(code) ? code : "us";
 }
 
+// Hyprland's blur variants that don't animate (the animated ones, like water, cost GPU time
+// all the time); anything else falls back to the classic one.
+const blurStyles = ["kawase", "frost", "acrylic", "prism", "aurora", "haze"];
+
+function blurStyle(name) {
+    return blurStyles.includes(name) ? name : "kawase";
+}
+
 function number(value, fallback) {
     return typeof value === "number" && isFinite(value) ? value : fallback;
 }
@@ -33,6 +41,8 @@ function lua(v) {
         "    },",
         "    decoration = {",
         `        rounding = ${number(v.rounding, 10)},`,
+        `        blur = { variant = "${blurStyle(v.blurStyle)}" },`,
+        `        wobble = { enabled = ${v.wobble === true} },`,
         "    },",
         "})",
         "",
