@@ -27,7 +27,9 @@ if [[ -d $HOME/.local/share/Steam ]]; then
     mkdir -p "$(dirname "$theme_dir")"
     # The colors file is the theme's own, overwritten by matugen: undo that before pulling.
     [[ -d $theme_dir/.git ]] && git -C "$theme_dir" checkout -- css/main/colors/matugen.css
-    clone_or_pull https://github.com/kuska1/Material-Theme "$theme_dir"
+    # At a fixed commit: it has no releases, and its scripts run inside Steam (update: change the
+    # commit after looking at what changed).
+    clone_at https://github.com/kuska1/Material-Theme "$theme_dir" 32b6c127aab294c6f7c79ba7d3a12c717cc67227
     sh "$HOME/.config/matugen/hooks/steam-material.sh"
 fi
 millennium_config="$HOME/.config/millennium/config.json"

@@ -11,7 +11,9 @@ step "Discord: Vencord with the Ghost theme plugin, for Vesktop"
 # Re-run this script (or install.sh) to update both. Enable the plugin in Vesktop: Settings -> Plugins -> Ghost.
 vencord_dir="$HOME/.local/share/vencord"
 ghost_dir="$HOME/.local/share/discord-ghost"
-clone_or_pull https://github.com/Vendicated/Vencord "$vencord_dir"
+# Vencord at a release (update: change the tag; github.com/Vendicated/Vencord/tags). Ghost is
+# yours, so it follows its main branch.
+clone_at https://github.com/Vendicated/Vencord "$vencord_dir" v1.15.13
 clone_or_pull https://github.com/RazerGhost/discord-ghost "$ghost_dir"
 (cd "$ghost_dir" && npm ci && node build.mjs --vencord "$vencord_dir")
 (cd "$vencord_dir" && pnpm install --frozen-lockfile && pnpm build)

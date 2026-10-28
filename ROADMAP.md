@@ -282,8 +282,9 @@ from Settings at startup, night light retries, battery time), shared implementat
 (`Windows.show`/`forApp`, `Session`, `WindowPreview`, `AlbumArt`, `SearchField`, `MorphAnimation`,
 `Theme.state`, `Colors.scrim`), the window menu as one card on the window, the wallpaper strip as
 its own surface (with arrow keys), new settings (editor, keyboard and touchpad, windows), and
-cleanup (package lists with comments, files in the right folders, the roadmap). Left for the
-other session: pinning the Vencord/Spicetify downloads in install.sh.
+cleanup (package lists with comments, files in the right folders, the roadmap). Third-party code that
+runs on the machine is pinned (2026-10-28, `clone_at` in `setup/lib.sh`): Vencord at a release
+tag, Material-Theme at a commit; the user's own Ghost repos follow their main branch.
 
 ### Emoji picker (done, verified on the laptop 2026-10-28)
 - An island menu (`controlcenter/EmojiPanel.qml`, Super+. like Windows): search field, a grid
