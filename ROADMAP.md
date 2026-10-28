@@ -161,6 +161,21 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
   (3-finger swipe up / hot corner, reusing the switcher's thumbnails), an emoji picker, a snipping
   overlay. Not possible on Wayland: a global app menu. Hard: real minimize, Stage Manager.
 
+### Phase 7: Settings app
+Added at the user's request (2026-10-28), after night light went manual-only: things that are
+fixed in config files should become settings.
+- A larger settings window (opened from a gear button in quick settings, and an IPC call),
+  categorized like the island menus. Candidates: night light (manual or a schedule, times,
+  temperature), idle timings (dim, lock, screen off, suspend; battery vs. plugged in), a Do Not
+  Disturb schedule, the wallpaper (the picker), a readable list of keybinds, default apps
+  (browser, terminal).
+- Choices saved in one settings file outside the shell directory (like
+  `~/.local/state/quickshell/*.json`), read by the services. Settings that live in other
+  programs' configs (hypridle, hyprsunset) need those files generated from it, or the program
+  restarted with new values: decide per setting, and check how each program reloads.
+- Ask the user which settings matter most before building, and whether it's an island menu
+  (wide, like the wallpaper picker) or a normal window.
+
 ## Decisions made
 
 - **External monitors:** keep the RTX in `AQ_DRM_DEVICES` (second, after the iGPU), so outputs wired
