@@ -496,6 +496,15 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   stays quiet). `SoundEvents.js` tested. Settings -> Sound (was Equalizer): a switch for all and
   one per kind.
 
+### Window tabs (built 2026-10-29; waiting on the user's test results)
+- Hyprland groups (user's choice: keys and the window menu, no dragging into groups): Super+G
+  makes the window a tab group (again: separate windows), Super+Ctrl+Shift+arrows moves a window
+  into the group next to it, Super+Shift+G takes it out, Alt+` / Alt+Shift+` or a click on a
+  tab switches. The window menu's "Tabs" / "Take out" (`Windows.toggleTabs`). A group takes
+  one spot in our layout (checked live). The tab bar is rounded tabs in Inter (look.lua), in
+  the wallpaper's colors (matugen's `hyprland-colors.lua`: the active tab in the primary
+  container color, the others like the shell's surfaces, blurred).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

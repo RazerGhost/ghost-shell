@@ -137,6 +137,15 @@ Singleton {
         run(window, "fullscreen", `mode = "fullscreen", action = "toggle"`);
     }
 
+    // Window tabs (Hyprland groups): a window in a group is taken out of it; any other window
+    // becomes a group of its own, which windows can then be moved into (Super+Ctrl+Shift+arrows).
+    function toggleTabs(window: HyprlandToplevel): void {
+        if ((window.lastIpcObject?.grouped ?? []).length > 0)
+            run(window, "move", "out_of_group = true");
+        else
+            Hyprland.dispatch(`hl.dsp.group.toggle({ window = "${selector(window)}" })`);
+    }
+
     function moveToWorkspace(window: HyprlandToplevel, id: int): void {
         run(window, "move", `workspace = ${id}, follow = false`);
     }

@@ -54,6 +54,29 @@ hl.config({
         },
     },
 
+    -- Window tabs (Hyprland groups, binds.lua): the tab bar as rounded tabs (the "gradients"),
+    -- not thin lines, in the shell's font. Colors come from matugen (colors.lua).
+    group = {
+        -- Windows join a group only through the keys or the window menu, not by dragging.
+        drag_into_group = 0,
+        groupbar = {
+            font_family          = "Inter",
+            font_size            = 11,
+            font_weight_active   = "semibold",
+            font_weight_inactive = "normal",
+            height               = 22,
+            gradients            = true,
+            indicator_height     = 0,
+            rounding             = 8,
+            gradient_rounding    = 8,
+            round_only_edges          = false,
+            gradient_round_only_edges = false,
+            gaps_in  = 4,
+            gaps_out = 4,
+            blur     = true,
+        },
+    },
+
     animations = {
         enabled = true,
     },

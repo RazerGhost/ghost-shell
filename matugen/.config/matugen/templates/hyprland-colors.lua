@@ -6,4 +6,27 @@ hl.config({
             inactive_border = "rgba({{colors.outline_variant.default.hex_stripped}}aa)",
         },
     },
+    -- Window tabs: borders like other windows; the active tab in the accent's container color,
+    -- the others like the shell's surfaces (see-through, the bar is blurred); locked groups in
+    -- the tertiary color.
+    group = {
+        col = {
+            border_active          = { colors = { "rgba({{colors.primary.default.hex_stripped}}ee)", "rgba({{colors.tertiary.default.hex_stripped}}ee)" }, angle = 45 },
+            border_inactive        = "rgba({{colors.outline_variant.default.hex_stripped}}aa)",
+            border_locked_active   = "rgba({{colors.tertiary.default.hex_stripped}}ee)",
+            border_locked_inactive = "rgba({{colors.outline_variant.default.hex_stripped}}aa)",
+        },
+        groupbar = {
+            text_color                 = "rgba({{colors.on_primary_container.default.hex_stripped}}ff)",
+            text_color_inactive        = "rgba({{colors.on_surface_variant.default.hex_stripped}}ff)",
+            text_color_locked_active   = "rgba({{colors.on_tertiary_container.default.hex_stripped}}ff)",
+            text_color_locked_inactive = "rgba({{colors.on_surface_variant.default.hex_stripped}}ff)",
+            col = {
+                active          = "rgba({{colors.primary_container.default.hex_stripped}}e6)",
+                inactive        = "rgba({{colors.surface_container_high.default.hex_stripped}}b3)",
+                locked_active   = "rgba({{colors.tertiary_container.default.hex_stripped}}e6)",
+                locked_inactive = "rgba({{colors.surface_container_high.default.hex_stripped}}b3)",
+            },
+        },
+    },
 })

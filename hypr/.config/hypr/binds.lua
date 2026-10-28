@@ -69,6 +69,18 @@ for _, direction in ipairs({ "left", "right", "up", "down" }) do
 end
 hl.bind(mainMod .. " + SHIFT + space", hl.dsp.window.float({ action = "toggle" }), { description = "Windows: Float or tile" })
 
+-- Window tabs (Hyprland groups): windows sharing one spot, with a tab bar on top. Super+G makes
+-- the window a tab group (again: back to separate windows), Super+Ctrl+Shift+arrows moves a
+-- window into the group next to it, Super+Shift+G takes it out; clicking a tab or Alt+`
+-- switches. The window menu has "Tabs" / "Take out" too.
+hl.bind(mainMod .. " + G",         hl.dsp.group.toggle(), { description = "Windows: Make a tab group (again: separate the windows)" })
+hl.bind(mainMod .. " + SHIFT + G", hl.dsp.window.move({ out_of_group = true }), { description = "Windows: Take the window out of its tab group" })
+hl.bind("ALT + grave",         hl.dsp.group.next(), { description = "Windows: Next tab" })
+hl.bind("ALT + SHIFT + grave", hl.dsp.group.prev(), { description = "Windows: Previous tab" })
+for direction, short in pairs({ left = "l", right = "r", up = "u", down = "d" }) do
+    hl.bind(mainMod .. " + CTRL + SHIFT + " .. direction, hl.dsp.window.move({ into_group = short }), { description = "Windows: Move into the tab group next to it" })
+end
+
 -- Alt+Tab switcher: Tab steps through the windows, releasing Alt switches (Quickshell sees that).
 hl.bind("ALT + Tab",         hl.dsp.exec_cmd("qs ipc call switcher next"), { description = "Windows: Switch windows" })
 hl.bind("ALT + SHIFT + Tab", hl.dsp.exec_cmd("qs ipc call switcher previous"), { description = "Windows: Switch windows, backwards" })

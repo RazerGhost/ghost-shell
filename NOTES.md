@@ -37,6 +37,12 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   a name twice is an error (`hyprctl eval` of the file again fails; `hyprctl reload` works).
   Verified on the laptop. A tiled app with a minimum size bigger than its box (Discord, 972 px)
   is cut off at the box, not moved.
+- Window groups (tabs) in 0.57: `hl.dsp.group.toggle/next/prev/active({ index })/lock/
+  move_window({ forward })`; into or out of a group is `hl.dsp.window.move({ into_group = "l"|"r"|"u"|"d" })`
+  (`into_or_create_group`, `out_of_group = true`); `group.move_window` only reorders tabs. A
+  group is one target for a Lua layout (our layout gave it one spot, verified); the tab bar
+  takes its height from the top of that spot. Options: `hyprctl descriptions -j` lists every
+  `group:` / `group:groupbar:` option (the wiki's variables page wasn't reachable).
 - Hyprland runs Lua 5.5. `hyprctl eval '<lua>'` runs code in the config's state; `hyprctl repl
   'return x'` prints a value, but prints "unknown request" for an empty string.
 - `hyprctl eval 'hl.monitor({ output = "eDP-1", mode = "1920x1080@60", position = "auto", scale = 1,
