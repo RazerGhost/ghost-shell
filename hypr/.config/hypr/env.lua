@@ -5,9 +5,9 @@
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
 
--- Quickshell's icon theme (it doesn't read GTK's setting). Without it only hicolor icons were
--- found, so the "unknown app" fallback icon (application-x-executable) never loaded.
-hl.env("QS_ICON_THEME", "Adwaita")
+-- Quickshell's icon theme: Colloid, the same as GTK apps (install.sh). Quickshell doesn't read
+-- GTK's setting; without this it found only hicolor icons (no fallback app icon either).
+hl.env("QS_ICON_THEME", "Colloid-Dark")
 
 -- GPU: Hyprland (and everything it launches) renders on the AMD iGPU; the first entry is primary.
 -- The RTX is listed second only so outputs wired to it (HDMI / USB-C) still work.

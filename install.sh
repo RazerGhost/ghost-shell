@@ -114,10 +114,12 @@ done
 # Quickshell fills this in for the QML language server; it's gitignored.
 touch quickshell/.config/quickshell/.qmlls.ini
 
-step "GTK dark mode and theme"
+step "GTK dark mode, theme and icons"
 # adw-gtk3 makes GTK3 apps match libadwaita (GTK4) ones; GTK4 apps follow color-scheme.
 gsettings set org.gnome.desktop.interface color-scheme prefer-dark
 gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark
+# Colloid icons (user's choice); Quickshell gets the same theme from QS_ICON_THEME in env.lua.
+gsettings set org.gnome.desktop.interface icon-theme Colloid-Dark
 # Title bar buttons for apps that draw their own bar (GTK apps, Ghostty). No minimize: Hyprland
 # ignores apps' minimize requests (Super+Down or the window menu minimizes instead).
 gsettings set org.gnome.desktop.wm.preferences button-layout 'appmenu:maximize,close'

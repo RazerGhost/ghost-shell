@@ -296,6 +296,10 @@ fixed in config files should become settings.
   spans the screen, so the island's window is as wide as the screen. Regular menus keep their
   width and stay centered while the island is wider.
 - **The bottom edge belongs to the dock:** nothing else goes there.
+- **Icons: Colloid** (`Colloid-Dark`, `colloid-icon-theme-git` from the AUR; user's choice over
+  WhiteSur and Tela Circle after previews in the dock, 2026-10-28): set for Quickshell with
+  `QS_ICON_THEME` in `env.lua` and for GTK apps with gsettings in `install.sh`. It redraws
+  nearly every app in one style; Adwaita has few app icons, so apps showed their own.
 - **Calendar locale:** `Qt.locale(Qt.uiLanguage)` (en_GB): the user has English UI with Dutch
   regional formats, and plain `Qt.locale()` gave Dutch day names next to English dates.
 - **No wallpaper yet:** `install.sh` with no argument generates colors from seed `#6750a4`, the same

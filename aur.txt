@@ -4,3 +4,4 @@ spotify
 spicetify-cli
 vesktop-bin
 millennium
+colloid-icon-theme-git
