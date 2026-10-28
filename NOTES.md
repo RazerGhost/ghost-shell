@@ -58,6 +58,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   e.g. `hl.dsp.focus({ workspace = "3" })`. Prefer `activate()` where it exists.
 - `SystemClock { precision: SystemClock.Minutes }`, then `Qt.formatDateTime(clock.date, ...)`.
 - `FileView { path; watchChanges: true; onFileChanged: reload(); adapter: JsonAdapter { ... } }`.
+  With `preload: false` and no reads, `fileChanged` still fires and the file is never loaded
+  (`loaded` stays false; tested with a throwaway config): a way to watch a big file like
+  `/var/log/pacman.log`.
   `Quickshell.env("HOME")`. `Quickshell.statePath()` points at a per-shell folder, not
   `~/.local/state`.
 - `IpcHandler { target: "name"; function f(arg: string): void {} }`: arguments and returns must be

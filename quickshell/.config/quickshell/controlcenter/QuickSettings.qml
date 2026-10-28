@@ -159,6 +159,44 @@ Item {
             onMoved: value => Brightness.set(value)
         }
 
+        // Waiting updates (services/Updates.qml), only when there are some.
+        Item {
+            width: parent.width
+            implicitHeight: Theme.slider.height
+            visible: Updates.count > 0
+
+            Row {
+                anchors.left: parent.left
+                anchors.leftMargin: Theme.spacing.s
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacing.s
+
+                MaterialIcon {
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon: "download"
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: Updates.summary
+                    color: Colors.m3onSurfaceVariant
+                    font.family: Theme.font.sans
+                    font.pixelSize: Theme.font.normal
+                }
+            }
+
+            TextButton {
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacing.xs
+                anchors.verticalCenter: parent.verticalCenter
+                text: "Update"
+                onClicked: {
+                    Updates.update();
+                    root.openMenu("");
+                }
+            }
+        }
+
         // Battery on the left; tray icons, wallpaper and power buttons on the right.
         Item {
             width: parent.width

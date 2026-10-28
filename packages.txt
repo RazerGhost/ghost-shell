@@ -60,8 +60,10 @@ cachyos-gaming-meta
 cachyos-gaming-applications
 steam
 
-# Tools (install.sh uses paru, stow, nodejs and lspci from pciutils)
+# Tools (install.sh uses paru, stow, nodejs and lspci from pciutils; the shell counts updates
+# with checkupdates from pacman-contrib)
 paru
+pacman-contrib
 stow
 github-cli
 pciutils

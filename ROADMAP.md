@@ -294,6 +294,15 @@ other session: pinning the Vencord/Spicetify downloads in install.sh.
   workspaces in use as miniatures (windows at their positions): click to go, drag a window onto
   one to move it, + for a new workspace. Keyboard on demand (focus race, see the switcher).
 
+### Update indicator (built 2026-10-28; waiting on the user's test results)
+- `services/Updates.qml` counts waiting updates: `checkupdates` (repositories, from
+  `pacman-contrib`; checks a copy of the database, no root) and `paru -Qua` (AUR), parsed by
+  `Updates.js` (tested). Counted a minute after login, every hour, and a few seconds after
+  `/var/log/pacman.log` changes (any install or update, whoever ran it; watched without reading
+  it). A download icon in the island's status icons while there are some; quick settings shows
+  "12 updates · 3 from the AUR" with an Update button that runs `paru` in the default terminal
+  (user's choice over `cachy-update`). `qs ipc call updates check|summary`.
+
 ### Screenshot tool (built 2026-10-28; waiting on the user's test results)
 - `screenshot/Screenshot.qml`, like Windows' Snipping Tool (user's choice): Super+Shift+S freezes
   the focused monitor (one `ScreencopyView` frame) and dims it, with a Region / Window / Screen
