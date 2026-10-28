@@ -83,10 +83,20 @@ new setup step.
 - OSD (`osd/Osd.qml`) for volume, mute, mic mute and brightness, on the focused monitor.
 - Windows open floating and centered by default (user's request); Super+T tiles one.
 
-### Phase 3: Notifications + rest of the control center + session menu
-- Quickshell as the notification server: popups (from the island?) plus history in the "today" menu.
-- Quick settings tiles still missing: DND, night light (hyprsunset).
-- Session/power menu: lock, logout, suspend, reboot, shutdown.
+### Phase 3: Notifications + rest of the control center + session menu (done, verified on the laptop
+  2026-10-28, except the power menu's suspend and log out: the user tests those later)
+- Quickshell is the notification server (`services/Notifications.qml`). New notifications pop up
+  from the island (`NotificationCard`) on the focused monitor, one at a time, 5 s each (paused on
+  hover; critical ones stay until dismissed), and stay in the history in the "today" menu until
+  dismissed or "Clear all". The menu opens with the month calendar folded (user's choice); click
+  the date to show it. Click a card for the app's default action; its other actions
+  are buttons. Bodies are shown as plain text (no markup).
+- Quick settings tiles: Do Not Disturb (no pop-ups except critical; history still collects) and
+  night light (`services/NightLight.qml`, hyprsunset: 4000 K from 20:00 to 07:00 by
+  `hypr/hyprsunset.conf`, the tile overrides it until the next switch).
+- Power menu (`controlcenter/PowerPanel.qml`, power button in quick settings or Ctrl+Alt+Delete):
+  lock, suspend, log out, restart, shut down; the last three need a second click within 4 s.
+  Lock runs hyprlock, which has no config until Phase 5.
 
 ### Phase 4: Clipboard + wallpaper
 - Clipboard picker on Super+V using cliphist history (Super+V is kept free for it).
@@ -153,7 +163,7 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
 - **Keybinds: Windows-style** (user's choice, 2026-10-28): tap Super or Super+Space launcher,
   Super+Enter terminal, Super+E files, Super+B browser, Super+W / Alt+F4 close, Super+Up maximize,
   Super+Down minimize, Super+T float/tile, Alt+Space window menu, Super+N quick settings, Super+C calendar, Super+Shift+S screenshot,
-  Ctrl+Alt+Delete log out, Super+Ctrl+arrows focus. Super+Left/Right are kept free for snapping
+  Ctrl+Alt+Delete power menu, Super+Ctrl+arrows focus. Super+Left/Right are kept free for snapping
   (Phase 6) and Super+V for the clipboard (Phase 4). Full list in `hypr/binds.lua`.
 - **Window buttons:** Hyprland draws no title bars, so instead of hyprbars: keybinds plus a window
   menu in the island (`controlcenter/WindowPanel.qml`, Alt+Space or right-click the island's top
@@ -178,6 +188,13 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
   `yes | bt-agent -c NoInputNoOutput`: without `--daemon` it reads answers from stdin, and in
   `--daemon` mode it rejects confirmations unless a PIN file matches. The Bluetooth page also sets
   the adapter `pairable` and the device `trusted` before `pair()`, and connects once paired.
+- **Notifications from the island** (user's choice over corner cards). Pop-ups wait while a menu
+  is open. Notifications carry no timestamp, so the service records arrival times; after a shell
+  restart (not a reload) the history is empty.
+- **Night light schedule** in `hyprsunset.conf` (user's choice: tile + automatic). hyprsunset
+  can't report a manual override, so the tile state comes from its profile at startup and on each
+  switch (`on-switch = qs ipc call nightlight refresh`) and from the tile itself.
+- **Island window height** is 840 px (was 680) so the "today" menu with notifications fits.
 - **Calendar locale:** `Qt.locale(Qt.uiLanguage)` (en_GB): the user has English UI with Dutch
   regional formats, and plain `Qt.locale()` gave Dutch day names next to English dates.
 - **No wallpaper yet:** `install.sh` with no argument generates colors from seed `#6750a4`, the same
@@ -267,6 +284,16 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - Qt: `QtQuick.Shapes` (`Shape.CurveRenderer`, `PathArc.direction`), `MonthGrid` / `DayOfWeekRow`
   from `QtQuick.Controls.Basic` (MonthGrid needs an explicit height).
 - `console.log` doesn't reach `qs log`; use `console.warn` when debugging.
+- `Quickshell.Services.Notifications`: `NotificationServer { keepOnReload; actionsSupported;
+  imageSupported; persistenceSupported; onNotification: n => n.tracked = true }`;
+  `trackedNotifications`. `Notification`: `id`, `appName`, `appIcon`, `image`, `summary`, `body`,
+  `urgency` (`NotificationUrgency.Low/Normal/Critical`), `actions` (`identifier`, `text`,
+  `invoke()`), `transient`, `lastGeneration` (true for ones carried over a reload, which are
+  announced again), `dismiss()`, `expire()`. No timestamp. App icons can be names, paths or URLs;
+  show them with `IconImage` (a plain `Image` scales up a tiny icon).
+- hyprsunset 0.4: `hyprctl hyprsunset temperature <K>` / `identity` / `reset` / `profile` (prints
+  the active profile's Time/Temperature/Gamma/Identity, not manual overrides). Profiles in
+  `~/.config/hypr/hyprsunset.conf` with `time`, `temperature`, `identity`, `on-switch`.
 - `HyprlandToplevel.address` has no `0x` (Hyprland's selector needs `address:0x<address>`).
   `Hyprland.activeToplevel` is null after the shell starts until focus changes; match
   `ToplevelManager.activeToplevel` (`Quickshell.Wayland`) against `HyprlandToplevel.wayland`.

@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
+import Quickshell.Services.Notifications
 import Quickshell.Wayland
 import qs.controlcenter
 import qs.services
@@ -13,12 +14,12 @@ import qs.widgets
 // "today" (calendar) or "settings" (quick settings). While music plays, a "live activity"
 // (cover and bars) takes the time's place: hovering it shows a small player (and the time
 // again), clicking it or the player opens the "media" menu. Hovering the workspace dots shows
-// the minimized windows. One menu is open at a time, on one monitor; click outside it or press
-// Escape to close it.
+// the minimized windows. New notifications pop up from it on the focused monitor, one at a
+// time. One menu is open at a time, on one monitor; click outside it or press Escape to close it.
 Scope {
     id: root
 
-    property string panel: ""      // "", "today", "settings", "media" or "window"
+    property string panel: ""      // "", "today", "settings", "media", "window" or "power"
     property string screenName: "" // the monitor the menu is open on
     // The window menu acts on the window that was focused when it opened.
     property HyprlandToplevel windowTarget: null
@@ -34,7 +35,7 @@ Scope {
         }
     }
 
-    // From Hyprland binds: qs ipc call island toggle settings (or: today, media, window)
+    // From Hyprland binds: qs ipc call island toggle settings (or: today, media, window, power)
     IpcHandler {
         target: "island"
 
@@ -66,8 +67,13 @@ Scope {
             // "minimized" (over the workspace dots). Unlike a menu it takes no keyboard and
             // closes when the pointer leaves the island.
             property string peek: ""
-            // What's shown below the top row: a menu, a hover view ("peek-media", ...) or nothing.
-            readonly property string shown: open ? panel : peek ? "peek-" + peek : ""
+            // The notification pop-up, on the focused monitor while no menu is open.
+            readonly property bool focusedScreen: Hyprland.focusedMonitor?.name === modelData.name
+            readonly property Notification popup: !open && focusedScreen ? Notifications.current : null
+
+            // What's shown below the top row: a menu, a pop-up, a hover view ("peek-media", ...)
+            // or nothing.
+            readonly property string shown: open ? panel : popup ? "notification" : peek ? "peek-" + peek : ""
             readonly property bool expanded: shown !== ""
 
             // While music plays the middle of the island shows the music instead of the time.
@@ -76,6 +82,22 @@ Scope {
             readonly property bool showMedia: Media.playing && !expanded
 
             onOpenChanged: peek = ""
+
+            // Each pop-up stays Theme.notifications.timeout ms, paused while hovered; critical
+            // ones stay until dismissed. popupReady dips for a moment when the pop-up changes,
+            // which restarts the timer for the next one.
+            property bool popupReady: true
+            onPopupChanged: {
+                popupReady = false;
+                Qt.callLater(() => popupReady = true);
+            }
+
+            Timer {
+                interval: Theme.notifications.timeout
+                running: window.popupReady && window.popup !== null && !content.containsMouse
+                         && window.popup.urgency !== NotificationUrgency.Critical
+                onTriggered: Notifications.next()
+            }
 
             // Hover the live activity or the workspace dots briefly to open their view; leave
             // the island to close it.
@@ -264,9 +286,25 @@ Scope {
                                       : window.shown === "settings" ? settings.implicitHeight
                                       : window.shown === "media" ? media.implicitHeight
                                       : window.shown === "window" ? windowMenu.implicitHeight
+                                      : window.shown === "power" ? powerMenu.implicitHeight
+                                      : window.shown === "notification" ? popupCard.implicitHeight + Theme.spacing.s * 2
                                       : window.shown === "peek-media" ? peekCard.implicitHeight + Theme.spacing.s
                                       : window.shown === "peek-minimized" ? peekMinimized.implicitHeight + Theme.spacing.m * 2
                                       : 0
+
+                        NotificationCard {
+                            id: popupCard
+                            x: Theme.spacing.s
+                            y: Theme.spacing.xs
+                            width: parent.width - Theme.spacing.s * 2
+                            notification: window.popup
+                            opacity: window.shown === "notification" ? 1 : 0
+                            visible: opacity > 0 && notification !== null
+
+                            Behavior on opacity {
+                                NumberAnimation { duration: Theme.anim.normal }
+                            }
+                        }
 
                         // The hover player. Clicking it (outside its buttons) opens the media menu.
                         MediaCard {
@@ -277,6 +315,18 @@ Scope {
                             onActivated: root.toggle("media", window.modelData.name)
                             opacity: window.shown === "peek-media" ? 1 : 0
                             visible: opacity > 0 && player !== null
+
+                            Behavior on opacity {
+                                NumberAnimation { duration: Theme.anim.normal }
+                            }
+                        }
+
+                        PowerPanel {
+                            id: powerMenu
+                            width: parent.width
+                            opacity: window.shown === "power" ? 1 : 0
+                            visible: opacity > 0
+                            onDone: root.panel = ""
 
                             Behavior on opacity {
                                 NumberAnimation { duration: Theme.anim.normal }
@@ -336,6 +386,7 @@ Scope {
                         QuickSettings {
                             id: settings
                             width: parent.width
+                            onPowerMenu: root.panel = "power"
                             opacity: window.panel === "settings" ? 1 : 0
                             visible: opacity > 0
 

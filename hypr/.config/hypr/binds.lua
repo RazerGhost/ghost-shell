@@ -27,8 +27,8 @@ hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("qs ipc call island toggle today"))  
 
 -- Session
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
--- Log out. Phase 3's session menu replaces this.
-hl.bind("CTRL + ALT + Delete", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
+-- Power menu in the island: lock, suspend, log out, restart, shut down.
+hl.bind("CTRL + ALT + Delete", hl.dsp.exec_cmd("qs ipc call island toggle power"))
 
 -- Windows
 hl.bind(mainMod .. " + W", hl.dsp.window.close())

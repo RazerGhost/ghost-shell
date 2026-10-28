@@ -1,14 +1,17 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import Quickshell
+import qs.services
 import qs.theme
 import qs.widgets
 
-// The "today" menu, opened by clicking the time: the date and a month calendar. (Phase 3 adds
-// notifications here.)
+// The "today" menu, opened by clicking the time: the date, the notification history, and a
+// month calendar that stays folded away until you click the date.
 Column {
     id: root
 
+    // Whether the month calendar is shown. Folded every time the menu opens.
+    property bool calendarOpen: false
     // The month the calendar shows. Back to the current month every time the menu opens.
     property int month: clock.date.getMonth()
     property int year: clock.date.getFullYear()
@@ -25,6 +28,7 @@ Column {
 
     onVisibleChanged: {
         if (visible) {
+            calendarOpen = false;
             month = clock.date.getMonth();
             year = clock.date.getFullYear();
         }
@@ -35,16 +39,43 @@ Column {
         precision: SystemClock.Minutes
     }
 
-    Text {
-        text: Qt.formatDate(clock.date, "dddd, d MMMM")
-        color: Colors.m3onSurface
-        font.family: Theme.font.sans
-        font.pixelSize: Theme.font.title
-        font.weight: Font.DemiBold
+    // The date; click it to show or hide the month calendar.
+    MouseArea {
+        width: parent.width - root.leftPadding - root.rightPadding
+        implicitHeight: date.implicitHeight
+        cursorShape: Qt.PointingHandCursor
+        onClicked: root.calendarOpen = !root.calendarOpen
+
+        Accessible.role: Accessible.Button
+        Accessible.name: date.text + (root.calendarOpen ? ", hide calendar" : ", show calendar")
+        Accessible.onPressAction: root.calendarOpen = !root.calendarOpen
+
+        Text {
+            id: date
+            anchors.verticalCenter: parent.verticalCenter
+            text: Qt.formatDate(clock.date, "dddd, d MMMM")
+            color: Colors.m3onSurface
+            font.family: Theme.font.sans
+            font.pixelSize: Theme.font.title
+            font.weight: Font.DemiBold
+        }
+
+        MaterialIcon {
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            icon: "expand_more"
+            color: Colors.m3onSurfaceVariant
+            rotation: root.calendarOpen ? 180 : 0
+
+            Behavior on rotation {
+                NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }
+            }
+        }
     }
 
     // Month title with previous / next buttons.
     Item {
+        visible: root.calendarOpen
         width: parent.width - root.leftPadding - root.rightPadding
         implicitHeight: Theme.slider.height
 
@@ -80,6 +111,7 @@ Column {
     // Day names and the first day of the week follow the UI language (en_GB: Monday), so
     // they match the English date above even with Dutch regional formats (LC_TIME=nl_NL).
     DayOfWeekRow {
+        visible: root.calendarOpen
         width: parent.width - root.leftPadding - root.rightPadding
         locale: grid.locale
 
@@ -96,6 +128,7 @@ Column {
     MonthGrid {
         id: grid
 
+        visible: root.calendarOpen
         width: parent.width - root.leftPadding - root.rightPadding
         month: root.month
         year: root.year
@@ -130,6 +163,71 @@ Column {
                 font.family: Theme.font.sans
                 font.pixelSize: Theme.font.normal
                 font.weight: cell.today ? Font.DemiBold : Font.Normal
+            }
+        }
+    }
+
+    // Notifications, newest first.
+    Column {
+        width: parent.width - root.leftPadding - root.rightPadding
+        spacing: Theme.spacing.s
+
+        Item {
+            width: parent.width
+            height: clearAll.height
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: "Notifications"
+                color: Colors.m3onSurface
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.normal
+                font.weight: Font.DemiBold
+            }
+
+            TextButton {
+                id: clearAll
+                anchors.right: parent.right
+                visible: Notifications.history.length > 0
+                text: "Clear all"
+                onClicked: Notifications.clearAll()
+            }
+        }
+
+        Text {
+            visible: Notifications.history.length === 0
+            width: parent.width
+            horizontalAlignment: Text.AlignHCenter
+            bottomPadding: Theme.spacing.s
+            text: "No notifications"
+            color: Colors.m3onSurfaceVariant
+            font.family: Theme.font.sans
+            font.pixelSize: Theme.font.normal
+        }
+
+        Flickable {
+            visible: Notifications.history.length > 0
+            width: parent.width
+            height: Math.min(contentHeight, Theme.notifications.historyHeight)
+            contentHeight: list.implicitHeight
+            clip: true
+            boundsBehavior: Flickable.StopAtBounds
+
+            Column {
+                id: list
+                width: parent.width
+                spacing: Theme.spacing.s
+
+                Repeater {
+                    model: Notifications.history
+
+                    NotificationCard {
+                        required property var modelData
+                        width: list.width
+                        notification: modelData
+                        now: clock.date.getTime() // ticks every minute
+                    }
+                }
             }
         }
     }

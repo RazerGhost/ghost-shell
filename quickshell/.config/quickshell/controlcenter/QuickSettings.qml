@@ -10,6 +10,9 @@ Item {
     id: root
 
     property string page: "main" // "main", "wifi" or "bluetooth"
+
+    // The power button; the island opens the power menu.
+    signal powerMenu()
     readonly property int padding: Theme.spacing.l
 
     // The island grows and shrinks to fit the current page.
@@ -93,6 +96,24 @@ Item {
                 active: !Audio.micMuted
                 onClicked: Audio.toggleMicMute()
             }
+
+            Tile {
+                width: parent.tileWidth
+                icon: Notifications.doNotDisturb ? "do_not_disturb_on" : "do_not_disturb_off"
+                title: "Do Not Disturb"
+                subtitle: Notifications.doNotDisturb ? "On" : "Off"
+                active: Notifications.doNotDisturb
+                onClicked: Notifications.doNotDisturb = !Notifications.doNotDisturb
+            }
+
+            Tile {
+                width: parent.tileWidth
+                icon: NightLight.on ? "nightlight" : "light_mode"
+                title: "Night light"
+                subtitle: NightLight.on ? "On" : "Off"
+                active: NightLight.on
+                onClicked: NightLight.toggle()
+            }
         }
 
         LevelSlider {
@@ -112,7 +133,7 @@ Item {
             onMoved: value => Brightness.set(value)
         }
 
-        // Battery on the left, tray icons on the right.
+        // Battery on the left, tray icons and the power button on the right.
         Item {
             width: parent.width
             implicitHeight: Theme.slider.height
@@ -139,10 +160,22 @@ Item {
                 }
             }
 
-            Tray {
+            Row {
                 anchors.right: parent.right
-                anchors.rightMargin: Theme.spacing.s
+                anchors.rightMargin: Theme.spacing.xs
                 anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacing.s
+
+                Tray {
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                IconButton {
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon: "power_settings_new"
+                    label: "Power menu"
+                    onClicked: root.powerMenu()
+                }
             }
         }
     }
