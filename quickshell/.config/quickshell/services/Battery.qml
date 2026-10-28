@@ -5,6 +5,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.UPower
 import qs.theme
+import "BatteryTime.js" as BatteryTime
 
 Singleton {
     // displayDevice combines all batteries into one, the way desktop environments show it.
@@ -29,8 +30,6 @@ Singleton {
                                       : ""
 
     function duration(seconds: real): string {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.round((seconds % 3600) / 60);
-        return hours > 0 ? hours + "h " + minutes + "m" : minutes + "m";
+        return BatteryTime.duration(seconds);
     }
 }
