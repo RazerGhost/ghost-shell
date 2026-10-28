@@ -91,6 +91,10 @@ Singleton {
         readonly property int height: 44
     }
 
+    readonly property QtObject wifi: QtObject {
+        readonly property int qr: 200 // the "join this network" QR code (WifiPage.qml)
+    }
+
     readonly property QtObject list: QtObject {
         readonly property int rowHeight: 52
         readonly property int rows:      6  // visible rows in the Wi-Fi / Bluetooth lists

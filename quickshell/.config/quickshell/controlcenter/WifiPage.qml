@@ -1,9 +1,11 @@
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Networking
 import qs.services
 import qs.theme
 import qs.widgets
+import "WifiQr.js" as WifiQr
 
 // Wi-Fi page of quick settings: on/off switch and the networks in range. Click a network to
 // connect (or disconnect from the connected one). Secured networks you haven't joined before
@@ -79,6 +81,50 @@ Column {
         }
     }
 
+    // Sharing the connected network as a QR code a phone can scan to join (WifiQr.js, tested):
+    // its password comes from NetworkManager, the picture from qrencode (the capture module).
+    // The text reaches qrencode through its environment, not its command line, which other users
+    // could see. The picture sits in the private runtime folder and goes when the QR closes.
+    property string sharing: ""   // the network shown as a QR code
+    property string qrFile: ""
+    readonly property string qrPath: Quickshell.env("XDG_RUNTIME_DIR") + "/qs-wifi-qr.png"
+
+    function share(network: WifiNetwork): void {
+        sharing = network.name;
+        qrFile = "";
+        readPassword.running = true;
+    }
+
+    function closeShare(): void {
+        sharing = "";
+        qrFile = "";
+        Quickshell.execDetached(["rm", "-f", qrPath]);
+    }
+
+    // The password of the connection active on the Wi-Fi card ("" for an open network).
+    Process {
+        id: readPassword
+        command: ["sh", "-c", `nmcli -s -g 802-11-wireless-security.psk connection show "$(nmcli -g GENERAL.CONNECTION device show "$1")"`,
+                  "sh", NetworkStatus.wifiDevice?.name ?? ""]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                drawQr.environment = { WIFI_QR: WifiQr.text(root.sharing, text.trim()) };
+                drawQr.running = true;
+            }
+        }
+    }
+
+    Process {
+        id: drawQr
+        command: ["sh", "-c", `printf %s "$WIFI_QR" | qrencode -s 8 -m 2 -o "$1"`, "sh", root.qrPath]
+        onExited: code => {
+            if (code === 0)
+                root.qrFile = "file://" + root.qrPath + "?" + Date.now();
+            else
+                root.error = "Couldn't make the QR code (is qrencode installed?)";
+        }
+    }
+
     PageHeader {
         width: parent.width
         title: "Wi-Fi"
@@ -95,6 +141,41 @@ Column {
         color: Colors.m3error
         font.family: Theme.font.sans
         font.pixelSize: Theme.font.normal
+    }
+
+    // The QR code to join the connected network, above the list.
+    Column {
+        visible: root.sharing !== ""
+        width: parent.width
+        spacing: Theme.spacing.s
+
+        Text {
+            width: parent.width
+            horizontalAlignment: Text.AlignHCenter
+            text: "Scan to join " + root.sharing
+            color: Colors.m3onSurface
+            font.family: Theme.font.sans
+            font.pixelSize: Theme.font.normal
+            font.weight: Font.DemiBold
+        }
+
+        Image {
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: Theme.wifi.qr
+            height: width
+            source: root.qrFile
+            cache: false
+            smooth: false // sharp squares
+            fillMode: Image.PreserveAspectFit
+            Accessible.role: Accessible.Graphic
+            Accessible.name: "QR code to join " + root.sharing
+        }
+
+        TextButton {
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: "Done"
+            onClicked: root.closeShare()
+        }
     }
 
     // Password prompt, shown instead of the list. It's kept out of the list rows on purpose:
@@ -192,6 +273,8 @@ Column {
         }
 
         delegate: ListRow {
+            id: networkRow
+
             required property WifiNetwork modelData
 
             // `?.`: a network that just disappeared leaves its row for a moment with no network.
@@ -207,6 +290,30 @@ Column {
             trailingIcon: !modelData || root.open(modelData) || modelData.known ? "" : "lock"
             highlighted: modelData?.connected ?? false
             onActivated: root.choose(modelData)
+
+            // Share the connected network as a QR code; forget a saved one.
+            Row {
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacing.s
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacing.xs
+
+                IconButton {
+                    visible: networkRow.modelData?.connected ?? false
+                    icon: "qr_code"
+                    label: "Share " + (networkRow.modelData?.name ?? "") + " as a QR code"
+                    iconSize: Theme.icon.small
+                    onClicked: root.share(networkRow.modelData)
+                }
+
+                IconButton {
+                    visible: networkRow.modelData?.known ?? false
+                    icon: "delete"
+                    label: "Forget " + (networkRow.modelData?.name ?? "")
+                    iconSize: Theme.icon.small
+                    onClicked: networkRow.modelData.forget()
+                }
+            }
         }
     }
 

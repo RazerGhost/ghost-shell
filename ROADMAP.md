@@ -83,7 +83,8 @@ new setup step.
   `controlcenter/TodayPanel.qml` (calendar, `MediaCard`) or `QuickSettings.qml` (tiles for Wi-Fi,
   Bluetooth, power mode, microphone; volume and brightness `LevelSlider`s; battery; `Tray`, since 2026-10-28 its own row "Running in
   the background" with a chip per app, icon and name, user's choice over icons next to the battery), with
-  `WifiPage` (scan, connect, password prompt) and `BluetoothPage` (scan, pair, connect). Super+N /
+  `WifiPage` (scan, connect, password prompt; the connected network can be shared as a QR code a
+  phone scans to join, `WifiQr.js` tested, and saved ones forgotten) and `BluetoothPage` (scan, pair, connect). Super+N /
   Super+C or `qs ipc call island toggle settings|today`.
 - Services: `Audio`, `Brightness`, `NetworkStatus`, `BluetoothStatus`, `Battery`. Widgets:
   `MaterialIcon`, `IconButton`, `Switch`, `LevelSlider`, `TextButton`.
