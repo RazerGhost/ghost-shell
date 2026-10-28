@@ -22,9 +22,7 @@ Scope {
 
     // The other windows on the snapped one's workspace, most recently used first.
     readonly property list<HyprlandToplevel> candidates: open
-        ? (Hyprland.toplevels?.values ?? [])
-            .filter(t => t !== snappedWindow && t.wayland !== null && t.workspace === snappedWindow?.workspace)
-            .sort((a, b) => (a.lastIpcObject?.focusHistoryID ?? 999) - (b.lastIpcObject?.focusHistoryID ?? 999))
+        ? Windows.recent.filter(t => t !== snappedWindow && t.workspace === snappedWindow?.workspace)
         : []
 
     function pick(window: HyprlandToplevel): void {

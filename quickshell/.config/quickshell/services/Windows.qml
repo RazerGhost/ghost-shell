@@ -15,6 +15,13 @@ Singleton {
     readonly property list<HyprlandToplevel> minimized: (Hyprland.toplevels?.values ?? [])
         .filter(t => t.workspace?.name === minimizedWorkspace)
 
+    // Every window, most recently used first, by Hyprland's focus history (0 = the focused
+    // window). The history is part of each window's details: call Hyprland.refreshToplevels()
+    // first when the order has to be fresh.
+    readonly property list<HyprlandToplevel> recent: (Hyprland.toplevels?.values ?? [])
+        .filter(t => t.wayland !== null)
+        .sort((a, b) => (a.lastIpcObject?.focusHistoryID ?? 999) - (b.lastIpcObject?.focusHistoryID ?? 999))
+
     // The focused window. Hyprland.activeToplevel only updates on focus changes, so it's null
     // until the first one after the shell starts; Wayland's window list knows it from the start.
     // A minimized window doesn't count: Hyprland can still call it active after moving it away.
@@ -73,9 +80,7 @@ Singleton {
     function minimize(window: HyprlandToplevel): void {
         const workspace = window.workspace;
         run(window, "move", `workspace = "${minimizedWorkspace}", follow = false`);
-        const next = (Hyprland.toplevels?.values ?? [])
-            .filter(t => t !== window && t.workspace === workspace && t.wayland !== null)
-            .sort((a, b) => (a.lastIpcObject?.focusHistoryID ?? 999) - (b.lastIpcObject?.focusHistoryID ?? 999))[0];
+        const next = recent.find(t => t !== window && t.workspace === workspace);
         if (next)
             focus(next);
     }

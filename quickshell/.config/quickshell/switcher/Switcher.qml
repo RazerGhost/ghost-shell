@@ -19,11 +19,8 @@ Scope {
     property bool open: false
     property int index: 0
 
-    // Most recently used first, by Hyprland's focus history (0 = the focused window). It's part
-    // of each window's details, which refreshToplevels() fetches when the switcher opens.
-    readonly property list<HyprlandToplevel> windows: Hyprland.toplevels.values
-        .filter(t => t.wayland !== null)
-        .sort((a, b) => (a.lastIpcObject?.focusHistoryID ?? 999) - (b.lastIpcObject?.focusHistoryID ?? 999))
+    // Most recently used first; the order is refreshed when the switcher opens.
+    readonly property list<HyprlandToplevel> windows: Windows.recent
 
     function step(delta: int): void {
         if (!open) {

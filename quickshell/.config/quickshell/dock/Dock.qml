@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
+import qs.services
 import "DockApps.js" as DockApps
 
 // The dock: an island along the bottom edge with your pinned apps and the other running ones
@@ -14,14 +15,9 @@ Scope {
     // the shell directory (a change there would reload the shell).
     readonly property list<string> pinned: state.pinned
 
-    // Every window with a Wayland handle, most recently used first.
-    readonly property list<HyprlandToplevel> windows: (Hyprland.toplevels?.values ?? [])
-        .filter(t => t.wayland !== null)
-        .sort((a, b) => (a.lastIpcObject?.focusHistoryID ?? 999) - (b.lastIpcObject?.focusHistoryID ?? 999))
-
-    // { id, pinned, windows } per app; see DockApps.items.
+    // { id, pinned, windows } per app, windows most recently used first; see DockApps.items.
     readonly property var items: DockApps.items(
-        windows.map(t => ({ appId: t.wayland.appId, window: t })),
+        Windows.recent.map(t => ({ appId: t.wayland.appId, window: t })),
         pinned,
         appId => DesktopEntries.heuristicLookup(appId)?.id ?? "")
 
