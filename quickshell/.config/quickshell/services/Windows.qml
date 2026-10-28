@@ -85,6 +85,20 @@ Singleton {
             focus(next);
     }
 
+    // The most recently used window of an app, from what notifications and media players say
+    // about themselves: a .desktop name ("spotify", "vesktop") or a display name ("Vesktop").
+    // Matches the window's app id, its .desktop entry's id, or that entry's name. null if none.
+    function forApp(name: string): HyprlandToplevel {
+        const n = name.toLowerCase();
+        if (n === "")
+            return null;
+        return recent.find(t => {
+            const appId = t.wayland.appId.toLowerCase();
+            const entry = DesktopEntries.heuristicLookup(t.wayland.appId);
+            return appId === n || entry?.id.toLowerCase() === n || entry?.name.toLowerCase() === n;
+        }) ?? null;
+    }
+
     // Switch to a window: brought back first if it's minimized. What clicking a window anywhere
     // does (Alt+Tab, the dock, the overview, the attention card, the media cover).
     function show(window: HyprlandToplevel): void {

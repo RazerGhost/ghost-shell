@@ -15,10 +15,7 @@ Singleton {
 
     // The player's window, matched by its .desktop name (Spotify's is "spotify"); null when it
     // has none (a browser tab plays in the browser's window, which this can't tell apart).
-    readonly property HyprlandToplevel window: {
-        const app = (player?.desktopEntry ?? "").toLowerCase();
-        return app ? Windows.recent.find(t => t.wayland.appId.toLowerCase() === app) ?? null : null;
-    }
+    readonly property HyprlandToplevel window: Windows.forApp(player?.desktopEntry ?? "")
 
     // Bring the player to the front. Through Hyprland, not MPRIS's raise(): apps may not take
     // the focus themselves here (they get an attention card instead).

@@ -52,10 +52,15 @@ Singleton {
             n.dismiss();
     }
 
-    // Runs the notification's default action (what clicking it means to the app), if any.
+    // Clicking a notification: runs its default action (what clicking it means to the app, e.g.
+    // open that chat) and switches to the app's window. The app can't take the focus itself
+    // here (it would get an attention card instead), so the shell does it.
     function activate(n: Notification): void {
+        const window = Windows.forApp(n.desktopEntry) ?? Windows.forApp(n.appName);
         n.actions.find(a => a.identifier === "default")?.invoke();
         n.dismiss();
+        if (window)
+            Windows.show(window);
     }
 
     NotificationServer {
