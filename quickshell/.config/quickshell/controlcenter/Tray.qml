@@ -18,6 +18,15 @@ Flow {
             id: item
 
             required property SystemTrayItem modelData
+            // The tray's icon, unless it names one no icon theme has (KDE Connect asks for Plasma's
+            // "kdeconnectindicatordark"): then the app's own icon, or a generic one.
+            readonly property string themeIcon: modelData.icon.startsWith("image://icon/") && !modelData.icon.includes("?path=")
+                ? modelData.icon.slice("image://icon/".length) : ""
+            readonly property string icon: themeIcon !== "" && Quickshell.iconPath(themeIcon, true) === ""
+                ? Quickshell.iconPath((DesktopEntries.heuristicLookup(name)
+                    ?? DesktopEntries.applications.values.find(e => e.name === name))?.icon ?? "", "application-x-executable")
+                : modelData.icon
+
             // The app's own name from its .desktop file, found by the tray title ("spotify" ->
             // "Spotify"). Not by the id: the fuzzy lookup matched Vesktop's
             // "vesktop_status_icon_1" to Pinentry. Without a title, the tooltip ("Vesktop").
@@ -66,7 +75,7 @@ Flow {
                 IconImage {
                     anchors.verticalCenter: parent.verticalCenter
                     implicitSize: Theme.icon.tray
-                    source: item.modelData.icon
+                    source: item.icon
                 }
 
                 Text {

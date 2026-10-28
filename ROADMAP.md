@@ -373,6 +373,14 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   ..." in quick settings (`Audio.recordingApps`: the app streams linked to the default source,
   `PwNodeLinkTracker`; verified with `pw-record`).
 
+### Drives and phone (built 2026-10-28; waiting on the user's test results)
+- `udiskie` (core module) mounts USB sticks and SD cards with a notification; its tray menu in
+  quick settings' background row unmounts and ejects. `kdeconnect-indicator` (phone module) the
+  same for the phone (battery, sending files, clipboard). Both start in `autostart.lua`.
+- Tray icons that name an icon no theme has (KDE Connect's Plasma-only
+  `kdeconnectindicatordark`) fall back to the app's icon from its desktop file, by fuzzy lookup
+  or exact name, else a generic one.
+
 ## Decisions made
 
 - **External monitors:** keep the RTX in `AQ_DRM_DEVICES` (second, after the iGPU), so outputs wired
