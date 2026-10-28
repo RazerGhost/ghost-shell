@@ -168,58 +168,13 @@ Scope {
                                     Windows.show(slot.toplevel);
                                 }
 
-                                Rectangle {
-                                    id: frame
-                                    width: parent.width
-                                    height: slot.modelData.height
-                                    radius: Theme.radius.m
-                                    color: Colors.m3surfaceContainerHigh
-                                    border.width: hover.hovered ? 3 : 0
-                                    border.color: Colors.m3primary
-
-                                    ScreencopyView {
-                                        anchors.fill: parent
-                                        anchors.margins: 3
-                                        captureSource: root.open ? slot.toplevel?.wayland ?? null : null
-                                        live: true
-                                    }
-                                }
-
-                                Row {
-                                    anchors.top: frame.bottom
-                                    anchors.topMargin: Theme.spacing.s
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    width: Math.min(implicitWidth, parent.width)
-                                    spacing: Theme.spacing.s
-
-                                    IconImage {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        implicitSize: Theme.icon.normal
-                                        source: Quickshell.iconPath(Windows.iconFor(slot.toplevel), "application-x-executable")
-                                    }
-
-                                    Text {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        width: Math.min(implicitWidth, card.width - Theme.icon.normal - parent.spacing)
-                                        text: slot.toplevel?.title ?? ""
-                                        color: Colors.m3onSurface
-                                        font.family: Theme.font.sans
-                                        font.pixelSize: Theme.font.normal
-                                        elide: Text.ElideRight
-                                    }
-                                }
-
-                                // Over the whole card, the × button included.
-                                HoverHandler {
-                                    id: hover
-                                }
-
-                                // Click: switch to it. Drag: onto a workspace in the strip.
+                                // Click: switch to it. Drag: onto a workspace in the strip. Under the
+                                // preview, so its × gets its own clicks; the rest reaches this.
                                 MouseArea {
                                     id: dragArea
 
-                                    anchors.fill: frame
-                                    hoverEnabled: true
+                                    width: parent.width
+                                    height: slot.modelData.height
                                     cursorShape: Qt.PointingHandCursor
                                     drag.target: card
                                     onClicked: {
@@ -234,22 +189,14 @@ Scope {
                                     }
                                 }
 
-                                IconButton {
-                                    anchors.top: frame.top
-                                    anchors.right: frame.right
-                                    anchors.margins: Theme.spacing.s
-                                    visible: hover.hovered
-                                    icon: "close"
-                                    label: "Close " + (slot.toplevel?.title ?? "window")
-                                    color: Colors.m3onSurface
-                                    onClicked: Windows.close(slot.toplevel)
-
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        z: -1
-                                        radius: Theme.radius.full
-                                        color: Colors.surfaceTranslucent
-                                    }
+                                WindowPreview {
+                                    id: preview
+                                    anchors.fill: parent
+                                    toplevel: slot.toplevel
+                                    previewHeight: slot.modelData.height
+                                    highlighted: hovered
+                                    capturing: root.open
+                                    closable: true
                                 }
                             }
                         }
