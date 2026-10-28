@@ -24,6 +24,7 @@ Singleton {
     readonly property QtObject font: QtObject {
         readonly property string sans: "Inter"
         readonly property string icon: "Material Symbols Rounded"
+        readonly property int iconWeight: 300 // Material Symbols line weight (400 is the font's default)
 
         readonly property int small:  11
         readonly property int normal: 13

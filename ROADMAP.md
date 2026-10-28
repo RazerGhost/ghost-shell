@@ -34,7 +34,7 @@ new setup step.
   animations).
 - **Colors:** matugen from the wallpaper is the single source of truth for Quickshell, Hyprland borders,
   Ghostty, GTK and Yazi. Dark mode by default.
-- **Icons:** Material Symbols (`Material Symbols Rounded`). **UI font:** Inter. **Mono:** MesloLGS Nerd Font.
+- **Icons:** Material Symbols (`Material Symbols Rounded`), outline at weight 300 (user's choice after comparing styles, 2026-10-28: filled made the few symbols with a solid variant look heavy; light sits closer to the Colloid app icons). **UI font:** Inter. **Mono:** MesloLGS Nerd Font.
 - **QML:** `shell.qml` entry, one folder per area (`bar/`, `launcher/`, `notifications/`, `osd/`,
   `controlcenter/`, `services/`, `theme/`, `widgets/` for shared components). Singletons for shared
   state, services and theme. No hardcoded colors or sizes in components: use `Colors` and `Theme`. Comment the non-obvious parts
