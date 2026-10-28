@@ -9,13 +9,19 @@ import "NotificationTime.js" as NotificationTime
 
 // One notification: app icon (or the notification's own image), app and time, title, text,
 // and the app's action buttons. Click it to run its default action; × dismisses it. Used for
-// the island's pop-up and in the history in the "today" menu.
+// the island's pop-up and in the history in the "today" menu. Chat apps can ask for a reply
+// field: in the history you type in it; a pop-up can't take the keyboard (the closed island
+// doesn't), so it shows a Reply button that opens the history instead.
 MouseArea {
     id: root
 
     required property Notification notification
     // For the "5 min" label; the history ticks it every minute.
     property real now: Date.now()
+    // Whether a reply can be typed here (the history), or Reply asks for that (a pop-up).
+    property bool canType: false
+
+    signal replyRequested()
 
     // A path or URL to an image, or an icon theme name.
     function imageSource(source: string): string {
@@ -134,13 +140,62 @@ MouseArea {
                 elide: Text.ElideRight
             }
 
+            // Quick reply, when the app offers it.
+            Rectangle {
+                visible: root.canType && (root.notification?.hasInlineReply ?? false)
+                width: parent.width
+                height: Theme.slider.height - Theme.spacing.s
+                radius: Theme.radius.full
+                color: Colors.m3surfaceContainerHighest
+
+                TextInput {
+                    id: reply
+
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.margins: Theme.spacing.m
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: Colors.m3onSurface
+                    font.family: Theme.font.sans
+                    font.pixelSize: Theme.font.normal
+                    clip: true
+
+                    Accessible.role: Accessible.EditableText
+                    Accessible.name: placeholder.text
+
+                    onAccepted: {
+                        if (text === "")
+                            return;
+                        root.notification.sendInlineReply(text);
+                        root.notification.dismiss();
+                    }
+
+                    Text {
+                        id: placeholder
+                        visible: reply.text === ""
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: root.notification?.inlineReplyPlaceholder || "Reply"
+                        color: Colors.m3onSurfaceVariant
+                        font: reply.font
+                    }
+                }
+            }
+
             // The app's buttons, except the default action (that's clicking the card).
             Row {
                 readonly property var buttons: (root.notification?.actions ?? []).filter(a => a.identifier !== "default")
+                readonly property bool replyButton: !root.canType && (root.notification?.hasInlineReply ?? false)
 
-                visible: buttons.length > 0
+                visible: buttons.length > 0 || replyButton
                 topPadding: Theme.spacing.xs
                 spacing: Theme.spacing.xs
+
+                TextButton {
+                    visible: parent.replyButton
+                    text: "Reply"
+                    filled: true
+                    onClicked: root.replyRequested()
+                }
 
                 Repeater {
                     model: parent.buttons

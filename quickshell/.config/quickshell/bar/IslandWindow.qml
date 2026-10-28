@@ -362,6 +362,7 @@ PanelWindow {
                         width: parent.width - Theme.spacing.s * 2
                         notification: root.popup
                         visible: notification !== null
+                        onReplyRequested: root.island.toggle("today", root.modelData.name)
                     }
                 }
 

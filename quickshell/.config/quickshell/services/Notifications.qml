@@ -64,6 +64,7 @@ Singleton {
         // Keep notifications when the shell reloads (e.g. after editing a QML file).
         keepOnReload: true
         actionsSupported: true
+        inlineReplySupported: true // chat apps can offer a reply field (NotificationCard)
         imageSupported: true
         persistenceSupported: true
 

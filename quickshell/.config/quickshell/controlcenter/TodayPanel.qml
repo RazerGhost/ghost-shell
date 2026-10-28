@@ -226,6 +226,7 @@ Column {
                         width: list.width
                         notification: modelData
                         now: clock.date.getTime() // ticks every minute
+                        canType: true
                     }
                 }
             }
