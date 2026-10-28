@@ -37,7 +37,14 @@ Singleton {
 
     function restore(window: HyprlandToplevel): void {
         run(window, "move", `workspace = ${Hyprland.focusedWorkspace?.id ?? 1}, follow = false`);
+        focus(window);
+    }
+
+    // Focus a window and bring it to the front. Focus alone doesn't raise a floating window
+    // above the others.
+    function focus(window: HyprlandToplevel): void {
         Hyprland.dispatch(`hl.dsp.focus({ window = "${selector(window)}" })`);
+        run(window, "alter_zorder", `mode = "top"`);
     }
 
     function close(window: HyprlandToplevel): void {

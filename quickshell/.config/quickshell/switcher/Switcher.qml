@@ -43,7 +43,7 @@ Scope {
         if (window.workspace?.name === Windows.minimizedWorkspace)
             Windows.restore(window);
         else
-            Hyprland.dispatch(`hl.dsp.focus({ window = "${Windows.selector(window)}" })`);
+            Windows.focus(window);
     }
 
     IpcHandler {
