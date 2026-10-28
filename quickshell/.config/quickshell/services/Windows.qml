@@ -18,7 +18,7 @@ Singleton {
     // The focused window. Hyprland.activeToplevel only updates on focus changes, so it's null
     // until the first one after the shell starts; Wayland's window list knows it from the start.
     readonly property HyprlandToplevel active: Hyprland.activeToplevel
-        ?? Hyprland.toplevels.values.find(t => t.wayland !== null && t.wayland === ToplevelManager.activeToplevel)
+        ?? (Hyprland.toplevels?.values ?? []).find(t => t.wayland !== null && t.wayland === ToplevelManager.activeToplevel)
         ?? null
 
     // Hyprland's window selector. Quickshell gives the address without the "0x".
@@ -57,10 +57,6 @@ Singleton {
 
     function toggleFullscreen(window: HyprlandToplevel): void {
         run(window, "fullscreen", `mode = "fullscreen", action = "toggle"`);
-    }
-
-    function toggleFloating(window: HyprlandToplevel): void {
-        run(window, "float", `action = "toggle"`);
     }
 
     function moveToWorkspace(window: HyprlandToplevel, id: int): void {

@@ -10,7 +10,9 @@ hl.config({
         kb_options = "",
         kb_rules   = "",
 
-        follow_mouse = 1,
+        -- Click to focus, like Windows and macOS: the window under the pointer still gets
+        -- scrolling and hover, but only a click moves the keyboard focus.
+        follow_mouse = 2,
         sensitivity  = 0,
 
         touchpad = {

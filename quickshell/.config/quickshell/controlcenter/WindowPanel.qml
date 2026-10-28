@@ -7,7 +7,7 @@ import qs.theme
 import qs.widgets
 
 // The window menu (Alt+Space, or right-click the island): what title bar buttons would do for
-// the focused window (minimize, maximize, float, fullscreen, close), moving it to another
+// the focused window (minimize, maximize, snap, fullscreen, close), moving it to another
 // workspace, and the minimized windows to bring back.
 Column {
     id: root
@@ -111,7 +111,9 @@ Column {
 
         Action { icon: "minimize"; text: "Minimize"; onTriggered: root.act(Windows.minimize) }
         Action { icon: "open_in_full"; text: "Maximize"; onTriggered: root.act(Windows.toggleMaximized) }
-        Action { icon: "picture_in_picture"; text: "Float/tile"; onTriggered: root.act(Windows.toggleFloating) }
+        // The snap picker is its own surface (snap/SnapPicker.qml); it snaps the focused window,
+        // which is this one again once the menu has closed.
+        Action { icon: "space_dashboard"; text: "Snap"; onTriggered: root.act(() => Quickshell.execDetached(["qs", "ipc", "call", "snap", "picker"])) }
         Action { icon: "fullscreen"; text: "Fullscreen"; onTriggered: root.act(Windows.toggleFullscreen) }
         Action { icon: "close"; text: "Close"; onTriggered: root.act(Windows.close) }
     }

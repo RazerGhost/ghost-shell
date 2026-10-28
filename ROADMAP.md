@@ -81,7 +81,7 @@ new setup step.
 - Launcher (`launcher/`, tap Super or Super+Space): `Fuzzy.js` scoring, tested in `tests/tst_fuzzy.qml`. Terminal apps
   open in Ghostty.
 - OSD (`osd/Osd.qml`) for volume, mute, mic mute and brightness, on the focused monitor.
-- Windows open floating and centered by default (user's request); Super+T tiles one.
+- Windows open floating and centered (user's request). Since Phase 6 nothing tiles; see decisions.
 
 ### Phase 3: Notifications + rest of the control center + session menu (done, verified on the laptop
   2026-10-28, except the power menu's suspend and log out: the user tests those later)
@@ -197,8 +197,14 @@ fixed in config files should become settings.
 - **matugen's Quickshell JSON lives outside the shell directory**
   (`~/.local/state/quickshell/colors.json`). Quickshell reloads the whole shell when files in its config
   directory change; `Colors.qml` watches the file instead.
-- **Floating by default:** a `float = true, center = true` rule for every window in `rules.lua`; the
-  dwindle layout is kept for windows tiled with Super+T.
+- **Everything floats, Windows/macOS style** (user's choice, 2026-10-28): a `float = true, center
+  = true` rule for every window in `rules.lua`, and no tiling keys (Super+T, P, J are gone).
+  Hyprland always draws tiled windows below floating ones, so a focused tiled window could stay
+  hidden. Snapping replaces tiling; the window menu's "Float/tile" became "Snap".
+- **Click to focus and raise on focus** (Windows/macOS behaviour, user's choice after research):
+  `input.follow_mouse = 2` (hover still scrolls, a click focuses) and `hypr/windows.lua` raises
+  every newly focused window (`hl.on("window.active", ...)` + `alter_zorder({ mode = "top" })`);
+  Hyprland only raises on click by itself. `windows.lua` holds the window behaviours.
 - **Brightness OSD through IPC:** sysfs backlight files send no inotify events, so the brightness
   binds run `qs ipc call brightness refresh` after `brightnessctl`. Volume and mic need nothing:
   the OSD watches PipeWire.
@@ -210,7 +216,7 @@ fixed in config files should become settings.
   menu closed immediately. (The launcher maps a new surface with `Exclusive`, which works.)
 - **Keybinds: Windows-style** (user's choice, 2026-10-28): tap Super or Super+Space launcher,
   Super+Enter terminal, Super+E files, Super+B browser, Super+W / Alt+F4 close, Super+Up maximize,
-  Super+Down minimize, Super+T float/tile, Alt+Space window menu, Super+N quick settings, Super+C calendar, Super+Shift+S screenshot, Super+V clipboard, Super+L lock (Super+Shift+L hyprlock fallback),
+  Super+Down minimize, Alt+Space window menu, Alt+Tab switcher, Super+Left/Right snap, Super+Z snap picker, Super+N quick settings, Super+C calendar, Super+Shift+S screenshot, Super+V clipboard, Super+L lock (Super+Shift+L hyprlock fallback),
   Ctrl+Alt+Delete power menu, Super+Ctrl+arrows focus. Super+Left/Right are kept free for snapping
   (Phase 6). Full list in `hypr/binds.lua`.
 - **Window buttons:** Hyprland draws no title bars, so instead of hyprbars: keybinds plus a window
@@ -372,6 +378,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   workspace = "special:x", follow = false })`, also `close`, `float`, `fullscreen({ mode =
   "maximized" | "fullscreen", action = "toggle" })`, `move({ x, y, relative })`;
   `hl.dsp.focus({ window = ... })`. A special workspace that's never toggled stays hidden.
+- Lua events: `hl.on("window.active", function(window, reason) ... end)`, also `window.urgent`,
+  `window.close`, `window.open`, `window.update_state` (see the wiki's events.md). `input.follow_mouse`:
+  0 cursor never focuses, 1 hover focuses, 2 click focuses (pointer separate), 3 click doesn't
+  focus. `hl.dsp.window.alter_zorder({ window?, mode = "top" | "bottom" })`.
 - wtype: Hyprland doesn't run its binds for wtype's virtual keyboard, so binds can't be tested
   with it. `wtype -M alt` only sets the modifier, without Alt key events; `-P Alt_L` / `-p Alt_L`
   send real ones.

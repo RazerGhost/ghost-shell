@@ -2,7 +2,9 @@
 ---- WINDOWS AND WORKSPACES ----
 --------------------------------
 
--- New windows open floating and centered. Super+V tiles the focused window (and floats it again).
+-- Every window floats, like on Windows and macOS: Hyprland draws tiled windows below all
+-- floating ones, so a tiled window could never come to the front. Snapping (Super+Left/Right,
+-- Super+Z) places windows side by side instead. New windows open centered.
 hl.window_rule({
     name   = "float-by-default",
     match  = { class = ".*" },
