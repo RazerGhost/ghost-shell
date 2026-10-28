@@ -109,9 +109,10 @@ new setup step.
   arrow keys / Enter, Delete or × to remove, Clear all. Picking an entry copies it and pastes it
   into the previous window with `wtype` (user's choice). Parsing in `ClipboardEntries.js`, tested.
 - Wallpaper: Quickshell draws it on the background layer (`wallpaper/WallpaperLayer.qml`, fades
-  in). The picker (`controlcenter/WallpaperPanel.qml`, wallpaper button in quick settings or
-  `qs ipc call island toggle wallpaper`) stretches the island across the whole top edge (user's
-  choice: its own strip, not a menu; the bottom edge is the dock's) with one row of
+  in). The picker (`wallpaper/WallpaperPicker.qml` + `WallpaperPanel.qml`, wallpaper button in quick
+  settings or `qs ipc call wallpaper picker`) is its own strip across the top under the island
+  (user's choice: a strip, not a menu; it stretched the island itself until 2026-10-28; the
+  bottom edge is the dock's) with one row of
   pictures: `~/Pictures/Wallpapers` first (local folder only: the user prefers real photos or
   anime art and picks them themselves), then the built-in ones: Hyprland's `/usr/share/hypr/wall*.png` and
   the `cachyos-wallpapers` package (in packages.txt). Those stay in their packages, not in this
@@ -410,9 +411,8 @@ From a survey of every Quickshell 0.3.2 type and the quickshell-examples repo (u
   running the call fails and the bind falls back to Ghostty / Zen / Nautilus, so there's always a
   terminal.
 - **Island window height** is 840 px (was 680) so the "today" menu with notifications fits.
-- **Island menu widths:** menus are `Theme.island.panelWidth` (380) wide; the wallpaper picker
-  spans the screen, so the island's window is as wide as the screen. Regular menus keep their
-  width and stay centered while the island is wider.
+- **Island menu widths:** menus are `Theme.island.panelWidth` (380) wide, and the island's window
+  is just that wide (plus its curves and offset); the wallpaper picker is its own surface.
 - **The bottom edge belongs to the dock:** nothing else goes there.
 - **Icons: Colloid** (`Colloid-Dark`, `colloid-icon-theme-git` from the AUR; user's choice over
   WhiteSur and Tela Circle after previews in the dock, 2026-10-28): set for Quickshell with

@@ -43,9 +43,7 @@ PanelWindow {
                                   : attentionWindow ? "attention"
                                   : peek ? "peek-" + peek : ""
     readonly property bool expanded: shown !== ""
-    // The wallpaper picker stretches across the whole top edge; other menus are narrow.
-    readonly property real menuWidth: shown === "wallpaper" ? modelData.width - Theme.island.fillet * 2
-                                                            : Theme.island.panelWidth
+    readonly property real menuWidth: Theme.island.panelWidth
 
     // While music plays the middle of the island shows the music instead of the time.
     // Once the island opens (hover player or a menu) the time comes back, since the
@@ -107,8 +105,9 @@ PanelWindow {
     // layer surface every animation frame would stutter. Only the island itself takes
     // input (mask); the rest is transparent and clicks go to the windows below.
     anchors.top: true
-    // As wide as the screen: the wallpaper picker spans it.
-    implicitWidth: modelData.width
+    // As wide as the widest the island gets (a menu), plus its curves into the screen edge and
+    // its offset (Theme.island.offset), so the island stays centered under the webcam.
+    implicitWidth: Theme.island.panelWidth + (Theme.island.fillet + Math.abs(Theme.island.offset)) * 2
     implicitHeight: Theme.island.maxHeight
     color: "transparent"
     mask: Region { item: shape }
@@ -383,14 +382,6 @@ PanelWindow {
                         color: "transparent"
                         visible: player !== null
                         onActivated: root.island.toggle("media", root.modelData.name)
-                    }
-                }
-
-                MenuSlot {
-                    shown: root.shown === "wallpaper"
-
-                    WallpaperPanel {
-                        width: parent.width
                     }
                 }
 

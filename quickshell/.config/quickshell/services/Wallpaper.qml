@@ -14,6 +14,9 @@ Singleton {
     readonly property string folder: Quickshell.env("HOME") + "/Pictures/Wallpapers"
     // The current wallpaper's path; "" until one is chosen (Hyprland's default shows then).
     readonly property string path: state.path
+    // The picker strip is open (wallpaper/WallpaperPicker.qml): quick settings' button, or
+    // `qs ipc call wallpaper picker`.
+    property bool pickerOpen: false
 
     // Every picture to choose from, as { filePath, fileName }: yours from ~/Pictures/Wallpapers
     // first, then the built-in ones that come with Hyprland and CachyOS (from their packages,
@@ -87,6 +90,10 @@ Singleton {
 
         function get(): string {
             return root.path;
+        }
+
+        function picker(): void {
+            root.pickerOpen = !root.pickerOpen;
         }
     }
 

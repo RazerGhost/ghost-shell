@@ -123,3 +123,12 @@ hl.layer_rule({
     ignore_alpha = 0.3,
     animation    = "fade",
 })
+
+-- Wallpaper picker strip (quick settings' wallpaper button): blurred, slides down from the top.
+hl.layer_rule({
+    name  = "qs-wallpaper-picker",
+    match = { namespace = "^qs-wallpaper-picker$" },
+    blur         = true,
+    ignore_alpha = 0.3,
+    animation    = "slide top",
+})

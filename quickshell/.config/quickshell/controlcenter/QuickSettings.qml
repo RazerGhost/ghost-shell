@@ -12,7 +12,7 @@ Item {
 
     property string page: "main" // "main", "wifi", "bluetooth" or "sound"
 
-    // A button here opens another island menu ("power", "wallpaper").
+    // A button here opens another island menu ("power"), or closes the island ("").
     signal openMenu(string menu)
     readonly property int padding: Theme.spacing.l
 
@@ -210,7 +210,10 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     icon: "wallpaper"
                     label: "Wallpaper"
-                    onClicked: root.openMenu("wallpaper")
+                    onClicked: {
+                        Wallpaper.pickerOpen = true;
+                        root.openMenu("");
+                    }
                 }
 
                 IconButton {

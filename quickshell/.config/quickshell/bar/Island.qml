@@ -15,7 +15,7 @@ import qs.services
 Scope {
     id: root
 
-    // "", "today", "settings", "media", "power", "clipboard", "emoji" or "wallpaper"
+    // "", "today", "settings", "media", "power", "clipboard" or "emoji"
     property alias panel: persist.panel
     property alias screenName: persist.screenName // the monitor the menu is open on
 
@@ -68,7 +68,7 @@ Scope {
     }
 
     // From Hyprland binds: qs ipc call island toggle settings (or: today, media, power,
-    // clipboard, emoji, wallpaper)
+    // clipboard, emoji)
     IpcHandler {
         target: "island"
 

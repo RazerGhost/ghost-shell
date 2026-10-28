@@ -5,13 +5,15 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// The wallpaper picker: the island stretches across the whole top edge and shows one row of
+// The wallpaper picker's contents (WallpaperPicker.qml is the strip): one row of
 // pictures, scrolling sideways (the mouse wheel too). Your pictures from ~/Pictures/Wallpapers
 // come first, then the built-in ones that come with Hyprland and CachyOS (from their packages,
 // so they're not copied anywhere). Click one to use it; the colors follow the picture.
 Column {
     id: root
 
+    // The strip is open (WallpaperPicker.qml).
+    property bool active
     // Thumbnails only load once the picker has been opened: the built-in pictures are large
     // (up to 5K), and decoding them all at login would keep the CPU busy for nothing.
     property bool opened: false
@@ -24,8 +26,8 @@ Column {
     topPadding: Theme.spacing.s
     spacing: Theme.spacing.s
 
-    onVisibleChanged: {
-        if (visible) {
+    onActiveChanged: {
+        if (active) {
             opened = true;
             Wallpaper.rescan();
         }

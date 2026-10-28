@@ -21,6 +21,7 @@ import qs.wallpaper
 
 ShellRoot {
     WallpaperLayer {}
+    WallpaperPicker {}
     Island {}
     Dock {}
     Launcher {}
