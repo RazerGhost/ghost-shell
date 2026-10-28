@@ -89,10 +89,9 @@ Scope {
         WlrLayershell.namespace: "qs-osd"
         WlrLayershell.layer: WlrLayer.Overlay
 
-        Rectangle {
+        Surface {
             anchors.fill: parent
             radius: Theme.radius.full
-            color: Colors.surfaceTranslucent
 
             Accessible.role: Accessible.Indicator
             Accessible.name: root.level < 0 ? root.label : root.label + " " + Math.round(root.level * 100) + "%"

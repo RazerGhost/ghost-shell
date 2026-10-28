@@ -39,11 +39,14 @@ hl.config({
             color        = 0xee1a1a1a,
         },
 
+        -- Strong and a little darker, for the shell's glass panels and see-through Ghostty and Zed
+        -- (like the Ghost Spotify theme's blurred background).
         blur = {
-            enabled  = true,
-            size     = 3,
-            passes   = 1,
-            vibrancy = 0.1696,
+            enabled    = true,
+            size       = 8,
+            passes     = 3,
+            vibrancy   = 0.3,
+            brightness = 0.85,
         },
     },
 

@@ -481,6 +481,15 @@ other session: pinning the Vencord/Spicetify downloads in install.sh.
   `qs ipc call apps ...`, which opens the default app chosen in settings. If the shell isn't
   running the call fails and the bind falls back to Ghostty / Zen / Nautilus, so there's always a
   terminal.
+- **Glass look** (user's request, 2026-10-28, like the Ghost Spotify theme: a strongly blurred
+  background, translucent panels, a faint light edge). Every shell panel is a `widgets/Surface.qml`
+  (the island draws the same with its shape's outline): `Colors.surfaceTranslucent` at the
+  setting's opacity (45 % by default, 35-85; below ~30 % the layer rules' `ignore_alpha` would
+  stop the blur) and a 1 px edge in the text color at 8 % (`Colors.glassEdge`). Settings ->
+  Windows -> Shell panels turns it off (85 % opaque, no edge). Hyprland's blur is stronger
+  (size 8, 3 passes, more vibrancy, a little darker; look.lua). Ghostty (`background-opacity
+  0.85`) and Zed (`background.appearance: blurred`, main backgrounds at 85 %) are see-through
+  too; those are fixed, not following the setting. GTK/libadwaita apps can't be.
 - **Island window height** is 840 px (was 680) so the "today" menu with notifications fits.
 - **Island menu widths:** menus are `Theme.island.panelWidth` (380) wide, and the island's window
   is just that wide (plus its curves and offset); the wallpaper picker is its own surface.

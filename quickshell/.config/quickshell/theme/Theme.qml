@@ -59,8 +59,14 @@ Singleton {
         readonly property real active: 0.14 // its menu is open (the island's buttons)
     }
 
-    // Backgrounds of the island, launcher and OSD; Hyprland blurs what's behind them.
+    // Backgrounds of the island, menus, launcher, OSD...; Hyprland blurs what's behind them. This
+    // is the opacity with the glass setting off; with it on, the setting's (Colors.surfaceTranslucent).
     readonly property real surfaceOpacity: 0.85
+
+    readonly property QtObject glass: QtObject {
+        readonly property int edge: 1          // the thin light line around glass panels
+        readonly property real edgeAlpha: 0.08 // its strength: the text color at 8 %
+    }
 
     readonly property QtObject island: QtObject {
         readonly property int height:     36  // when closed; also the space reserved at the top

@@ -84,7 +84,7 @@ Scope {
             onCleared: root.open = false
         }
 
-        Rectangle {
+        Surface {
             id: frame
 
             // The windows in a grid that fills the space and keeps their shapes (like the
@@ -98,7 +98,6 @@ Scope {
 
             anchors.fill: parent
             radius: Theme.radius.xl
-            color: Colors.surfaceTranslucent
             focus: true
 
             // Arrow keys move the selection, Enter puts it in the space, Escape skips.

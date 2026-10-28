@@ -5,6 +5,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.services
 
 Singleton {
     // Every name has an "m3" prefix because QML treats "on" + capital letter as a change
@@ -22,9 +23,13 @@ Singleton {
     readonly property color m3outlineVariant:          json.outline_variant
     readonly property color m3error:                   json.error
 
-    // Background of the island, launcher and OSD: translucent so Hyprland's blur shows through.
-    readonly property color surfaceTranslucent: Qt.rgba(m3surfaceContainer.r, m3surfaceContainer.g,
-                                                         m3surfaceContainer.b, Theme.surfaceOpacity)
+    // Background of the shell's panels (widgets/Surface.qml): translucent so Hyprland's blur shows
+    // through; more so with the glass setting, which also gives them a thin light edge.
+    readonly property bool glass: Settings.values.glass
+    readonly property color surfaceTranslucent: Qt.rgba(m3surfaceContainer.r, m3surfaceContainer.g, m3surfaceContainer.b,
+                                                         glass ? Settings.values.glassOpacity / 100 : Theme.surfaceOpacity)
+    readonly property color glassEdge: glass ? Qt.rgba(m3onSurface.r, m3onSurface.g, m3onSurface.b, Theme.glass.edgeAlpha)
+                                             : "transparent"
 
     // Dims the screen behind the overview, the screenshot overlay and password prompts.
     readonly property color m3scrim:                   json.scrim

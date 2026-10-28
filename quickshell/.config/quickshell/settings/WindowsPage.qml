@@ -4,7 +4,8 @@ import qs.theme
 import qs.widgets
 
 // Windows: the gaps around tiled windows, their border and corners, and whether floating apps
-// reopen where they were. Applied through Hyprland (HyprlandSettings.qml).
+// reopen where they were (applied through Hyprland, HyprlandSettings.qml); and the shell's panels:
+// glass or nearly solid (Colors.surfaceTranslucent, widgets/Surface.qml).
 Column {
     id: page
 
@@ -61,6 +62,36 @@ Column {
                 value: Settings.values.rounding
                 format: page.pixels
                 onPicked: v => Settings.values.rounding = v
+            }
+        }
+    }
+
+    SettingGroup {
+        title: "Shell panels"
+
+        SettingRow {
+            title: "Glass"
+            subtitle: "The island, menus, dock and launcher are see-through, with a thin light edge"
+
+            Switch {
+                label: "Glass panels"
+                checked: Settings.values.glass
+                onToggled: Settings.values.glass = !checked
+            }
+        }
+
+        SettingRow {
+            visible: Settings.values.glass
+            title: "See-through"
+            subtitle: "How solid the glass is"
+
+            Stepper {
+                label: "Glass opacity"
+                // Not below 35 %: the blur rules skip pixels under 30 % (ignore_alpha in rules.lua).
+                values: Array.from({ length: 11 }, (_, i) => 35 + i * 5)
+                value: Settings.values.glassOpacity
+                format: v => v + " %"
+                onPicked: v => Settings.values.glassOpacity = v
             }
         }
     }

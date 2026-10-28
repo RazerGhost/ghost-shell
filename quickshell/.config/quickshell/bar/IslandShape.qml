@@ -13,6 +13,8 @@ Shape {
     property real bodyHeight
     property real radius // bottom corners
     property color color
+    // The thin light edge of glass panels (widgets/Surface.qml); transparent for none.
+    property color edgeColor: "transparent"
 
     readonly property real f: Theme.island.fillet
 
@@ -23,7 +25,9 @@ Shape {
 
     ShapePath {
         fillColor: root.color
-        strokeWidth: -1 // no outline
+        // Along the whole path; the part on the top screen edge falls mostly outside the screen.
+        strokeColor: root.edgeColor
+        strokeWidth: root.edgeColor.a > 0 ? Theme.glass.edge : -1
 
         // Clockwise from the top-left: along the screen edge, down the right side, along the
         // bottom, up the left side. Convex corners turn clockwise, the fillets the other way.

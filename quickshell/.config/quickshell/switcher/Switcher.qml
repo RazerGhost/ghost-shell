@@ -79,10 +79,9 @@ Scope {
             onCleared: root.open = false
         }
 
-        Rectangle {
+        Surface {
             anchors.fill: parent
             radius: Theme.radius.xl
-            color: Colors.surfaceTranslucent
             focus: true
 
             Keys.onReleased: event => {

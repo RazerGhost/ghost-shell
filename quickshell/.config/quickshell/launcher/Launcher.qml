@@ -80,13 +80,12 @@ Scope {
             }
         }
 
-        Rectangle {
+        Surface {
             id: panel
 
             width: parent.width
             implicitHeight: column.implicitHeight + Theme.spacing.m * 2
             radius: Theme.radius.m * 2
-            color: Colors.surfaceTranslucent
 
             Column {
                 id: column

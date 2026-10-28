@@ -59,6 +59,11 @@ Singleton {
             property bool greeterShowName: true     // your user name above the password field
             property bool greeterPowerButtons: true // suspend, restart and shut down
 
+            // The shell's panels (island, menus, dock, launcher...): glass, see-through over
+            // Hyprland's blur with a thin light edge (like the Ghost Spotify theme), or nearly solid.
+            property bool glass: true
+            property int glassOpacity: 45 // percent; below ~35 Hyprland stops blurring (ignore_alpha)
+
             // Hyprland's options (settings/HyprlandSettings.qml writes them to shell-settings.lua).
             // The defaults are input.lua's and look.lua's.
             property string keyboardLayout: "us" // XKB codes, e.g. "us" or "us,nl"

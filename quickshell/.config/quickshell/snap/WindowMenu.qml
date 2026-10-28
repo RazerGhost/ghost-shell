@@ -5,6 +5,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import qs.services
 import qs.theme
+import qs.widgets
 
 // The window menu (Alt+Space or Super+Z), a card at the top of the focused window, so it's clear
 // which window it's about: its title bar actions and workspace (WindowActions.qml), and the snap
@@ -84,13 +85,12 @@ Scope {
             onCleared: root.open = false
         }
 
-        Rectangle {
+        Surface {
             id: card
 
             implicitWidth: menu.implicitWidth + Theme.spacing.l * 2
             implicitHeight: menu.implicitHeight + Theme.spacing.l * 2
             radius: Theme.radius.xl
-            color: Colors.surfaceTranslucent
             focus: true
             Keys.onEscapePressed: root.open = false
 

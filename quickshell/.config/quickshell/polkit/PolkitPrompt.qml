@@ -49,12 +49,11 @@ Scope {
             color: Colors.scrim
         }
 
-        Rectangle {
+        Surface {
             anchors.centerIn: parent
             width: Theme.lock.fieldWidth + Theme.spacing.l * 4
             height: content.implicitHeight + Theme.spacing.l * 2
             radius: Theme.radius.xl
-            color: Colors.surfaceTranslucent
 
             Accessible.role: Accessible.Dialog
             Accessible.name: "Authentication required"

@@ -4,6 +4,7 @@ import Quickshell.Hyprland
 import Quickshell.Widgets
 import qs.services
 import qs.theme
+import qs.widgets
 import "DockApps.js" as DockApps
 
 // One app in the dock: its icon, a dot per open window (up to three; the focused app's are in the
@@ -88,14 +89,13 @@ MouseArea {
     }
 
     // The app's name above the icon while hovered.
-    Rectangle {
+    Surface {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.top
         anchors.bottomMargin: Theme.spacing.s
         width: label.implicitWidth + Theme.spacing.m * 2
         height: label.implicitHeight + Theme.spacing.xs * 2
         radius: Theme.radius.full
-        color: Colors.surfaceTranslucent
         opacity: root.containsMouse ? 1 : 0
         visible: opacity > 0
 

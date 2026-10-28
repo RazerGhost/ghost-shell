@@ -163,6 +163,7 @@ PanelWindow {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.horizontalCenterOffset: Theme.island.offset // under the webcam
         color: Colors.surfaceTranslucent
+        edgeColor: Colors.glassEdge
 
         // The morph: width, height and corner radius animate between the closed pill
         // and the open menu, all on the same curve so the shape moves as one.

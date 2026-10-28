@@ -14,3 +14,6 @@ window-padding-balance = true
 # Draw Ghostty's own title bar (close, maximize, minimize; drag to move). Hyprland draws none,
 # and with the default "auto" Ghostty leaves it to the compositor, so there'd be no bar at all.
 window-decoration = client
+
+# See-through, like the shell's glass panels: Hyprland blurs what's behind (look.lua).
+background-opacity = 0.85

@@ -256,14 +256,13 @@ Scope {
         }
 
         // The workspaces strip at the bottom.
-        Rectangle {
+        Surface {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             anchors.bottomMargin: Theme.spacing.l
             width: strip.implicitWidth + Theme.spacing.m * 2
             height: strip.implicitHeight + Theme.spacing.m * 2
             radius: Theme.radius.xl
-            color: Colors.surfaceTranslucent
 
             Accessible.role: Accessible.List
             Accessible.name: "Workspaces"

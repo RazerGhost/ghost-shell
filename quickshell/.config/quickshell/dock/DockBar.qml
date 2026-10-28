@@ -92,14 +92,13 @@ PanelWindow {
         acceptedButtons: Qt.NoButton
 
         // The bar. Slides down out of sight while hidden.
-        Rectangle {
+        Surface {
             id: shape
 
             y: window.shown ? 0 : hitArea.height + Theme.spacing.s
             width: parent.width
             height: window.bodyHeight
             radius: Theme.dock.radius
-            color: Colors.surfaceTranslucent
 
             Behavior on y {
                 MorphAnimation {}
@@ -155,7 +154,7 @@ PanelWindow {
     }
 
     // Right-click menu: new window, pin or unpin, close the app's windows.
-    Rectangle {
+    Surface {
         id: menu
 
         property var item: null
@@ -173,7 +172,6 @@ PanelWindow {
         width: Theme.dock.menuWidth
         height: actions.implicitHeight + Theme.spacing.s * 2
         radius: Theme.radius.l
-        color: Colors.surfaceTranslucent
 
         Column {
             id: actions

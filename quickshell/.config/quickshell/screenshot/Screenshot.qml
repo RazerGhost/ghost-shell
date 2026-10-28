@@ -176,14 +176,13 @@ Scope {
                 border.width: 2
                 border.color: Colors.m3primary
 
-                Rectangle {
+                Surface {
                     anchors.top: parent.bottom
                     anchors.topMargin: Theme.spacing.s
                     anchors.horizontalCenter: parent.horizontalCenter
                     width: sizeLabel.implicitWidth + Theme.spacing.m * 2
                     height: sizeLabel.implicitHeight + Theme.spacing.xs * 2
                     radius: Theme.radius.full
-                    color: Colors.surfaceTranslucent
 
                     Text {
                         id: sizeLabel
@@ -248,14 +247,13 @@ Scope {
         }
 
         // The mode bar, at the top center (under the island).
-        Rectangle {
+        Surface {
             visible: frozen.hasContent && !capture.immediate
             anchors.horizontalCenter: parent.horizontalCenter
             y: Theme.island.height + Theme.spacing.l
             width: bar.implicitWidth + Theme.spacing.s * 2
             height: bar.implicitHeight + Theme.spacing.s * 2
             radius: Theme.radius.full
-            color: Colors.surfaceTranslucent
 
             Accessible.role: Accessible.ToolBar
             Accessible.name: "Screenshot"

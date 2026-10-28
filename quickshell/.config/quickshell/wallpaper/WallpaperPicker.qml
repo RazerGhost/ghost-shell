@@ -4,6 +4,7 @@ import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.services
 import qs.theme
+import qs.widgets
 
 // The wallpaper picker: its own strip across the top of the focused screen, under the island
 // (user's choice; it used to stretch the island itself). Opened from quick settings' wallpaper
@@ -38,10 +39,9 @@ Scope {
             onCleared: Wallpaper.pickerOpen = false
         }
 
-        Rectangle {
+        Surface {
             anchors.fill: parent
             radius: Theme.radius.xl
-            color: Colors.surfaceTranslucent
             focus: true
             Keys.onEscapePressed: Wallpaper.pickerOpen = false
             Keys.onPressed: event => panel.handleKey(event)
