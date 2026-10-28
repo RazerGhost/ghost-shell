@@ -84,7 +84,7 @@ new setup step.
 - Windows open floating and centered (user's request). Since Phase 6 nothing tiles; see decisions.
 
 ### Phase 3: Notifications + rest of the control center + session menu (done, verified on the laptop
-  2026-10-28, except the power menu's suspend and log out: the user tests those later)
+  2026-10-28)
 - Quickshell is the notification server (`services/Notifications.qml`). New notifications pop up
   from the island (`NotificationCard`) on the focused monitor, one at a time, 5 s each (paused on
   hover; critical ones stay until dismissed), and stay in the history in the "today" menu until
@@ -168,6 +168,20 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
 - Later candidates from the same research, not planned yet: a macOS-style dock, an Exposé overview
   (3-finger swipe up / hot corner, reusing the switcher's thumbnails), an emoji picker, a snipping
   overlay. Not possible on Wayland: a global app menu. Hard: real minimize, Stage Manager.
+
+### Dock (built; waiting on the user's test results)
+Added at the user's request (2026-10-28), between Phases 6 and 7.
+- `dock/Dock.qml` + `DockBar.qml` + `DockItem.qml`: the island shape turned over along the bottom
+  edge (user's choice), with pinned apps then other running ones (`DockApps.js`, tested), a dot per
+  open window (accent for the focused app) and the name on hover. Click opens the app or switches
+  to it, again to cycle its windows, on the focused app's only window it minimizes (Windows
+  taskbar). Right-click: new window, pin/unpin, close. Pins are desktop entry ids in
+  `~/.local/state/quickshell/dock.json` (defaults: Zen, Ghostty, Nautilus, Zed, Spotify, Vesktop,
+  Steam). App launching is shared with the launcher (`services/Apps.qml`).
+- Shown on an empty desktop; slides down while a window on that monitor's workspace overlaps it
+  or one is fullscreen (user's choice); touching the bottom edge brings it back. Hyprland sends
+  no move/resize events, so window positions are re-read every second and on window events.
+- It reserves no space (`ExclusionMode.Ignore`); maximized windows cover it.
 
 ### Phase 7: Settings app
 Added at the user's request (2026-10-28), after night light went manual-only: things that are

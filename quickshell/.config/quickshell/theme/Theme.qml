@@ -94,6 +94,16 @@ Singleton {
         readonly property int menuArt:     160  // cover in the media menu
     }
 
+    readonly property QtObject dock: QtObject {
+        readonly property int height:    60  // the dock's body, along the bottom edge
+        readonly property int icon:      40  // app icons
+        readonly property int radius:    24  // its top corners
+        readonly property int trigger:   3   // the strip at the bottom edge that brings a hidden dock back
+        readonly property int hideDelay: 500 // ms the dock stays after the pointer leaves
+        readonly property int menuSpace: 240 // room above the dock for tooltips and the menu
+        readonly property int menuWidth: 220 // the right-click menu
+    }
+
     readonly property QtObject switcher: QtObject {
         readonly property int thumbHeight: 160 // window previews in Alt+Tab
         readonly property int labelHeight: 32  // app icon and title under each preview

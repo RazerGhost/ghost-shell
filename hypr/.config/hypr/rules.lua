@@ -85,6 +85,15 @@ hl.layer_rule({
     animation    = "popin 90%",
 })
 
+-- Dock: blurred; no open animation, it slides itself.
+hl.layer_rule({
+    name  = "qs-dock",
+    match = { namespace = "^qs-dock$" },
+    blur         = true,
+    ignore_alpha = 0.3,
+    no_anim      = true,
+})
+
 -- Launcher: blurred, pops in from its center.
 hl.layer_rule({
     name  = "qs-launcher",

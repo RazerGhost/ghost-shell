@@ -4,6 +4,7 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
+import qs.services
 import qs.theme
 import qs.widgets
 import "Fuzzy.js" as Fuzzy
@@ -16,12 +17,7 @@ Scope {
     property bool open: false
 
     function launch(entry: DesktopEntry): void {
-        // execute() ignores Terminal=true, so run those apps in Ghostty ourselves.
-        // Keep the terminal in sync with `terminal` in hypr/binds.lua.
-        if (entry.runInTerminal)
-            Quickshell.execDetached(["ghostty", "-e", ...entry.command]);
-        else
-            entry.execute();
+        Apps.launch(entry);
         open = false;
     }
 
