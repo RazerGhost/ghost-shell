@@ -257,7 +257,7 @@ From a survey of every Quickshell 0.3.2 type and the quickshell-examples repo (u
   (nothing measurable to gain); hibernate, i3/X11, sockets (not relevant). Bluetooth device
   batteries were already in the Bluetooth page.
 
-### Emoji picker (built 2026-10-28; waiting on the user's test results)
+### Emoji picker (done, verified on the laptop 2026-10-28)
 - An island menu (`controlcenter/EmojiPanel.qml`, Super+. like Windows): search field, a grid
   with the recently used emoji first (`~/.local/state/quickshell/emoji.json`), arrow keys and
   Enter or click. Terminals get the emoji typed (wtype); other apps get it pasted
