@@ -37,4 +37,17 @@ TestCase {
         compare(DockApps.clickTarget([a, b, c], c), a);       // wraps
         compare(DockApps.clickTarget([a], a), "minimize");    // the active app's only window
     }
+
+    function test_notificationCount() {
+        const notifications = [
+            { desktopEntry: "vesktop", appName: "Vesktop" },
+            { desktopEntry: "", appName: "Vesktop" },       // no desktop entry: the name matches
+            { desktopEntry: "spotify", appName: "Spotify" },
+            { desktopEntry: "", appName: "" }
+        ];
+        compare(DockApps.notificationCount(notifications, "vesktop", "Vesktop"), 2);
+        compare(DockApps.notificationCount(notifications, "spotify", "Spotify"), 1);
+        compare(DockApps.notificationCount(notifications, "zen", "Zen Browser"), 0);
+        compare(DockApps.notificationCount([], "zen", "Zen Browser"), 0);
+    }
 }

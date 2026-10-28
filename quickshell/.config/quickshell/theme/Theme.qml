@@ -121,6 +121,9 @@ Singleton {
         readonly property int hideDelay: 500 // ms the dock stays after the pointer leaves
         readonly property int menuSpace: 240 // room above the dock for tooltips and the menu
         readonly property int menuWidth: 220 // the right-click menu
+        readonly property int badge:     18  // notification count on an icon
+        readonly property int preview:   130 // window previews on hover: their height
+        readonly property int previewDelay: 400 // ms resting on an app before its previews show
     }
 
     readonly property QtObject switcher: QtObject {

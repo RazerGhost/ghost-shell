@@ -37,3 +37,13 @@ function clickTarget(windows, focused) {
         return "minimize";
     return windows[(i + 1) % windows.length];
 }
+
+// How many of `notifications` ([{ desktopEntry, appName }], the today menu's history) belong to
+// the app with desktop entry `id` and name `name`: the dock's badge. Exact matches only (the
+// notification's desktop entry, or its app name as the id or name): a fuzzy lookup once matched
+// Vesktop to Pinentry.
+function notificationCount(notifications, id, name) {
+    const lower = s => (s || "").toLowerCase();
+    return notifications.filter(n => lower(n.desktopEntry) === lower(id)
+        || (n.appName && (lower(n.appName) === lower(id) || lower(n.appName) === lower(name)))).length;
+}

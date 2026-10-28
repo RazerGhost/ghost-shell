@@ -200,6 +200,11 @@ Added at the user's request (2026-10-28), between Phases 6 and 7.
   masking to the sliding bar made the dock hide again right after revealing (the bar was still
   below the screen, so the pointer counted as having left).
 - It reserves no space (`ExclusionMode.Ignore`); maximized windows cover it.
+- Resting 400 ms on an app with windows shows live previews of them above the dock (click one to
+  switch; the pointer can move up onto them). A badge on an icon counts that app's notifications
+  in the today menu's history (`DockApps.notificationCount`, tested; exact matches only). Apps'
+  own unread counts (the Unity LauncherEntry D-Bus signal) aren't read: Quickshell has no API for
+  it, and whether Vesktop sends one on Linux is unverified.
 
 ### Phase 7: Settings app (done, verified on the laptop 2026-10-28)
 Added at the user's request, after night light went manual-only: things that were fixed in

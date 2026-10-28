@@ -21,6 +21,7 @@ PanelWindow {
     // The pointer is at the bottom edge or on the dock, or its menu is open. Stays true for a
     // moment after the pointer leaves, so the dock doesn't flicker away.
     readonly property bool wanted: trigger.containsMouse || hitArea.containsMouse || menu.visible
+                                   || previews.hovered
     property bool revealed: false
     onWantedChanged: {
         if (wanted) {
@@ -55,6 +56,10 @@ PanelWindow {
 
         Region {
             item: menu.visible ? menu : null
+        }
+
+        Region {
+            item: previews.visible ? previews : null
         }
     }
 
@@ -142,7 +147,16 @@ PanelWindow {
 
                         DockItem {
                             item: slot.modelData
+                            previewing: previews.item === slot.modelData && previews.visible
+                            // Resting on an app with windows shows them above the dock.
+                            onContainsMouseChanged: {
+                                if (containsMouse && windows.length > 0 && menu.item === null)
+                                    previews.request(slot.modelData, mapToItem(window.contentItem, width / 2, 0).x);
+                                else
+                                    previews.release();
+                            }
                             onMenuRequested: {
+                                previews.close();
                                 menu.item = slot.modelData;
                                 menu.anchorX = mapToItem(window.contentItem, width / 2, 0).x;
                             }
@@ -250,6 +264,108 @@ PanelWindow {
                 icon: "close"
                 text: (menu.item?.windows.length ?? 0) > 1 ? "Close all windows" : "Close window"
                 onClicked: menu.run(() => menu.item.windows.forEach(w => Windows.close(w.window)))
+            }
+        }
+    }
+
+    // Window previews of the app the pointer rests on (Theme.dock.previewDelay), like Windows'
+    // taskbar: click one to switch to it. The pointer can move up from the icon onto them; they
+    // close a moment after it leaves both.
+    Surface {
+        id: previews
+
+        property var item: null
+        property var wanted: null // the app the pointer is on, until the delay passes
+        property real anchorX
+        readonly property bool hovered: previewHover.hovered
+        readonly property list<HyprlandToplevel> windows: (item?.windows ?? []).map(w => w.window)
+
+        function request(app: var, x: real): void {
+            closeDelay.stop();
+            wanted = app;
+            anchorX = x;
+            if (item !== null)
+                item = app; // already showing: switch right away
+            else
+                openDelay.restart();
+        }
+
+        function release(): void {
+            openDelay.stop();
+            closeDelay.restart();
+        }
+
+        function close(): void {
+            openDelay.stop();
+            closeDelay.stop();
+            item = null;
+        }
+
+        visible: item !== null && windows.length > 0
+        x: Math.max(Theme.spacing.s, Math.min(window.width - width - Theme.spacing.s, anchorX - width / 2))
+        y: hitArea.y - height - Theme.spacing.s
+        width: thumbs.implicitWidth + Theme.spacing.s * 2
+        height: thumbs.implicitHeight + Theme.spacing.s * 2
+        radius: Theme.radius.l
+
+        Timer {
+            id: openDelay
+            interval: Theme.dock.previewDelay
+            onTriggered: previews.item = previews.wanted
+        }
+
+        Timer {
+            id: closeDelay
+            interval: Theme.dock.hideDelay
+            onTriggered: {
+                if (!previews.hovered)
+                    previews.item = null;
+            }
+        }
+
+        HoverHandler {
+            id: previewHover
+            onHoveredChanged: hovered ? closeDelay.stop() : closeDelay.restart()
+        }
+
+        Row {
+            id: thumbs
+            anchors.centerIn: parent
+            spacing: Theme.spacing.s
+
+            Repeater {
+                model: previews.windows
+
+                MouseArea {
+                    id: thumb
+
+                    required property HyprlandToplevel modelData
+                    // The window's shape at the preview height, not wider than Alt+Tab allows.
+                    readonly property real aspect: Math.min(Theme.switcher.maxAspect,
+                        (modelData.lastIpcObject?.size?.[0] ?? 16) / (modelData.lastIpcObject?.size?.[1] ?? 10))
+
+                    width: Theme.dock.preview * aspect
+                    height: Theme.dock.preview + Theme.switcher.labelHeight
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        previews.close();
+                        Windows.show(modelData);
+                    }
+
+                    Accessible.role: Accessible.Button
+                    Accessible.name: "Switch to " + modelData.title
+                    Accessible.onPressAction: Windows.show(modelData)
+
+                    WindowPreview {
+                        anchors.fill: parent
+                        toplevel: thumb.modelData
+                        previewHeight: Theme.dock.preview
+                        highlighted: thumb.containsMouse
+                        capturing: previews.visible
+                        closable: true
+                    }
+                }
             }
         }
     }
