@@ -28,6 +28,10 @@ Scope {
         color: "transparent"
 
         WlrLayershell.namespace: "qs-wallpaper-picker"
+
+        // Blur behind the strip (ext-background-effect; see NOTES.md).
+        BackgroundEffect.blurRegion: Region { item: surface; radius: surface.radius }
+
         WlrLayershell.layer: WlrLayer.Top
         // For Escape. On demand, like the island's menus.
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
@@ -40,6 +44,8 @@ Scope {
         }
 
         Surface {
+            id: surface
+
             anchors.fill: parent
             radius: Theme.radius.xl
             focus: true

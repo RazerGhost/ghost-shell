@@ -73,6 +73,10 @@ Scope {
         color: "transparent"
 
         WlrLayershell.namespace: "qs-snap-assist"
+
+        // Blur behind the card (ext-background-effect; see NOTES.md).
+        BackgroundEffect.blurRegion: Region { item: frame; radius: frame.radius }
+
         WlrLayershell.layer: WlrLayer.Overlay
         // OnDemand, not Exclusive: Hyprland refuses to focus windows while an exclusive surface
         // exists, which raced pick()'s focus call (see Switcher.qml).

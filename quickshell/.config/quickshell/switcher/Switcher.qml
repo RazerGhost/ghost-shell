@@ -66,6 +66,10 @@ Scope {
         color: "transparent"
 
         WlrLayershell.namespace: "qs-switcher"
+
+        // Blur behind the card (ext-background-effect; see NOTES.md).
+        BackgroundEffect.blurRegion: Region { item: surface; radius: surface.radius }
+
         WlrLayershell.layer: WlrLayer.Overlay
         // The keyboard, so the switcher sees Alt being released: an OnDemand surface gets it when
         // it appears. Not Exclusive: while an exclusive surface exists Hyprland refuses to focus
@@ -80,6 +84,8 @@ Scope {
         }
 
         Surface {
+            id: surface
+
             anchors.fill: parent
             radius: Theme.radius.xl
             focus: true

@@ -506,12 +506,15 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   container color, the others like the shell's surfaces, blurred).
 
 ### Native blur shapes (built 2026-10-29; waiting on the user's test results)
-- The island and the dock (user's choice: these two first, the menus and pop-ups after
-  comparing) ask Hyprland for blur behind their exact shape (`BackgroundEffect.blurRegion`,
-  ext-background-effect-v1) instead of a layer rule blurring every pixel above 30 % opacity: the
+- Every shell panel asks Hyprland for blur behind exactly its cards (`BackgroundEffect.blurRegion`,
+  ext-background-effect-v1) instead of a layer rule blurring every pixel above 30 % opacity
+  (the island and dock first, verified by the user; then the rest at their request): the
   island's body rounded at the bottom plus the screen-edge strip minus the fillets' circles; the
-  dock's bar, right-click menu and previews. Their `blur`/`ignore_alpha` layer rules are gone.
-  If it looks better, the other panels follow, and the glass opacity could go below 35 %.
+  dock's bar, right-click menu and previews (plus one pixel, see NOTES); the launcher, OSD,
+  switcher, window menu, Snap Assist, wallpaper strip, polkit prompt and welcome tour their card;
+  the overview its whole dimmed screen. No `blur` layer rules are left. Not the screenshot bar
+  (over the frozen, opaque picture) or the lock preview (its own blurred wallpaper). The glass
+  opacity could now go below 35 %.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

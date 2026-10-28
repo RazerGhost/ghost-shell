@@ -65,7 +65,8 @@ hl.window_rule({
 ---------------------
 
 -- Quickshell panels are layer surfaces; each sets a namespace starting with "qs-"
--- (check with: hyprctl layers).
+-- (check with: hyprctl layers). Their blur isn't set here: each panel asks Hyprland for blur
+-- behind exactly its cards (BackgroundEffect.blurRegion, ext-background-effect; NOTES.md).
 
 -- Island (the bar): slides in. It asks for blur behind its exact shape itself
 -- (BackgroundEffect in bar/IslandWindow.qml), so no blur rule.
@@ -82,30 +83,24 @@ hl.layer_rule({
     no_anim = true,
 })
 
--- Window menu (Alt+Space, Super+Z): blurred, pops in over its window.
+-- Window menu (Alt+Space, Super+Z): pops in over its window.
 hl.layer_rule({
     name  = "qs-snap",
     match = { namespace = "^qs-snap$" },
-    blur         = true,
-    ignore_alpha = 0.3,
     animation    = "popin 90%",
 })
 
--- Snap Assist (the other windows, offered for the space next to a snapped one): blurred, fades in.
+-- Snap Assist (the other windows, offered for the space next to a snapped one): fades in.
 hl.layer_rule({
     name  = "qs-snap-assist",
     match = { namespace = "^qs-snap-assist$" },
-    blur         = true,
-    ignore_alpha = 0.3,
     animation    = "fade",
 })
 
--- Alt+Tab switcher: blurred, pops in.
+-- Alt+Tab switcher: pops in.
 hl.layer_rule({
     name  = "qs-switcher",
     match = { namespace = "^qs-switcher$" },
-    blur         = true,
-    ignore_alpha = 0.3,
     animation    = "popin 90%",
 })
 
@@ -117,48 +112,37 @@ hl.layer_rule({
     no_anim      = true,
 })
 
--- Launcher: blurred, pops in from its center.
+-- Launcher: pops in from its center.
 hl.layer_rule({
     name  = "qs-launcher",
     match = { namespace = "^qs-launcher$" },
-    blur         = true,
-    ignore_alpha = 0.3,
     animation    = "popin 90%",
 })
 
--- OSD (volume / brightness popup): blurred, slides up from the bottom edge.
+-- OSD (volume / brightness popup): slides up from the bottom edge.
 hl.layer_rule({
     name  = "qs-osd",
     match = { namespace = "^qs-osd$" },
-    blur         = true,
-    ignore_alpha = 0.3,
     animation    = "slide bottom",
 })
 
--- Password prompt for apps (polkit): the card is blurred, not the dimmed screen around it
--- (the dimming is 40% opaque, under ignore_alpha), and it fades in.
+-- Password prompt for apps (polkit): fades in.
 hl.layer_rule({
     name  = "qs-polkit",
     match = { namespace = "^qs-polkit$" },
-    blur         = true,
-    ignore_alpha = 0.5,
     animation    = "fade",
 })
 
--- Overview (Super+Tab): the dimmed desktop behind it is blurred too, and it fades in.
+-- Overview (Super+Tab): fades in.
 hl.layer_rule({
     name  = "qs-overview",
     match = { namespace = "^qs-overview$" },
-    blur         = true,
-    ignore_alpha = 0.3,
     animation    = "fade",
 })
 
--- Wallpaper picker strip (quick settings' wallpaper button): blurred, slides down from the top.
+-- Wallpaper picker strip (quick settings' wallpaper button): slides down from the top.
 hl.layer_rule({
     name  = "qs-wallpaper-picker",
     match = { namespace = "^qs-wallpaper-picker$" },
-    blur         = true,
-    ignore_alpha = 0.3,
     animation    = "slide top",
 })

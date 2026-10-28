@@ -89,9 +89,15 @@ Scope {
         color: "transparent"
 
         WlrLayershell.namespace: "qs-osd"
+
+        // Blur behind the card (ext-background-effect; see NOTES.md).
+        BackgroundEffect.blurRegion: Region { item: surface; radius: surface.radius }
+
         WlrLayershell.layer: WlrLayer.Overlay
 
         Surface {
+            id: surface
+
             anchors.fill: parent
             radius: Theme.radius.full
 

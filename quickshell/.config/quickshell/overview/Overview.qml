@@ -89,6 +89,10 @@ Scope {
         color: "transparent"
 
         WlrLayershell.namespace: "qs-overview"
+
+        // Blur behind the whole dimmed desktop (ext-background-effect; see NOTES.md).
+        BackgroundEffect.blurRegion: Region { item: dimmed }
+
         WlrLayershell.layer: WlrLayer.Overlay
         // OnDemand, not Exclusive: clicking a window focuses it as the overview closes, and
         // Hyprland refuses to focus windows while an exclusive surface exists (see Switcher).
@@ -106,8 +110,10 @@ Scope {
             }
         }
 
-        // The dimmed (and, through the layer rule, blurred) desktop. Click it to close.
+        // The dimmed (and blurred, see BackgroundEffect above) desktop. Click it to close.
         Rectangle {
+            id: dimmed
+
             anchors.fill: parent
             color: Colors.scrim
 

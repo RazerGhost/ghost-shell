@@ -73,6 +73,10 @@ Scope {
         color: "transparent"
 
         WlrLayershell.namespace: "qs-snap"
+
+        // Blur behind the card (ext-background-effect; see NOTES.md).
+        BackgroundEffect.blurRegion: Region { item: card; radius: card.radius }
+
         WlrLayershell.layer: WlrLayer.Overlay
         // The keyboard, for Escape. OnDemand, not Exclusive: minimizing focuses the next window
         // as the menu closes, which an exclusive surface would refuse (see the switcher).

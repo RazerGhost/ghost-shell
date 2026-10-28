@@ -33,6 +33,10 @@ Scope {
         color: "transparent"
 
         WlrLayershell.namespace: "qs-polkit"
+
+        // Blur behind the card, not the dimmed screen around it (ext-background-effect; see NOTES.md).
+        BackgroundEffect.blurRegion: Region { item: surface; radius: surface.radius }
+
         WlrLayershell.layer: WlrLayer.Overlay
         // The password goes here and nowhere else.
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
@@ -50,6 +54,8 @@ Scope {
         }
 
         Surface {
+            id: surface
+
             anchors.centerIn: parent
             width: Theme.lock.fieldWidth + Theme.spacing.l * 4
             height: content.implicitHeight + Theme.spacing.l * 2

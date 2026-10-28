@@ -62,6 +62,10 @@ Scope {
         color: "transparent"
 
         WlrLayershell.namespace: "qs-launcher"
+
+        // Blur behind the card (ext-background-effect; see NOTES.md).
+        BackgroundEffect.blurRegion: Region { item: panel; radius: panel.radius }
+
         WlrLayershell.layer: WlrLayer.Overlay
         // Take the keyboard while open, so typing goes to the search field.
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive

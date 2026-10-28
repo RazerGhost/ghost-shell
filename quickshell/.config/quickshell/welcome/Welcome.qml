@@ -88,6 +88,10 @@ Scope {
         color: "transparent"
 
         WlrLayershell.namespace: "qs-welcome"
+
+        // Blur behind the card, not the dimmed screen around it (ext-background-effect; see NOTES.md).
+        BackgroundEffect.blurRegion: Region { item: card; radius: card.radius }
+
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
