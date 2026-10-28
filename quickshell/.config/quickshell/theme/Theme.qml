@@ -96,8 +96,7 @@ Singleton {
     }
 
     readonly property QtObject wallpaper: QtObject {
-        readonly property int columns: 4   // thumbnails per row in the picker
-        readonly property int height:  460 // the picker scrolls past this
+        readonly property int columns: 4 // thumbnails visible side by side in the picker
     }
 
     readonly property QtObject clipboard: QtObject {

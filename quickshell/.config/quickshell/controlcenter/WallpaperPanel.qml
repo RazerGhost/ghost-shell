@@ -6,10 +6,10 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// The wallpaper picker, wider than the other menus so more pictures fit side by side: your
-// pictures from ~/Pictures/Wallpapers, then the built-in ones that come with Hyprland and
-// CachyOS (from their packages, so they're not copied anywhere). Click one to use it; the
-// colors follow the picture.
+// The wallpaper picker, wider than the other menus: your pictures from ~/Pictures/Wallpapers in
+// one row, then the built-in ones that come with Hyprland and CachyOS (from their packages, so
+// they're not copied anywhere) in two rows. Both scroll sideways (the mouse wheel too). Click
+// one to use it; the colors follow the picture.
 Column {
     id: root
 
@@ -20,6 +20,15 @@ Column {
     readonly property real contentWidth: width - leftPadding - rightPadding
     readonly property real thumbWidth: (contentWidth - Theme.spacing.s * (Theme.wallpaper.columns - 1)) / Theme.wallpaper.columns
     readonly property real thumbHeight: thumbWidth * 9 / 16
+
+    // The pictures in a FolderListModel as { filePath, fileName }, so the two built-in folders
+    // can share one strip.
+    function files(model: FolderListModel): var {
+        const list = [];
+        for (let i = 0; i < model.count; i++)
+            list.push({ filePath: model.get(i, "filePath"), fileName: model.get(i, "fileName") });
+        return list;
+    }
 
     padding: Theme.spacing.l
     topPadding: Theme.spacing.s
@@ -60,8 +69,9 @@ Column {
     component Thumbnail: MouseArea {
         id: cell
 
-        required property string filePath
-        required property string fileName
+        required property var modelData
+        readonly property string filePath: modelData.filePath
+        readonly property string fileName: modelData.fileName
         readonly property bool current: filePath === Wallpaper.path
 
         width: root.thumbWidth
@@ -127,55 +137,45 @@ Column {
         }
     }
 
-    Flickable {
+    SectionTitle {
+        text: yours.count > 0 ? "Your pictures" : "Your pictures: none yet. Put some in ~/Pictures/Wallpapers (Open folder)."
+    }
+
+    ListView {
+        visible: yours.count > 0
         width: root.contentWidth
-        height: Math.min(contentHeight, Theme.wallpaper.height)
-        contentHeight: sections.implicitHeight
+        height: root.thumbHeight
+        orientation: ListView.Horizontal
+        spacing: Theme.spacing.s
         clip: true
         boundsBehavior: Flickable.StopAtBounds
+        model: root.files(yours) // re-read when the folder changes (files() reads its count)
+        delegate: Thumbnail {}
 
         Accessible.role: Accessible.List
+        Accessible.name: "Your pictures"
+    }
 
-        Column {
-            id: sections
-            width: parent.width
-            spacing: Theme.spacing.s
+    SectionTitle {
+        topPadding: Theme.spacing.xs
+        visible: hyprland.count + cachyos.count > 0
+        text: "Built-in (Hyprland and CachyOS)"
+    }
 
-            SectionTitle {
-                text: yours.count > 0 ? "Your pictures" : "Your pictures: none yet. Put some in ~/Pictures/Wallpapers (Open folder)."
-            }
+    // Two rows, filled top to bottom, then sideways.
+    GridView {
+        visible: hyprland.count + cachyos.count > 0
+        width: root.contentWidth
+        height: cellHeight * 2
+        flow: GridView.FlowTopToBottom
+        cellWidth: root.thumbWidth + Theme.spacing.s
+        cellHeight: root.thumbHeight + Theme.spacing.s
+        clip: true
+        boundsBehavior: Flickable.StopAtBounds
+        model: root.files(hyprland).concat(root.files(cachyos))
+        delegate: Thumbnail {}
 
-            Grid {
-                visible: yours.count > 0
-                columns: Theme.wallpaper.columns
-                spacing: Theme.spacing.s
-
-                Repeater {
-                    model: yours
-                    Thumbnail {}
-                }
-            }
-
-            SectionTitle {
-                topPadding: Theme.spacing.xs
-                visible: hyprland.count + cachyos.count > 0
-                text: "Built-in (Hyprland and CachyOS)"
-            }
-
-            Grid {
-                columns: Theme.wallpaper.columns
-                spacing: Theme.spacing.s
-
-                Repeater {
-                    model: hyprland
-                    Thumbnail {}
-                }
-
-                Repeater {
-                    model: cachyos
-                    Thumbnail {}
-                }
-            }
-        }
+        Accessible.role: Accessible.List
+        Accessible.name: "Built-in wallpapers"
     }
 }

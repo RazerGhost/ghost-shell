@@ -109,8 +109,9 @@ new setup step.
   `~/Pictures/Wallpapers` (local folder only: the user prefers real photos or anime art and
   picks them themselves), then a "Built-in" section: Hyprland's `/usr/share/hypr/wall*.png` and
   the `cachyos-wallpapers` package (in packages.txt). Those stay in their packages, not in this
-  repo: their licensing is unclear (no artist credits) and they're ~200 MB. Thumbnails load the
-  first time the picker opens. Choosing one runs matugen on it. The choice is saved in
+  repo: their licensing is unclear (no artist credits) and they're ~200 MB. Both sections scroll
+  sideways (user's choice: horizontal, not vertical): yours in one row, built-in in two.
+  Thumbnails load the first time the picker opens. Choosing one runs matugen on it. The choice is saved in
   `~/.local/state/quickshell/wallpaper.json`; `qs ipc call wallpaper set <path>` and
   `./install.sh <image>` set it too. With none chosen, Hyprland's default wallpaper shows.
 
