@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell.Services.Mpris
-import Quickshell.Widgets
 import qs.services
 import qs.theme
 import qs.widgets
@@ -29,30 +28,13 @@ Column {
         onTriggered: root.player.positionChanged()
     }
 
-    ClippingRectangle {
+    AlbumArt {
         anchors.horizontalCenter: parent.horizontalCenter
         width: Theme.media.menuArt
         height: Theme.media.menuArt
         radius: Theme.radius.l
-        color: Colors.m3surfaceContainerHighest
-
-        MaterialIcon {
-            anchors.centerIn: parent
-            visible: art.status !== Image.Ready
-            icon: "music_note"
-            color: Colors.m3onSurfaceVariant
-            font.pixelSize: Theme.icon.launcher
-        }
-
-        Image {
-            id: art
-            anchors.fill: parent
-            source: root.player?.trackArtUrl ?? ""
-            fillMode: Image.PreserveAspectCrop
-            asynchronous: true
-            sourceSize.width: width * 2
-            Accessible.ignored: true
-        }
+        iconSize: Theme.icon.launcher
+        source: root.player?.trackArtUrl ?? ""
 
         // Click the cover to bring the player to the front.
         MouseArea {

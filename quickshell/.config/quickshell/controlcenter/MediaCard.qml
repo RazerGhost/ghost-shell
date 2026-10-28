@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell.Services.Mpris
-import Quickshell.Widgets
 import qs.services
 import qs.theme
 import qs.widgets
@@ -31,7 +30,7 @@ Rectangle {
     Accessible.name: "Open media: " + (player?.trackTitle ?? "")
     Accessible.onPressAction: root.activated()
 
-    ClippingRectangle {
+    AlbumArt {
         id: cover
 
         anchors.left: parent.left
@@ -39,24 +38,8 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         width: Theme.tile.height
         height: Theme.tile.height
-        radius: Theme.radius.m
         color: Colors.m3surfaceContainerHigh
-
-        MaterialIcon {
-            anchors.centerIn: parent
-            visible: art.status !== Image.Ready
-            icon: "music_note"
-            color: Colors.m3onSurfaceVariant
-        }
-
-        Image {
-            id: art
-            anchors.fill: parent
-            source: root.player?.trackArtUrl ?? ""
-            fillMode: Image.PreserveAspectCrop
-            asynchronous: true
-            Accessible.ignored: true
-        }
+        source: root.player?.trackArtUrl ?? ""
     }
 
     Column {
