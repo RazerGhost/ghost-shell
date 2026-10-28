@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Services.SystemTray
 import Quickshell.Services.UPower
 import qs.services
 import qs.settings
@@ -197,7 +198,27 @@ Item {
             }
         }
 
-        // Battery on the left; tray icons, wallpaper and power buttons on the right.
+        // Apps running in the background (the system tray), only when there are some.
+        Column {
+            width: parent.width
+            visible: SystemTray.items.values.length > 0
+            spacing: Theme.spacing.s
+
+            Text {
+                x: Theme.spacing.s
+                text: "Running in the background"
+                color: Colors.m3onSurfaceVariant
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.small
+            }
+
+            Tray {
+                x: Theme.spacing.s
+                width: parent.width - Theme.spacing.s * 2
+            }
+        }
+
+        // Battery on the left; settings, wallpaper and power buttons on the right.
         Item {
             width: parent.width
             implicitHeight: Theme.slider.height
@@ -229,10 +250,6 @@ Item {
                 anchors.rightMargin: Theme.spacing.xs
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.spacing.s
-
-                Tray {
-                    anchors.verticalCenter: parent.verticalCenter
-                }
 
                 IconButton {
                     anchors.verticalCenter: parent.verticalCenter

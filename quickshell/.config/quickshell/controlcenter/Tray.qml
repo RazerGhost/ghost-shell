@@ -4,9 +4,11 @@ import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 import qs.theme
 
-// System tray (StatusNotifierItem): left click activates, middle click is the secondary
-// action, right click opens the app's menu.
-Row {
+// System tray (StatusNotifierItem), the apps running in the background: a chip per app with its
+// icon and name (user's choice: its own row in quick settings, not small icons next to the
+// battery). Left click activates, middle click is the secondary action, right click opens the
+// app's menu. Wraps onto more lines when there are many.
+Flow {
     spacing: Theme.spacing.s
 
     Repeater {
@@ -16,15 +18,20 @@ Row {
             id: item
 
             required property SystemTrayItem modelData
+            // The app's own name from its .desktop file, found by the tray title ("spotify" ->
+            // "Spotify"). Not by the id: the fuzzy lookup matched Vesktop's
+            // "vesktop_status_icon_1" to Pinentry. Without a title, the tooltip ("Vesktop").
+            readonly property string name: (modelData.title ? DesktopEntries.heuristicLookup(modelData.title)?.name : "")
+                || modelData.title || modelData.tooltipTitle || modelData.id
 
-            anchors.verticalCenter: parent.verticalCenter
-            implicitWidth: Theme.icon.tray
-            implicitHeight: Theme.icon.tray
+            implicitWidth: chip.implicitWidth + Theme.spacing.m * 2
+            implicitHeight: Theme.icon.tray + Theme.spacing.s * 2
+            hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
 
             Accessible.role: Accessible.Button
-            Accessible.name: modelData.tooltipTitle || modelData.title || modelData.id
+            Accessible.name: name
             Accessible.onPressAction: modelData.activate()
 
             onClicked: event => {
@@ -37,9 +44,38 @@ Row {
                     menu.open();
             }
 
-            IconImage {
+            Rectangle {
                 anchors.fill: parent
-                source: item.modelData.icon
+                radius: Theme.radius.full
+                color: Colors.m3surfaceContainerHighest
+            }
+
+            // State layer on hover.
+            Rectangle {
+                anchors.fill: parent
+                radius: Theme.radius.full
+                color: Colors.m3onSurface
+                opacity: item.containsMouse ? Theme.state.hover : 0
+            }
+
+            Row {
+                id: chip
+                anchors.centerIn: parent
+                spacing: Theme.spacing.s
+
+                IconImage {
+                    anchors.verticalCenter: parent.verticalCenter
+                    implicitSize: Theme.icon.tray
+                    source: item.modelData.icon
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: item.name
+                    color: Colors.m3onSurface
+                    font.family: Theme.font.sans
+                    font.pixelSize: Theme.font.small
+                }
             }
 
             // Opens the item's menu (exported over D-Bus by the app) just below the icon.
