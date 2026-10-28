@@ -40,11 +40,11 @@ Singleton {
         yours.folder = "file://" + folder;
     }
 
+    // matugen's wallpaper.sh saves the choice (the file below, which updates `path`) and runs
+    // matugen; install.sh uses the same script.
     function set(path: string): void {
-        state.path = path;
-        file.writeAdapter();
-        matugen.command = ["matugen", "image", path, "-m", "dark", "--source-color-index", "0"];
-        matugen.running = true;
+        apply.command = ["sh", Quickshell.env("HOME") + "/.config/matugen/wallpaper.sh", path];
+        apply.running = true;
     }
 
     FolderListModel {
@@ -69,12 +69,13 @@ Singleton {
     }
 
     // Kept next to matugen's colors.json, outside the shell directory: Quickshell reloads the
-    // shell when files in its own directory change.
+    // shell when files in its own directory change. Written by wallpaper.sh.
     FileView {
-        id: file
         path: Quickshell.env("HOME") + "/.local/state/quickshell/wallpaper.json"
         // Missing until a wallpaper is chosen for the first time; that's fine.
         printErrors: false
+        watchChanges: true
+        onFileChanged: reload()
 
         adapter: JsonAdapter {
             id: state
@@ -100,10 +101,10 @@ Singleton {
     }
 
     Process {
-        id: matugen
+        id: apply
         onExited: (code, status) => {
             if (code !== 0)
-                console.warn("Wallpaper: matugen exited with code " + code);
+                console.warn("Wallpaper: wallpaper.sh exited with code " + code);
         }
     }
 }

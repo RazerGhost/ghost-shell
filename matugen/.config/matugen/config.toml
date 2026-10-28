@@ -74,8 +74,8 @@ output_path = '~/.local/state/matugen/steam-material.css'
 post_hook   = 'sh ~/.config/matugen/hooks/steam-material.sh'
 
 [templates.zen]
-# Zen: rendered to its own file; the hook copies it into the profile and sets it up. Zen reads
-# userChrome.css at startup, so open windows keep their colors until Zen restarts.
+# Zen: rendered to its own file; the hook copies it into the profile (setup/zen.sh makes Zen load
+# it). Zen reads userChrome.css at startup, so open windows keep their colors until Zen restarts.
 input_path  = 'templates/zen-colors.css'
 output_path = '~/.local/state/matugen/zen-colors.css'
 post_hook   = 'sh ~/.config/matugen/hooks/zen.sh'

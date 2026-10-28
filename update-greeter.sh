@@ -10,6 +10,7 @@
 # copy); settings, colors and the wallpaper reach it by themselves.
 set -euo pipefail
 cd "$(dirname "$0")"
+. setup/lib.sh
 
 greeter_home=/var/lib/qs-greeter
 greeter_state=$greeter_home/.local/state/quickshell
@@ -38,9 +39,6 @@ sh quickshell/.config/quickshell/greeter/sync.sh
 
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
-GREETER_USER="$USER" TMP="$tmp" node -e '
-    const fs = require("fs");
-    fs.writeFileSync(process.env.TMP + "/greeter.json", JSON.stringify({ user: process.env.GREETER_USER }, null, 4) + "\n");
-'
+GREETER_USER="$USER" json_edit "$tmp/greeter.json" 'data.user = process.env.GREETER_USER'
 sudo install -m644 -o greeter -g greeter "$tmp/greeter.json" "$greeter_state/"
 echo "Login screen updated for $USER."
