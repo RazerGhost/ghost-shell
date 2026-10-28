@@ -14,12 +14,13 @@ Singleton {
     readonly property WifiDevice wifiDevice: devices.find(d => d.type === DeviceType.Wifi) ?? null
     readonly property WifiNetwork wifiNetwork: wifiDevice?.networks.values.find(n => n.connected) ?? null
 
+    // A network's details fill in a moment after it shows up, hence the defaults.
     readonly property string icon: wired ? "lan"
-                                 : wifiNetwork ? wifiIcon(wifiNetwork.signalStrength)
+                                 : wifiNetwork ? wifiIcon(wifiNetwork.signalStrength ?? 0)
                                  : Networking.wifiEnabled ? "wifi_find"
                                  : "signal_wifi_off"
     readonly property string label: wired ? "Wired"
-                                  : wifiNetwork ? wifiNetwork.name
+                                  : wifiNetwork ? wifiNetwork.name ?? ""
                                   : Networking.wifiEnabled ? "Not connected"
                                   : "Off"
 
