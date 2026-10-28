@@ -6,29 +6,35 @@ import Quickshell.Wayland
 import qs.controlcenter
 import qs.services
 import qs.theme
+import qs.widgets
 
 // The bar: an "island" attached to the top edge of each monitor with the workspaces, the
 // time and status icons. Clicking the time or the status icons morphs it into a menu:
 // "today" (calendar) or "settings" (quick settings). While music plays, a "live activity"
 // (cover and bars) takes the time's place: hovering it shows a small player (and the time
-// again), clicking it or the player opens the "media" menu. One menu is open at a time, on one
-// monitor; click outside it or press Escape to close it.
+// again), clicking it or the player opens the "media" menu. Hovering the workspace dots shows
+// the minimized windows. One menu is open at a time, on one monitor; click outside it or press
+// Escape to close it.
 Scope {
     id: root
 
-    property string panel: ""      // "", "today", "settings" or "media"
+    property string panel: ""      // "", "today", "settings", "media" or "window"
     property string screenName: "" // the monitor the menu is open on
+    // The window menu acts on the window that was focused when it opened.
+    property HyprlandToplevel windowTarget: null
 
     function toggle(name: string, screen: string): void {
         if (panel === name && screenName === screen) {
             panel = "";
         } else {
+            if (name === "window")
+                windowTarget = Windows.active;
             panel = name;
             screenName = screen;
         }
     }
 
-    // From Hyprland binds: qs ipc call island toggle settings (or: today, media)
+    // From Hyprland binds: qs ipc call island toggle settings (or: today, media, window)
     IpcHandler {
         target: "island"
 
@@ -56,11 +62,12 @@ Scope {
             readonly property bool open: panel !== ""
             readonly property real closedWidth: topRow.implicitWidth + Theme.island.padding * 2
 
-            // The small player shown while hovering the live activity. Unlike a menu it takes
-            // no keyboard and closes when the pointer leaves the island.
-            property bool peek: false
-            // What's shown below the top row: a menu, the hover player ("peek") or nothing.
-            readonly property string shown: open ? panel : peek ? "peek" : ""
+            // A small view opened by hovering: "media" (the player, over the live activity) or
+            // "minimized" (over the workspace dots). Unlike a menu it takes no keyboard and
+            // closes when the pointer leaves the island.
+            property string peek: ""
+            // What's shown below the top row: a menu, a hover view ("peek-media", ...) or nothing.
+            readonly property string shown: open ? panel : peek ? "peek-" + peek : ""
             readonly property bool expanded: shown !== ""
 
             // While music plays the middle of the island shows the music instead of the time.
@@ -68,19 +75,26 @@ Scope {
             // music is then shown below it.
             readonly property bool showMedia: Media.playing && !expanded
 
-            onOpenChanged: peek = false
+            onOpenChanged: peek = ""
 
-            // Hover the live activity briefly to open the player; leave the island to close it.
+            // Hover the live activity or the workspace dots briefly to open their view; leave
+            // the island to close it.
             Timer {
                 interval: Theme.media.hoverDelay
                 running: center.containsMouse && window.showMedia
-                onTriggered: window.peek = true
+                onTriggered: window.peek = "media"
             }
 
             Timer {
                 interval: Theme.media.hoverDelay
-                running: window.peek && !content.containsMouse
-                onTriggered: window.peek = false
+                running: workspaces.hovered && Windows.minimized.length > 0 && !window.open
+                onTriggered: window.peek = "minimized"
+            }
+
+            Timer {
+                interval: Theme.media.hoverDelay
+                running: window.peek !== "" && !content.containsMouse
+                onTriggered: window.peek = ""
             }
 
             // The window is as big as the island can get, and stays that size: resizing a
@@ -135,8 +149,9 @@ Scope {
                 }
 
                 // Everything inside the island, clipped to its current size so the menus are
-                // revealed as it grows. A MouseArea only to know whether the pointer is over the
-                // island (hover reaches it through its children too); it takes no clicks.
+                // revealed as it grows. A MouseArea to know whether the pointer is over the island
+                // (hover reaches it through its children too), and for right-clicking the top
+                // row to open the window menu. Left clicks go to the buttons inside.
                 MouseArea {
                     id: content
 
@@ -146,7 +161,11 @@ Scope {
                     clip: true
                     focus: true
                     hoverEnabled: true
-                    acceptedButtons: Qt.NoButton
+                    acceptedButtons: Qt.RightButton
+                    onClicked: mouse => {
+                        if (mouse.y < Theme.island.height)
+                            root.toggle("window", window.modelData.name);
+                    }
                     Keys.onEscapePressed: root.panel = ""
 
                     // Workspaces | time | status icons. Both sides get the width of the wider
@@ -244,7 +263,9 @@ Scope {
                         implicitHeight: window.shown === "today" ? today.implicitHeight
                                       : window.shown === "settings" ? settings.implicitHeight
                                       : window.shown === "media" ? media.implicitHeight
-                                      : window.shown === "peek" ? peekCard.implicitHeight + Theme.spacing.s
+                                      : window.shown === "window" ? windowMenu.implicitHeight
+                                      : window.shown === "peek-media" ? peekCard.implicitHeight + Theme.spacing.s
+                                      : window.shown === "peek-minimized" ? peekMinimized.implicitHeight + Theme.spacing.m * 2
                                       : 0
 
                         // The hover player. Clicking it (outside its buttons) opens the media menu.
@@ -254,8 +275,36 @@ Scope {
                             width: parent.width - Theme.spacing.s * 2
                             color: "transparent"
                             onActivated: root.toggle("media", window.modelData.name)
-                            opacity: window.shown === "peek" ? 1 : 0
+                            opacity: window.shown === "peek-media" ? 1 : 0
                             visible: opacity > 0 && player !== null
+
+                            Behavior on opacity {
+                                NumberAnimation { duration: Theme.anim.normal }
+                            }
+                        }
+
+                        WindowPanel {
+                            id: windowMenu
+                            width: parent.width
+                            target: root.windowTarget
+                            opacity: window.shown === "window" ? 1 : 0
+                            visible: opacity > 0
+                            onDone: root.panel = ""
+
+                            Behavior on opacity {
+                                NumberAnimation { duration: Theme.anim.normal }
+                            }
+                        }
+
+                        // The minimized windows, while hovering the workspace dots.
+                        MinimizedList {
+                            id: peekMinimized
+                            x: Theme.spacing.l
+                            y: Theme.spacing.s
+                            width: parent.width - Theme.spacing.l * 2
+                            opacity: window.shown === "peek-minimized" ? 1 : 0
+                            visible: opacity > 0 && Windows.minimized.length > 0
+                            onRestored: window.peek = ""
 
                             Behavior on opacity {
                                 NumberAnimation { duration: Theme.anim.normal }

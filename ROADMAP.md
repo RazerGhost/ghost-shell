@@ -81,7 +81,7 @@ new setup step.
 - Launcher (`launcher/`, tap Super or Super+Space): `Fuzzy.js` scoring, tested in `tests/tst_fuzzy.qml`. Terminal apps
   open in Ghostty.
 - OSD (`osd/Osd.qml`) for volume, mute, mic mute and brightness, on the focused monitor.
-- Windows open floating and centered by default (user's request); Super+Down tiles one.
+- Windows open floating and centered by default (user's request); Super+T tiles one.
 
 ### Phase 3: Notifications + rest of the control center + session menu
 - Quickshell as the notification server: popups (from the island?) plus history in the "today" menu.
@@ -140,7 +140,7 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
   (`~/.local/state/quickshell/colors.json`). Quickshell reloads the whole shell when files in its config
   directory change; `Colors.qml` watches the file instead.
 - **Floating by default:** a `float = true, center = true` rule for every window in `rules.lua`; the
-  dwindle layout is kept for windows tiled with Super+Down.
+  dwindle layout is kept for windows tiled with Super+T.
 - **Brightness OSD through IPC:** sysfs backlight files send no inotify events, so the brightness
   binds run `qs ipc call brightness refresh` after `brightnessctl`. Volume and mic need nothing:
   the OSD watches PipeWire.
@@ -152,11 +152,18 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
   menu closed immediately. (The launcher maps a new surface with `Exclusive`, which works.)
 - **Keybinds: Windows-style** (user's choice, 2026-10-28): tap Super or Super+Space launcher,
   Super+Enter terminal, Super+E files, Super+B browser, Super+W / Alt+F4 close, Super+Up maximize,
-  Super+Down float/tile, Super+N quick settings, Super+C calendar, Super+Shift+S screenshot,
+  Super+Down minimize, Super+T float/tile, Alt+Space window menu, Super+N quick settings, Super+C calendar, Super+Shift+S screenshot,
   Ctrl+Alt+Delete log out, Super+Ctrl+arrows focus. Super+Left/Right are kept free for snapping
   (Phase 6) and Super+V for the clipboard (Phase 4). Full list in `hypr/binds.lua`.
 - **Window buttons:** Hyprland draws no title bars, so instead of hyprbars: keybinds plus a window
-  menu in the island for the focused window (close, maximize, float, move to workspace). Planned.
+  menu in the island (`controlcenter/WindowPanel.qml`, Alt+Space or right-click the island's top
+  row): minimize, maximize, float/tile, fullscreen, close, move to workspace 1-5, and the minimized
+  windows to restore.
+- **Minimize:** Hyprland has none. A minimized window moves to the hidden `special:minimized`
+  workspace (Super+Down, or the window menu); restoring moves it to the current workspace and
+  focuses it (`services/Windows.qml`). Hovering the workspace dots shows the minimized windows
+  (`MinimizedList`, also in the window menu); no separate indicator, to keep the island
+  consistent (user's choice).
 - **Media in the island:** while music plays, a "live activity" (`bar/MediaActivity.qml`: cover +
   bouncing bars, an effect, not real levels) replaces the clock, so the island stays centered (no
   alternating: user's choice). Hovering it opens a small player (`MediaCard`, no keyboard focus,
@@ -260,6 +267,14 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - Qt: `QtQuick.Shapes` (`Shape.CurveRenderer`, `PathArc.direction`), `MonthGrid` / `DayOfWeekRow`
   from `QtQuick.Controls.Basic` (MonthGrid needs an explicit height).
 - `console.log` doesn't reach `qs log`; use `console.warn` when debugging.
+- `HyprlandToplevel.address` has no `0x` (Hyprland's selector needs `address:0x<address>`).
+  `Hyprland.activeToplevel` is null after the shell starts until focus changes; match
+  `ToplevelManager.activeToplevel` (`Quickshell.Wayland`) against `HyprlandToplevel.wayland`.
+  `DesktopEntries.heuristicLookup(appId)` finds a window's .desktop entry (icon).
+- Lua dispatchers take a target window: `hl.dsp.window.move({ window = "address:0x...",
+  workspace = "special:x", follow = false })`, also `close`, `float`, `fullscreen({ mode =
+  "maximized" | "fullscreen", action = "toggle" })`, `move({ x, y, relative })`;
+  `hl.dsp.focus({ window = ... })`. A special workspace that's never toggled stays hidden.
 - Scrolling: `WheelHandler` received no wheel events on the island's layer surface; a
   `MouseArea { acceptedButtons: Qt.NoButton; onWheel: ... }` under the content works and lets
   clicks through. Wheel events pass through MouseAreas that have no `onWheel`.

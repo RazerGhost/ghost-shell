@@ -1,13 +1,17 @@
 import QtQuick
+import Quickshell
+import Quickshell.Widgets
 import qs.theme
 import qs.widgets
 
-// A row in the Wi-Fi and Bluetooth lists: icon, name, state, and an optional trailing icon.
-// `highlighted` (the connected network or device) draws it in the accent color.
+// A row in the Wi-Fi, Bluetooth and minimized-window lists: icon, name, state, and an optional
+// trailing icon. `icon` is a Material Symbol; `appIcon` (an icon theme name) replaces it with an
+// app's own icon. `highlighted` (the connected network or device) draws it in the accent color.
 MouseArea {
     id: root
 
     property string icon
+    property string appIcon
     property string title
     property string subtitle
     property string trailingIcon
@@ -37,17 +41,30 @@ MouseArea {
         }
     }
 
-    MaterialIcon {
-        id: glyph
+    Item {
+        id: leading
         anchors.left: parent.left
         anchors.leftMargin: Theme.spacing.m
         anchors.verticalCenter: parent.verticalCenter
-        icon: root.icon
-        color: root.contentColor
+        width: Theme.icon.normal
+        height: width
+
+        MaterialIcon {
+            anchors.centerIn: parent
+            visible: root.appIcon === ""
+            icon: root.icon
+            color: root.contentColor
+        }
+
+        IconImage {
+            anchors.fill: parent
+            visible: root.appIcon !== ""
+            source: visible ? Quickshell.iconPath(root.appIcon, "application-x-executable") : ""
+        }
     }
 
     Column {
-        anchors.left: glyph.right
+        anchors.left: leading.right
         anchors.right: trailing.visible ? trailing.left : parent.right
         anchors.leftMargin: Theme.spacing.m
         anchors.rightMargin: Theme.spacing.m

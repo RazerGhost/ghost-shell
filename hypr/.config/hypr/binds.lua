@@ -34,7 +34,12 @@ hl.bind("CTRL + ALT + Delete", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/nu
 hl.bind(mainMod .. " + W", hl.dsp.window.close())
 hl.bind("ALT + F4",        hl.dsp.window.close())
 hl.bind(mainMod .. " + up",   hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }))
-hl.bind(mainMod .. " + down", hl.dsp.window.float({ action = "toggle" })) -- float <-> tile
+-- Minimize: Hyprland has none, so the window goes to a hidden special workspace. The island's
+-- window menu lists it there to restore (same name as in quickshell's services/Windows.qml).
+hl.bind(mainMod .. " + down", hl.dsp.window.move({ workspace = "special:minimized", follow = false }))
+hl.bind(mainMod .. " + T",    hl.dsp.window.float({ action = "toggle" })) -- float <-> tile
+-- Window menu in the island (like Windows' Alt+Space): minimize, maximize, move, restore.
+hl.bind("ALT + space", hl.dsp.exec_cmd("qs ipc call island toggle window"))
 hl.bind(mainMod .. " + F",    hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit")) -- dwindle only

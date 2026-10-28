@@ -7,11 +7,13 @@ import "WorkspaceSlots.js" as WorkspaceSlots
 // Workspace dots for one monitor: always at least Theme.workspace.minimum of them, so you can
 // see where you are and jump to an empty one. The active one stretches into a pill, ones with
 // windows are bright, empty ones dim. Click a dot to go there; scroll to step through them.
+// `hovered` tells the island to show the minimized windows.
 Item {
     id: root
 
     required property ShellScreen screen
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(screen)
+    readonly property alias hovered: wheelArea.containsMouse
     readonly property int active: monitor?.activeWorkspace?.id ?? 1
 
     // This monitor's workspaces, by id. Hyprland.workspaces only lists ones that exist.
@@ -40,10 +42,13 @@ Item {
     // WheelHandler: the WheelHandler never received wheel events here. It takes no buttons, so
     // clicks still reach the dots.
     MouseArea {
+        id: wheelArea
+
         property real accumulated: 0
 
         anchors.fill: parent
         acceptedButtons: Qt.NoButton
+        hoverEnabled: true
         onWheel: wheel => {
             // Touchpads send many small scroll events; step once per notch-sized amount.
             accumulated += wheel.angleDelta.y;
