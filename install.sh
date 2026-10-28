@@ -152,6 +152,11 @@ elif [[ $# -ge 1 ]]; then
         fs.mkdirSync(require("path").dirname(file), { recursive: true });
         fs.writeFileSync(file, JSON.stringify({ path: process.env.WALLPAPER }, null, 4) + "\n");
     '
+elif wallpaper=$(node -e 'process.stdout.write(require(process.argv[1]).path || "")' \
+        "$HOME/.local/state/quickshell/wallpaper.json" 2>/dev/null) && [[ -f $wallpaper ]]; then
+    # Regenerate from the chosen wallpaper: renders templates added since (Spotify, Discord).
+    echo "Regenerating colors from the current wallpaper: $wallpaper"
+    matugen image "$wallpaper" -m dark --source-color-index 0
 elif [[ -f $HOME/.local/state/quickshell/colors.json ]]; then
     echo "Colors already generated; pass a wallpaper or a hex color to regenerate."
 else
