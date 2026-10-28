@@ -208,7 +208,7 @@ config files became settings.
   - **Keybinds:** read from Hyprland (`hyprctl binds -j`, every bind in `binds.lua` has a
     description), grouped per description (`settings/Keybinds.js`, tested).
 
-### Lock and login screen settings (built 2026-10-28; waiting on the user's test results)
+### Lock and login screen settings (done, verified on the laptop 2026-10-28)
 The follow-up to Phase 7 (user's choice of options; the lock screen shares the look, user's
 choice).
 - A "Lock and login screen" page: the picture (same as the desktop, or one of the wallpaper
