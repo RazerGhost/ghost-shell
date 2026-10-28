@@ -33,7 +33,7 @@ Scope {
         // also locks if hypridle isn't running.
         onIsIdleChanged: {
             if (isIdle)
-                Quickshell.execDetached(["qs", "ipc", "call", "lock", "lock"]);
+                Session.lock();
         }
     }
 
@@ -48,7 +48,7 @@ Scope {
         minutes: Settings.values["idle" + root.power + "Suspend"]
         onIsIdleChanged: {
             if (isIdle)
-                Quickshell.execDetached(["systemctl", "suspend"]);
+                Session.suspend();
         }
     }
 }

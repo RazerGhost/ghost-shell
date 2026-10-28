@@ -88,12 +88,25 @@ Scope {
         }
     }
 
+    function lock(): void {
+        message = "";
+        sessionLock.locked = true;
+    }
+
+    // Session.lock(): the power menu and the idle steps.
+    Connections {
+        target: Session
+
+        function onLockRequested(): void {
+            root.lock();
+        }
+    }
+
     IpcHandler {
         target: "lock"
 
         function lock(): void {
-            root.message = "";
-            sessionLock.locked = true;
+            root.lock();
         }
 
         function isLocked(): bool {

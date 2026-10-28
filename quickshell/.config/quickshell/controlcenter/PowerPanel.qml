@@ -1,5 +1,5 @@
 import QtQuick
-import Quickshell
+import qs.services
 import qs.theme
 
 // The power menu (power button in quick settings, or Ctrl+Alt+Delete): lock, suspend, log out,
@@ -21,16 +21,16 @@ Column {
         }
         armed = "";
         done();
-        Quickshell.execDetached(action.command);
+        Session[action.run]();
     }
 
+    // `run` is the Session function that does it.
     readonly property var actions: [
-        { name: "Lock", icon: "lock", command: ["qs", "ipc", "call", "lock", "lock"], confirm: false },
-        { name: "Suspend", icon: "bedtime", command: ["systemctl", "suspend"], confirm: false },
-        { name: "Log out", icon: "logout", confirm: true,
-          command: ["sh", "-c", "command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"] },
-        { name: "Restart", icon: "restart_alt", command: ["systemctl", "reboot"], confirm: true },
-        { name: "Shut down", icon: "power_settings_new", command: ["systemctl", "poweroff"], confirm: true }
+        { name: "Lock", icon: "lock", run: "lock", confirm: false },
+        { name: "Suspend", icon: "bedtime", run: "suspend", confirm: false },
+        { name: "Log out", icon: "logout", run: "logout", confirm: true },
+        { name: "Restart", icon: "restart_alt", run: "reboot", confirm: true },
+        { name: "Shut down", icon: "power_settings_new", run: "poweroff", confirm: true }
     ]
 
     padding: Theme.spacing.l

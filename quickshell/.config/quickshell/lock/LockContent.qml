@@ -193,9 +193,9 @@ Item {
 
         Repeater {
             model: [
-                { icon: "bedtime", label: "Suspend", command: "suspend" },
-                { icon: "restart_alt", label: "Restart", command: "reboot" },
-                { icon: "power_settings_new", label: "Shut down", command: "poweroff" }
+                { icon: "bedtime", label: "Suspend", run: "suspend" },
+                { icon: "restart_alt", label: "Restart", run: "reboot" },
+                { icon: "power_settings_new", label: "Shut down", run: "poweroff" }
             ]
 
             IconButton {
@@ -204,7 +204,7 @@ Item {
                 label: modelData.label
                 iconSize: Theme.icon.launcher
                 color: Colors.m3onSurface
-                onClicked: Quickshell.execDetached(["systemctl", modelData.command])
+                onClicked: Session[modelData.run]()
             }
         }
     }
