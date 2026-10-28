@@ -18,6 +18,7 @@ import qs.settings
 import qs.snap
 import qs.switcher
 import qs.wallpaper
+import qs.welcome
 
 ShellRoot {
     WallpaperLayer {}
@@ -28,6 +29,7 @@ ShellRoot {
     Lock {}
     LoginScreenSync {}
     PolkitPrompt {}
+    Welcome {}
     Screenshot {}
     Osd {}
     Overview {}

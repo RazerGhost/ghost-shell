@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 import qs.theme
 import qs.widgets
@@ -138,6 +139,11 @@ Column {
                 }
             }
         }
+    }
+
+    TextButton {
+        text: "Show the welcome tour"
+        onClicked: Quickshell.execDetached(["qs", "ipc", "call", "welcome", "show"])
     }
 
     Text {

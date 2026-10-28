@@ -89,6 +89,7 @@ Singleton {
             property var monitors: ({})
             // Equalizer gains in dB per output, by PipeWire node name (services/Equalizer.qml).
             property var equalizer: ({})
+            property bool welcomeSeen: false // the welcome tour (welcome/Welcome.qml) has been shown
             property bool rememberPositions: true // floating apps reopen where they were (positions.lua)
 
             // Desktop entry ids of the apps Super+Enter, Super+B and Super+E open, and of the apps

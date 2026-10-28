@@ -65,7 +65,7 @@ Singleton {
         { id: "screentime", section: "Apps", icon: "hourglass", title: "Screen time",
           words: "usage time apps today week hours digital wellbeing" },
         { id: "keybinds", section: "Apps", icon: "keyboard", title: "Keybinds",
-          words: "shortcuts keys" },
+          words: "shortcuts keys welcome tour help" },
         { id: "clock", section: "Apps", icon: "partly_cloudy_day", title: "Weather and clock",
           words: "weather town location 24-hour 12-hour time" }
     ]

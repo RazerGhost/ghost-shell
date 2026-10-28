@@ -148,6 +148,12 @@ Singleton {
         readonly property int width: 56 // one layout picture in the snap picker (16:9)
     }
 
+    readonly property QtObject welcome: QtObject {
+        readonly property int width: 440 // the tour's card
+        readonly property int icon:  48  // the symbol at the top of each card
+        readonly property int dot:   6   // the progress dots
+    }
+
     readonly property QtObject lock: QtObject {
         readonly property int clock:      112 // the big clock
         readonly property int fieldWidth: 340 // password field

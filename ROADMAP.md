@@ -478,6 +478,13 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   (`ScreenTime.js`, tested), saved every minute; across a shell reload the counts stay in
   `PersistentProperties` as JSON text (a write during a reload is cancelled).
 
+### Welcome tour (done, verified on the laptop 2026-10-29)
+- `welcome/Welcome.qml` (user's choice: cards): six cards over the dimmed screen (welcome, the
+  launcher, the island, tiling and switching, the dock and tools, Settings), each with its keys
+  as key caps, progress dots, Skip / Back / Next. Right or Enter, Left, Escape. Shown on the
+  first start (`welcomeSeen` in settings.json) and again from Settings -> Keybinds ("Show the
+  welcome tour") or `qs ipc call welcome show`.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
