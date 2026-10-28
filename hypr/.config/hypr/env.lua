@@ -5,6 +5,10 @@
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
 
+-- Quickshell's icon theme (it doesn't read GTK's setting). Without it only hicolor icons were
+-- found, so the "unknown app" fallback icon (application-x-executable) never loaded.
+hl.env("QS_ICON_THEME", "Adwaita")
+
 -- GPU: Hyprland (and everything it launches) renders on the AMD iGPU; the first entry is primary.
 -- The RTX is listed second only so outputs wired to it (HDMI / USB-C) still work.
 -- Run heavy apps on the RTX with: prime-run <app>
