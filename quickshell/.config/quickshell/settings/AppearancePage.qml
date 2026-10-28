@@ -1,0 +1,88 @@
+import QtQuick
+import qs.services
+import qs.theme
+import qs.widgets
+
+// Appearance: the wallpaper (the colors of everything come from it), the shell's panels (glass
+// or nearly solid: Colors.surfaceTranslucent, widgets/Surface.qml), and the windows' border and
+// corners (applied through Hyprland, HyprlandSettings.qml).
+Column {
+    id: page
+
+    spacing: Theme.spacing.l
+
+    readonly property var pixels: v => v === 0 ? "None" : v + " px"
+
+    SettingGroup {
+        title: "Wallpaper"
+
+        SettingRow {
+            title: Wallpaper.path ? Wallpaper.path.split("/").pop() : "Hyprland's default"
+            subtitle: "The colors of the shell, Hyprland and your apps come from it"
+
+            TextButton {
+                text: "Change"
+                onClicked: Wallpaper.pickerOpen = true
+            }
+        }
+    }
+
+    SettingGroup {
+        title: "Shell panels"
+
+        SettingRow {
+            title: "Glass"
+            subtitle: "The island, menus, dock and launcher are see-through, with a thin light edge"
+
+            Switch {
+                label: "Glass panels"
+                checked: Settings.values.glass
+                onToggled: Settings.values.glass = !checked
+            }
+        }
+
+        SettingRow {
+            visible: Settings.values.glass
+            title: "See-through"
+            subtitle: "How solid the glass is"
+
+            Stepper {
+                label: "Glass opacity"
+                // Not below 35 %: the blur rules skip pixels under 30 % (ignore_alpha in rules.lua).
+                values: Array.from({ length: 11 }, (_, i) => 35 + i * 5)
+                value: Settings.values.glassOpacity
+                format: v => v + " %"
+                onPicked: v => Settings.values.glassOpacity = v
+            }
+        }
+    }
+
+    SettingGroup {
+        title: "Windows"
+
+        SettingRow {
+            title: "Border"
+            subtitle: "In your wallpaper's colors"
+
+            Stepper {
+                label: "Border width"
+                values: Array.from({ length: 7 }, (_, i) => i)
+                value: Settings.values.borderSize
+                format: page.pixels
+                onPicked: v => Settings.values.borderSize = v
+            }
+        }
+
+        SettingRow {
+            title: "Rounded corners"
+
+            Stepper {
+                label: "Corner rounding"
+                values: Array.from({ length: 13 }, (_, i) => i * 2)
+                value: Settings.values.rounding
+                format: page.pixels
+                onPicked: v => Settings.values.rounding = v
+            }
+        }
+    }
+}

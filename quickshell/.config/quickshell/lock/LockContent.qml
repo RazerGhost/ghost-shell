@@ -71,7 +71,7 @@ Item {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             visible: Settings.values.lockClock
-            text: Qt.formatTime(clock.date, Settings.values.lock24Hour ? "HH:mm" : "h:mm AP")
+            text: Qt.formatTime(clock.date, Settings.values.clock24Hour ? "HH:mm" : "h:mm AP")
             color: Colors.m3onSurface
             font.family: Theme.font.sans
             font.pixelSize: Theme.lock.clock

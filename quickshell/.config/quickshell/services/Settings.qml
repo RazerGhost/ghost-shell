@@ -55,11 +55,12 @@ Singleton {
             property int lockDim: 25          // percent darker
             property bool lockClock: true
             property bool lockDate: true
-            property bool lock24Hour: true
             property bool greeterShowName: true     // your user name above the password field
             property bool greeterPowerButtons: true // suspend, restart and shut down
 
             property bool hotCorner: true // the pointer in the top-left corner opens the overview
+
+            property bool clock24Hour: true // the island's and the lock screen's clock ("9:41 PM" off)
 
             // The town for the weather in the today menu (services/Weather.qml); "" = no weather.
             property string weatherLocation: ""

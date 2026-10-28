@@ -179,18 +179,6 @@ Column {
         }
 
         SettingRow {
-            title: "24-hour clock"
-            subtitle: "Off: 9:41 PM"
-            enabled: Settings.values.lockClock
-
-            Switch {
-                label: "24-hour clock"
-                checked: Settings.values.lock24Hour
-                onToggled: Settings.values.lock24Hour = !checked
-            }
-        }
-
-        SettingRow {
             title: "Show the date"
 
             Switch {

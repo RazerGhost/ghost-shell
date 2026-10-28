@@ -23,7 +23,7 @@ Singleton {
         reloadableId: "settingsWindow"
 
         property bool open: false
-        property string page: "nightlight"
+        property string page: "appearance"
     }
 
     // This window in Hyprland's list, for maximizing. Not FloatingWindow.maximized: Hyprland marks
@@ -39,16 +39,36 @@ Singleton {
             Windows.toggleMaximized(toplevel);
     }
 
+    // The pages in their sidebar sections (user's choice: grouped, with a search field). The
+    // search matches a page's title and these words, so it finds the page for any setting on it.
     readonly property var pages: [
-        { id: "nightlight", icon: "nightlight", title: "Night light" },
-        { id: "dnd", icon: "do_not_disturb_on", title: "Do Not Disturb" },
-        { id: "idle", icon: "bedtime", title: "Idle and power" },
-        { id: "input", icon: "touchpad_mouse", title: "Keyboard and touchpad" },
-        { id: "windows", icon: "select_window", title: "Windows" },
-        { id: "lock", icon: "lock", title: "Lock and login screen" },
-        { id: "apps", icon: "apps", title: "Default apps" },
-        { id: "keybinds", icon: "keyboard", title: "Keybinds" }
+        { id: "appearance", section: "Personalize", icon: "palette", title: "Appearance",
+          words: "wallpaper colors theme glass blur transparent see-through border corners rounding" },
+        { id: "display", section: "Personalize", icon: "brightness_6", title: "Display",
+          words: "night light warm blue light schedule screen" },
+        { id: "lock", section: "Personalize", icon: "lock", title: "Lock screen",
+          words: "login greeter picture blur darken clock date name power buttons" },
+        { id: "windows", section: "System", icon: "select_window", title: "Windows",
+          words: "gaps tiling hot corner overview reopen floating position" },
+        { id: "notifications", section: "System", icon: "notifications", title: "Notifications",
+          words: "do not disturb dnd quiet schedule" },
+        { id: "power", section: "System", icon: "battery_charging_full", title: "Power",
+          words: "idle dim lock screen off suspend sleep battery plugged" },
+        { id: "input", section: "System", icon: "touchpad_mouse", title: "Keyboard and mouse",
+          words: "keyboard layout language touchpad natural scrolling tap click pointer speed" },
+        { id: "apps", section: "Apps", icon: "apps", title: "Default apps",
+          words: "terminal browser file manager editor image viewer video audio player" },
+        { id: "keybinds", section: "Apps", icon: "keyboard", title: "Keybinds",
+          words: "shortcuts keys" },
+        { id: "clock", section: "Apps", icon: "partly_cloudy_day", title: "Weather and clock",
+          words: "weather town location 24-hour 12-hour time" }
     ]
+    property string search: ""
+    // The pages the search finds (all of them without one).
+    readonly property var shown: {
+        const q = search.trim().toLowerCase();
+        return q === "" ? root.pages : root.pages.filter(p => (p.title + " " + p.words).toLowerCase().includes(q));
+    }
 
     FloatingWindow {
         id: window
@@ -64,6 +84,8 @@ Singleton {
         onVisibleChanged: {
             if (!visible)
                 root.open = false;
+            else
+                searchField.focusInput(); // type to search right away
         }
 
         // The title bar: drag it to move the window, double-click to maximize.
@@ -125,70 +147,126 @@ Singleton {
             }
         }
 
-        // The categories.
-        Column {
-            id: sidebar
+        // The sidebar: search and the pages, scrolling when the window is short.
+        Flickable {
+            id: sidebarView
 
             anchors.top: titleBar.bottom
             anchors.bottom: parent.bottom
             width: Theme.settings.sidebar
-            leftPadding: Theme.spacing.m
-            rightPadding: Theme.spacing.m
-            spacing: Theme.spacing.xs
+            contentHeight: sidebar.implicitHeight + Theme.spacing.m
+            clip: true
+            boundsBehavior: Flickable.StopAtBounds
 
-            Accessible.role: Accessible.PageTabList
-            Accessible.name: "Settings categories"
+            Column {
+                id: sidebar
 
-            Repeater {
-                model: root.pages
+                width: parent.width
+                leftPadding: Theme.spacing.m
+                rightPadding: Theme.spacing.m
+                spacing: Theme.spacing.xs
 
-                MouseArea {
-                    id: entry
+                Accessible.role: Accessible.PageTabList
+                Accessible.name: "Settings categories"
 
-                    required property var modelData
-                    readonly property bool selected: root.page === modelData.id
-
+                SearchField {
+                    id: searchField
                     width: sidebar.width - sidebar.leftPadding - sidebar.rightPadding
-                    height: Theme.list.rowHeight - Theme.spacing.s
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.page = modelData.id
-
-                    Accessible.role: Accessible.PageTab
-                    Accessible.name: modelData.title
-                    Accessible.selected: selected
-                    Accessible.onPressAction: root.page = modelData.id
-
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: Theme.radius.full
-                        color: entry.selected ? Colors.m3primaryContainer : Colors.m3onSurface
-                        opacity: entry.selected ? 1 : entry.containsMouse ? Theme.state.hover : 0
-
-                        Behavior on opacity {
-                            NumberAnimation { duration: Theme.anim.fast }
+                    placeholder: "Search settings"
+                    onTextChanged: root.search = text
+                    // Enter opens the first page found.
+                    onKeyPressed: event => {
+                        if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && root.shown.length > 0) {
+                            root.page = root.shown[0].id;
+                            event.accepted = true;
                         }
                     }
+                }
 
-                    Row {
-                        anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacing.l
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacing.m
+                Text {
+                    visible: root.shown.length === 0
+                    leftPadding: Theme.spacing.l
+                    topPadding: Theme.spacing.s
+                    text: "Nothing found"
+                    color: Colors.m3onSurfaceVariant
+                    font.family: Theme.font.sans
+                    font.pixelSize: Theme.font.small
+                }
 
-                        MaterialIcon {
-                            anchors.verticalCenter: parent.verticalCenter
-                            icon: entry.modelData.icon
-                            color: entry.selected ? Colors.m3onPrimaryContainer : Colors.m3onSurfaceVariant
-                        }
+                Repeater {
+                    model: root.shown
+
+                    MouseArea {
+                        id: entry
+
+                        required property var modelData
+                        required property int index
+                        readonly property bool selected: root.page === modelData.id
+                        // A section's name above its first page (not while searching).
+                        readonly property bool firstOfSection: root.search === ""
+                            && (index === 0 || root.shown[index - 1].section !== modelData.section)
+                        readonly property real rowHeight: Theme.list.rowHeight - Theme.spacing.s
+
+                        width: sidebar.width - sidebar.leftPadding - sidebar.rightPadding
+                        height: rowHeight + (firstOfSection ? header.height : 0)
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.page = modelData.id
+
+                        Accessible.role: Accessible.PageTab
+                        Accessible.name: modelData.title
+                        Accessible.selected: selected
+                        Accessible.onPressAction: root.page = modelData.id
 
                         Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: entry.modelData.title
-                            color: entry.selected ? Colors.m3onPrimaryContainer : Colors.m3onSurface
+                            id: header
+                            visible: entry.firstOfSection
+                            leftPadding: Theme.spacing.l
+                            topPadding: entry.index === 0 ? Theme.spacing.s : Theme.spacing.m
+                            bottomPadding: Theme.spacing.xs
+                            text: entry.modelData.section
+                            color: Colors.m3primary
                             font.family: Theme.font.sans
-                            font.pixelSize: Theme.font.normal
-                            font.weight: entry.selected ? Font.DemiBold : Font.Normal
+                            font.pixelSize: Theme.font.small
+                            font.weight: Font.DemiBold
+                            Accessible.role: Accessible.Heading
+                        }
+
+                        Rectangle {
+                            anchors.bottom: parent.bottom
+                            width: parent.width
+                            height: entry.rowHeight
+                            radius: Theme.radius.full
+                            color: entry.selected ? Colors.m3primaryContainer : Colors.m3onSurface
+                            opacity: entry.selected ? 1 : entry.containsMouse ? Theme.state.hover : 0
+
+                            Behavior on opacity {
+                                NumberAnimation { duration: Theme.anim.fast }
+                            }
+
+                        }
+
+                        Row {
+                            anchors.left: parent.left
+                            anchors.leftMargin: Theme.spacing.l
+                            anchors.bottom: parent.bottom
+                            height: entry.rowHeight
+                            spacing: Theme.spacing.m
+
+                            MaterialIcon {
+                                anchors.verticalCenter: parent.verticalCenter
+                                icon: entry.modelData.icon
+                                color: entry.selected ? Colors.m3onPrimaryContainer : Colors.m3onSurfaceVariant
+                            }
+
+                            Text {
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: entry.modelData.title
+                                color: entry.selected ? Colors.m3onPrimaryContainer : Colors.m3onSurface
+                                font.family: Theme.font.sans
+                                font.pixelSize: Theme.font.normal
+                                font.weight: entry.selected ? Font.DemiBold : Font.Normal
+                            }
                         }
                     }
                 }
@@ -199,7 +277,7 @@ Singleton {
         Flickable {
             id: content
 
-            anchors.left: sidebar.right
+            anchors.left: sidebarView.right
             anchors.right: parent.right
             anchors.top: titleBar.bottom
             anchors.bottom: parent.bottom
@@ -216,24 +294,19 @@ Singleton {
                 spacing: Theme.spacing.l
 
                 // Only the chosen page is visible; a Column skips the others.
-                NightLightPage {
+                AppearancePage {
                     width: parent.width
-                    visible: root.page === "nightlight"
+                    visible: root.page === "appearance"
                 }
 
-                DndPage {
+                DisplayPage {
                     width: parent.width
-                    visible: root.page === "dnd"
+                    visible: root.page === "display"
                 }
 
-                IdlePage {
+                LockPage {
                     width: parent.width
-                    visible: root.page === "idle"
-                }
-
-                InputPage {
-                    width: parent.width
-                    visible: root.page === "input"
+                    visible: root.page === "lock"
                 }
 
                 WindowsPage {
@@ -241,9 +314,19 @@ Singleton {
                     visible: root.page === "windows"
                 }
 
-                LockPage {
+                NotificationsPage {
                     width: parent.width
-                    visible: root.page === "lock"
+                    visible: root.page === "notifications"
+                }
+
+                PowerPage {
+                    width: parent.width
+                    visible: root.page === "power"
+                }
+
+                InputPage {
+                    width: parent.width
+                    visible: root.page === "input"
                 }
 
                 AppsPage {
@@ -254,6 +337,11 @@ Singleton {
                 KeybindsPage {
                     width: parent.width
                     visible: root.page === "keybinds"
+                }
+
+                ClockWeatherPage {
+                    width: parent.width
+                    visible: root.page === "clock"
                 }
             }
         }

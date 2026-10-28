@@ -4,7 +4,7 @@ import qs.theme
 import qs.widgets
 import "../services/Schedule.js" as Schedule
 
-// Do Not Disturb: on/off and an optional daily schedule (e.g. at night).
+// Notifications: Do Not Disturb, on/off and an optional daily schedule (e.g. at night).
 Column {
     spacing: Theme.spacing.l
 

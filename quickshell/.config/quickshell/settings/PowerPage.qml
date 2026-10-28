@@ -4,7 +4,7 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// Idle and power: after how long without input the screen dims, locks, turns off and the
+// Power: after how long without input the screen dims, locks, turns off and the
 // laptop suspends; separately on battery and plugged in (idle/Idle.qml does it).
 Column {
     id: root

@@ -4,7 +4,7 @@ import qs.theme
 import qs.widgets
 import "../services/Schedule.js" as Schedule
 
-// Night light: on/off, how warm, and an optional daily schedule.
+// Display: night light (on/off, how warm, and an optional daily schedule).
 Column {
     spacing: Theme.spacing.l
 

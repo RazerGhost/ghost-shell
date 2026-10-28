@@ -1,11 +1,12 @@
 import QtQuick
 import Quickshell
+import qs.services
 import qs.theme
 
 // The time, e.g. "14:32". The date is in the calendar menu (click the time).
 Text {
     anchors.verticalCenter: parent.verticalCenter
-    text: Qt.formatDateTime(clock.date, "HH:mm")
+    text: Qt.formatDateTime(clock.date, Settings.values.clock24Hour ? "HH:mm" : "h:mm AP")
     color: Colors.m3onSurface
     font.family: Theme.font.sans
     font.pixelSize: Theme.font.normal

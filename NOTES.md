@@ -44,6 +44,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   floating one by dispatch failed until it was 0.
 
 **Quickshell 0.3.2**
+- An `id` wins over a same-named property in unqualified lookups: in a file with
+  `Column { id: pages }` and `readonly property var pages`, a binding saying `pages.filter(...)`
+  got the Column (TypeError, an empty list). Qualify (`root.pages`) when an id and a property share a name.
 - Imports: `import qs.<folder>` relative to `shell.qml`; no `qmldir` needed. Singletons:
   `pragma Singleton` with a `Singleton {}` root.
 - `PanelWindow`: `anchors.*`, `margins.*`, `implicitWidth/Height`, `exclusionMode`
