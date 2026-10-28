@@ -337,6 +337,12 @@ tag, Material-Theme at a commit; the user's own Ghost repos follow their main br
 - `screenshot/Screenshot.qml`, like Windows' Snipping Tool (user's choice): Super+Shift+S freezes
   the focused monitor (one `ScreencopyView` frame) and dims it, with a Region / Window / Screen
   bar under the island (R / W / S keys too, Escape cancels). Print takes the whole screen at once.
+- Capture tools (the capture module, user's picks from the research): the bar also picks what
+  to do: Screenshot, Text (tesseract OCR, copied), QR code (zbarimg, copied; a link can be opened
+  from the notification) or Record (`services/Recorder.qml`, gpu-screen-recorder with the desktop's
+  sound into `~/Videos/Recordings`; a red dot and the time in the island, Stop in quick settings or
+  Super+Shift+R again), and has the color picker (hyprpicker, copies #rrggbb). Keys P/T/Q/V and C.
+  Mouse selection couldn't be simulated in tests; each tool was tested on its own.
 - Every screenshot is copied and saved to `~/Pictures/Screenshots` (user's choice: both), with a
   notification showing it; clicking it opens the picture. The picture is cut from the frozen
   frame, so it's exactly what was frozen (menus, tooltips). Without the shell, the binds fall back

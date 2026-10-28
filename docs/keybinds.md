@@ -35,6 +35,7 @@ the same list.
 | Super + Tab | Overview |
 | Super + Ctrl + left … Super + Ctrl + down | Move focus |
 | Super + Shift + S | Screenshot (region, window or screen) |
+| Super + Shift + R | Record the screen (again: stop) |
 | Print | Screenshot of the screen |
 | Super + 1 … Super + 0 | Go to workspace 1-10 |
 | Super + Shift + 1 … Super + Shift + 0 | Move window to workspace 1-10 |

@@ -8,10 +8,13 @@ import qs.theme
 import qs.widgets
 
 // Screenshots, like Windows' Snipping Tool (user's choice). Super+Shift+S freezes the focused
-// monitor and dims it; a bar at the top picks Region (drag a rectangle), Window (click one) or
-// Screen (click anywhere). Escape cancels. Print Screen takes the whole screen at once.
+// monitor and dims it; a bar at the top picks what to do (a screenshot, the text in it (OCR), a
+// QR code in it, or a recording) and where: Region (drag a rectangle), Window (click one) or
+// Screen (click anywhere); and has the color picker. Escape cancels. Print Screen takes the whole
+// screen at once; Super+Shift+R starts (or stops) a recording.
 // Every screenshot is saved to ~/Pictures/Screenshots, copied to the clipboard, and announced
-// with a notification showing it (click it to open the picture).
+// with a notification showing it (click it to open the picture). Text and QR codes are copied
+// (the picture they came from isn't kept); recordings are services/Recorder.qml's.
 //
 // The frozen picture is one frame from ScreencopyView, and the screenshot is cut from that same
 // frame, so it shows exactly what was frozen (an open menu or tooltip included).
@@ -20,10 +23,12 @@ Scope {
 
     property bool open: false
     property string mode: "region" // "region", "window" or "screen"
+    property string action: "shot" // "shot", "text", "qr" or "record"
     readonly property string folder: Quickshell.env("HOME") + "/Pictures/Screenshots"
 
-    function start(withMode: string): void {
+    function start(withMode: string, withAction: string): void {
         mode = withMode;
+        action = withAction;
         Hyprland.refreshToplevels(); // fresh window positions for Window mode
         open = true;
     }
@@ -42,17 +47,63 @@ Scope {
         return folder + "/Screenshot_" + Qt.formatDateTime(new Date(), "yyyy-MM-dd_HH-mm-ss") + ".png";
     }
 
+    // The text in a picture (tesseract), or the QR code in it (zbarimg), copied to the clipboard
+    // and shown in a notification; a link from a QR code can be opened from it. The picture was
+    // only for reading, so it's removed.
+    function read(path: string): void {
+        open = false;
+        const script = action === "text" ? `
+            text=$(tesseract "$1" - -l eng 2>/dev/null); rm -f "$1"
+            if [ -n "$(printf %s "$text" | tr -d '[:space:]')" ]; then
+                printf %s "$text" | wl-copy
+                notify-send -a Screenshot -i edit-copy "Text copied" "$(printf %s "$text" | head -c 300)"
+            else
+                notify-send -a Screenshot "No text found" "Try a larger or sharper area"
+            fi` : `
+            code=$(zbarimg -q --raw "$1" 2>/dev/null); rm -f "$1"
+            if [ -n "$code" ]; then
+                printf %s "$code" | wl-copy
+                case $code in
+                    http://*|https://*)
+                        action=$(notify-send -a Screenshot -A default=Open "QR code copied" "$code")
+                        [ "$action" = default ] && xdg-open "$code" ;;
+                    *) notify-send -a Screenshot "QR code copied" "$code" ;;
+                esac
+            else
+                notify-send -a Screenshot "No QR code found" "Select the whole code"
+            fi`;
+        Quickshell.execDetached(["sh", "-c", script, "sh", path]);
+    }
+
+    // The color picker (hyprpicker): the overlay closes first, since hyprpicker draws its own.
+    // The color is copied as #rrggbb.
+    function pickColor(): void {
+        open = false;
+        Quickshell.execDetached(["sh", "-c", `
+            sleep 0.3
+            color=$(hyprpicker -a -f hex) && [ -n "$color" ] && notify-send -a "Color picker" "Color copied" "$color"
+        `]);
+    }
+
     IpcHandler {
         target: "screenshot"
 
         // Super+Shift+S: the overlay, starting in Region mode.
         function region(): void {
-            root.start("region");
+            root.start("region", "shot");
+        }
+
+        // Super+Shift+R: stops a recording, or opens the overlay to start one.
+        function record(): void {
+            if (Recorder.recording)
+                Recorder.stop();
+            else
+                root.start("region", "record");
         }
 
         // Print Screen: the whole focused monitor, without the overlay.
         function screen(): void {
-            root.start("screen");
+            root.start("screen", "shot");
             capture.immediate = true;
         }
     }
@@ -102,14 +153,30 @@ Scope {
             if (r.width < 2 || r.height < 2)
                 return;
             const scale = monitor?.scale ?? 1;
+            if (root.action === "record") {
+                // Recorded live, not from the frozen frame: hand the area over to the recorder,
+                // in the monitor's pixels and global coordinates.
+                root.open = false;
+                if (root.mode === "screen")
+                    Recorder.start(monitor.name, null);
+                else
+                    Recorder.start("region", { x: (monitor.x + r.x) * scale, y: (monitor.y + r.y) * scale,
+                                               width: r.width * scale, height: r.height * scale });
+                return;
+            }
             cut.sourceRect = r;
             cut.width = r.width;
             cut.height = r.height;
-            const path = root.fileName();
+            // Text and QR codes are read from a temporary picture, not kept in Pictures.
+            const path = root.action === "shot" ? root.fileName()
+                : Quickshell.env("XDG_RUNTIME_DIR") + "/qs-capture-" + Date.now() + ".png";
             cut.grabToImage(result => {
                 result.saveToFile(path);
                 capture.immediate = false;
-                root.done(path);
+                if (root.action === "shot")
+                    root.done(path);
+                else
+                    root.read(path);
             }, Qt.size(Math.round(r.width * scale), Math.round(r.height * scale)));
         }
 
@@ -231,18 +298,21 @@ Scope {
             }
         }
 
-        // Keyboard: Escape cancels; R / W / S switch modes.
+        // Keyboard: Escape cancels; R / W / S pick where; P / T / Q / V what (picture, text, QR
+        // code, video); C the color picker.
         Item {
             id: keys
             focus: true
             Keys.onEscapePressed: root.open = false
             Keys.onPressed: event => {
-                if (event.key === Qt.Key_R)
-                    root.mode = "region";
-                else if (event.key === Qt.Key_W)
-                    root.mode = "window";
-                else if (event.key === Qt.Key_S)
-                    root.mode = "screen";
+                const modes = { [Qt.Key_R]: "region", [Qt.Key_W]: "window", [Qt.Key_S]: "screen" };
+                const actions = { [Qt.Key_P]: "shot", [Qt.Key_T]: "text", [Qt.Key_Q]: "qr", [Qt.Key_V]: "record" };
+                if (modes[event.key])
+                    root.mode = modes[event.key];
+                else if (actions[event.key])
+                    root.action = actions[event.key];
+                else if (event.key === Qt.Key_C)
+                    root.pickColor();
             }
         }
 
@@ -263,58 +333,61 @@ Scope {
                 anchors.centerIn: parent
                 spacing: Theme.spacing.xs
 
+                // What to do.
                 Repeater {
                     model: [
-                        { mode: "region", icon: "crop", label: "Region" },
-                        { mode: "window", icon: "select_window", label: "Window" },
-                        { mode: "screen", icon: "fullscreen", label: "Screen" }
+                        { value: "shot", icon: "photo_camera", label: "Screenshot" },
+                        { value: "text", icon: "text_fields", label: "Text" },
+                        { value: "qr", icon: "qr_code_scanner", label: "QR code" },
+                        { value: "record", icon: "videocam", label: "Record" }
                     ]
 
-                    MouseArea {
-                        id: modeButton
-
+                    CaptureChoice {
                         required property var modelData
-                        readonly property bool selected: root.mode === modelData.mode
-
-                        width: modeRow.implicitWidth + Theme.spacing.l * 2
-                        height: Theme.island.height
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.mode = modelData.mode
-
-                        Accessible.role: Accessible.RadioButton
-                        Accessible.name: modelData.label
-                        Accessible.checked: selected
-                        Accessible.onPressAction: root.mode = modelData.mode
-
-                        Rectangle {
-                            anchors.fill: parent
-                            radius: Theme.radius.full
-                            color: modeButton.selected ? Colors.m3primaryContainer : Colors.m3onSurface
-                            opacity: modeButton.selected ? 1 : modeButton.containsMouse ? Theme.state.hover : 0
-                        }
-
-                        Row {
-                            id: modeRow
-                            anchors.centerIn: parent
-                            spacing: Theme.spacing.s
-
-                            MaterialIcon {
-                                anchors.verticalCenter: parent.verticalCenter
-                                icon: modeButton.modelData.icon
-                                color: modeButton.selected ? Colors.m3onPrimaryContainer : Colors.m3onSurface
-                                font.pixelSize: Theme.icon.small
-                            }
-
-                            Text {
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: modeButton.modelData.label
-                                color: modeButton.selected ? Colors.m3onPrimaryContainer : Colors.m3onSurface
-                                font.family: Theme.font.sans
-                                font.pixelSize: Theme.font.normal
-                            }
-                        }
+                        icon: modelData.icon
+                        label: modelData.label
+                        selected: root.action === modelData.value
+                        onPicked: root.action = modelData.value
                     }
+                }
+
+                Rectangle {
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 1
+                    height: Theme.island.height * 0.6
+                    color: Colors.m3outlineVariant
+                }
+
+                // Where.
+                Repeater {
+                    model: [
+                        { value: "region", icon: "crop", label: "Region" },
+                        { value: "window", icon: "select_window", label: "Window" },
+                        { value: "screen", icon: "fullscreen", label: "Screen" }
+                    ]
+
+                    CaptureChoice {
+                        required property var modelData
+                        icon: modelData.icon
+                        label: modelData.label
+                        selected: root.mode === modelData.value
+                        onPicked: root.mode = modelData.value
+                    }
+                }
+
+                Rectangle {
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 1
+                    height: Theme.island.height * 0.6
+                    color: Colors.m3outlineVariant
+                }
+
+                IconButton {
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon: "colorize"
+                    label: "Color picker"
+                    iconSize: Theme.icon.small
+                    onClicked: root.pickColor()
                 }
 
                 IconButton {

@@ -160,6 +160,44 @@ Item {
             onMoved: value => Brightness.set(value)
         }
 
+        // A screen recording: its time and a Stop button.
+        Item {
+            width: parent.width
+            implicitHeight: Theme.slider.height
+            visible: Recorder.recording
+
+            Row {
+                anchors.left: parent.left
+                anchors.leftMargin: Theme.spacing.s
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacing.s
+
+                Rectangle {
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: Theme.spacing.s
+                    height: width
+                    radius: width / 2
+                    color: Colors.m3error
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "Recording the screen · " + Recorder.time
+                    color: Colors.m3onSurfaceVariant
+                    font.family: Theme.font.sans
+                    font.pixelSize: Theme.font.normal
+                }
+            }
+
+            TextButton {
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacing.xs
+                anchors.verticalCenter: parent.verticalCenter
+                text: "Stop"
+                onClicked: Recorder.stop()
+            }
+        }
+
         // An app recording from the microphone, like Android's privacy indicator.
         Row {
             visible: Audio.recordingApps.length > 0

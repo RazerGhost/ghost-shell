@@ -23,6 +23,33 @@ Row {
         font.pixelSize: Theme.icon.small
     }
 
+    // A screen recording is running: a red dot and the time (services/Recorder.qml).
+    Row {
+        anchors.verticalCenter: parent.verticalCenter
+        visible: Recorder.recording
+        spacing: Theme.spacing.xs
+
+        Rectangle {
+            anchors.verticalCenter: parent.verticalCenter
+            width: Theme.spacing.s
+            height: width
+            radius: width / 2
+            color: Colors.m3error
+        }
+
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            text: Recorder.time
+            color: Colors.m3onSurface
+            font.family: Theme.font.sans
+            font.pixelSize: Theme.font.small
+            font.features: { "tnum": 1 } // digits of equal width, so the time doesn't jitter
+        }
+
+        Accessible.role: Accessible.StaticText
+        Accessible.name: "Recording the screen, " + Recorder.time
+    }
+
     // An app is recording from the microphone.
     MaterialIcon {
         anchors.verticalCenter: parent.verticalCenter

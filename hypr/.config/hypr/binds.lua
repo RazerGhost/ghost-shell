@@ -85,6 +85,7 @@ hl.bind(mainMod .. " + CTRL + down",  hl.dsp.focus({ direction = "down" }), { de
 -- Super+Shift+S picks a region, window or the screen; Print takes the whole screen. Without the
 -- shell, grim + slurp still copy a region.
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd('qs ipc call screenshot region || grim -g "$(slurp)" - | wl-copy'), { description = "Screenshot (region, window or screen)" })
+hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("qs ipc call screenshot record"), { description = "Record the screen (again: stop)" })
 hl.bind("Print",                   hl.dsp.exec_cmd("qs ipc call screenshot screen || grim - | wl-copy"), { description = "Screenshot of the screen" })
 
 -- Workspaces 1-10 (Super+0 = 10)
