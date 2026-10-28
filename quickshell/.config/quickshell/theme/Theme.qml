@@ -137,11 +137,10 @@ Singleton {
     readonly property QtObject battery: QtObject {
         readonly property real low: 0.15 // at or below this (and discharging) the battery turns red
         // The battery pill in the island (bar/BatteryPill.qml).
-        readonly property int width:  26 // minimum; grows to fit "100" and the bolt
-        readonly property int height: 15
-        readonly property int radius: 5
+        readonly property int width:  22
+        readonly property int height: 11
+        readonly property int radius: 4
         readonly property int nub:    3  // the terminal on the right end
-        readonly property int text:   11
     }
 
     readonly property QtObject launcher: QtObject {

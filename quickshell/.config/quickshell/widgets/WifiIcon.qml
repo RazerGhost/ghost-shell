@@ -13,7 +13,7 @@ MaterialIcon {
         visible: root.icon === "wifi_1_bar" || root.icon === "wifi_2_bar"
         icon: "wifi"
         color: root.color
-        opacity: 0.3
+        opacity: 0.45
         font.pixelSize: root.font.pixelSize
     }
 }
