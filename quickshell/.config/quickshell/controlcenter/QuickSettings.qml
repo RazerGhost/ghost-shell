@@ -160,6 +160,27 @@ Item {
             onMoved: value => Brightness.set(value)
         }
 
+        // An app recording from the microphone, like Android's privacy indicator.
+        Row {
+            visible: Audio.recordingApps.length > 0
+            leftPadding: Theme.spacing.s
+            spacing: Theme.spacing.s
+
+            MaterialIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                icon: "mic"
+                color: Colors.m3primary
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: "Microphone in use by " + Audio.recordingApps.join(", ")
+                color: Colors.m3onSurfaceVariant
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.normal
+            }
+        }
+
         // Waiting updates (services/Updates.qml), only when there are some.
         Item {
             width: parent.width

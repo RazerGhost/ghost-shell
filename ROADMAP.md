@@ -368,6 +368,11 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   power saver, back to the previous mode when plugged in (Settings -> Power -> Low battery, on by
   default). Not seen live yet: the laptop was plugged in.
 
+### Microphone indicator (built 2026-10-28; waiting on the user's test results)
+- While an app records from the microphone, a mic icon in the island and "Microphone in use by
+  ..." in quick settings (`Audio.recordingApps`: the app streams linked to the default source,
+  `PwNodeLinkTracker`; verified with `pw-record`).
+
 ## Decisions made
 
 - **External monitors:** keep the RTX in `AQ_DRM_DEVICES` (second, after the iGPU), so outputs wired

@@ -14,6 +14,32 @@ Singleton {
     readonly property bool muted: sink?.audio?.muted ?? false
     readonly property bool micMuted: source?.audio?.muted ?? false
 
+    // The apps recording from the microphone right now, by name (like the microphone indicator
+    // on Android and macOS): the app streams linked to the default microphone. The shell itself
+    // never counts.
+    readonly property list<string> recordingApps: {
+        const names = [];
+        for (const group of micLinks.linkGroups) {
+            const node = group?.target;
+            if (!node?.isStream)
+                continue;
+            const name = node.properties["application.name"] || node.description || node.name || "";
+            if (name && !/quickshell/i.test(name) && !names.includes(name))
+                names.push(name);
+        }
+        return names;
+    }
+
+    PwNodeLinkTracker {
+        id: micLinks
+        node: Pipewire.defaultAudioSource
+    }
+
+    // PipeWire only fills in a node's details (its app name) while something tracks it.
+    PwObjectTracker {
+        objects: micLinks.linkGroups.map(g => g?.target).filter(n => n)
+    }
+
     readonly property string icon: muted || volume === 0 ? "volume_off"
                                  : volume < 0.5 ? "volume_down"
                                  : "volume_up"

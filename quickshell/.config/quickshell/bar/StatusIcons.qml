@@ -4,7 +4,8 @@ import qs.theme
 import qs.widgets
 
 // Small status glyphs on the right of the closed island, like Android's status bar.
-// Bluetooth, waiting updates and mute only show up when they have something to say.
+// Bluetooth, the microphone in use, waiting updates and mute only show up when they have
+// something to say.
 Row {
     anchors.verticalCenter: parent.verticalCenter
     spacing: Theme.spacing.xs
@@ -20,6 +21,16 @@ Row {
         visible: BluetoothStatus.connected.length > 0
         icon: "bluetooth_connected"
         font.pixelSize: Theme.icon.small
+    }
+
+    // An app is recording from the microphone.
+    MaterialIcon {
+        anchors.verticalCenter: parent.verticalCenter
+        visible: Audio.recordingApps.length > 0
+        icon: "mic"
+        color: Colors.m3primary
+        font.pixelSize: Theme.icon.small
+        Accessible.name: "Microphone in use by " + Audio.recordingApps.join(", ")
     }
 
     MaterialIcon {
