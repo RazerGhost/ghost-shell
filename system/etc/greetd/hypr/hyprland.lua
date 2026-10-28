@@ -5,6 +5,9 @@
 require("monitors")
 require("env")
 require("input")
+-- Your keyboard layout and touchpad settings from the shell's settings window, kept up to date by
+-- greeter/sync.sh (a symlink into /var/lib/qs-greeter/shared, see update-greeter.sh). Optional.
+pcall(require, "shell-settings")
 
 hl.config({
     misc = {

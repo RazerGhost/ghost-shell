@@ -132,7 +132,27 @@ Singleton {
 
     Component.onCompleted: Hyprland.refreshMonitors()
 
+    // Gaps changed in the settings window: read them again once Hyprland has reloaded.
+    Connections {
+        target: Settings.values
+
+        function onGapsInChanged(): void {
+            rereadGaps.restart();
+        }
+
+        function onGapsOutChanged(): void {
+            rereadGaps.restart();
+        }
+    }
+
+    Timer {
+        id: rereadGaps
+        interval: 1500 // after HyprlandSettings' write (400 ms) and the reload
+        onTriggered: gaps.running = true
+    }
+
     Process {
+        id: gaps
         command: ["sh", "-c", "hyprctl getoption general:gaps_out -j; hyprctl getoption general:gaps_in -j"]
         running: true
         stdout: StdioCollector {

@@ -68,7 +68,15 @@ end
 
 load_positions()
 
+-- The settings window can turn this off (ShellSettings comes from shell-settings.lua).
+local function enabled()
+    return not (ShellSettings and ShellSettings.remember_positions == false)
+end
+
 hl.on("window.close", function(window)
+    if not enabled() then
+        return
+    end
     local workspace = window.workspace and window.workspace.name or ""
     if window.class == "" or not window.floating or window.fullscreen ~= 0
         or workspace:find("^special:") then
@@ -79,6 +87,9 @@ hl.on("window.close", function(window)
 end)
 
 hl.on("window.open", function(window)
+    if not enabled() then
+        return
+    end
     local p = positions[window.class]
     if not p or not window.floating or others_open(window) or not on_screen(p) then
         return

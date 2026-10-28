@@ -59,6 +59,18 @@ Singleton {
             property bool greeterShowName: true     // your user name above the password field
             property bool greeterPowerButtons: true // suspend, restart and shut down
 
+            // Hyprland's options (settings/HyprlandSettings.qml writes them to shell-settings.lua).
+            // The defaults are input.lua's and look.lua's.
+            property string keyboardLayout: "us" // XKB codes, e.g. "us" or "us,nl"
+            property real pointerSpeed: 0        // -1 (slow) to 1 (fast), mouse and touchpad
+            property bool naturalScroll: false   // the touchpad's
+            property bool tapToClick: true
+            property int gapsIn: 5               // between windows
+            property int gapsOut: 20             // between windows and the screen's edges
+            property int borderSize: 2
+            property int rounding: 10            // window corners
+            property bool rememberPositions: true // apps reopen where they were (windows.lua)
+
             // Desktop entry ids of the apps Super+Enter, Super+B and Super+E open, and of the apps
             // pictures, videos and audio files open in.
             property string terminal: "com.mitchellh.ghostty"

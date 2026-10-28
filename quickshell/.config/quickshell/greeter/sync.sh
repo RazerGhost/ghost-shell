@@ -25,6 +25,12 @@ for file in settings.json colors.json; do
     fi
 done
 
+# The keyboard layout and touchpad settings (written by the shell's settings window); the login
+# screen's Hyprland loads this copy (system/etc/greetd/hypr/hyprland.lua).
+if [ -f "$HOME/.config/hypr/shell-settings.lua" ]; then
+    copy "$HOME/.config/hypr/shell-settings.lua" "$shared/shell-settings.lua"
+fi
+
 picture=$(node -e '
     const read = file => { try { return require(file) } catch { return {} } };
     const [settings, wallpaper] = process.argv.slice(1).map(read);

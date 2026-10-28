@@ -43,6 +43,8 @@ Singleton {
         { id: "nightlight", icon: "nightlight", title: "Night light" },
         { id: "dnd", icon: "do_not_disturb_on", title: "Do Not Disturb" },
         { id: "idle", icon: "bedtime", title: "Idle and power" },
+        { id: "input", icon: "touchpad_mouse", title: "Keyboard and touchpad" },
+        { id: "windows", icon: "select_window", title: "Windows" },
         { id: "lock", icon: "lock", title: "Lock and login screen" },
         { id: "apps", icon: "apps", title: "Default apps" },
         { id: "keybinds", icon: "keyboard", title: "Keybinds" }
@@ -227,6 +229,16 @@ Singleton {
                 IdlePage {
                     width: parent.width
                     visible: root.page === "idle"
+                }
+
+                InputPage {
+                    width: parent.width
+                    visible: root.page === "input"
+                }
+
+                WindowsPage {
+                    width: parent.width
+                    visible: root.page === "windows"
                 }
 
                 LockPage {

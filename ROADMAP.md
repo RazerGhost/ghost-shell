@@ -216,6 +216,12 @@ config files became settings.
     xdg-settings) match the settings at every start, the only place they're set, so re-running
     install.sh doesn't undo a choice. The keybinds open the chosen ones; the browser and file manager also become the
     system defaults (`xdg-settings`, `xdg-mime`).
+  - **Keyboard and touchpad** (layout from XKB's list, natural scrolling, tap to click, pointer
+    speed) and **Windows** (gaps, border, corners, apps reopening where they were): Hyprland
+    options, written to the generated `hypr/shell-settings.lua` (gitignored, loaded last by
+    hyprland.lua; `settings/HyprlandSettings.qml` + tested `HyprlandConfig.js`) and applied with
+    `hyprctl reload` only when the content changes. Snapping re-reads the gaps. The login screen
+    gets the file through the shared folder (keyboard layout).
   - **Keybinds:** read from Hyprland (`hyprctl binds -j`, every bind in `binds.lua` has a
     description), grouped per description (`settings/Keybinds.js`, tested).
 

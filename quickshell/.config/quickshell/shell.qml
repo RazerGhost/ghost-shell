@@ -35,6 +35,7 @@ ShellRoot {
     SnapAssist {}
     Switcher {}
     Idle {}
+    HyprlandSettings {}
 
     // The system's default apps follow the settings (services/Apps.qml).
     Connections {

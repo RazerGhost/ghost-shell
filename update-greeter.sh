@@ -18,6 +18,8 @@ sudo rm -rf /etc/greetd/quickshell
 sudo cp -r quickshell/.config/quickshell /etc/greetd/quickshell
 
 sudo install -Dm644 system/etc/greetd/hypr/hyprland.lua /etc/greetd/hypr/hyprland.lua
+# The keyboard layout from the settings window: greeter/sync.sh keeps the target up to date.
+sudo ln -sfn /var/lib/qs-greeter/shared/shell-settings.lua /etc/greetd/hypr/shell-settings.lua
 for file in monitors env input; do
     sudo install -Dm644 "hypr/.config/hypr/$file.lua" "/etc/greetd/hypr/$file.lua"
 done
