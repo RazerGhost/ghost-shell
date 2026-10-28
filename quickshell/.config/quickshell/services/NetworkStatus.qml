@@ -6,6 +6,8 @@ import Quickshell
 import Quickshell.Networking
 
 Singleton {
+    id: root
+
     // These bindings re-run when any property they read changes (a device connecting,
     // the signal strength moving), including reads inside find().
     readonly property list<NetworkDevice> devices: Networking.devices.values
@@ -13,6 +15,23 @@ Singleton {
     // The Wi-Fi card, connected or not; null on machines without one.
     readonly property WifiDevice wifiDevice: devices.find(d => d.type === DeviceType.Wifi) ?? null
     readonly property WifiNetwork wifiNetwork: wifiDevice?.networks.values.find(n => n.connected) ?? null
+    // The network wants you to sign in first (a hotel's or café's login page): NetworkManager's
+    // connectivity check is redirected.
+    readonly property bool needsSignIn: Networking.connectivity === NetworkConnectivity.Portal
+
+    // Opens the sign-in page: a plain http page made for this, which the network redirects to its
+    // login (https pages can't be redirected).
+    function signIn(): void {
+        Quickshell.execDetached(["xdg-open", "http://neverssl.com"]);
+    }
+
+    // While signing in, check again every 10 s, so the hint goes away soon after.
+    Timer {
+        interval: 10000
+        running: root.needsSignIn
+        repeat: true
+        onTriggered: Networking.checkConnectivity()
+    }
 
     // A network's details fill in a moment after it shows up, hence the defaults.
     readonly property string icon: wired ? "lan"

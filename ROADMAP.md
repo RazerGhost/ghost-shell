@@ -395,6 +395,12 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
 - The scratchpad (Super+`) starts a terminal when it's empty (`on_created_empty`), over the
   dimmed workspace below (`decoration.dim_special`).
 
+### Network sign-in hint (built 2026-10-28; untested: needs a network with a login page)
+- When NetworkManager's connectivity check is redirected (`Networking.connectivity` is Portal: a
+  hotel's or café's login page), quick settings shows "This network needs you to sign in" with a
+  button that opens http://neverssl.com (plain http, so the network can redirect it); the shell
+  re-checks every 10 s until it's gone.
+
 ## Decisions made
 
 - **External monitors:** keep the RTX in `AQ_DRM_DEVICES` (second, after the iGPU), so outputs wired

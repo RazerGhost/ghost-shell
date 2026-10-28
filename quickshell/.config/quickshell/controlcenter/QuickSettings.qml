@@ -160,6 +160,45 @@ Item {
             onMoved: value => Brightness.set(value)
         }
 
+        // The network wants you to sign in (a hotel's or café's Wi-Fi).
+        Item {
+            width: parent.width
+            implicitHeight: Theme.slider.height
+            visible: NetworkStatus.needsSignIn
+
+            Row {
+                anchors.left: parent.left
+                anchors.leftMargin: Theme.spacing.s
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacing.s
+
+                MaterialIcon {
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon: "login"
+                    color: Colors.m3primary
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "This network needs you to sign in"
+                    color: Colors.m3onSurfaceVariant
+                    font.family: Theme.font.sans
+                    font.pixelSize: Theme.font.normal
+                }
+            }
+
+            TextButton {
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacing.xs
+                anchors.verticalCenter: parent.verticalCenter
+                text: "Sign in"
+                onClicked: {
+                    NetworkStatus.signIn();
+                    root.openMenu("");
+                }
+            }
+        }
+
         // A screen recording: its time and a Stop button.
         Item {
             width: parent.width
