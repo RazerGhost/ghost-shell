@@ -116,7 +116,7 @@ Scope {
                     readonly property bool selected: index === root.index
                     // The window's own shape, like in the overview (16:10 until its size is known),
                     // capped so a very wide window doesn't take the whole row.
-                    readonly property var size: modelData.lastIpcObject?.size
+                    readonly property var size: modelData?.lastIpcObject?.size
                     readonly property real aspect: size ? size[0] / size[1] : 16 / 10
 
                     width: Theme.switcher.thumbHeight * Math.min(aspect, Theme.switcher.maxAspect)
@@ -127,7 +127,7 @@ Scope {
                     onClicked: root.commit()
 
                     Accessible.role: Accessible.ListItem
-                    Accessible.name: modelData.title
+                    Accessible.name: modelData?.title ?? ""
                     Accessible.selected: selected
 
                     // Only captured while the switcher is open.

@@ -152,13 +152,30 @@ Scope {
                                 // Read by a workspace in the strip when the card is dropped on it.
                                 readonly property HyprlandToplevel toplevel: slot.toplevel
 
+                                // Where it was grabbed. While dragged it shrinks around that point
+                                // to about a workspace miniature's size, so it doesn't cover the
+                                // strip; that point (the pointer) decides where it's dropped.
+                                property point grab: Qt.point(width / 2, height / 2)
+                                readonly property real dragScale: Math.min(1, Theme.overview.workspace / width)
+
                                 width: slot.width
                                 height: slot.height
                                 z: dragArea.drag.active ? 1 : 0
 
+                                transform: Scale {
+                                    origin.x: card.grab.x
+                                    origin.y: card.grab.y
+                                    xScale: dragArea.drag.active ? card.dragScale : 1
+                                    yScale: xScale
+
+                                    Behavior on xScale {
+                                        NumberAnimation { duration: Theme.anim.fast; easing.type: Theme.anim.easing }
+                                    }
+                                }
+
                                 Drag.active: dragArea.drag.active
                                 Drag.keys: ["window"]
-                                Drag.hotSpot: Qt.point(width / 2, height / 2)
+                                Drag.hotSpot: grab
 
                                 Accessible.role: Accessible.Button
                                 Accessible.name: slot.toplevel?.title ?? ""
@@ -176,6 +193,7 @@ Scope {
                                     height: slot.modelData.height
                                     cursorShape: Qt.PointingHandCursor
                                     drag.target: card
+                                    onPressed: mouse => card.grab = Qt.point(mouse.x, mouse.y)
                                     onClicked: {
                                         root.open = false;
                                         Windows.show(slot.toplevel);
