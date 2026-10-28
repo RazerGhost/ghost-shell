@@ -73,8 +73,9 @@ new setup step.
   the wider group, each group against the island's end with the same padding (user's choice
   2026-10-28: centered on its side, one workspace dot floated in empty space next to the wider
   status icons; spreading the narrower group to match looked odd with two dots), so the island is symmetric and the time or cover sits exactly in the screen's middle, under the webcam (user's
-  request). Workspace dots only for workspaces
-  in use plus the current one (user's choice, `WorkspaceSlots.used`, tested); hovering them shows
+  request). Workspace dots for workspaces 1-5 and
+  higher ones in use, the empty ones dimmed (user's choice 2026-10-28; only the used ones left one
+  or two dots and the island looked lopsided); hovering them shows
   all workspaces 1-5 (and higher ones in use) as numbers to click (`WorkspaceNumbers.qml`), with
   the minimized windows below; scroll over the dots to step through. Status icons: Wi-Fi as three arcs with the
   unlit ones dimmed to 45 % (`widgets/WifiIcon.qml`, also in the Wi-Fi tile and list), battery as an Android 16-style pill that fills with the charge, no text (user's choice: the

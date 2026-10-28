@@ -4,8 +4,9 @@ import Quickshell.Hyprland
 import qs.theme
 import "../services/WorkspaceSlots.js" as WorkspaceSlots
 
-// Workspace dots for one monitor: one per workspace in use, plus the one you're on (user's
-// choice), so there are usually only a few. The active one stretches into a pill. Click a dot to
+// Workspace dots for one monitor: workspaces 1 to Theme.workspace.minimum and any higher one in
+// use (user's choice, 2026-10-28: only the used ones left one or two dots, and the island looked
+// lopsided next to the status icons). Empty ones are dimmed; the active one stretches into a pill. Click a dot to
 // go there; scroll to step through workspaces 1 to Theme.workspace.minimum (and higher ones in
 // use). `hovered` tells the island to show all of them as numbers (WorkspaceNumbers.qml).
 Item {
@@ -25,9 +26,8 @@ Item {
         }
         return byId;
     }
-    // Every workspace you can scroll or click to (the numbers on hover), and the ones with dots.
+    // Every workspace you can scroll or click to: the dots, and the numbers on hover.
     readonly property var slots: WorkspaceSlots.slots(Theme.workspace.minimum, Object.keys(existing).map(Number))
-    readonly property var usedSlots: WorkspaceSlots.used(Object.keys(existing).map(Number), active)
 
 
     // Works for workspaces that don't exist yet, unlike HyprlandWorkspace.activate().
@@ -69,7 +69,7 @@ Item {
         spacing: Theme.workspace.spacing
 
         Repeater {
-            model: root.usedSlots
+            model: root.slots
 
             delegate: Rectangle {
                 id: dot
