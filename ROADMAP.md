@@ -98,7 +98,8 @@ new setup step.
   the date to show it. Click a card for the app's default action; its other actions
   are buttons. Bodies are shown as plain text (no markup).
 - Quick settings tiles: Do Not Disturb (no pop-ups except critical; history still collects) and
-  night light (`services/NightLight.qml`, hyprsunset at 4000 K; manual only, see decisions).
+  night light (`services/NightLight.qml`, hyprsunset; warmth and a schedule in Settings, see
+  decisions). Both became round buttons under the wide tiles later (see the Quickshell additions).
 - Power menu (`controlcenter/PowerPanel.qml`, power button in quick settings or Ctrl+Alt+Delete):
   lock, suspend, log out, restart, shut down; the last three need a second click within 4 s.
   Lock uses Quickshell's lock screen (Phase 5).
@@ -165,8 +166,9 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
   window was raised but not focused); with `OnDemand` 30/30 did. Caveat: a very quick Alt+Tab tap may release Alt before the
   switcher has the keyboard; then it stays open until Alt is tapped again (or Escape).
 - **Snapping** (built): Super+Left/Right snap the focused window to halves; Super+Z (Zed moved to
-  Super+Shift+Z) shows a picker (`snap/SnapPicker.qml`, its own card at the top center of the
-  window, not in the island: user's choice) with halves, quarters, thirds and two-thirds. The
+  Super+Shift+Z) shows a picker, its own card at the top center of the window, not in the island
+  (user's choice); since 2026-10-28 it's the window menu (`snap/WindowMenu.qml`, also Alt+Space)
+  with halves, quarters, thirds and two-thirds below the window's actions. The
   window floats and gets an exact rectangle (`services/SnapLayout.js`, tested): the monitor minus
   its reserved area (the island) and Hyprland's gaps, read with `hyprctl getoption`. The first
   snap saves the window's position and size (from `hyprctl clients -j`); Super+Down puts a
@@ -332,9 +334,11 @@ From a survey of every Quickshell 0.3.2 type and the quickshell-examples repo (u
   menus open. (The launcher maps a new surface with `Exclusive`, which works.)
 - **Keybinds: Windows-style** (user's choice, 2026-10-28): tap Super or Super+Space launcher,
   Super+Enter terminal, Super+E files, Super+B browser, Super+W / Alt+F4 close, Super+Up maximize,
-  Super+Down minimize, Alt+Space window menu, Alt+Tab switcher, Super+Left/Right snap, Super+Z snap picker, Super+N quick settings, Super+C calendar, Super+Shift+S screenshot, Super+V clipboard, Super+L lock (Super+Shift+L hyprlock fallback),
-  Ctrl+Alt+Delete power menu, Super+Ctrl+arrows focus, Super+I settings. Full list in
-  `hypr/binds.lua` and the settings window.
+  Super+Down minimize, Alt+Space or Super+Z window menu (with snap layouts), Alt+Tab switcher,
+  Super+Tab overview, Super+Left/Right snap, Super+N quick settings, Super+C calendar,
+  Super+Shift+S screenshot (Print: whole screen), Super+V clipboard, Super+. emoji, Super+L lock
+  (Super+Shift+L hyprlock fallback), Ctrl+Alt+Delete power menu, Super+Ctrl+arrows focus, Super+I
+  settings, Super+Shift+Z editor. Full list in `hypr/binds.lua` and the settings window.
 - **Window buttons:** Hyprland draws no title bars, so instead of hyprbars: keybinds plus a window
   menu on the window itself (`snap/WindowMenu.qml`, Alt+Space or Super+Z; user's choice
   2026-10-28, it used to be an island menu next to a separate snap picker): minimize, maximize,
