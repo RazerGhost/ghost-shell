@@ -1,8 +1,10 @@
 import QtQuick
+import Quickshell
 import Quickshell.Services.Mpris
 import qs.services
 import qs.theme
 import qs.widgets
+import "MediaAccent.js" as MediaAccent
 import "TrackTime.js" as TrackTime
 
 // The media menu, opened by clicking the island's live activity: a large cover, the track,
@@ -27,6 +29,17 @@ Column {
         running: root.visible && Media.playing
         onTriggered: root.player.positionChanged()
     }
+
+    // The cover's own color for the seek bar and the play button, like a phone's media player
+    // (MediaAccent.js, tested); the theme's accent for covers without real color.
+    ColorQuantizer {
+        id: quantizer
+        source: Media.artFile ? "file://" + Media.artFile : ""
+        depth: 3 // 8 colors
+        rescaleSize: 64
+    }
+    readonly property var coverAccent: MediaAccent.accent(quantizer.colors.map(c => ({ h: c.hslHue, s: c.hslSaturation, l: c.hslLightness })))
+    readonly property color accent: coverAccent ? Qt.hsla(coverAccent.h, coverAccent.s, coverAccent.l, 1) : Colors.m3primary
 
     AlbumArt {
         anchors.horizontalCenter: parent.horizontalCenter
@@ -105,7 +118,7 @@ Column {
                     width: parent.width * track.fraction
                     height: parent.height
                     radius: height / 2
-                    color: Colors.m3primary
+                    color: root.accent
                 }
             }
 
@@ -183,7 +196,7 @@ Column {
             width: Theme.tile.height
             height: width
             radius: width / 2
-            color: Colors.m3primary
+            color: root.accent
 
             IconButton {
                 anchors.centerIn: parent

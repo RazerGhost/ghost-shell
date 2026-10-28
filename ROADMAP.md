@@ -401,6 +401,11 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   button that opens http://neverssl.com (plain http, so the network can redirect it); the shell
   re-checks every 10 s until it's gone.
 
+### Cover colors in the media menu (built 2026-10-28; waiting on the user's test results)
+- The seek bar and play button take the album cover's most colorful main color, lightened for
+  the dark menu (`ColorQuantizer` + `MediaAccent.js`, tested); grey or black and white covers keep
+  the theme's accent. The cover is downloaded per track for it (`Media.artFile`).
+
 ## Decisions made
 
 - **External monitors:** keep the RTX in `AQ_DRM_DEVICES` (second, after the iGPU), so outputs wired
