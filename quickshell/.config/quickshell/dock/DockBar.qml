@@ -7,7 +7,7 @@ import qs.theme
 import qs.widgets
 
 // The dock on one monitor, macOS style (user's choice): a rounded bar floating a little above the
-// bottom edge, whose icons grow as the pointer passes over them. It's shown on an empty desktop
+// bottom edge. It's shown on an empty desktop
 // and slides down out of sight while a window covers its area (or one is fullscreen); touching
 // the bottom edge with the pointer brings it back.
 PanelWindow {
@@ -16,29 +16,9 @@ PanelWindow {
     required property var dock // Dock.qml: items, pinned, togglePin()
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(screen)
 
-    // The bar at rest (no icon magnified), centered at the bottom. Magnification and covering are
-    // worked out from this, so they don't shift while the icons grow.
-    readonly property real slotWidth: Theme.dock.icon + Theme.spacing.m
-    readonly property real restWidth: window.dock.items.length * slotWidth + Theme.spacing.m * 2
-    readonly property real restLeft: (width - restWidth) / 2
-    // The bar as drawn: wider while icons are magnified.
+    // The bar, centered at the bottom.
     readonly property real bodyWidth: row.implicitWidth + Theme.spacing.m * 2
     readonly property real bodyHeight: Theme.dock.height
-    // Magnified icons rise above the bar.
-    readonly property real overflow: Theme.dock.icon * (Theme.dock.magnify - 1)
-
-    // The pointer's x over the dock (window coordinates), or -1 when it's elsewhere.
-    readonly property real pointerX: hitArea.containsMouse ? hitArea.mapToItem(window.contentItem, hitArea.mouseX, 0).x : -1
-
-    // How much the icon at `index` is magnified: most under the pointer, falling off over about
-    // two icons to each side (a bell curve, like macOS).
-    function magnification(index: int): real {
-        if (pointerX < 0)
-            return 1;
-        const center = restLeft + Theme.spacing.m + (index + 0.5) * slotWidth;
-        const distance = (pointerX - center) / slotWidth;
-        return 1 + (Theme.dock.magnify - 1) * Math.exp(-distance * distance / 2);
-    }
 
     // Whether a window on this monitor's workspace overlaps the dock (or is fullscreen).
     // Positions come from Hyprland (Dock.qml keeps them fresh), in global coordinates.
@@ -46,8 +26,8 @@ PanelWindow {
         const ws = monitor?.activeWorkspace;
         if (!ws)
             return false;
-        const left = (monitor.x ?? 0) + restLeft;
-        const right = left + restWidth;
+        const left = (monitor.x ?? 0) + (width - bodyWidth) / 2;
+        const right = left + bodyWidth;
         const top = (monitor.y ?? 0) + height - bodyHeight - Theme.dock.margin;
         for (const t of Hyprland.toplevels.values) {
             const info = t.lastIpcObject;
@@ -87,7 +67,7 @@ PanelWindow {
     anchors.bottom: true
     anchors.left: true
     anchors.right: true
-    // Room above the dock for magnified icons, the tooltips and the right-click menu.
+    // Room above the dock for the tooltips and the right-click menu.
     implicitHeight: Theme.dock.height + Theme.dock.margin + Theme.dock.menuSpace
     exclusionMode: ExclusionMode.Ignore
     color: "transparent"
@@ -118,22 +98,21 @@ PanelWindow {
         id: trigger
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
-        width: window.restWidth
+        width: window.bodyWidth
         height: Theme.dock.trigger
         hoverEnabled: true
     }
 
-    // Where the shown dock is: from the top of magnified icons down to the screen edge (so the
-    // pointer can go from the edge to the dock without leaving it). A MouseArea to follow the
-    // pointer (magnification, staying shown); clicks go to the icons inside it. It doesn't move;
-    // the bar and icons slide inside it.
+    // Where the shown dock is, down to the screen edge (so the pointer can go from the edge to the
+    // dock without leaving it). A MouseArea to know whether the pointer is on the dock; clicks go
+    // to the icons inside it. It doesn't move; the bar and icons slide inside it.
     MouseArea {
         id: hitArea
 
         anchors.horizontalCenter: parent.horizontalCenter
         y: window.height - height
         width: window.bodyWidth
-        height: window.overflow + window.bodyHeight + Theme.dock.margin
+        height: window.bodyHeight + Theme.dock.margin
         hoverEnabled: true
         acceptedButtons: Qt.NoButton
 
@@ -141,7 +120,7 @@ PanelWindow {
         Rectangle {
             id: shape
 
-            y: window.shown ? window.overflow : hitArea.height + Theme.spacing.s
+            y: window.shown ? 0 : hitArea.height + Theme.spacing.s
             width: parent.width
             height: window.bodyHeight
             radius: Theme.dock.radius
@@ -152,13 +131,13 @@ PanelWindow {
             }
         }
 
-        // The apps, sitting on the bar and growing up out of it.
+        // The apps, on the bar.
         Item {
             id: content
 
-            y: shape.y - window.overflow
+            y: shape.y
             width: parent.width
-            height: window.bodyHeight + window.overflow
+            height: window.bodyHeight
 
             Row {
                 id: row
@@ -179,17 +158,14 @@ PanelWindow {
                         // A thin line between the pinned apps and the other running ones.
                         Rectangle {
                             visible: slot.index > 0 && !slot.modelData.pinned && window.dock.items[slot.index - 1].pinned
-                            anchors.bottom: parent.bottom
-                            anchors.bottomMargin: (window.bodyHeight - height) / 2
+                            anchors.verticalCenter: parent.verticalCenter
                             width: 1
                             height: Theme.dock.icon * 0.6
                             color: Colors.m3outlineVariant
                         }
 
                         DockItem {
-                            anchors.bottom: parent.bottom
                             item: slot.modelData
-                            magnification: window.magnification(slot.index)
                             onMenuRequested: {
                                 menu.item = slot.modelData;
                                 menu.anchorX = mapToItem(window.contentItem, width / 2, 0).x;

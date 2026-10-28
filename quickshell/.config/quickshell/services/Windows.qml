@@ -17,9 +17,13 @@ Singleton {
 
     // The focused window. Hyprland.activeToplevel only updates on focus changes, so it's null
     // until the first one after the shell starts; Wayland's window list knows it from the start.
-    readonly property HyprlandToplevel active: Hyprland.activeToplevel
-        ?? (Hyprland.toplevels?.values ?? []).find(t => t.wayland !== null && t.wayland === ToplevelManager.activeToplevel)
-        ?? null
+    // A minimized window doesn't count: Hyprland can still call it active after moving it away.
+    readonly property HyprlandToplevel active: {
+        const window = Hyprland.activeToplevel
+            ?? (Hyprland.toplevels?.values ?? []).find(t => t.wayland !== null && t.wayland === ToplevelManager.activeToplevel)
+            ?? null;
+        return window?.workspace?.name === minimizedWorkspace ? null : window;
+    }
 
     // Windows that asked for attention (an app can't take the focus by itself, like on Windows,
     // so Hyprland marks it urgent instead), oldest first. The island shows the first one. A window
@@ -65,8 +69,15 @@ Singleton {
         Hyprland.dispatch(`hl.dsp.window.${dispatcher}({ window = "${selector(window)}"${args ? ", " + args : ""} })`);
     }
 
+    // Like on Windows, the next most recently used window on the workspace gets the focus.
     function minimize(window: HyprlandToplevel): void {
+        const workspace = window.workspace;
         run(window, "move", `workspace = "${minimizedWorkspace}", follow = false`);
+        const next = (Hyprland.toplevels?.values ?? [])
+            .filter(t => t !== window && t.workspace === workspace && t.wayland !== null)
+            .sort((a, b) => (a.lastIpcObject?.focusHistoryID ?? 999) - (b.lastIpcObject?.focusHistoryID ?? 999))[0];
+        if (next)
+            focus(next);
     }
 
     function restore(window: HyprlandToplevel): void {

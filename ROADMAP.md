@@ -172,9 +172,8 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
 ### Dock (built; waiting on the user's test results)
 Added at the user's request (2026-10-28), between Phases 6 and 7.
 - `dock/Dock.qml` + `DockBar.qml` + `DockItem.qml`: a macOS-style bar floating above the bottom
-  edge (user's choice, after first trying the island shape turned over), whose icons magnify near
-  the pointer (a bell curve over the icons' resting positions, so they don't wobble while the bar
-  widens). Pinned apps then other running ones (`DockApps.js`, tested), a dot per
+  edge (user's choice, after first trying the island shape turned over); no magnification (tried,
+  the user found it excessive), icons lift a little on hover. Pinned apps then other running ones (`DockApps.js`, tested), a dot per
   open window (accent for the focused app) and the name on hover. Click opens the app or switches
   to it, again to cycle its windows, on the focused app's only window it minimizes (Windows
   taskbar). Right-click: new window, pin/unpin, close. Pins are desktop entry ids in
@@ -249,8 +248,10 @@ fixed in config files should become settings.
   row): minimize, maximize, float/tile, fullscreen, close, move to workspace 1-5, and the minimized
   windows to restore.
 - **Minimize:** Hyprland has none. A minimized window moves to the hidden `special:minimized`
-  workspace (Super+Down, or the window menu); restoring moves it to the current workspace and
-  focuses it (`services/Windows.qml`). Hovering the workspace dots shows the minimized windows
+  workspace (Super+Down, the window menu, the dock); the next most recent window on that workspace
+  gets the focus, and `Windows.active` ignores minimized windows (Hyprland can still report one as
+  active, which made a second dock click minimize again instead of restoring). Restoring moves
+  it to the current workspace and focuses it (`services/Windows.qml`). Hovering the workspace dots shows the minimized windows
   (`MinimizedList`, also in the window menu); no separate indicator, to keep the island
   consistent (user's choice).
 - **Media in the island:** while music plays, a "live activity" (`bar/MediaActivity.qml`: cover +
