@@ -158,6 +158,18 @@ else
     matugen color hex "$default_seed" -m dark
 fi
 
+step "Steam: Millennium"
+# Millennium (themes and plugins for Steam) loads through a library Steam picks up from its own
+# folder. Its package only links that for Steam folders that exist when it's installed, so
+# link it here too. Steam creates the folder on its first start.
+steam_dir="$HOME/.local/share/Steam"
+if [[ -d $steam_dir/ubuntu12_64 ]]; then
+    ln -sf /usr/lib/millennium/libmillennium_bootstrap_x86.so "$steam_dir/ubuntu12_32/libXtst.so.6"
+    ln -sf /usr/lib/millennium/libmillennium_bootstrap_hhx64.so "$steam_dir/ubuntu12_64/libXtst.so.6"
+else
+    echo "Skipped: start Steam once, then re-run this script."
+fi
+
 step "Dev tools: Docker"
 # docker.socket starts Docker on first use instead of at every boot.
 sudo systemctl enable --now docker.socket
