@@ -22,9 +22,11 @@ PanelWindow {
     readonly property real closedWidth: topRow.implicitWidth + Theme.island.padding * 2
 
     // A small view opened by hovering: "media" (the player, over the live activity) or
-    // "minimized" (over the workspace dots). Unlike a menu it takes no keyboard and
+    // "workspaces" (all workspaces as numbers and the minimized windows, over the dots). Unlike a menu it takes no keyboard and
     // closes when the pointer leaves the island.
     property string peek: ""
+    // The dots, for the numbers on hover (named apart from WorkspaceNumbers' own `workspaces`).
+    readonly property Item workspaceDots: workspaces
     // The notification pop-up, on the focused monitor while no menu is open.
     readonly property bool focusedScreen: Hyprland.focusedMonitor?.name === modelData.name
     readonly property Notification popup: !open && focusedScreen ? Notifications.current : null
@@ -91,8 +93,8 @@ PanelWindow {
 
     Timer {
         interval: Theme.media.hoverDelay
-        running: workspaces.hovered && Windows.minimized.length > 0 && !root.open
-        onTriggered: root.peek = "minimized"
+        running: workspaces.hovered && !root.open
+        onTriggered: root.peek = "workspaces"
     }
 
     Timer {
@@ -212,8 +214,10 @@ PanelWindow {
                 anchors.horizontalCenter: parent.horizontalCenter
                 height: Theme.island.height
 
+                // Both sides are exactly sideWidth (plus the buttons' padding), with their group
+                // centered: a single dot can't spread to the icons' width.
                 Item {
-                    width: workspaces.implicitWidth + Theme.spacing.m * 2
+                    width: topRow.sideWidth + Theme.spacing.m * 2
                     height: parent.height
 
                     Workspaces {
@@ -269,12 +273,12 @@ PanelWindow {
                 }
 
                 Item {
-                    width: status.implicitWidth
+                    width: topRow.sideWidth + Theme.spacing.m * 2
                     height: parent.height
 
                     IslandButton {
                         id: status
-                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.centerIn: parent
                         label: "Quick settings"
                         active: root.panel === "settings"
                         onActivated: root.island.toggle("settings", root.modelData.name)
@@ -424,17 +428,27 @@ PanelWindow {
                     }
                 }
 
-                // The minimized windows, while hovering the workspace dots.
+                // While hovering the dots: every workspace as a number, and the minimized windows.
                 MenuSlot {
-                    shown: root.shown === "peek-minimized"
+                    shown: root.shown === "peek-workspaces"
                     extraHeight: Theme.spacing.m * 2
 
-                    MinimizedList {
+                    Column {
                         x: Theme.spacing.l
                         y: Theme.spacing.s
                         width: parent.width - Theme.spacing.l * 2
-                        visible: Windows.minimized.length > 0
-                        onRestored: root.peek = ""
+                        spacing: Theme.spacing.m
+
+                        WorkspaceNumbers {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            workspaces: root.workspaceDots
+                        }
+
+                        MinimizedList {
+                            width: parent.width
+                            visible: Windows.minimized.length > 0
+                            onRestored: root.peek = ""
+                        }
                     }
                 }
 

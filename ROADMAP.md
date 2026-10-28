@@ -72,9 +72,10 @@ new setup step.
   the dots got smaller). The dots and the status icons get
   the same width, the narrower group spreading out (`bar/Spread.js`, tested), so the island is
   symmetric and the time or cover sits exactly in the screen's middle, under the webcam (user's
-  request). Workspace dots always show at
-  least 5 (`WorkspaceSlots.js`, tested in `tests/tst_workspaces.qml`): click one to go there, even
-  if it's empty; scroll over them to step through. Status icons: Wi-Fi as three arcs with the
+  request). Workspace dots only for workspaces
+  in use plus the current one (user's choice, `WorkspaceSlots.used`, tested); hovering them shows
+  all workspaces 1-5 (and higher ones in use) as numbers to click (`WorkspaceNumbers.qml`), with
+  the minimized windows below; scroll over the dots to step through. Status icons: Wi-Fi as three arcs with the
   unlit ones dimmed to 45 % (`widgets/WifiIcon.qml`, also in the Wi-Fi tile and list), battery as an Android 16-style pill that fills with the charge, no text (user's choice: the
   percentage is in quick settings) (`bar/BatteryPill.qml`). Opens
   `controlcenter/TodayPanel.qml` (calendar, `MediaCard`) or `QuickSettings.qml` (tiles for Wi-Fi,
@@ -308,7 +309,7 @@ From a survey of every Quickshell 0.3.2 type and the quickshell-examples repo (u
   gets the focus, and `Windows.active` ignores minimized windows (Hyprland can still report one as
   active, which made a second dock click minimize again instead of restoring). Restoring moves
   it to the current workspace and focuses it (`services/Windows.qml`). Hovering the workspace dots shows the minimized windows
-  (`MinimizedList`, also in the window menu); no separate indicator, to keep the island
+  under the workspace numbers (`MinimizedList`, also in the window menu); no separate indicator, to keep the island
   consistent (user's choice).
 - **Media in the island:** while music plays, a "live activity" (`bar/MediaActivity.qml`: the
   album cover; level bars next to it were dropped, user's choice) replaces the clock, so the island stays centered (no

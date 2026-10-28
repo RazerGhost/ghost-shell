@@ -89,7 +89,8 @@ Singleton {
         readonly property int dot:       6  // inactive indicator: a dot
         readonly property int activeDot: 16 // active indicator stretches into a pill
         readonly property int spacing:   3  // between the dots, at least (Spread.js)
-        readonly property int minimum:   5  // dots shown even when those workspaces are empty
+        readonly property int minimum:   5  // numbers shown on hover even when those workspaces are empty
+        readonly property int number:    28 // a number on hover (WorkspaceNumbers.qml)
     }
 
     // Media in the island: the live activity, the hover player and the media menu.

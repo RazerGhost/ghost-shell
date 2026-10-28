@@ -5,10 +5,10 @@ import qs.theme
 import "Spread.js" as Spread
 import "WorkspaceSlots.js" as WorkspaceSlots
 
-// Workspace dots for one monitor: always at least Theme.workspace.minimum of them, so you can
-// see where you are and jump to an empty one. The active one stretches into a pill, ones with
-// windows are bright, empty ones dim. Click a dot to go there; scroll to step through them.
-// `hovered` tells the island to show the minimized windows.
+// Workspace dots for one monitor: one per workspace in use, plus the one you're on (user's
+// choice), so there are usually only a few. The active one stretches into a pill. Click a dot to
+// go there; scroll to step through workspaces 1 to Theme.workspace.minimum (and higher ones in
+// use). `hovered` tells the island to show all of them as numbers (WorkspaceNumbers.qml).
 Item {
     id: root
 
@@ -26,12 +26,14 @@ Item {
         }
         return byId;
     }
+    // Every workspace you can scroll or click to (the numbers on hover), and the ones with dots.
     readonly property var slots: WorkspaceSlots.slots(Theme.workspace.minimum, Object.keys(existing).map(Number))
+    readonly property var usedSlots: WorkspaceSlots.used(Object.keys(existing).map(Number), active)
 
     // The island gives the dots and the status icons the same width; the dots spread out to fill
     // it when the icons are wider (see Spread.js).
     property real fillWidth: 0
-    readonly property list<real> dotWidths: slots.map(s => s === active ? Theme.workspace.activeDot : Theme.workspace.dot)
+    readonly property list<real> dotWidths: usedSlots.map(s => s === active ? Theme.workspace.activeDot : Theme.workspace.dot)
     readonly property real naturalWidth: Spread.naturalWidth(dotWidths, Theme.workspace.spacing)
 
     // Works for workspaces that don't exist yet, unlike HyprlandWorkspace.activate().
@@ -73,7 +75,7 @@ Item {
         spacing: Spread.spacing(root.dotWidths, Theme.workspace.spacing, root.fillWidth)
 
         Repeater {
-            model: root.slots
+            model: root.usedSlots
 
             delegate: Rectangle {
                 id: dot

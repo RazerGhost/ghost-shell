@@ -14,3 +14,12 @@ function slots(minimum, existingIds) {
 function step(active, delta, count) {
     return ((active - 1 + delta) % count + count) % count + 1;
 }
+
+// The dots the closed island shows (user's choice): only workspaces in use, plus the one you're
+// on, in order. Hyprland removes an empty workspace once you leave it, so the ones that exist
+// are the used ones; the active one counts even before it has a window.
+function used(existingIds, active) {
+    const ids = new Set(existingIds.filter(id => id > 0));
+    ids.add(active);
+    return Array.from(ids).sort((a, b) => a - b);
+}

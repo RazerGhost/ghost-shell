@@ -26,4 +26,16 @@ TestCase {
         compare(WorkspaceSlots.step(5, 1, 5), 1);
         compare(WorkspaceSlots.step(1, -1, 5), 5);
     }
+
+    function test_usedOnlyExistingAndActive() {
+        compare(WorkspaceSlots.used([1, 3], 1), [1, 3]);
+        // The active workspace shows even while empty (it may not exist yet).
+        compare(WorkspaceSlots.used([1, 3], 2), [1, 2, 3]);
+        compare(WorkspaceSlots.used([], 1), [1]);
+    }
+
+    function test_usedSortedAndSkipsSpecial() {
+        // Special workspaces (minimized windows, scratchpad) have negative ids.
+        compare(WorkspaceSlots.used([8, -98, 2], 2), [2, 8]);
+    }
 }
