@@ -337,7 +337,9 @@ other session: pinning the Vencord/Spicetify downloads in install.sh.
   pointer with `hl.timer` + `hl.get_cursor_pos` while the button is held (`tiling.drag`, tested).
   Dragging the border itself (without Super) does nothing on tiled windows. `input.float_switch_override_focus = 0`, or focusing a tiled window under a
   floating one jumped back to the window under the pointer. Windows already open when this came
-  in keep floating until tiled.
+  in keep floating until tiled. Helpers float: CachyOS Hello (a window rule), its root terminals
+  (`ghostty -e pkexec`, floated from `windows.lua` when the title becomes "pkexec": a rule only
+  sees the title at open, "Ghostty"), and picture-in-picture videos (floating and pinned).
 - **Click to focus and raise on focus** (Windows/macOS behaviour, user's choice after research):
   `input.follow_mouse = 2` (hover still scrolls, a click focuses) and `hypr/windows.lua` raises
   every newly focused window (`hl.on("window.active", ...)` + `alter_zorder({ mode = "top" })`);

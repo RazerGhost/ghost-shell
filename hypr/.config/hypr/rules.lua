@@ -5,6 +5,23 @@
 -- Windows tile (layout.lua); Hyprland floats dialogs by itself, and the window menu or
 -- Super+Shift+Space floats any other window. Floating windows stay above tiled ones.
 
+-- Small helper apps float in the middle instead of tiling: CachyOS Hello (its install terminals
+-- float from windows.lua, where their title is known).
+hl.window_rule({
+    name   = "float-helpers",
+    match  = { class = "^org\\.cachyos\\.hello$" },
+    float  = true,
+    center = true,
+})
+
+-- The browser's picture-in-picture video floats and stays on every workspace (pinned).
+hl.window_rule({
+    name  = "float-picture-in-picture",
+    match = { title = "^Picture-in-Picture$" },
+    float = true,
+    pin   = true,
+})
+
 -- Fix XWayland dragging issues
 hl.window_rule({
     name  = "fix-xwayland-drags",
