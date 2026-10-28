@@ -58,6 +58,9 @@ Singleton {
     readonly property QtObject island: QtObject {
         readonly property int height:     36  // when closed; also the space reserved at the top
         readonly property int padding:    14  // left/right padding inside the closed island
+        // The whole island moves this many px right of the screen's middle: the laptop's webcam
+        // sits a pixel right of the panel's exact middle (the user lined it up by eye).
+        readonly property int offset:     1
         readonly property int fillet:     14  // radius of the concave joins to the screen edge
         readonly property int openRadius: 32  // bottom corners when open (closed: half the height)
         readonly property int panelWidth: 380 // width of the open menus

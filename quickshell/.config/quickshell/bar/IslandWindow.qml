@@ -160,6 +160,7 @@ PanelWindow {
 
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenterOffset: Theme.island.offset // under the webcam
         color: Colors.surfaceTranslucent
 
         // The morph: width, height and corner radius animate between the closed pill
