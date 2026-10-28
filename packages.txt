@@ -28,6 +28,8 @@ cliphist
 matugen
 inter-font
 ttf-meslo-nerd
+noto-fonts-emoji
+unicode-emoji
 nvidia-prime
 nautilus
 loupe

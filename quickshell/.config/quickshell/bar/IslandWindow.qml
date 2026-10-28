@@ -394,6 +394,18 @@ PanelWindow {
                 }
 
                 MenuSlot {
+                    shown: root.shown === "emoji"
+
+                    EmojiPanel {
+                        width: parent.width
+                        onPicked: emoji => {
+                            root.island.panel = "";
+                            Emoji.type(emoji);
+                        }
+                    }
+                }
+
+                MenuSlot {
                     shown: root.shown === "clipboard"
 
                     ClipboardPanel {

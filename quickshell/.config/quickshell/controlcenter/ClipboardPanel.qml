@@ -24,81 +24,41 @@ Column {
         if (visible) {
             Clipboard.refresh();
             search.text = "";
-            search.forceActiveFocus();
+            search.focusInput();
         }
     }
 
-    // Search field, like the launcher's.
-    Rectangle {
+    SearchField {
+        id: search
+
         width: parent.width - root.leftPadding - root.rightPadding
-        implicitHeight: Theme.slider.height
-        radius: Theme.radius.full
-        color: Colors.m3surfaceContainerHighest
+        placeholder: "Search clipboard"
 
-        MaterialIcon {
-            id: searchIcon
-            anchors.left: parent.left
-            anchors.leftMargin: Theme.spacing.m
-            anchors.verticalCenter: parent.verticalCenter
-            icon: "search"
-            color: Colors.m3onSurfaceVariant
-        }
-
-        TextInput {
-            id: search
-
-            anchors.left: searchIcon.right
-            anchors.right: clearAll.left
-            anchors.leftMargin: Theme.spacing.s
-            anchors.rightMargin: Theme.spacing.s
-            anchors.verticalCenter: parent.verticalCenter
-            color: Colors.m3onSurface
-            selectionColor: Colors.m3primary
-            selectedTextColor: Colors.m3onPrimary
-            font.family: Theme.font.sans
-            font.pixelSize: Theme.font.normal
-            clip: true
-
-            Accessible.role: Accessible.EditableText
-            Accessible.name: "Search clipboard"
-
-            onTextChanged: list.currentIndex = 0
-
-            Keys.onPressed: event => {
-                switch (event.key) {
-                case Qt.Key_Down:
-                    list.incrementCurrentIndex();
-                    break;
-                case Qt.Key_Up:
-                    list.decrementCurrentIndex();
-                    break;
-                case Qt.Key_Return:
-                case Qt.Key_Enter:
-                    if (list.currentItem)
-                        root.picked(list.currentItem.modelData);
-                    break;
-                case Qt.Key_Delete:
-                    if (list.currentItem)
-                        Clipboard.remove(list.currentItem.modelData);
-                    break;
-                default:
-                    return; // typing goes to the field
-                }
-                event.accepted = true;
+        onTextChanged: list.currentIndex = 0
+        onKeyPressed: event => {
+            switch (event.key) {
+            case Qt.Key_Down:
+                list.incrementCurrentIndex();
+                break;
+            case Qt.Key_Up:
+                list.decrementCurrentIndex();
+                break;
+            case Qt.Key_Return:
+            case Qt.Key_Enter:
+                if (list.currentItem)
+                    root.picked(list.currentItem.modelData);
+                break;
+            case Qt.Key_Delete:
+                if (list.currentItem)
+                    Clipboard.remove(list.currentItem.modelData);
+                break;
+            default:
+                return; // typing goes to the field
             }
-
-            Text {
-                visible: search.text === ""
-                text: "Search clipboard"
-                color: Colors.m3onSurfaceVariant
-                font: search.font
-            }
+            event.accepted = true;
         }
 
         TextButton {
-            id: clearAll
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
             visible: Clipboard.entries.length > 0
             text: "Clear all"
             onClicked: Clipboard.wipe()

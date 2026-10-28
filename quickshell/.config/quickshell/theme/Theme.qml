@@ -24,6 +24,7 @@ Singleton {
     readonly property QtObject font: QtObject {
         readonly property string sans: "Inter"
         readonly property string mono: "MesloLGS Nerd Font" // error messages
+        readonly property string emoji: "Noto Color Emoji"
         readonly property string icon: "Material Symbols Rounded"
         readonly property int iconWeight: 300 // Material Symbols line weight (400 is the font's default)
 
@@ -136,6 +137,12 @@ Singleton {
 
     readonly property QtObject wallpaper: QtObject {
         readonly property int thumbHeight: 120 // thumbnails in the picker (16:9)
+    }
+
+    readonly property QtObject emoji: QtObject {
+        readonly property int cell: 42 // one emoji in the picker's grid
+        readonly property int size: 26 // the emoji glyph
+        readonly property int rows: 7  // visible rows; the grid scrolls past that
     }
 
     readonly property QtObject clipboard: QtObject {

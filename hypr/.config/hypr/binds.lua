@@ -33,6 +33,7 @@ hl.bind(mainMod .. " + I",       hl.dsp.exec_cmd("qs ipc call settings open"), {
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("qs ipc call island toggle settings"), { description = "Quick settings" })
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("qs ipc call island toggle today"), { description = "Calendar and notifications" })
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("qs ipc call island toggle clipboard"), { description = "Clipboard history" })
+hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("qs ipc call island toggle emoji"), { description = "Emoji" })
 
 -- Session
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("qs ipc call lock lock"), { description = "Lock" })
