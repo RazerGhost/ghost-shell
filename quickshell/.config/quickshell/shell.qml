@@ -7,6 +7,7 @@ import qs.launcher
 import qs.lock
 import qs.osd
 import qs.snap
+import qs.switcher
 import qs.wallpaper
 
 ShellRoot {
@@ -16,4 +17,5 @@ ShellRoot {
     Lock {}
     Osd {}
     SnapPicker {}
+    Switcher {}
 }

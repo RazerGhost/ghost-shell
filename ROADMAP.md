@@ -144,15 +144,16 @@ go back with Ctrl+Alt+F1 and unlock with your password.
 restarting): Ctrl+Alt+F2, log in, then switch greetd back to tuigreet and restart it:
 `sudo sed -i 's/^command = "env/# command = "env/; s/^# command = "tuigreet/command = "tuigreet/' /etc/greetd/config.toml && sudo systemctl restart greetd`.
 
-### Phase 6: Window switching + snap layouts (snapping built; Alt+Tab in progress)
+### Phase 6: Window switching + snap layouts (built; waiting on the user's test results)
 Added at the user's request after researching Windows/macOS features (2026-10-28). The phase number
 isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
-- **Alt+Tab switcher** (Windows/macOS style): an overlay with a live thumbnail of every window
-  (`ScreencopyView` capturing `HyprlandToplevel.wayland`), most recently used first. Hold Alt, tap
-  Tab / Shift+Tab to move, release Alt to focus the selected window; Escape cancels. The overlay
-  takes the keyboard (`Exclusive`) while open so it sees the Alt release. Check before building:
-  whether Hyprland exposes focus order (`focusHistoryID` or similar) for MRU sorting, and how much
-  live capture of many windows costs on battery (fall back to still frames if it's heavy).
+- **Alt+Tab switcher** (built, `switcher/Switcher.qml`): every window on every workspace (user's
+  choice) with a live preview (`ScreencopyView`, only while open), most recently used first by
+  Hyprland's `focusHistoryID`. Alt+Tab / Alt+Shift+Tab are Hyprland binds calling
+  `qs ipc call switcher next|previous`; the switcher takes the keyboard and switches when it sees
+  Alt released; Escape or a click elsewhere cancels; minimized windows are restored. Tested with
+  wtype holding a real Alt key. Caveat: a very quick Alt+Tab tap may release Alt before the
+  switcher has the keyboard; then it stays open until Alt is tapped again (or Escape).
 - **Snapping** (built): Super+Left/Right snap the focused window to halves; Super+Z (Zed moved to
   Super+Shift+Z) shows a picker (`snap/SnapPicker.qml`, its own card at the top center of the
   window, not in the island: user's choice) with halves, quarters, thirds and two-thirds. The
@@ -371,6 +372,11 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   workspace = "special:x", follow = false })`, also `close`, `float`, `fullscreen({ mode =
   "maximized" | "fullscreen", action = "toggle" })`, `move({ x, y, relative })`;
   `hl.dsp.focus({ window = ... })`. A special workspace that's never toggled stays hidden.
+- wtype: Hyprland doesn't run its binds for wtype's virtual keyboard, so binds can't be tested
+  with it. `wtype -M alt` only sets the modifier, without Alt key events; `-P Alt_L` / `-p Alt_L`
+  send real ones.
+- `ScreencopyView { captureSource: toplevel.wayland; live; constraintSize }` (`Quickshell.Wayland`)
+  captures windows on other workspaces too.
 - `float({ action })` takes `"toggle"` (default), `"enable"`/`"on"`, `"disable"`/`"off"`; an
   unknown value like `"set"` toggles. `fullscreen` uses `"set"`/`"unset"`. `resize({ window, x, y
   })` and `move({ window, x, y })` take logical pixels (a 940x1004 resize gives exactly that).

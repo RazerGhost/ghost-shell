@@ -52,6 +52,10 @@ hl.bind(mainMod .. " + left",  hl.dsp.exec_cmd("qs ipc call snap active left"))
 hl.bind(mainMod .. " + right", hl.dsp.exec_cmd("qs ipc call snap active right"))
 hl.bind(mainMod .. " + Z",     hl.dsp.exec_cmd("qs ipc call snap picker"))
 
+-- Alt+Tab switcher: Tab steps through the windows, releasing Alt switches (Quickshell sees that).
+hl.bind("ALT + Tab",         hl.dsp.exec_cmd("qs ipc call switcher next"))
+hl.bind("ALT + SHIFT + Tab", hl.dsp.exec_cmd("qs ipc call switcher previous"))
+
 -- Focus with arrow keys
 hl.bind(mainMod .. " + CTRL + left",  hl.dsp.focus({ direction = "left" }))
 hl.bind(mainMod .. " + CTRL + right", hl.dsp.focus({ direction = "right" }))

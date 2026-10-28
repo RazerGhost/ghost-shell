@@ -65,6 +65,15 @@ hl.layer_rule({
     animation    = "popin 90%",
 })
 
+-- Alt+Tab switcher: blurred, pops in.
+hl.layer_rule({
+    name  = "qs-switcher",
+    match = { namespace = "^qs-switcher$" },
+    blur         = true,
+    ignore_alpha = 0.3,
+    animation    = "popin 90%",
+})
+
 -- Launcher: blurred, pops in from its center.
 hl.layer_rule({
     name  = "qs-launcher",

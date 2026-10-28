@@ -94,6 +94,11 @@ Singleton {
         readonly property int menuArt:     160  // cover in the media menu
     }
 
+    readonly property QtObject switcher: QtObject {
+        readonly property int thumbHeight: 160 // window previews in Alt+Tab
+        readonly property int labelHeight: 32  // app icon and title under each preview
+    }
+
     readonly property QtObject snap: QtObject {
         readonly property int width: 56 // one layout picture in the snap picker (16:9)
     }
