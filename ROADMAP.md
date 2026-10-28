@@ -115,14 +115,24 @@ new setup step.
   `~/.local/state/quickshell/wallpaper.json`; `qs ipc call wallpaper set <path>` and
   `./install.sh <image>` set it too. With none chosen, Hyprland's default wallpaper shows.
 
-### Phase 5: Lock screen + idle + greeter
-- Quickshell session lock with PAM. Keep `hyprlock` as a fallback bind (currently Super+L) and tell the
-  user how to recover from a crashed lock screen.
-- `hypridle` config: dim, then lock, then screen off, then suspend. Ask the user for timings if unsure.
-  Check hypridle's current config format.
-- Quickshell greeter (`Quickshell.Services.Greetd`) to replace tuigreet, sharing parts with the lock
-  screen. It runs inside a small Hyprland instance started by greetd; switching over is a change to
-  `command` in `system/etc/greetd/config.toml`.
+### Phase 5: Lock screen + idle + greeter (lock screen and idle built; greeter not started)
+- Lock screen (`lock/Lock.qml`, `LockContent.qml`): Quickshell `WlSessionLock` on every monitor,
+  blurred wallpaper, big clock and date, password field checked through PAM's `login` config.
+  `qs ipc call lock lock` (Super+L, power menu, hypridle); `qs ipc call lock preview` shows it
+  without locking, to check the look. Fallback: Super+Shift+L runs hyprlock with its sample config
+  (`/usr/share/hypr/hyprlock.conf`).
+- Idle (`hypr/hypridle.conf`, user's "balanced" choice): dim at 4 min, lock at 5, screen off at
+  5.5, suspend at 15 only on battery (`condition_cmd` checks `ACAD/online`). Locks before every
+  suspend (`inhibit_sleep = 3` waits for the lock).
+- Still to do: the Quickshell greeter (`Quickshell.Services.Greetd`) replacing tuigreet, sharing
+  `LockContent`'s look. It runs inside a small Hyprland instance started by greetd; switching
+  over is a change to `command` in `system/etc/greetd/config.toml`.
+
+**Lock screen recovery.** If the lock screen crashes, Hyprland keeps the session locked (red
+screen). `misc.allow_session_lock_restore` (look.lua) lets another lock screen take over:
+Ctrl+Alt+F2, log in, run
+`hyprctl --instance 0 dispatch 'hl.dsp.exec_cmd("hyprlock -c /usr/share/hypr/hyprlock.conf")'`,
+go back with Ctrl+Alt+F1 and unlock with your password.
 
 ### Phase 6: Window switching + snap layouts
 Added at the user's request after researching Windows/macOS features (2026-10-28). The phase number
@@ -173,7 +183,7 @@ isn't a priority: it can move ahead of Phases 3-5 if the user wants it sooner.
   menu closed immediately. (The launcher maps a new surface with `Exclusive`, which works.)
 - **Keybinds: Windows-style** (user's choice, 2026-10-28): tap Super or Super+Space launcher,
   Super+Enter terminal, Super+E files, Super+B browser, Super+W / Alt+F4 close, Super+Up maximize,
-  Super+Down minimize, Super+T float/tile, Alt+Space window menu, Super+N quick settings, Super+C calendar, Super+Shift+S screenshot, Super+V clipboard,
+  Super+Down minimize, Super+T float/tile, Alt+Space window menu, Super+N quick settings, Super+C calendar, Super+Shift+S screenshot, Super+V clipboard, Super+L lock (Super+Shift+L hyprlock fallback),
   Ctrl+Alt+Delete power menu, Super+Ctrl+arrows focus. Super+Left/Right are kept free for snapping
   (Phase 6). Full list in `hypr/binds.lua`.
 - **Window buttons:** Hyprland draws no title bars, so instead of hyprbars: keybinds plus a window
@@ -305,6 +315,15 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `invoke()`), `transient`, `lastGeneration` (true for ones carried over a reload, which are
   announced again), `dismiss()`, `expire()`. No timestamp. App icons can be names, paths or URLs;
   show them with `IconImage` (a plain `Image` scales up a tiny icon).
+- Lock: `WlSessionLock { locked; WlSessionLockSurface { ... } }` (one surface per screen;
+  `Quickshell.Wayland`). `PamContext { config: "login"; start(); respond(text) }` with
+  `responseRequired`, `completed(PamResult.Success/Failed/Error/MaxTries)`, `error(PamError)`.
+  `MultiEffect` (`QtQuick.Effects`) blurs (`blurEnabled`, `blur`, `blurMax`). Use
+  `Qt.locale(name).toString(date, format)`; `Qt.formatDate(date, locale, x)` treats `x` as a
+  format type, not a string.
+- hypridle 0.1.8: `general { lock_cmd; before_sleep_cmd; after_sleep_cmd; inhibit_sleep }`,
+  `listener { timeout; on-timeout; on-resume; condition_cmd; condition_retry }`. Screen off is
+  `hyprctl dispatch 'hl.dsp.dpms({ action = "disable" })'`.
 - cliphist: `cliphist list` prints `<id>\t<preview>` newest first; images look like
   `[[ binary data 120 KiB png 1920x1080 ]]`. `cliphist decode <id>`, `cliphist delete` (the
   whole line on stdin), `cliphist wipe`. `wtype -M ctrl v -m ctrl` presses Ctrl+V.

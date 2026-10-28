@@ -63,6 +63,9 @@ hl.config({
     misc = {
         force_default_wallpaper = -1,
         disable_hyprland_logo   = false,
+        -- If the lock screen (Quickshell) crashes, the session stays locked; this lets a new
+        -- lock screen take over (see "Lock screen recovery" in ROADMAP.md).
+        allow_session_lock_restore = true,
     },
 })
 

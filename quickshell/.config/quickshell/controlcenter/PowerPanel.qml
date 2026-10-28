@@ -25,8 +25,7 @@ Column {
     }
 
     readonly property var actions: [
-        // hyprlock has no config yet; the lock screen arrives in Phase 5.
-        { name: "Lock", icon: "lock", command: ["hyprlock"], confirm: false },
+        { name: "Lock", icon: "lock", command: ["qs", "ipc", "call", "lock", "lock"], confirm: false },
         { name: "Suspend", icon: "bedtime", command: ["systemctl", "suspend"], confirm: false },
         { name: "Log out", icon: "logout", confirm: true,
           command: ["sh", "-c", "command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"] },

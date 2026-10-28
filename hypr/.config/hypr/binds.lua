@@ -27,7 +27,9 @@ hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("qs ipc call island toggle today"))  
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("qs ipc call island toggle clipboard")) -- clipboard history
 
 -- Session
-hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("qs ipc call lock lock"))
+-- Fallback lock screen with hyprlock's sample config, in case Quickshell's misbehaves.
+hl.bind(mainMod .. " + SHIFT + L", hl.dsp.exec_cmd("hyprlock -c /usr/share/hypr/hyprlock.conf"))
 -- Power menu in the island: lock, suspend, log out, restart, shut down.
 hl.bind("CTRL + ALT + Delete", hl.dsp.exec_cmd("qs ipc call island toggle power"))
 

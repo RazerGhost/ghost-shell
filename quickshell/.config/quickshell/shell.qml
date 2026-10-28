@@ -4,6 +4,7 @@
 import Quickshell
 import qs.bar
 import qs.launcher
+import qs.lock
 import qs.osd
 import qs.wallpaper
 
@@ -11,5 +12,6 @@ ShellRoot {
     WallpaperLayer {}
     Island {}
     Launcher {}
+    Lock {}
     Osd {}
 }

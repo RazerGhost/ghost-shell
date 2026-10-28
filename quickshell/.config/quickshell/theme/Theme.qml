@@ -95,6 +95,12 @@ Singleton {
         readonly property int menuArt:     160  // cover in the media menu
     }
 
+    readonly property QtObject lock: QtObject {
+        readonly property int clock:      112 // the big clock
+        readonly property int fieldWidth: 340 // password field
+        readonly property int blur:       64  // wallpaper blur radius
+    }
+
     readonly property QtObject wallpaper: QtObject {
         readonly property int columns: 4 // thumbnails visible side by side in the picker
     }
