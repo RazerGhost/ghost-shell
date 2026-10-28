@@ -2,12 +2,13 @@ import QtQuick
 import qs.theme
 import qs.widgets
 
-// Header of a quick settings sub-page: back arrow, title, and an on/off switch.
+// Header of a quick settings sub-page: back arrow, title, and an on/off switch (hasSwitch).
 Item {
     id: root
 
     property string title
     property bool checked
+    property bool hasSwitch: true
 
     signal back()
     signal toggled()
@@ -35,6 +36,7 @@ Item {
     }
 
     Switch {
+        visible: root.hasSwitch
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         checked: root.checked

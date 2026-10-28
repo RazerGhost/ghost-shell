@@ -11,7 +11,7 @@ import qs.widgets
 Item {
     id: root
 
-    property string page: "main" // "main", "wifi", "bluetooth" or "sound"
+    property string page: "main" // "main", "wifi", "bluetooth", "sound" or "system"
 
     // A button here opens another island menu ("power"), or closes the island ("").
     signal openMenu(string menu)
@@ -19,7 +19,7 @@ Item {
 
     // The island grows and shrinks to fit the current page.
     implicitHeight: (page === "wifi" ? wifiPage : page === "bluetooth" ? bluetoothPage
-                     : page === "sound" ? soundPage : mainPage).implicitHeight
+                     : page === "sound" ? soundPage : page === "system" ? systemPage : mainPage).implicitHeight
                     + padding
     clip: true // pages slide in from the side
 
@@ -253,6 +253,13 @@ Item {
 
                 IconButton {
                     anchors.verticalCenter: parent.verticalCenter
+                    icon: "monitoring"
+                    label: "System"
+                    onClicked: root.page = "system"
+                }
+
+                IconButton {
+                    anchors.verticalCenter: parent.verticalCenter
                     icon: "settings"
                     label: "Settings"
                     onClicked: {
@@ -310,6 +317,24 @@ Item {
         x: root.page === "sound" ? root.padding : root.width
         width: root.width - root.padding * 2
         onBack: root.page = "main"
+
+        Behavior on x {
+            NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }
+        }
+    }
+
+    SystemPage {
+        id: systemPage
+        x: root.page === "system" ? root.padding : root.width
+        width: root.width - root.padding * 2
+        onBack: root.page = "main"
+
+        // Only read the system while the page shows.
+        Binding {
+            target: SystemStats
+            property: "active"
+            value: root.visible && root.page === "system"
+        }
 
         Behavior on x {
             NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }

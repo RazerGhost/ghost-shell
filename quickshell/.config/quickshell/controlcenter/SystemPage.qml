@@ -1,0 +1,123 @@
+import QtQuick
+import qs.services
+import qs.theme
+import qs.widgets
+
+// System page of quick settings: processor, memory, each graphics card and the disk, with a
+// bar for how busy or full each is. Updated every 2 s while the page is open (SystemStats).
+Column {
+    id: root
+
+    signal back()
+
+    spacing: Theme.spacing.m
+
+    // One reading: a title and details on one line, and a bar below (hidden for value < 0).
+    component StatRow: Column {
+        id: row
+
+        property string title
+        property string detail
+        property real value: -1 // 0-1
+
+        width: parent.width
+        spacing: Theme.spacing.xs
+
+        Accessible.role: Accessible.StaticText
+        Accessible.name: title + ": " + detail
+
+        Item {
+            width: parent.width
+            implicitHeight: label.implicitHeight
+
+            Text {
+                id: label
+                x: Theme.spacing.m
+                text: row.title
+                color: Colors.m3onSurface
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.normal
+            }
+
+            Text {
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacing.m
+                text: row.detail
+                color: Colors.m3onSurfaceVariant
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.small
+                anchors.verticalCenter: label.verticalCenter
+            }
+        }
+
+        Rectangle {
+            x: Theme.spacing.m
+            width: parent.width - Theme.spacing.m * 2
+            height: Theme.spacing.xs
+            radius: height / 2
+            visible: row.value >= 0
+            color: Colors.m3surfaceContainerHighest
+
+            Rectangle {
+                width: parent.width * Math.min(1, Math.max(0, row.value))
+                height: parent.height
+                radius: height / 2
+                // Nearly full turns the error color, like a warning light.
+                color: row.value > 0.9 ? Colors.m3error : Colors.m3primary
+
+                Behavior on width {
+                    NumberAnimation { duration: Theme.anim.normal }
+                }
+            }
+        }
+    }
+
+    function percent(value: real): string {
+        return Math.round(value * 100) + " %";
+    }
+
+    function degrees(value: var): string {
+        return value === null ? "" : Math.round(value) + " °C";
+    }
+
+    PageHeader {
+        width: parent.width
+        title: "System"
+        hasSwitch: false
+        onBack: root.back()
+    }
+
+    StatRow {
+        title: "Processor"
+        detail: [SystemStats.cpuLoad >= 0 ? root.percent(SystemStats.cpuLoad) : "…", root.degrees(SystemStats.cpuTemp)]
+            .filter(s => s !== "").join(" · ")
+        value: SystemStats.cpuLoad
+    }
+
+    StatRow {
+        visible: SystemStats.memory !== null
+        title: "Memory"
+        detail: SystemStats.memory ? SystemStats.amount(SystemStats.memory.used, SystemStats.memory.total) : ""
+        value: SystemStats.memory ? SystemStats.memory.used / SystemStats.memory.total : -1
+    }
+
+    Repeater {
+        model: SystemStats.gpus
+
+        StatRow {
+            required property var modelData
+            title: modelData.name
+            detail: modelData.asleep ? "Asleep (saving power)"
+                : [root.percent(modelData.load), root.degrees(modelData.temp),
+                   SystemStats.amount(modelData.memory.used, modelData.memory.total)].join(" · ")
+            value: modelData.asleep ? -1 : modelData.load
+        }
+    }
+
+    StatRow {
+        visible: SystemStats.disk !== null
+        title: "Disk"
+        detail: SystemStats.disk ? SystemStats.amount(SystemStats.disk.used, SystemStats.disk.total) : ""
+        value: SystemStats.disk ? SystemStats.disk.used / SystemStats.disk.total : -1
+    }
+}

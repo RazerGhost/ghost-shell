@@ -305,6 +305,14 @@ other session: pinning the Vencord/Spicetify downloads in install.sh.
   "12 updates · 3 from the AUR" with an Update button that runs `paru` in the default terminal
   (user's choice over `cachy-update`). `qs ipc call updates check|summary`.
 
+### System page (built 2026-10-28; waiting on the user's test results)
+- Quick settings' monitor button opens a System page (user's pick from the Glyph rice's ideas):
+  processor load and temperature, memory, each graphics card (load, temperature, video memory)
+  and the disk, each with a bar that turns the error color above 90 %. `services/SystemStats.qml`
+  runs `system-stats.sh` every 2 s only while the page is open, parsed by `SystemStats.js`
+  (tested). Sensors are found by hwmon name (numbers change between boots). The RTX is only
+  asked (`nvidia-smi`) while it's awake: asking would wake it, so a sleeping one shows "Asleep".
+
 ### Screenshot tool (built 2026-10-28; waiting on the user's test results)
 - `screenshot/Screenshot.qml`, like Windows' Snipping Tool (user's choice): Super+Shift+S freezes
   the focused monitor (one `ScreencopyView` frame) and dims it, with a Region / Window / Screen
