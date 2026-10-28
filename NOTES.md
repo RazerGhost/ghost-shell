@@ -177,6 +177,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `inhibitingIdle` per window (Vesktop holds one during voice).
 - Notifications: `NotificationServer.inlineReplySupported`, `Notification.hasInlineReply`,
   `sendInlineReply(text)` (an `inline-reply` action over D-Bus).
+- Testing notifications by hand: `gdbus call ... Notify` prints `(uint32 7,)`; take the id with
+  `sed -E 's/\(uint32 ([0-9]+),\)/\1/'` (grepping digits catches the 32 in "uint32").
+  `CloseNotification <id>` removes it from the shell's list; that works.
 - `qs ipc call` exits 0 even for an unknown target, but non-zero when no shell is running.
 - `hyprctl hyprsunset temperature` prints the last temperature set, also after `identity`, so it
   doesn't tell whether night light is on.
