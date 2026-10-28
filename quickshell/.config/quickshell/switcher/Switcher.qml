@@ -118,8 +118,12 @@ Scope {
                     required property HyprlandToplevel modelData
                     required property int index
                     readonly property bool selected: index === root.index
+                    // The window's own shape, like in the overview (16:10 until its size is known),
+                    // capped so a very wide window doesn't take the whole row.
+                    readonly property var size: modelData.lastIpcObject?.size
+                    readonly property real aspect: size ? size[0] / size[1] : 16 / 10
 
-                    width: Theme.switcher.thumbHeight * 16 / 10
+                    width: Theme.switcher.thumbHeight * Math.min(aspect, Theme.switcher.maxAspect)
                     height: ListView.view.height
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
@@ -142,11 +146,34 @@ Scope {
 
                         ScreencopyView {
                             anchors.fill: parent
-                            anchors.margins: 6
+                            anchors.margins: 3
                             captureSource: root.open ? card.modelData.wayland : null
                             live: true
-                            constraintSize: Qt.size(width, height)
                         }
+
+                        // Close the window, from its preview (shown while hovered).
+                        IconButton {
+                            anchors.top: parent.top
+                            anchors.right: parent.right
+                            anchors.margins: Theme.spacing.s
+                            visible: hover.hovered
+                            icon: "close"
+                            label: "Close " + card.modelData.title
+                            color: Colors.m3onSurface
+                            onClicked: Windows.close(card.modelData)
+
+                            Rectangle {
+                                anchors.fill: parent
+                                z: -1
+                                radius: Theme.radius.full
+                                color: Colors.surfaceTranslucent
+                            }
+                        }
+                    }
+
+                    // Over the whole card, the × button included.
+                    HoverHandler {
+                        id: hover
                     }
 
                     Row {
@@ -166,7 +193,7 @@ Scope {
                             anchors.verticalCenter: parent.verticalCenter
                             width: Math.min(implicitWidth, card.width - Theme.icon.normal - parent.spacing)
                             text: card.modelData.title
-                            color: card.selected ? Colors.m3onSurface : Colors.m3onSurfaceVariant
+                            color: Colors.m3onSurface
                             font.family: Theme.font.sans
                             font.pixelSize: Theme.font.normal
                             font.weight: card.selected ? Font.DemiBold : Font.Normal

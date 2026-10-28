@@ -111,7 +111,8 @@ Singleton {
     }
 
     readonly property QtObject switcher: QtObject {
-        readonly property int thumbHeight: 160 // window previews in Alt+Tab
+        readonly property int thumbHeight: 220 // window previews in Alt+Tab; widths follow each window's shape
+        readonly property real maxAspect:  2.2 // the widest a preview gets, relative to its height
         readonly property int labelHeight: 32  // app icon and title under each preview
     }
 
