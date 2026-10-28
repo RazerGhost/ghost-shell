@@ -235,7 +235,10 @@ config files became settings.
     `hyprctl reload` only when the content changes. The gaps apply to tiled windows. The login screen
     gets the file through the shared folder (keyboard layout).
   - **Keybinds:** read from Hyprland (`hyprctl binds -j`, every bind in `binds.lua` has a
-    description), grouped per description (`settings/Keybinds.js`, tested).
+    description, "Category: what it does"), by category (Apps, Menus, Session, Windows,
+    Workspaces, Capture, Zoom; user's request 2026-10-28: the flat list was too spread out), each
+    key a key cap, with a search (`settings/Keybinds.js`, tested; `ghost keybinds` loads the same
+    file for docs/keybinds.md).
 
 ### Lock and login screen settings (done, verified on the laptop 2026-10-28)
 The follow-up to Phase 7 (user's choice of options; the lock screen shares the look, user's

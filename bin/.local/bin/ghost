@@ -214,29 +214,20 @@ cmd_doctor() {
     echo "Everything is set up."
 }
 
-# Every bind with a description, grouped like the settings window does (one row per
-# description, its key combinations together), as a Markdown table.
+# Every bind with a description, by category, as Markdown: the settings window's keybinds page
+# in text. The grouping is the page's own (quickshell's settings/Keybinds.js, loaded here).
 cmd_keybinds() {
-    hyprctl binds -j | node -e '
-        const binds = JSON.parse(require("fs").readFileSync(0, "utf8"));
-        // Hyprland modifier bits, in the order they are written.
-        const mods = [[64, "Super"], [4, "Ctrl"], [8, "Alt"], [1, "Shift"]];
-        const names = { "mouse:272": "Left drag", "mouse:273": "Right drag", Return: "Enter",
-                        space: "Space", period: ".", grave: "`", SUPER_L: "Super (tap)" };
-        const combo = b => [...mods.filter(([bit]) => b.modmask & bit).map(([, n]) => n),
-                            names[b.key] ?? (b.key.length === 1 ? b.key.toUpperCase() : b.key)]
-            .filter((k, i, a) => !(k === "Super" && a.includes("Super (tap)"))).join(" + ");
-        const groups = new Map();
-        for (const b of binds) {
-            if (!b.has_description) continue;
-            if (!groups.has(b.description)) groups.set(b.description, []);
-            const c = combo(b);
-            if (!groups.get(b.description).includes(c)) groups.get(b.description).push(c);
-        }
-        console.log("| Keys | What it does |\n|---|---|");
-        for (const [description, combos] of groups) {
-            const keys = combos.length > 3 ? combos[0] + " … " + combos[combos.length - 1] : combos.join(" / ");
-            console.log(`| ${keys.replace(/\|/g, "\\|")} | ${description} |`);
+    hyprctl binds -j | KEYBINDS_JS="quickshell/.config/quickshell/settings/Keybinds.js" node -e '
+        const fs = require("fs");
+        // The file is a QML JavaScript library: everything but its ".pragma library" line is plain JS.
+        const source = fs.readFileSync(process.env.KEYBINDS_JS, "utf8").replace(/^\.pragma library$/m, "");
+        const { groups } = new Function(source + "\nreturn { groups };")();
+        for (const group of groups(JSON.parse(fs.readFileSync(0, "utf8")))) {
+            console.log(`\n## ${group.category}\n\n| Keys | What it does |\n|---|---|`);
+            for (const row of group.rows) {
+                const keys = row.combos.map(c => c.map(k => "`" + k + "`").join(" + ")).join(" or ");
+                console.log(`| ${keys.replace(/\|/g, "\\|")} | ${row.description} |`);
+            }
         }
     '
 }

@@ -18,35 +18,36 @@ TestCase {
         compare(Keybinds.combo(0, "Print"), "Print Screen");
         compare(Keybinds.combo(8, "F4"), "Alt + F4");
         compare(Keybinds.combo(64, "mouse:272"), "Super + Left drag");
+        compare(Keybinds.combo(64, "equal"), "Super + +");
     }
 
     function test_modifierOnly() {
         // Tapping Super: the key is Super itself.
-        compare(Keybinds.combo(64, "SUPER_L"), "Super");
+        compare(Keybinds.parts(64, "SUPER_L"), ["Super"]);
     }
 
-    function test_rowsGroupByDescription() {
-        const rows = Keybinds.rows([
-            bind(64, "W", "Close window"),
-            bind(64, "B", "Browser"),
-            bind(8, "F4", "Close window")
+    function test_groupsByCategory() {
+        const groups = Keybinds.groups([
+            bind(64, "W", "Windows: Close window"),
+            bind(64, "B", "Apps: Browser"),
+            bind(8, "F4", "Windows: Close window"),
+            bind(64, "X", "No category")
         ]);
-        compare(rows.length, 2);
-        compare(rows[0].description, "Close window");
-        compare(rows[0].keys, "Super + W / Alt + F4");
-        compare(rows[1].keys, "Super + B");
+        compare(groups.map(g => g.category), ["Windows", "Apps", "Other"]);
+        compare(groups[0].rows, [{ description: "Close window", combos: [["Super", "W"], ["Alt", "F4"]] }]);
+        compare(groups[2].rows[0].description, "No category");
     }
 
-    function test_rowsSkipUndescribed() {
-        const rows = Keybinds.rows([bind(0, "XF86AudioMute"), bind(64, "L", "Lock")]);
-        compare(rows.length, 1);
-        compare(rows[0].description, "Lock");
+    function test_skipsUndescribed() {
+        const groups = Keybinds.groups([bind(0, "XF86AudioMute"), bind(64, "L", "Session: Lock")]);
+        compare(groups.length, 1);
+        compare(groups[0].rows[0].description, "Lock");
     }
 
-    function test_rowsLongGroupShowsRange() {
+    function test_rangeBecomesOne() {
         const binds = [];
         for (let i = 1; i <= 10; i++)
-            binds.push(bind(64, String(i % 10), "Go to workspace 1-10"));
-        compare(Keybinds.rows(binds)[0].keys, "Super + 1 … Super + 0");
+            binds.push(bind(64, String(i % 10), "Workspaces: Go to workspace 1-10"));
+        compare(Keybinds.groups(binds)[0].rows[0].combos, [["Super", "1–0"]]);
     }
 }

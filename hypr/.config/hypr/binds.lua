@@ -13,8 +13,9 @@ local function app(kind, fallback)
     return hl.dsp.exec_cmd("qs ipc call apps open " .. kind .. " || " .. fallback)
 end
 
--- Every bind except the media keys has a description: the settings window lists them
--- (hyprctl binds -j), and binds with the same description show as one row ("Super + W / Alt + F4").
+-- Every bind except the media keys has a description, "Category: what it does": the settings
+-- window lists them by category (hyprctl binds -j), and binds with the same description show as
+-- one row ("Super + W / Alt + F4").
 
 local mainMod = "SUPER"
 
@@ -22,86 +23,86 @@ local mainMod = "SUPER"
 -- bind on the Super key itself.
 
 -- Apps
-hl.bind(mainMod .. " + SUPER_L", hl.dsp.exec_cmd("qs ipc call launcher toggle"), { release = true, description = "App launcher" })
-hl.bind(mainMod .. " + space",   hl.dsp.exec_cmd("qs ipc call launcher toggle"), { description = "App launcher" })
-hl.bind(mainMod .. " + Return",  app("terminal", "ghostty"), { description = "Terminal" })
-hl.bind(mainMod .. " + E",       app("fileManager", "nautilus"), { description = "File manager" })
-hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd("qs ipc call apps terminal yazi || ghostty -e yazi"), { description = "Yazi (files in the terminal)" })
-hl.bind(mainMod .. " + B",       app("browser", "zen-browser"), { description = "Browser" })
-hl.bind(mainMod .. " + SHIFT + Z", app("editor", "zeditor"), { description = "Editor" })
-hl.bind(mainMod .. " + I",       hl.dsp.exec_cmd("qs ipc call settings open"), { description = "Settings" })
+hl.bind(mainMod .. " + SUPER_L", hl.dsp.exec_cmd("qs ipc call launcher toggle"), { release = true, description = "Apps: App launcher" })
+hl.bind(mainMod .. " + space",   hl.dsp.exec_cmd("qs ipc call launcher toggle"), { description = "Apps: App launcher" })
+hl.bind(mainMod .. " + Return",  app("terminal", "ghostty"), { description = "Apps: Terminal" })
+hl.bind(mainMod .. " + E",       app("fileManager", "nautilus"), { description = "Apps: File manager" })
+hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd("qs ipc call apps terminal yazi || ghostty -e yazi"), { description = "Apps: Yazi (files in the terminal)" })
+hl.bind(mainMod .. " + B",       app("browser", "zen-browser"), { description = "Apps: Browser" })
+hl.bind(mainMod .. " + SHIFT + Z", app("editor", "zeditor"), { description = "Apps: Editor" })
+hl.bind(mainMod .. " + I",       hl.dsp.exec_cmd("qs ipc call settings open"), { description = "Apps: Settings" })
 
 -- Island menus
-hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("qs ipc call island toggle settings"), { description = "Quick settings" })
-hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("qs ipc call island toggle today"), { description = "Calendar and notifications" })
-hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("qs ipc call island toggle clipboard"), { description = "Clipboard history" })
-hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("qs ipc call island toggle emoji"), { description = "Emoji" })
+hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("qs ipc call island toggle settings"), { description = "Menus: Quick settings" })
+hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("qs ipc call island toggle today"), { description = "Menus: Calendar and notifications" })
+hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("qs ipc call island toggle clipboard"), { description = "Menus: Clipboard history" })
+hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("qs ipc call island toggle emoji"), { description = "Menus: Emoji" })
 
 -- Session
-hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("qs ipc call lock lock || " .. fallbackLock), { description = "Lock" })
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("qs ipc call lock lock || " .. fallbackLock), { description = "Session: Lock" })
 -- Fallback lock screen with hyprlock's sample config, in case Quickshell's misbehaves.
-hl.bind(mainMod .. " + SHIFT + L", hl.dsp.exec_cmd(fallbackLock), { description = "Lock (fallback lock screen)" })
+hl.bind(mainMod .. " + SHIFT + L", hl.dsp.exec_cmd(fallbackLock), { description = "Session: Lock (fallback lock screen)" })
 -- Power menu in the island: lock, suspend, log out, restart, shut down.
-hl.bind("CTRL + ALT + Delete", hl.dsp.exec_cmd("qs ipc call island toggle power"), { description = "Power menu" })
+hl.bind("CTRL + ALT + Delete", hl.dsp.exec_cmd("qs ipc call island toggle power"), { description = "Session: Power menu" })
 
 -- Windows
-hl.bind(mainMod .. " + W", hl.dsp.window.close(), { description = "Close window" })
-hl.bind("ALT + F4",        hl.dsp.window.close(), { description = "Close window" })
-hl.bind(mainMod .. " + up",   hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }), { description = "Maximize" })
+hl.bind(mainMod .. " + W", hl.dsp.window.close(), { description = "Windows: Close window" })
+hl.bind("ALT + F4",        hl.dsp.window.close(), { description = "Windows: Close window" })
+hl.bind(mainMod .. " + up",   hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }), { description = "Windows: Maximize" })
 -- Super+Down minimizes (Hyprland has no minimize, so the window goes to a hidden special
 -- workspace that the island lists; see quickshell's services/Windows.qml).
-hl.bind(mainMod .. " + down", hl.dsp.exec_cmd("qs ipc call snap down"), { description = "Minimize" })
+hl.bind(mainMod .. " + down", hl.dsp.exec_cmd("qs ipc call snap down"), { description = "Windows: Minimize" })
 -- Window menu on the window (like Windows' Alt+Space): minimize, maximize, fullscreen, close,
 -- the snap layouts and moving it to another workspace. Super+Z opens the same menu.
-hl.bind("ALT + space", hl.dsp.exec_cmd("qs ipc call snap picker"), { description = "Window menu and snap layouts" })
-hl.bind(mainMod .. " + F",    hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }), { description = "Fullscreen" })
+hl.bind("ALT + space", hl.dsp.exec_cmd("qs ipc call snap picker"), { description = "Windows: Window menu and snap layouts" })
+hl.bind(mainMod .. " + F",    hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }), { description = "Windows: Fullscreen" })
 
 -- Tiling (layout.lua). Super+Left/Right put the window in a half, every other spot is in the
 -- window menu; both go through the shell, which offers windows for a spot left empty (Snap Assist).
-hl.bind(mainMod .. " + left",  hl.dsp.exec_cmd("qs ipc call snap active left"), { description = "Snap left" })
-hl.bind(mainMod .. " + right", hl.dsp.exec_cmd("qs ipc call snap active right"), { description = "Snap right" })
-hl.bind(mainMod .. " + Z",     hl.dsp.exec_cmd("qs ipc call snap picker"), { description = "Window menu and snap layouts" })
+hl.bind(mainMod .. " + left",  hl.dsp.exec_cmd("qs ipc call snap active left"), { description = "Windows: Snap left" })
+hl.bind(mainMod .. " + right", hl.dsp.exec_cmd("qs ipc call snap active right"), { description = "Windows: Snap right" })
+hl.bind(mainMod .. " + Z",     hl.dsp.exec_cmd("qs ipc call snap picker"), { description = "Windows: Window menu and snap layouts" })
 -- Move the window's border, or swap it with the window next to it.
 for _, direction in ipairs({ "left", "right", "up", "down" }) do
-    hl.bind(mainMod .. " + ALT + " .. direction, hl.dsp.layout("resize " .. direction), { repeating = true, description = "Resize the tiled window" })
-    hl.bind(mainMod .. " + SHIFT + " .. direction, hl.dsp.layout("move " .. direction), { description = "Swap with the window next to it" })
+    hl.bind(mainMod .. " + ALT + " .. direction, hl.dsp.layout("resize " .. direction), { repeating = true, description = "Windows: Resize the tiled window" })
+    hl.bind(mainMod .. " + SHIFT + " .. direction, hl.dsp.layout("move " .. direction), { description = "Windows: Swap with the window next to it" })
 end
-hl.bind(mainMod .. " + SHIFT + space", hl.dsp.window.float({ action = "toggle" }), { description = "Float or tile" })
+hl.bind(mainMod .. " + SHIFT + space", hl.dsp.window.float({ action = "toggle" }), { description = "Windows: Float or tile" })
 
 -- Alt+Tab switcher: Tab steps through the windows, releasing Alt switches (Quickshell sees that).
-hl.bind("ALT + Tab",         hl.dsp.exec_cmd("qs ipc call switcher next"), { description = "Switch windows" })
-hl.bind("ALT + SHIFT + Tab", hl.dsp.exec_cmd("qs ipc call switcher previous"), { description = "Switch windows, backwards" })
+hl.bind("ALT + Tab",         hl.dsp.exec_cmd("qs ipc call switcher next"), { description = "Windows: Switch windows" })
+hl.bind("ALT + SHIFT + Tab", hl.dsp.exec_cmd("qs ipc call switcher previous"), { description = "Windows: Switch windows, backwards" })
 
 -- Overview, like Windows' Task View: every window on the workspace, and the workspaces strip.
-hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("qs ipc call overview toggle"), { description = "Overview" })
+hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("qs ipc call overview toggle"), { description = "Windows: Overview" })
 
 -- Focus with arrow keys
-hl.bind(mainMod .. " + CTRL + left",  hl.dsp.focus({ direction = "left" }), { description = "Move focus" })
-hl.bind(mainMod .. " + CTRL + right", hl.dsp.focus({ direction = "right" }), { description = "Move focus" })
-hl.bind(mainMod .. " + CTRL + up",    hl.dsp.focus({ direction = "up" }), { description = "Move focus" })
-hl.bind(mainMod .. " + CTRL + down",  hl.dsp.focus({ direction = "down" }), { description = "Move focus" })
+hl.bind(mainMod .. " + CTRL + left",  hl.dsp.focus({ direction = "left" }), { description = "Windows: Move focus" })
+hl.bind(mainMod .. " + CTRL + right", hl.dsp.focus({ direction = "right" }), { description = "Windows: Move focus" })
+hl.bind(mainMod .. " + CTRL + up",    hl.dsp.focus({ direction = "up" }), { description = "Windows: Move focus" })
+hl.bind(mainMod .. " + CTRL + down",  hl.dsp.focus({ direction = "down" }), { description = "Windows: Move focus" })
 
 -- Screenshots (quickshell's screenshot/Screenshot.qml): saved to ~/Pictures/Screenshots and copied.
 -- Super+Shift+S picks a region, window or the screen; Print takes the whole screen. Without the
 -- shell, grim + slurp still copy a region.
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd('qs ipc call screenshot region || grim -g "$(slurp)" - | wl-copy'), { description = "Screenshot (region, window or screen)" })
-hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("qs ipc call screenshot record"), { description = "Record the screen (again: stop)" })
-hl.bind("Print",                   hl.dsp.exec_cmd("qs ipc call screenshot screen || grim - | wl-copy"), { description = "Screenshot of the screen" })
+hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd('qs ipc call screenshot region || grim -g "$(slurp)" - | wl-copy'), { description = "Capture: Screenshot (region, window or screen)" })
+hl.bind(mainMod .. " + SHIFT + R", hl.dsp.exec_cmd("qs ipc call screenshot record"), { description = "Capture: Record the screen (again: stop)" })
+hl.bind("Print",                   hl.dsp.exec_cmd("qs ipc call screenshot screen || grim - | wl-copy"), { description = "Capture: Screenshot of the screen" })
 
 -- Workspaces 1-10 (Super+0 = 10)
 for i = 1, 10 do
     local key = i % 10
-    hl.bind(mainMod .. " + " .. key,         hl.dsp.focus({ workspace = i }), { description = "Go to workspace 1-10" })
-    hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }), { description = "Move window to workspace 1-10" })
+    hl.bind(mainMod .. " + " .. key,         hl.dsp.focus({ workspace = i }), { description = "Workspaces: Go to workspace 1-10" })
+    hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }), { description = "Workspaces: Move window to workspace 1-10" })
 end
 
 -- Scratchpad
-hl.bind(mainMod .. " + grave",         hl.dsp.workspace.toggle_special("magic"), { description = "Show or hide the scratchpad (a terminal when empty)" })
-hl.bind(mainMod .. " + SHIFT + grave", hl.dsp.window.move({ workspace = "special:magic" }), { description = "Move window to the scratchpad" })
+hl.bind(mainMod .. " + grave",         hl.dsp.workspace.toggle_special("magic"), { description = "Workspaces: Show or hide the scratchpad (a terminal when empty)" })
+hl.bind(mainMod .. " + SHIFT + grave", hl.dsp.window.move({ workspace = "special:magic" }), { description = "Workspaces: Move window to the scratchpad" })
 
 -- Scroll through workspaces
-hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }), { description = "Next or previous workspace" })
-hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }), { description = "Next or previous workspace" })
+hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }), { description = "Workspaces: Next or previous workspace" })
+hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }), { description = "Workspaces: Next or previous workspace" })
 
 -- Magnifier, like Windows': zoom in around the pointer in steps, out again, and back to normal.
 local function zoom(factor)
@@ -111,16 +112,16 @@ local function zoom(factor)
         hl.config({ cursor = { zoom_factor = next } })
     end
 end
-hl.bind(mainMod .. " + equal",  zoom(1.5),     { repeating = true, description = "Zoom in (magnifier)" })
-hl.bind(mainMod .. " + minus",  zoom(1 / 1.5), { repeating = true, description = "Zoom out (magnifier)" })
-hl.bind(mainMod .. " + Escape", zoom(nil),     { description = "Zoom back to normal" })
+hl.bind(mainMod .. " + equal",  zoom(1.5),     { repeating = true, description = "Zoom: Zoom in (magnifier)" })
+hl.bind(mainMod .. " + minus",  zoom(1 / 1.5), { repeating = true, description = "Zoom: Zoom out (magnifier)" })
+hl.bind(mainMod .. " + Escape", zoom(nil),     { description = "Zoom: Zoom back to normal" })
 
 -- Move/resize windows with mouse. Hyprland's own drag and resize only reach floating windows;
 -- for tiled ones drag.lua follows the pointer while the button is held (it does nothing over a
 -- floating window): left-drag swaps the window with the tiled one it's dropped on, right-drag
 -- moves the borders nearest the pointer.
-hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true, description = "Move window" })
-hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true, description = "Resize window" })
+hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true, description = "Windows: Move window" })
+hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true, description = "Windows: Resize window" })
 local drag = require("drag")
 hl.bind(mainMod .. " + mouse:272", drag.start_move, { non_consuming = true })
 hl.bind(mainMod .. " + mouse:272", drag.stop_move, { release = true, non_consuming = true })
