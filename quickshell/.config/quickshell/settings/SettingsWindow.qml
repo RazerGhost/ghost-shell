@@ -14,8 +14,17 @@ import qs.widgets
 Singleton {
     id: root
 
-    property bool open: false
-    property string page: "nightlight"
+    property alias open: persist.open
+    property alias page: persist.page
+
+    // Stays open on the same page when the shell reloads (after editing its files).
+    PersistentProperties {
+        id: persist
+        reloadableId: "settingsWindow"
+
+        property bool open: false
+        property string page: "nightlight"
+    }
 
     // This window in Hyprland's list, for maximizing. Not FloatingWindow.maximized: Hyprland marks
     // every window as tiled on all edges (so apps drop their shadows), which Qt reports as

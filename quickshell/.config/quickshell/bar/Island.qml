@@ -16,8 +16,17 @@ Scope {
     id: root
 
     // "", "today", "settings", "media", "window", "power", "clipboard" or "wallpaper"
-    property string panel: ""
-    property string screenName: "" // the monitor the menu is open on
+    property alias panel: persist.panel
+    property alias screenName: persist.screenName // the monitor the menu is open on
+
+    // The open menu stays open when the shell reloads (after editing its files).
+    PersistentProperties {
+        id: persist
+        reloadableId: "island"
+
+        property string panel: ""
+        property string screenName: ""
+    }
     // The window menu acts on the window that was focused when it opened.
     property HyprlandToplevel windowTarget: null
 
