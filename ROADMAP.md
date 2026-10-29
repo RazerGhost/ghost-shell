@@ -768,6 +768,11 @@ shell's cost, features and customization), checked before acting. Done so far:
   `cliphist decode`) in `~/.local/state/quickshell/clipboard-pins.json`, shown first in the
   menu with a pin mark, searched like the rest, kept through "Clear all"; × or Delete unpins
   (`ClipboardEntries.withPins/pin/unpin`, tested). Images can't be pinned.
+- Launcher extras: a color typed as #rgb, #rrggbb or rgb() shows a swatch (Enter copies the
+  hex); "? words" searches the keybinds (`hyprctl binds -j`, grouped like Settings' page); one
+  typo in an app's name still finds it when nothing else does (`Fuzzy.oneTypo`); the last row
+  searches the web for the text (DuckDuckGo in the browser; user's choice: no Google). `Fuzzy.color`,
+  `keybinds`, typos tested. Verified live.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

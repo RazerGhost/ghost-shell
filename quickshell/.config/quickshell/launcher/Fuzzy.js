@@ -64,8 +64,37 @@ function scoredApps(entries, q) {
         if (best >= 0)
             results.push({ entry: entry, score: best });
     }
+    // Nothing found: allow one typo (a letter wrong, missing, extra or two swapped) against a
+    // word of the app's name, for queries of 4 letters or more ("spotfy", "firfox").
+    if (results.length === 0 && q.length >= 4) {
+        for (const entry of entries) {
+            const words = entry.name.toLowerCase().split(/[\s\-_.]+/);
+            if (words.some(w => oneTypo(q.toLowerCase(), w) || oneTypo(q.toLowerCase(), w.slice(0, q.length))))
+                results.push({ entry: entry, score: 1 });
+        }
+    }
     results.sort((a, b) => b.score - a.score || byName(a.entry, b.entry));
     return results;
+}
+
+// Whether `a` and `b` differ by at most one edit: a letter changed, added or removed, or two
+// neighbours swapped.
+function oneTypo(a, b) {
+    if (a === b)
+        return true;
+    if (Math.abs(a.length - b.length) > 1)
+        return false;
+    let i = 0;
+    while (i < a.length && i < b.length && a[i] === b[i])
+        i++;
+    if (a.length === b.length) {
+        if (a.slice(i + 1) === b.slice(i + 1))
+            return true; // one letter changed
+        return a[i] === b[i + 1] && a[i + 1] === b[i] && a.slice(i + 2) === b.slice(i + 2); // swapped
+    }
+    const longer = a.length > b.length ? a : b;
+    const shorter = a.length > b.length ? b : a;
+    return longer.slice(i + 1) === shorter.slice(i); // one letter more
 }
 
 // Apps' own shortcuts (.desktop actions, like Zen's "New Private Window" or Steam's "Library")
@@ -116,14 +145,17 @@ function results(entries, query, windows) {
         .map(r => ({ entry: r.entry, action: r.action, window: r.window }));
 }
 
-// What a query asks for: "/ report" searches files, "> htop" runs a command, anything else
-// searches apps and windows. { mode: "apps" | "files" | "command", text }.
+// What a query asks for: "/ report" searches files, "> htop" runs a command, "? close" searches
+// the keybinds, anything else searches apps and windows. { mode: "apps" | "files" | "command" |
+// "keys", text }.
 function mode(query) {
     const trimmed = query.replace(/^\s+/, ""); // no trimStart in QML's engine
     if (trimmed.startsWith("/"))
         return { mode: "files", text: trimmed.slice(1).trim() };
     if (trimmed.startsWith(">"))
         return { mode: "command", text: trimmed.slice(1).trim() };
+    if (trimmed.startsWith("?"))
+        return { mode: "keys", text: trimmed.slice(1).trim() };
     return { mode: "apps", text: query };
 }
 
@@ -177,4 +209,34 @@ function fileIcon(name) {
     const ext = name.slice(dot + 1).toLowerCase();
     const kind = Object.keys(fileIcons).find(k => fileIcons[k].includes(ext));
     return kind ? iconNames[kind] : "text-x-generic";
+}
+
+// A color typed into the launcher: "#abc", "#aabbcc" or "rgb(10, 20, 30)", as "#rrggbb"; ""
+// for anything else. The # is needed, so a word like "beaded" isn't a color.
+function color(query) {
+    const q = query.trim().toLowerCase();
+    let m = /^#([0-9a-f]{3})$/.exec(q);
+    if (m)
+        return "#" + m[1].split("").map(c => c + c).join("");
+    m = /^#([0-9a-f]{6})$/.exec(q);
+    if (m)
+        return "#" + m[1];
+    m = /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/.exec(q);
+    if (m && [m[1], m[2], m[3]].every(n => +n <= 255))
+        return "#" + [m[1], m[2], m[3]].map(n => (+n).toString(16).padStart(2, "0")).join("");
+    return "";
+}
+
+// Keybinds matching `query` ("? close"), from Keybinds.groups(): [{ description, keys, category }]
+// with `keys` as written ("Super + W / Alt + F4"); every bind for an empty query.
+function keybinds(groups, query) {
+    const q = query.trim().toLowerCase();
+    const list = [];
+    for (const group of groups)
+        for (const row of group.rows) {
+            const keys = row.combos.map(c => c.join(" + ")).join(" / ");
+            if (q === "" || (row.description + " " + keys + " " + group.category).toLowerCase().includes(q))
+                list.push({ description: row.description, keys: keys, category: group.category });
+        }
+    return list;
 }

@@ -133,4 +133,33 @@ TestCase {
         compare(Fuzzy.fileIcon("notes.md"), "text-x-generic");
         compare(Fuzzy.fileIcon(".bashrc"), "folder"); // hidden files aren't searched
     }
+
+    function test_typos() {
+        const apps = [{ name: "Spotify", genericName: "", keywords: [], noDisplay: false },
+                      { name: "Zen Browser", genericName: "", keywords: [], noDisplay: false }];
+        compare(Fuzzy.results(apps, "sptofiy").length, 0); // two typos: nothing
+        compare(Fuzzy.results(apps, "spotfy")[0].entry.name, "Spotify");   // a letter missing
+        compare(Fuzzy.results(apps, "spoitfy")[0].entry.name, "Spotify");  // two swapped
+        compare(Fuzzy.results(apps, "browsr")[0].entry.name, "Zen Browser");
+        verify(Fuzzy.oneTypo("abcd", "abxd"));
+        verify(!Fuzzy.oneTypo("abcd", "axyd"));
+    }
+
+    function test_color() {
+        compare(Fuzzy.color("#FF8800"), "#ff8800");
+        compare(Fuzzy.color("#f80"), "#ff8800");
+        compare(Fuzzy.color("rgb(255, 136, 0)"), "#ff8800");
+        compare(Fuzzy.color("rgb(300, 0, 0)"), "");
+        compare(Fuzzy.color("beaded"), "");
+        compare(Fuzzy.color("ff8800"), "");
+    }
+
+    function test_keybinds() {
+        const groups = [{ category: "Windows", rows: [{ description: "Close window", combos: [["Super", "W"], ["Alt", "F4"]] }] },
+                        { category: "Apps", rows: [{ description: "Open files", combos: [["Super", "E"]] }] }];
+        compare(Fuzzy.keybinds(groups, "close"), [{ description: "Close window", keys: "Super + W / Alt + F4", category: "Windows" }]);
+        compare(Fuzzy.keybinds(groups, "super + e").map(k => k.description), ["Open files"]);
+        compare(Fuzzy.keybinds(groups, "").length, 2);
+        compare(Fuzzy.mode("? close"), { mode: "keys", text: "close" });
+    }
 }

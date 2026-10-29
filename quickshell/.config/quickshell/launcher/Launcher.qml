@@ -7,6 +7,7 @@ import qs.services
 import qs.theme
 import qs.widgets
 import "Fuzzy.js" as Fuzzy
+import "../settings/Keybinds.js" as Keybinds
 
 // App launcher: type to fuzzy-search installed apps and open windows, arrow keys to pick, Enter
 // to launch or switch, Escape or a click outside to close. "/ name" searches files in the home
@@ -18,9 +19,17 @@ Scope {
     property bool open: false
 
     // A result: an app or one of its shortcuts ({ entry, action }; action null for the app), a
-    // window ({ window }), a file ({ file }) or a command to run ({ command }).
+    // window ({ window }), a file ({ file }), a command to run ({ command }), a web search
+    // ({ web }: DuckDuckGo in the default browser), a color ({ color }: copied) or a keybind
+    // ({ keybind }: just shown).
     function launch(result: var): void {
-        if (result.window)
+        if (result.web !== undefined)
+            Qt.openUrlExternally("https://duckduckgo.com/?q=" + encodeURIComponent(result.web));
+        else if (result.color)
+            Quickshell.execDetached(["wl-copy", result.color]);
+        else if (result.keybind)
+            ; // nothing to run: the launcher just closes
+        else if (result.window)
             Windows.show(result.window);
         else if (result.file)
             Quickshell.execDetached(["xdg-open", result.file.path]);
@@ -32,6 +41,31 @@ Scope {
         else
             Apps.launch(result.entry);
         open = false;
+    }
+
+    function appResults(text: string): var {
+        const color = Fuzzy.color(text);
+        const found = Fuzzy.results(DesktopEntries.applications.values, text,
+                                    open && text.trim() !== "" ? windowList() : []);
+        return (color ? [{ color: color }] : []).concat(found, text.trim() !== "" ? [{ web: text.trim() }] : []);
+    }
+
+    // The keybinds for "? ...": read from Hyprland once per opening, when "?" is typed.
+    property var keybindGroups: []
+    onOpenChanged: keybindGroups = []
+
+    Process {
+        id: readBinds
+        command: ["hyprctl", "binds", "-j"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    root.keybindGroups = Keybinds.groups(JSON.parse(text));
+                } catch (e) {
+                    console.warn("Launcher: unexpected hyprctl binds output: " + e.message);
+                }
+            }
+        }
     }
 
     // Open windows to search, with their app's name.
@@ -122,7 +156,7 @@ Scope {
                     readonly property var query: Fuzzy.mode(text)
 
                     width: parent.width
-                    placeholder: "Search apps and windows,  / files,  > run"
+                    placeholder: "Search apps and windows,  / files,  > run,  ? keys"
                     fontSize: Theme.font.large
 
                     // New results: select the best match again (the answer, while there is one).
@@ -131,6 +165,8 @@ Scope {
                         // From the text itself: `query` may not have caught up with it yet here,
                         // and a search for the text before the last key was thrown away as stale.
                         const now = Fuzzy.mode(text);
+                        if (now.mode === "keys" && root.keybindGroups.length === 0 && !readBinds.running)
+                            readBinds.running = true;
                         calc.ask(now.mode === "apps" ? text : "");
                         if (now.mode === "files")
                             fileSearch.ask(now.text);
@@ -191,9 +227,10 @@ Scope {
                     model: ScriptModel {
                         values: search.query.mode === "files" ? fileSearch.found.map(f => ({ file: f }))
                               : search.query.mode === "command" ? (search.query.text === "" ? [] : [{ command: search.query.text }])
-                              // Windows only while open with a query: their titles change all the time.
-                              : Fuzzy.results(DesktopEntries.applications.values, search.text,
-                                              root.open && search.query.text.trim() !== "" ? root.windowList() : [])
+                              : search.query.mode === "keys" ? Fuzzy.keybinds(root.keybindGroups, search.query.text).map(k => ({ keybind: k }))
+                              // A color first, the apps and windows, then the web; windows only
+                              // while open with a query (their titles change all the time).
+                              : root.appResults(search.text)
                     }
                     highlightMoveDuration: Theme.anim.fast
                     boundsBehavior: Flickable.StopAtBounds
@@ -219,6 +256,7 @@ Scope {
                     bottomPadding: Theme.spacing.s
                     text: search.query.mode === "files" ? (search.query.text === "" ? "Type a file or folder name" : fileSearch.busy ? "Searching…" : "No files found")
                         : search.query.mode === "command" ? "Type a command to run in the terminal"
+                        : search.query.mode === "keys" ? "No keybind found"
                         : "No apps found"
                     color: Colors.m3onSurfaceVariant
                     font.family: Theme.font.sans
