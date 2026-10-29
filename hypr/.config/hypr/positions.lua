@@ -59,10 +59,10 @@ end
 
 load_positions()
 
--- Windows left out by title: the shell's windows editor's sample (customize/WindowsEditor.qml)
--- shares the class org.quickshell with the shell's Settings window, and would take or
--- overwrite its place.
-local skipped_titles = { ["Animation sample"] = true }
+-- Windows left out by title: the shell's windows editor's example windows
+-- (customize/ExampleWindow.qml) share the class org.quickshell with the shell's Settings
+-- window, and would take or overwrite its place.
+local skipped_titles = { ["Animation sample"] = true, ["Example window"] = true, ["Another window"] = true }
 
 -- The settings window can turn this off (ShellSettings comes from shell-settings.lua).
 local function enabled()

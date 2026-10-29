@@ -953,14 +953,18 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   It goes to an empty workspace too (user's choice: the glass sheet read poorly over windows);
   the trip there and back is `Editing.toEmptyWorkspace()` / `back()`, shared with the desktop
   editor.
-- Windows editor (`customize/WindowsEditor.qml`, `qs ipc call customize windows`): stays on
-  your workspace, so each change shows on your own windows ("Open a window to see these on it"
-  when there's none). Borders (width, corners, turning border, glow, floating and pinned
+- Windows editor (`customize/WindowsEditor.qml`, `qs ipc call customize windows`): on an empty
+  workspace with two example windows of its own, tiled side by side (`ExampleWindow.qml`, a
+  title and placeholder lines in your colors; user's choice over relying on windows already
+  open), the first focused before the editor takes the keyboard so the active border and glow
+  show; Done or Cancel close them and go back. A rule lets them take the focus when they open
+  (otherwise they'd ask for attention: the island's card). Borders (width, corners, turning border, glow, floating and pinned
   windows standing out), Space (gaps between windows and at the edges), Motion (speed, opening
   and closing, switching workspaces, wobbly windows). Each animation has Play: a floating
-  "Animation sample" window opens and closes (a rule in rules.lua floats it, and positions.lua
-  leaves it out: it shares Quickshell's class with the Settings window, whose saved place it
-  took), or the workspace switches away and back. A step list includes your current value
+  "Animation sample" window opens and closes (a rule in rules.lua floats it; positions.lua
+  leaves all the examples out: they share Quickshell's class with the Settings window, whose
+  saved place the first sample took), or the workspace switches away and back (its own trip,
+  not `Editing`'s, which is the way home). A step list includes your current value
   when it isn't one of its steps. Moved out of Settings: Appearance's animation speed and window
   border and corners, Windows' gaps and wobbly windows (now a Customize button). With this,
   Settings keeps only what isn't seen; every visual option is in an editor.

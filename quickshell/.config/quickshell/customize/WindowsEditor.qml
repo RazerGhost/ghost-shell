@@ -9,11 +9,12 @@ import qs.widgets
 import "../settings/HyprlandConfig.js" as HyprlandConfig
 import "Presets.js" as Presets
 
-// The windows editor: your windows' borders, corners, gaps and motion, shown on the windows
-// themselves (it stays on your workspace; Hyprland applies each change in a moment). The
-// animations have Play buttons: a sample window opens and closes, or the workspace switches
-// away and back. Cancel writes the earlier settings back. Opened from Settings -> Windows and
-// the launcher (Customize.qml).
+// The windows editor: the windows' borders, corners, gaps and motion, shown on two example
+// windows it opens side by side on an empty workspace (user's choice: not relying on windows
+// already being open; Done or Cancel close them and go back). Hyprland applies each change in
+// a moment. The animations have Play buttons: a sample window opens and closes, or the
+// workspace switches away and back. Cancel writes the earlier settings back. Opened from
+// Settings -> Windows and the launcher (Customize.qml).
 Scope {
     id: root
 
@@ -25,10 +26,23 @@ Scope {
     }
 
     function open(): void {
-        if (editor.active)
+        if (editor.active || editorLater.running)
             return;
         saved = Presets.snapshot(Settings.values, Presets.windowsKeys);
-        editor.active = true;
+        Editing.toEmptyWorkspace();
+        examples.active = true;
+        editorLater.restart();
+    }
+
+    // The editor's window takes the keyboard, and Hyprland focuses no window while it's open:
+    // focus the first example before, so its active border and glow show.
+    Timer {
+        id: editorLater
+        interval: 400
+        onTriggered: {
+            Hyprland.dispatch(`hl.dsp.focus({ window = "title:^Example window$" })`);
+            editor.active = true;
+        }
     }
 
     function close(): void {
@@ -36,6 +50,8 @@ Scope {
             return;
         editor.active = false;
         sample.active = false;
+        examples.active = false;
+        Editing.back();
     }
 
     function cancel(): void {
@@ -52,9 +68,14 @@ Scope {
         sampleClose.restart();
     }
 
-    // Play: the workspace switches to an empty one and back.
+    // Play: the workspace switches to an empty one and back to the examples' (its own trip:
+    // Editing's is the way back to your workspace when the editor closes).
+    property int playFrom: 0
+
     function playWorkspace(): void {
-        Editing.toEmptyWorkspace();
+        playFrom = Hyprland.focusedWorkspace?.id ?? 0;
+        const used = Hyprland.workspaces.values.map(w => w.id).filter(id => id > 0);
+        Hyprland.dispatch(`hl.dsp.focus({ workspace = ${Math.max(0, ...used) + 1} })`);
         workspaceBack.restart();
     }
 
@@ -67,25 +88,30 @@ Scope {
     Timer {
         id: workspaceBack
         interval: root.playTime
-        onTriggered: Editing.back()
+        onTriggered: Hyprland.dispatch(`hl.dsp.focus({ workspace = ${root.playFrom} })`)
     }
 
+    // The two example windows, tiled side by side on the empty workspace.
+    LazyLoader {
+        id: examples
+
+        Scope {
+            ExampleWindow {
+                heading: "Example window"
+            }
+
+            ExampleWindow {
+                heading: "Another window"
+            }
+        }
+    }
+
+    // Play's window: floats in the middle (rules.lua).
     LazyLoader {
         id: sample
 
-        FloatingWindow {
-            title: "Animation sample"
-            implicitWidth: Theme.editor.sample
-            implicitHeight: Math.round(Theme.editor.sample * 0.6)
-            color: Colors.m3surfaceContainer
-
-            Text {
-                anchors.centerIn: parent
-                text: "Animation sample"
-                color: Colors.m3onSurface
-                font.family: Theme.font.sans
-                font.pixelSize: Theme.font.large
-            }
+        ExampleWindow {
+            heading: "Animation sample"
         }
     }
 
@@ -118,7 +144,6 @@ Scope {
                 id: chrome
                 tabs: [{ value: "borders", label: "Borders" }, { value: "space", label: "Space" }, { value: "motion", label: "Motion" }]
                 glass: true
-                status: Hyprland.focusedWorkspace?.toplevels.values.length > 0 ? "" : "Open a window to see these on it"
                 onCancelled: root.cancel()
                 onFinished: root.close()
 

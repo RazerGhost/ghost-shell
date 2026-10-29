@@ -14,13 +14,22 @@ hl.window_rule({
     center = true,
 })
 
--- The windows editor's sample window (customize/WindowsEditor.qml) floats in the middle, so
--- playing an animation doesn't rearrange your tiled windows.
+-- The windows editor's animation sample (customize/WindowsEditor.qml) floats in the middle, so
+-- playing an animation doesn't rearrange the example windows tiled behind it.
 hl.window_rule({
     name   = "animation-sample",
     match  = { class = "^org\\.quickshell$", title = "^Animation sample$" },
     float  = true,
     center = true,
+})
+
+-- All the windows editor's example windows may take the focus when they open, instead of
+-- asking for attention (the island's "wants your attention" card): the focused one shows the
+-- active border and glow being edited.
+hl.window_rule({
+    name              = "example-windows",
+    match             = { class = "^org\\.quickshell$", title = "^(Example window|Another window|Animation sample)$" },
+    focus_on_activate = true,
 })
 
 -- The scratchpad (Super+`) doubles as a drop-down terminal: opened empty, it starts one. It
