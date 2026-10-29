@@ -74,7 +74,7 @@ Generated from Hyprland's binds with `ghost keybinds`, by category; every bind i
 | `Super` + `1–0` | Go to workspace 1-10 |
 | `Super` + `Shift` + `1–0` | Move window to workspace 1-10 |
 | `Super` + ``` | Show or hide the scratchpad (a terminal when empty) |
-| `Super` + `Shift` + ``` | Move window to the scratchpad |
+| `Super` + `Shift` + ``` | Move window to or from the scratchpad |
 | `Super` + `Scroll down` or `Super` + `Scroll up` | Next or previous workspace |
 
 ## Zoom
