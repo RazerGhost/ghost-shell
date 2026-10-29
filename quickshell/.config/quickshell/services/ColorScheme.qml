@@ -45,17 +45,27 @@ Singleton {
         precision: SystemClock.Minutes
     }
 
+    // The mode the colors were last made for: the file's at start (read once), then remembered
+    // here. Not re-read after a run: the read right after came back stale, so every switch ran
+    // twice (logged 2026-10-29).
+    property string applied: ""
+    property bool appliedRead: false
+
     // Clicking through the choices quickly makes the colors once.
     Timer {
         id: applyLater
-        interval: 600
+        interval: 300
         onTriggered: {
             // A change during a run is picked up when it ends (apply's onExited).
             if (!root.known || apply.running)
                 return;
-            current.reload();
-            if (current.text().trim() === root.mode)
+            if (!root.appliedRead) {
+                root.applied = current.text().trim();
+                root.appliedRead = true;
+            }
+            if (root.applied === root.mode)
                 return;
+            root.applied = root.mode;
             apply.command = ["sh", "-c", `printf '%s\\n' "$1" > "$2" && sh "$3"`, "sh", root.mode, root.file,
                              Quickshell.env("HOME") + "/.config/matugen/wallpaper.sh"];
             apply.running = true;
@@ -65,13 +75,14 @@ Singleton {
     FileView {
         id: current
         path: root.file
-        blockLoading: true // compared with right away
+        blockLoading: true // read once, right away
         printErrors: false // missing until the first switch
     }
 
     Process {
         id: apply
         onExited: code => {
+            // A failed run isn't retried here (it would loop); the next change runs it again.
             if (code !== 0)
                 console.warn("ColorScheme: wallpaper.sh exited with code " + code);
             applyLater.restart(); // the choice may have changed while it ran
