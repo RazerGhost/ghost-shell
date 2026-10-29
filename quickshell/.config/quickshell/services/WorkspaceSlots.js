@@ -15,6 +15,15 @@ function step(active, delta, count) {
     return ((active - 1 + delta) % count + count) % count + 1;
 }
 
+// The workspace one step away from `active` among `slots` (the dots shown), wrapping around:
+// with only the used ones shown, 2 -> 5 -> 8 rather than 2 -> 3.
+function stepIn(slots, active, delta) {
+    if (slots.length === 0)
+        return active;
+    const i = slots.indexOf(active);
+    return slots[step(i < 0 ? 1 : i + 1, delta, slots.length) - 1];
+}
+
 // The workspaces in use, plus the one you're on, in order (the overview's strip). Hyprland removes an empty workspace once you leave it, so the ones that exist
 // are the used ones; the active one counts even before it has a window.
 function used(existingIds, active) {

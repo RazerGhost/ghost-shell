@@ -202,6 +202,31 @@ Column {
                 onPicked: v => Settings.values.cornerScale = v
             }
         }
+
+        SettingRow {
+            title: "Launcher"
+            subtitle: "Its width, and how many results show before the list scrolls"
+
+            Row {
+                spacing: Theme.spacing.s
+
+                Stepper {
+                    label: "Launcher width"
+                    values: ThemeScale.launcherWidths
+                    value: ThemeScale.pick(Settings.values.launcherWidth, ThemeScale.launcherWidths, 560)
+                    format: v => ({ 480: "Narrow", 560: "Normal", 640: "Wide", 720: "Wider" })[v] ?? v
+                    onPicked: v => Settings.values.launcherWidth = v
+                }
+
+                Stepper {
+                    label: "Launcher rows"
+                    values: ThemeScale.launcherRows
+                    value: Theme.launcher.rows
+                    format: v => v + " rows"
+                    onPicked: v => Settings.values.launcherRows = v
+                }
+            }
+        }
     }
 
     SettingGroup {
@@ -344,6 +369,24 @@ Column {
 
     // The island's status icons, each on or off (bar/StatusIcons.qml). The privacy ones
     // (recording, microphone, camera, screen sharing) always show, so they aren't listed.
+    SettingGroup {
+        title: "Workspaces"
+
+        SettingRow {
+            title: "Workspace dots"
+            subtitle: Theme.workspace.minimum === 0 ? "Only the workspaces you use (and the one you're on)"
+                    : "Always " + Theme.workspace.minimum + ", more when you use a higher one"
+
+            Stepper {
+                label: "Workspace dots"
+                values: ThemeScale.workspaceDots
+                value: Theme.workspace.minimum
+                format: v => v === 0 ? "In use" : String(v)
+                onPicked: v => Settings.values.workspaceDots = v
+            }
+        }
+    }
+
     SettingGroup {
         title: "Status icons"
 

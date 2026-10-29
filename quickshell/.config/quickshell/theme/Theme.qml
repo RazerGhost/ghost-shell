@@ -161,7 +161,9 @@ Singleton {
         readonly property int dot:       root.px(6)  // inactive indicator: a dot
         readonly property int activeDot: root.px(16) // active indicator stretches into a pill
         readonly property int spacing:   root.px(4)  // between the dots
-        readonly property int minimum:   5  // numbers shown on hover even when those workspaces are empty
+        // Dots always shown, empty or not (Settings; 0 = only the workspaces in use).
+        readonly property int minimum: ThemeScale.pick(Settings.values.workspaceDots, ThemeScale.workspaceDots, 5)
+        readonly property int menu:      5  // the window menu's "move to workspace" buttons
         readonly property int number:    root.px(28) // a number on hover (WorkspaceNumbers.qml)
     }
 
@@ -174,9 +176,10 @@ Singleton {
     }
 
     readonly property QtObject dock: QtObject {
-        readonly property int height:    root.px(60)  // the bar
+        // App icons at rest (Settings -> Windows -> Dock), and the bar around them.
+        readonly property int icon:      root.px(ThemeScale.pick(Settings.values.dockIconSize, ThemeScale.dockIcons, 44))
+        readonly property int height:    icon + root.px(16)
         readonly property int margin:    root.px(8)   // between the bar and the screen edge
-        readonly property int icon:      root.px(44)  // app icons at rest
         readonly property int radius:    root.round(22)  // the bar's corners
         readonly property int trigger:   3   // the strip at the bottom edge that brings a hidden dock back
         readonly property int hideDelay: 500 // ms the dock stays after the pointer leaves
@@ -248,8 +251,9 @@ Singleton {
     }
 
     readonly property QtObject launcher: QtObject {
-        readonly property int width:     root.px(560)
-        readonly property int rows:      8  // visible result rows; the list scrolls past that
+        // Settings -> Appearance -> Size: its width, and the result rows shown before it scrolls.
+        readonly property int width:     root.px(ThemeScale.pick(Settings.values.launcherWidth, ThemeScale.launcherWidths, 560))
+        readonly property int rows:      ThemeScale.pick(Settings.values.launcherRows, ThemeScale.launcherRows, 8)
         readonly property int rowHeight: root.px(52)
     }
 

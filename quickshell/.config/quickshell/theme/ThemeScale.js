@@ -6,10 +6,15 @@
 const sizes = [0.85, 0.9, 1, 1.1, 1.25];       // the shell: spacing, icons, panels
 const textSizes = [0.9, 1, 1.1, 1.2, 1.3];     // on top of that, the text
 const corners = [0, 0.5, 1, 1.5];              // 0 is square, 1 the normal roundness
+const dockIcons = [36, 44, 52, 60];            // the dock's app icons, px at 100 %
+const launcherWidths = [480, 560, 640, 720];   // px at 100 %
+const launcherRows = [5, 6, 8, 10, 12];        // results shown before the list scrolls
+const workspaceDots = [0, 3, 4, 5, 6, 8, 10];  // always shown; 0 = only the ones in use
 
-// One of `allowed`, else 1: a hand-edited settings file can't make the shell unusable.
-function pick(value, allowed) {
-    return allowed.includes(value) ? value : 1;
+// One of `allowed`, else `fallback` (1 when not given): a hand-edited settings file can't make
+// the shell unusable.
+function pick(value, allowed, fallback) {
+    return allowed.includes(value) ? value : (fallback ?? 1);
 }
 
 // A size in px at `scale`, whole pixels, never below 1 (a 1 px line stays a line).

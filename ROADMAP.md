@@ -852,6 +852,10 @@ audit of our own UI): all sixteen, built in batches.
   and its corners (square to rounder). Theme's sizes go through `px`, font sizes through
   `text` and radii through `round` (`theme/ThemeScale.js`, tested); timings, counts, outline
   widths and the webcam offset don't change. Checked at 125 % with square corners.
+- Dock icon size (Settings -> Windows -> Dock; the bar follows), the launcher's width and rows
+  (Appearance -> Size) and the workspace dots (Appearance -> Workspaces: 3-10 always, or only
+  the ones in use, which scrolling then steps between: `WorkspaceSlots.stepIn`, tested). The
+  window menu keeps five "move to" buttons. Checked live.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

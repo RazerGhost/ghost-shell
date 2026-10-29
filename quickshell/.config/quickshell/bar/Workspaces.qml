@@ -27,7 +27,10 @@ Item {
         return byId;
     }
     // Every workspace you can scroll or click to: the dots, and the numbers on hover.
-    readonly property var slots: WorkspaceSlots.slots(Theme.workspace.minimum, Object.keys(existing).map(Number))
+    // With Settings' "only the ones in use", just those (and the one you're on).
+    readonly property var slots: Theme.workspace.minimum === 0
+        ? WorkspaceSlots.used(Object.keys(existing).map(Number), active)
+        : WorkspaceSlots.slots(Theme.workspace.minimum, Object.keys(existing).map(Number))
 
 
     // Works for workspaces that don't exist yet, unlike HyprlandWorkspace.activate().
@@ -56,7 +59,7 @@ Item {
             // Touchpads send many small scroll events; step once per notch-sized amount.
             accumulated += wheel.angleDelta.y;
             if (Math.abs(accumulated) >= 120) {
-                root.go(WorkspaceSlots.step(root.active, accumulated > 0 ? -1 : 1, root.slots.length));
+                root.go(WorkspaceSlots.stepIn(root.slots, root.active, accumulated > 0 ? -1 : 1));
                 accumulated = 0;
             }
         }

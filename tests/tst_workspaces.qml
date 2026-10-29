@@ -16,6 +16,16 @@ TestCase {
         compare(WorkspaceSlots.slots(5, [2, 8]), [1, 2, 3, 4, 5, 6, 7, 8]);
     }
 
+    function test_stepIn() {
+        // Only the used ones shown: steps between them, wrapping.
+        compare(WorkspaceSlots.stepIn([2, 5, 8], 5, 1), 8);
+        compare(WorkspaceSlots.stepIn([2, 5, 8], 8, 1), 2);
+        compare(WorkspaceSlots.stepIn([2, 5, 8], 2, -1), 8);
+        // The same as step() for 1..n.
+        compare(WorkspaceSlots.stepIn([1, 2, 3, 4, 5], 5, 1), 1);
+        compare(WorkspaceSlots.stepIn([], 3, 1), 3);
+    }
+
     function test_ignoresSpecialWorkspaces() {
         // The scratchpad has a negative id.
         compare(WorkspaceSlots.slots(5, [-98, 1]), [1, 2, 3, 4, 5]);

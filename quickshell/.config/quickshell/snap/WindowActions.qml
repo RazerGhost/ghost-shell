@@ -144,7 +144,7 @@ Column {
             spacing: Theme.spacing.s
 
             Repeater {
-                model: Theme.workspace.minimum
+                model: Theme.workspace.menu
 
                 Rectangle {
                     id: pill

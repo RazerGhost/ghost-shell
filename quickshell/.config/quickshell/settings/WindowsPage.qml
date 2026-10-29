@@ -2,6 +2,7 @@ import QtQuick
 import qs.services
 import qs.theme
 import qs.widgets
+import "../theme/ThemeScale.js" as ThemeScale
 
 // Windows: the gaps around tiled windows (applied through Hyprland, HyprlandSettings.qml), the
 // hot corner, and whether floating apps reopen where they were. Their border and corners are on
@@ -57,6 +58,19 @@ Column {
                 value: Settings.values.dockMode
                 format: v => ({ hide: "At the edge", always: "Always", off: "Off" })[v]
                 onPicked: v => Settings.values.dockMode = v
+            }
+        }
+
+        SettingRow {
+            enabled: Settings.values.dockMode !== "off"
+            title: "Icon size"
+
+            Stepper {
+                label: "Dock icon size"
+                values: ThemeScale.dockIcons
+                value: ThemeScale.pick(Settings.values.dockIconSize, ThemeScale.dockIcons, 44)
+                format: v => ({ 36: "Small", 44: "Normal", 52: "Large", 60: "Larger" })[v] ?? v
+                onPicked: v => Settings.values.dockIconSize = v
             }
         }
     }

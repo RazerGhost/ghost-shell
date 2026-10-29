@@ -69,6 +69,10 @@ Singleton {
             property var hiddenStatusIcons: []
             // The dock: "hide" (shows at the bottom edge), "always" (reserves its space) or "off".
             property string dockMode: "hide"
+            property int dockIconSize: 44  // px at 100 % (theme/ThemeScale.js lists the sizes)
+            property int launcherWidth: 560
+            property int launcherRows: 8
+            property int workspaceDots: 5  // always shown; 0 = only the ones in use
             // Pop-ups (Settings -> Notifications): how long a notification stays (seconds; critical
             // ones stay until dismissed), and the OSD's place ("bottom" or "top") and time.
             property real notificationSeconds: 5

@@ -11,6 +11,10 @@ TestCase {
         compare(ThemeScale.pick("1.1", ThemeScale.textSizes), 1);
         compare(ThemeScale.pick(undefined, ThemeScale.corners), 1);
         compare(ThemeScale.pick(0, ThemeScale.corners), 0);
+        // With a fallback: the setting's own default.
+        compare(ThemeScale.pick(99, ThemeScale.dockIcons, 44), 44);
+        compare(ThemeScale.pick(0, ThemeScale.workspaceDots, 5), 0);
+        compare(ThemeScale.pick(undefined, ThemeScale.launcherRows, 8), 8);
     }
 
     function test_px() {
