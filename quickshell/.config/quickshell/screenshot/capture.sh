@@ -8,6 +8,14 @@
 #   capture.sh qr <picture>     the QR code in it (zbarimg), copied; a link can be opened from the
 #                               notification; the picture is removed
 #   capture.sh color            the color picker (hyprpicker), #rrggbb copied
+
+# An app in its own scope, like the ones the shell starts (Apps.run in services/Apps.qml): when
+# memory runs out, oomd closes it rather than the session. Without the shell's Mesa-only EGL.
+app() {
+    systemd-run --user --scope --quiet --collect --slice=app.slice \
+        env -u __EGL_VENDOR_LIBRARY_FILENAMES "$@"
+}
+
 case "${1-}" in
     save)
         file=$2 where=${3:-Pictures/Screenshots}
@@ -16,8 +24,8 @@ case "${1-}" in
         command -v satty >/dev/null && set -- "$@" -A "draw=Draw on it"
         action=$(notify-send -a Screenshot -i "$file" "$@" "Screenshot saved" "Copied to the clipboard, and saved in $where")
         case "$action" in
-            default) xdg-open "$file" ;;
-            draw) satty --filename "$file" --output-filename "$file" --copy-command wl-copy \
+            default) app xdg-open "$file" ;;
+            draw) app satty --filename "$file" --output-filename "$file" --copy-command wl-copy \
                       --actions-on-enter save-to-clipboard,save-to-file,exit --save-after-copy ;;
         esac
         ;;
@@ -39,7 +47,7 @@ case "${1-}" in
             case $code in
                 http://*|https://*)
                     action=$(notify-send -a Screenshot -A default=Open "QR code copied" "$code")
-                    [ "$action" = default ] && xdg-open "$code" ;;
+                    [ "$action" = default ] && app xdg-open "$code" ;;
                 *) notify-send -a Screenshot "QR code copied" "$code" ;;
             esac
         else

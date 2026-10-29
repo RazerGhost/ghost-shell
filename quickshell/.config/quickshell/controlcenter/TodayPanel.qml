@@ -58,6 +58,16 @@ Column {
         Accessible.name: date.text + (root.calendarOpen ? ", hide calendar" : ", show calendar")
         Accessible.onPressAction: root.calendarOpen = !root.calendarOpen
 
+        // The keyboard (arrow keys or Tab, then Enter or Space), like a click.
+        activeFocusOnTab: true
+        Keys.onReturnPressed: root.calendarOpen = !root.calendarOpen
+        Keys.onEnterPressed: root.calendarOpen = !root.calendarOpen
+        Keys.onSpacePressed: root.calendarOpen = !root.calendarOpen
+
+        FocusRing {
+            radius: Theme.radius.s
+        }
+
         Text {
             id: date
             anchors.verticalCenter: parent.verticalCenter

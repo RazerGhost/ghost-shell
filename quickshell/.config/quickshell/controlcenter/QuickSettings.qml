@@ -28,6 +28,23 @@ Item {
             page = "main";
     }
 
+    // Escape on a page goes back to the main page; on the main page it closes the menu (the
+    // island handles it). A page opened with the mouse leaves the keyboard on the island
+    // itself, outside this menu, so take it then: the arrow keys still reach the island.
+    Keys.onEscapePressed: event => {
+        event.accepted = page !== "main";
+        page = "main";
+    }
+    onPageChanged: {
+        if (page === "main")
+            return;
+        for (let item = Window.activeFocusItem; item; item = item.parent) {
+            if (item === root)
+                return;
+        }
+        forceActiveFocus();
+    }
+
     Column {
         id: mainPage
 

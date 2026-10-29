@@ -30,6 +30,16 @@ Rectangle {
     Accessible.name: "Open media: " + (player?.trackTitle ?? "")
     Accessible.onPressAction: root.activated()
 
+    // The keyboard (arrow keys or Tab, then Enter or Space), like a click.
+    activeFocusOnTab: true
+    Keys.onReturnPressed: root.activated()
+    Keys.onEnterPressed: root.activated()
+    Keys.onSpacePressed: root.activated()
+
+    FocusRing {
+        radius: root.radius
+    }
+
     AlbumArt {
         id: cover
 

@@ -80,6 +80,16 @@ Item {
         Accessible.name: "Weather location: " + town.text + ", change"
         Accessible.onPressAction: root.editing = true
 
+        // The keyboard (arrow keys or Tab, then Enter or Space), like a click.
+        activeFocusOnTab: true
+        Keys.onReturnPressed: root.editing = true
+        Keys.onEnterPressed: root.editing = true
+        Keys.onSpacePressed: root.editing = true
+
+        FocusRing {
+            radius: Theme.radius.s
+        }
+
         Text {
             id: town
             anchors.right: parent.right

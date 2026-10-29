@@ -59,6 +59,16 @@ Column {
             Accessible.role: Accessible.Button
             Accessible.name: "Show " + (root.player?.identity ?? "the player")
             Accessible.onPressAction: Media.show()
+
+            // The keyboard (arrow keys or Tab, then Enter or Space), like a click.
+            activeFocusOnTab: enabled
+            Keys.onReturnPressed: Media.show()
+            Keys.onEnterPressed: Media.show()
+            Keys.onSpacePressed: Media.show()
+
+            FocusRing {
+                radius: Theme.radius.l
+            }
         }
     }
 

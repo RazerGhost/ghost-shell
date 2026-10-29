@@ -784,8 +784,8 @@ shell's cost, features and customization), checked before acting. Done so far:
   apps, `xdg-open`, the terminal) with `systemd-run --user --scope` in `app.slice` (`Apps.run`),
   as does the scratchpad's terminal, so oomd closes the app that ran out of memory instead of
   the session it used to share with Hyprland. Apps also no longer inherit the shell's Mesa-only
-  EGL. Not scoped: what Hyprland's fallback binds start while the shell is down, and the
-  screenshot tool's satty and picture viewer (`capture.sh`). Read from this boot's
+  EGL. The screenshot tool's satty and picture viewer too (`capture.sh`'s `app`). Not scoped:
+  what Hyprland's fallback binds start while the shell is down. Read from this boot's
   journal and followed (`OomAlerts.js`, tested); the last one reported is in
   `~/.local/state/quickshell/oom-seen`, so a restart doesn't repeat it. Verified with a
   memory-limited test process; the session case is untested.
@@ -801,7 +801,11 @@ shell's cost, features and customization), checked before acting. Done so far:
   click never shows it. Only the menu's own controls: the top row's clock and status icons
   are left out (Enter on one closed the menu and gave the keyboard back to the window, so the
   next keys went there). Quick settings' pages are hidden once they've slid out, so the keys
-  skip them.
+  skip them. Escape on one of its pages goes back to the main page first.
+- The same in the Settings window (the sidebar's pages take the keyboard; Down from the search
+  field goes into the list) and in the today and media menus (the date that folds the calendar
+  out, the weather town, notification cards, the small player, the cover). Not the media
+  menu's seek bar: Spotify reports a frozen position, so stepping from it would jump wrong.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

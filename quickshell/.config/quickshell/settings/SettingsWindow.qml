@@ -165,6 +165,7 @@ Singleton {
             contentHeight: sidebar.implicitHeight + Theme.spacing.m
             clip: true
             boundsBehavior: Flickable.StopAtBounds
+            Keys.onPressed: event => window.navigate(event)
 
             Column {
                 id: sidebar
@@ -226,6 +227,12 @@ Singleton {
                         Accessible.selected: selected
                         Accessible.onPressAction: root.page = modelData.id
 
+                        // The keyboard (arrow keys or Tab, then Enter or Space), like a click.
+                        activeFocusOnTab: true
+                        Keys.onReturnPressed: root.page = modelData.id
+                        Keys.onEnterPressed: root.page = modelData.id
+                        Keys.onSpacePressed: root.page = modelData.id
+
                         SectionHeading {
                             id: header
                             visible: entry.firstOfSection
@@ -246,7 +253,16 @@ Singleton {
                             Behavior on opacity {
                                 NumberAnimation { duration: Theme.anim.fast }
                             }
+                        }
 
+                        // Around the row, under the section's name.
+                        FocusRing {
+                            control: entry
+                            anchors.fill: undefined
+                            anchors.bottom: parent.bottom
+                            width: parent.width
+                            height: entry.rowHeight
+                            radius: Theme.radius.full
                         }
 
                         Row {
@@ -276,9 +292,25 @@ Singleton {
             }
         }
 
+        // The arrow keys move between the sidebar's pages and the page's controls, like the
+        // island's menus (Tab follows the order they're written in). Keys a control doesn't use
+        // reach the sidebar or the page, which hand them on here.
+        ArrowNavigation {
+            id: navigation
+            area: window.contentItem
+        }
+
+        function navigate(event: KeyEvent): void {
+            const keys = [Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down];
+            if (keys.includes(event.key) && !(event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier)))
+                event.accepted = navigation.move(event.key);
+        }
+
         // The chosen page; scrolls when it's taller than the window.
         Flickable {
             id: content
+
+            Keys.onPressed: event => window.navigate(event)
 
             anchors.left: sidebarView.right
             anchors.right: parent.right

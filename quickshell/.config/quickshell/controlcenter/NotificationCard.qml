@@ -46,11 +46,21 @@ MouseArea {
     Accessible.name: (notification?.appName ?? "") + ": " + (notification?.summary ?? "") + ". " + (notification?.body ?? "")
     Accessible.onPressAction: Notifications.activate(notification)
 
+    // The keyboard (arrow keys or Tab, then Enter or Space), like a click.
+    activeFocusOnTab: true
+    Keys.onReturnPressed: Notifications.activate(notification)
+    Keys.onEnterPressed: Notifications.activate(notification)
+    Keys.onSpacePressed: Notifications.activate(notification)
+
     Rectangle {
         anchors.fill: parent
         radius: Theme.radius.l
         color: root.notification?.urgency === NotificationUrgency.Critical ? Colors.m3primaryContainer
                                                                             : Colors.m3surfaceContainerHigh
+    }
+
+    FocusRing {
+        radius: Theme.radius.l
     }
 
     Row {
