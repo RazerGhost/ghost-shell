@@ -43,7 +43,7 @@ Singleton {
     // search matches a page's title and these words, so it finds the page for any setting on it.
     readonly property var pages: [
         { id: "appearance", section: "Personalize", icon: "palette", title: "Appearance",
-          words: "wallpaper colors theme light dark mode sunset night glass blur style frost acrylic transparent see-through border corners rounding" },
+          words: "wallpaper colors theme light dark mode sunset night status icons island wifi bluetooth battery glass blur style frost acrylic transparent see-through border corners rounding" },
         { id: "display", section: "Personalize", icon: "brightness_6", title: "Display",
           words: "night light warm blue light schedule screen monitor resolution refresh rate hz scale rotation rotate vrr adaptive sync" },
         { id: "lock", section: "Personalize", icon: "lock", title: "Lock screen",

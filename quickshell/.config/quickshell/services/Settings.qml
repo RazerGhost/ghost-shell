@@ -66,6 +66,9 @@ Singleton {
 
             // Pop-ups (Settings -> Notifications): how long a notification stays (seconds; critical
             // ones stay until dismissed), and the OSD's place ("bottom" or "top") and time.
+            // The island's status icons you've hidden, by key (bar/StatusIcons.qml); the privacy
+            // ones (recording, microphone, camera, screen sharing) always show.
+            property var hiddenStatusIcons: []
             property real notificationSeconds: 5
             property string osdPosition: "bottom"
             property real osdSeconds: 1.5

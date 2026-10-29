@@ -87,6 +87,42 @@ Column {
         }
     }
 
+    // The island's status icons, each on or off (bar/StatusIcons.qml). The privacy ones
+    // (recording, microphone, camera, screen sharing) always show, so they aren't listed.
+    SettingGroup {
+        title: "Status icons"
+
+        Repeater {
+            model: [
+                { key: "wifi", title: "Wi-Fi or cable" },
+                { key: "bluetooth", title: "Bluetooth device connected" },
+                { key: "vpn", title: "VPN connected" },
+                { key: "airplane", title: "Airplane mode" },
+                { key: "timer", title: "Timer running" },
+                { key: "updates", title: "Updates waiting" },
+                { key: "muted", title: "Sound muted" },
+                { key: "battery", title: "Battery" }
+            ]
+
+            SettingRow {
+                id: iconRow
+
+                required property var modelData
+                readonly property var hidden: Array.from(Settings.values.hiddenStatusIcons ?? [])
+
+                title: modelData.title
+
+                Switch {
+                    label: "Show " + iconRow.modelData.title
+                    checked: !iconRow.hidden.includes(iconRow.modelData.key)
+                    onToggled: Settings.values.hiddenStatusIcons = checked
+                        ? [...iconRow.hidden, iconRow.modelData.key]
+                        : iconRow.hidden.filter(k => k !== iconRow.modelData.key)
+                }
+            }
+        }
+    }
+
     SettingGroup {
         title: "Windows"
 

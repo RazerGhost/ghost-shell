@@ -709,6 +709,9 @@ shell's cost, features and customization), checked before acting. Done so far:
 - Settings -> Notifications -> Pop-ups: how long a notification stays (3-30 s, 5 by default;
   the attention card too) and the volume and brightness pop-up's place (bottom, or top under the
   island) and time (1-5 s).
+- Settings -> Appearance -> Status icons: Wi-Fi, Bluetooth, VPN, airplane mode, timer, updates,
+  muted and battery can each be hidden (`hiddenStatusIcons`). The privacy icons (recording,
+  microphone, camera, screen sharing) always show.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
