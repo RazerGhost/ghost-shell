@@ -21,20 +21,26 @@ Scope {
 
     property bool open: false
 
+    // Opens it with fresh window positions and sizes (Hyprland doesn't send them on its own).
+    function show(): void {
+        if (open)
+            return;
+        Hyprland.refreshToplevels();
+        open = true;
+    }
+
     IpcHandler {
         target: "overview"
 
         function toggle(): void {
-            if (!root.open)
-                Hyprland.refreshToplevels(); // fresh window positions and sizes
-            root.open = !root.open;
+            if (root.open)
+                root.open = false;
+            else
+                root.show();
         }
 
         function open(): void {
-            if (!root.open) {
-                Hyprland.refreshToplevels();
-                root.open = true;
-            }
+            root.show();
         }
 
         function close(): void {
@@ -43,12 +49,7 @@ Scope {
     }
 
     HotCorner {
-        onTriggered: {
-            if (!root.open) {
-                Hyprland.refreshToplevels();
-                root.open = true;
-            }
-        }
+        onTriggered: root.show()
     }
 
     PanelWindow {
