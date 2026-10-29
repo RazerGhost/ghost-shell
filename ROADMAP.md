@@ -643,7 +643,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   (`CalendarEvents.js`, tested). Read-only: events are made in Proton's app or site. khal gives
   an all-day event's last day as its end date (its `AllDayEvent.end` is DTEND minus a day).
 
-### Optimization review (2026-10-29; verified on the laptop: menus, Settings pages, covers, OSD)
+### Optimization review (done, verified on the laptop 2026-10-29)
 Four read-only reviews (code against ENGINEERING_PRINCIPLES.md, packages and system, the running
 shell's cost, features and customization), checked before acting. Done so far:
 - Bugs: settings never saved over an unreadable settings.json (Quickshell loads defaults without
