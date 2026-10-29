@@ -3,7 +3,7 @@
 # Spotify (the Ghost Spicetify theme), Discord (the Ghost Vencord plugin in Vesktop), MangoHud,
 # Zed, Steam (Millennium's Material-Theme) and Zen.
 #
-# Run: matugen image <wallpaper> -m dark --source-color-index 0
+# Run through wallpaper.sh (light or dark from the shell): matugen image <wallpaper> -m dark --source-color-index 0
 # (--source-color-index 0 skips the interactive prompt when an image yields several source colors)
 #
 # Templates use matugen's syntax: {{colors.<name>.default.<format>}}, loops with <* for ... *>.

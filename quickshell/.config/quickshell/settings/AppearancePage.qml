@@ -3,7 +3,7 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// Appearance: the wallpaper (the colors of everything come from it), the shell's panels (glass
+// Appearance: the wallpaper (the colors of everything come from it), light or dark, the shell's panels (glass
 // or nearly solid: Colors.surfaceTranslucent, widgets/Surface.qml), and the windows' border and
 // corners (applied through Hyprland, HyprlandSettings.qml).
 Column {
@@ -23,6 +23,21 @@ Column {
             TextButton {
                 text: "Change"
                 onClicked: Wallpaper.pickerOpen = true
+            }
+        }
+
+        SettingRow {
+            title: "Light or dark"
+            subtitle: Settings.values.colorScheme !== "auto" ? "For the shell, Hyprland and your apps"
+                    : Weather.current?.sunset != null ? "Dark from sunset to sunrise in " + Weather.place.name
+                    : "Dark from 19:00 to 07:00 (set a weather town to follow sunset)"
+
+            Stepper {
+                label: "Light or dark"
+                values: ["dark", "light", "auto"]
+                value: Settings.values.colorScheme
+                format: v => ({ dark: "Dark", light: "Light", auto: "At sunset" })[v]
+                onPicked: v => Settings.values.colorScheme = v
             }
         }
     }

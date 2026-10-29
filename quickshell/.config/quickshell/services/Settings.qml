@@ -66,6 +66,8 @@ Singleton {
             // The town for the weather in the today menu (services/Weather.qml); "" = no weather.
             property string weatherLocation: ""
 
+            // "dark", "light" or "auto" (dark from sunset to sunrise; services/ColorScheme.qml).
+            property string colorScheme: "dark"
             // The shell's panels (island, menus, dock, launcher...): glass, see-through over
             // Hyprland's blur with a thin light edge (like the Ghost Spotify theme), or nearly solid.
             property bool glass: true

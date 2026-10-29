@@ -30,7 +30,14 @@ function place(answer) {
     return first ? { name: first.name, latitude: first.latitude, longitude: first.longitude } : null;
 }
 
-// A forecast answer as { temperature, high, low, icon, label } (rounded °C); null if incomplete.
+// "2026-10-29T07:45" (open-meteo's local times) -> minutes since midnight; null if missing.
+function minutesOf(time) {
+    const match = /T(\d\d):(\d\d)/.exec(time ?? "");
+    return match ? Number(match[1]) * 60 + Number(match[2]) : null;
+}
+
+// A forecast answer as { temperature, high, low, icon, label, sunrise, sunset } (rounded °C;
+// sunrise and sunset in minutes since midnight, or null); null if incomplete.
 function forecast(answer) {
     const now = answer && answer.current;
     const day = answer && answer.daily;
@@ -42,6 +49,8 @@ function forecast(answer) {
         high: Math.round(day.temperature_2m_max[0]),
         low: Math.round(day.temperature_2m_min[0]),
         icon: kind.icon,
-        label: kind.label
+        label: kind.label,
+        sunrise: minutesOf(day.sunrise?.[0]),
+        sunset: minutesOf(day.sunset?.[0])
     };
 }

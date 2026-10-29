@@ -38,7 +38,7 @@ Column {
         depth: 3 // 8 colors
         rescaleSize: 64
     }
-    readonly property var coverAccent: MediaAccent.accent(quantizer.colors.map(c => ({ h: c.hslHue, s: c.hslSaturation, l: c.hslLightness })))
+    readonly property var coverAccent: MediaAccent.accent(quantizer.colors.map(c => ({ h: c.hslHue, s: c.hslSaturation, l: c.hslLightness })), ColorScheme.mode === "light")
     readonly property color accent: coverAccent ? Qt.hsla(coverAccent.h, coverAccent.s, coverAccent.l, 1) : Colors.m3primary
 
     AlbumArt {

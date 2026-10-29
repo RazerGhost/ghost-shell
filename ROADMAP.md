@@ -33,7 +33,7 @@ new setup step.
   Aesthetic reference: saneAspect's Hyprland/Quickshell builds (clean, rounded, Material-ish, subtle
   animations).
 - **Colors:** matugen from the wallpaper is the single source of truth for Quickshell, Hyprland borders,
-  Ghostty, GTK, Yazi, Spotify (Ghost theme) and Discord (Ghost plugin). Dark mode by default.
+  Ghostty, GTK, Yazi, Spotify (Ghost theme) and Discord (Ghost plugin). Dark mode by default; light or at sunset in Settings.
 - **Icons:** Material Symbols (`Material Symbols Rounded`), outline at weight 300 (user's choice after comparing styles, 2026-10-28: filled made the few symbols with a solid variant look heavy; light sits closer to the Colloid app icons). **UI font:** Inter. **Mono:** MesloLGS Nerd Font.
 - **QML:** `shell.qml` entry, one folder per area (`bar/`, `launcher/`, `notifications/`, `osd/`,
   `controlcenter/`, `services/`, `theme/`, `widgets/` for shared components). Singletons for shared
@@ -587,6 +587,18 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   while it's on; `Privacy.js`, tested). Screen sharing is the portal's PipeWire stream
   (`xdph-streaming-<n>`): Hyprland's `screencast` event also fires for grim and the shell's own
   previews.
+
+### Light mode (built 2026-10-29; untested in light)
+- Settings -> Appearance -> Light or dark: Dark (default), Light or At sunset (dark from sunset
+  to sunrise at the weather town, open-meteo's `sunrise`/`sunset`; 19:00-07:00 without a town;
+  `ColorScheme.js`, tested). `services/ColorScheme.qml` writes the result to
+  `~/.local/state/quickshell/scheme` and runs `wallpaper.sh`, which runs matugen with `-m light`
+  or `-m dark` and sets GTK's color-scheme, adw-gtk3 or adw-gtk3-dark and Colloid-Light or
+  Colloid-Dark (moved there from the core module). Every template takes the scheme's colors;
+  Zed's theme says `{{mode}}` (matugen 4.2 has it). `wallpaper.sh` with no wallpaper reuses the
+  last seed color (`~/.local/state/quickshell/seed`). The cover accent in the media menu is
+  darkened on a light menu. Not switched: the shell's own icon theme (`QS_ICON_THEME`, read at
+  start).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

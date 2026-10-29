@@ -13,5 +13,7 @@ TestCase {
         // Black and white, or grey: none (the theme's accent stays).
         compare(MediaAccent.accent([{ h: -1, s: 0, l: 0 }, { h: 0.1, s: 0.05, l: 0.5 }, { h: 0.5, s: 0.5, l: 0.98 }]), null);
         compare(MediaAccent.accent([]), null);
+        // On a light menu: darkened instead.
+        compare(MediaAccent.accent([{ h: 0.0, s: 0.8, l: 0.75 }], true), { h: 0.0, s: 0.8, l: 0.4 });
     }
 }

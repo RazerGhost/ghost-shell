@@ -5,7 +5,7 @@
   "themes": [
     {
       "name": "Matugen",
-      "appearance": "dark",
+      "appearance": "{{mode}}",
       "style": {
         "border": "{{colors.outline_variant.default.hex}}",
         "border.variant": "{{colors.surface_container_highest.default.hex}}",

@@ -21,12 +21,10 @@ done
 # Quickshell fills this in for the QML language server; it's gitignored.
 touch quickshell/.config/quickshell/.qmlls.ini
 
-step "GTK dark mode, theme and icons"
-# adw-gtk3 makes GTK3 apps match libadwaita (GTK4) ones; GTK4 apps follow color-scheme.
-gsettings set org.gnome.desktop.interface color-scheme prefer-dark
-gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark
-# Colloid icons (user's choice); Quickshell gets the same theme from QS_ICON_THEME in env.lua.
-gsettings set org.gnome.desktop.interface icon-theme Colloid-Dark
+step "GTK settings"
+# Light or dark, the GTK theme (adw-gtk3) and the Colloid icons (user's choice) are set with the
+# colors, by matugen's wallpaper.sh below, so they follow Settings -> Appearance. Quickshell gets
+# its icons from QS_ICON_THEME in env.lua.
 # Default apps (pictures, videos, music, browser, folders) are set by the shell at startup, from
 # its settings (services/Apps.qml), so a re-run doesn't undo a choice made in Settings.
 # Title bar buttons for apps that draw their own bar (GTK apps, Ghostty). No minimize: Hyprland
