@@ -738,6 +738,13 @@ shell's cost, features and customization), checked before acting. Done so far:
 - Settings -> Lock screen: weather and battery under the date (on), and the next calendar event
   (off by default: its title would show to anyone at the locked screen); `LockLine.qml`, and
   the "Today 14:00" wording moved into `Agenda.when` (shared with the today menu).
+- Wallpapers: the picker's pictures come from `services/wallpapers.sh` (your folder, Hyprland's,
+  everything under /usr/share/wallpapers and /usr/share/backgrounds; JPEG XL/AVIF/HEIC only with
+  kimageformats) grouped by `Wallpapers.js` (tested): a KDE Plasma picture is one entry at the
+  screen's size, dark versions (`images_dark/`, `-dark`, `_dark`, `-d`) paired with their light
+  ones. Core gained the KDE Plasma, nwg-shell and Ubuntu art contest sets (user's picks).
+  Settings -> Appearance -> Wallpaper: your folder, a slideshow (15 min to 4 h, from yours or
+  all; each change recolors), and following light and dark for pictures with a dark version.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

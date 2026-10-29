@@ -29,6 +29,57 @@ Column {
             }
         }
 
+        Item {
+            width: parent.width
+            height: wallpaperFolder.height + Theme.spacing.m * 2
+
+            FolderField {
+                id: wallpaperFolder
+                x: Theme.spacing.m
+                y: Theme.spacing.m
+                width: parent.width - Theme.spacing.m * 2
+                key: "wallpaperFolder"
+                fallback: Quickshell.env("HOME") + "/Pictures/Wallpapers"
+                home: Quickshell.env("HOME")
+            }
+        }
+
+        SettingRow {
+            title: "Change it every"
+            subtitle: Settings.values.wallpaperMinutes > 0 ? "A random one; the colors change with it" : "Off"
+
+            Stepper {
+                label: "Change the wallpaper every"
+                values: [0, 15, 30, 60, 120, 240]
+                value: Settings.values.wallpaperMinutes
+                format: v => v === 0 ? "Never" : v < 60 ? v + " min" : (v / 60) + " h"
+                onPicked: v => Settings.values.wallpaperMinutes = v
+            }
+        }
+
+        SettingRow {
+            enabled: Settings.values.wallpaperMinutes > 0
+            title: "From all pictures"
+            subtitle: "Off: only from your folder"
+
+            Switch {
+                label: "Slideshow from all pictures"
+                checked: Settings.values.wallpaperSlideshowAll
+                onToggled: Settings.values.wallpaperSlideshowAll = !checked
+            }
+        }
+
+        SettingRow {
+            title: "Follow light and dark"
+            subtitle: "A picture that comes with a dark version (some of KDE's) switches with the mode"
+
+            Switch {
+                label: "Wallpaper follows light and dark"
+                checked: Settings.values.wallpaperFollowsMode
+                onToggled: Settings.values.wallpaperFollowsMode = !checked
+            }
+        }
+
         SettingRow {
             title: "Light or dark"
             subtitle: Settings.values.colorScheme !== "auto" ? "For the shell, Hyprland and your apps"
