@@ -551,10 +551,10 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
 
 ### Caps lock, keyboard layout and power mode pop-ups (built 2026-10-29)
 - The OSD shows "Caps lock on/off", a new keyboard layout's name (Hyprland's `activelayout`
-  event; repeats for the same layout are skipped) and the power mode when it changes. Caps lock
-  sends no event: a bind on the key's release that doesn't take it (`non_consuming`) calls
-  `qs ipc call osd capsLock`, which reads the main keyboard's state from `hyprctl devices -j`
-  (`osd/Keyboard.js`, tested).
+  event for the main keyboard, seeded from `hyprctl devices -j` at start; `osd/Keyboard.js`,
+  tested) and the power mode when it changes. Caps lock sends no event, and a release bind on
+  the key that leaves it alone never fired (user's test), so the shell reads the keyboard's
+  caps lock LED (`/sys/class/leds/*::capslock/brightness`) 4 times a second, in-process.
 
 ### VPN, hotspot and airplane mode (built 2026-10-29; the hotspot and airplane mode untested)
 - Under the networks in quick settings' Wi-Fi page (`services/NetworkExtras.qml`, parsing in

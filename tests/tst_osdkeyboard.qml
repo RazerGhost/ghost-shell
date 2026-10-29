@@ -16,8 +16,7 @@ TestCase {
             { name: "power-button", capsLock: false, main: false, active_keymap: "English (US)" },
             { name: "at-translated-set-2-keyboard", capsLock: on, main: true, active_keymap: "Dutch" }
         ] });
-        compare(Keyboard.mainKeyboard(devices(true)), { name: "at-translated-set-2-keyboard", layout: "Dutch", capsLock: true });
-        compare(Keyboard.mainKeyboard(devices(false)).capsLock, false);
+        compare(Keyboard.mainKeyboard(devices(true)), { name: "at-translated-set-2-keyboard", layout: "Dutch" });
         compare(Keyboard.mainKeyboard(JSON.stringify({ keyboards: [] })), null);
         compare(Keyboard.mainKeyboard("not json"), null);
     }

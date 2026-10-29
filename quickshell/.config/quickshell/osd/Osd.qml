@@ -107,35 +107,55 @@ Scope {
         }
     }
 
-    // Caps lock sends no event: binds.lua calls `qs ipc call osd capsLock` when the key is let go
-    // (a bind that doesn't take the key away), and its state is read from Hyprland.
-    IpcHandler {
-        target: "osd"
-
-        function capsLock(): void {
-            devices.running = true;
-        }
-    }
-
-    // The main keyboard: at start for its name and layout, after the caps lock key for its state.
+    // The main keyboard's name and layout, once at start (Hyprland sends no activelayout then).
     Process {
-        id: devices
-        property bool started: false
         command: ["hyprctl", "devices", "-j"]
         running: true
         stdout: StdioCollector {
             onStreamFinished: {
                 const main = Keyboard.mainKeyboard(text);
-                if (!main)
-                    return;
-                root.mainKeyboard = main.name;
-                if (!devices.started) {
-                    devices.started = true;
+                if (main) {
+                    root.mainKeyboard = main.name;
                     root.layout = main.layout;
-                } else {
-                    root.show("keyboard_capslock", main.capsLock ? "Caps lock on" : "Caps lock off", -1);
                 }
             }
+        }
+    }
+
+    // Caps lock sends no event, and Hyprland doesn't run a bind on the key (tried: a release bind
+    // that leaves the key alone never fired). Its light does follow it: the keyboard's
+    // `::capslock` LED in sysfs, read in-process 4 times a second (sysfs files send no change
+    // events, like the backlight's).
+    property string capsLed: ""
+    property string capsState: ""
+
+    Process {
+        command: ["sh", "-c", "ls -d /sys/class/leds/*::capslock 2>/dev/null | head -n 1"]
+        running: true
+        stdout: StdioCollector {
+            onStreamFinished: root.capsLed = text.trim()
+        }
+    }
+
+    FileView {
+        id: capsFile
+        path: root.capsLed !== "" ? root.capsLed + "/brightness" : ""
+        blockLoading: true // read right away in the timer
+    }
+
+    Timer {
+        interval: 250
+        running: root.capsLed !== ""
+        repeat: true
+        onTriggered: {
+            capsFile.reload();
+            const state = capsFile.text().trim();
+            if (state === "" || state === root.capsState)
+                return;
+            const first = root.capsState === "";
+            root.capsState = state;
+            if (!first)
+                root.show("keyboard_capslock", state !== "0" ? "Caps lock on" : "Caps lock off", -1);
         }
     }
 

@@ -13,7 +13,7 @@ local function app(kind, fallback)
     return hl.dsp.exec_cmd("qs ipc call apps open " .. kind .. " || " .. fallback)
 end
 
--- Every bind except the media keys and the caps lock pop-up's hook has a description, "Category: what it does": the settings
+-- Every bind except the media keys has a description, "Category: what it does": the settings
 -- window lists them by category (hyprctl binds -j), and binds with the same description show as
 -- one row ("Super + W / Alt + F4").
 
@@ -149,10 +149,6 @@ hl.bind("XF86AudioMute",         hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_
 hl.bind("XF86AudioMicMute",      hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+ && qs ipc call brightness refresh"), { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%- && qs ipc call brightness refresh"), { locked = true, repeating = true })
-
--- Caps lock has no event for the shell's pop-up: tell it once the key is let go (the key still
--- works, the bind doesn't take it).
-hl.bind("Caps_Lock", hl.dsp.exec_cmd("qs ipc call osd capsLock"), { locked = true, release = true, non_consuming = true })
 
 -- Media (requires playerctl)
 hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = true })
