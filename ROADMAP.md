@@ -941,6 +941,15 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   `ColorScheme.busy`); a new icon theme offers restarting the shell (its own icons are read at
   start); the widgets' places can go back to the start; and the Looks gallery shows "Yours"
   first when your lock screen matches no preset.
+- Dock and island editor (`customize/DockIslandEditor.qml`, `qs ipc call customize dock`): the
+  real island and dock (kept shown while it's open, `Editing.dock`) change as you pick; its
+  sheet sits in the middle of the screen (`EditorChrome.centered`), clear of both. Island:
+  workspace dots as segments, the day, seconds and music-for-clock switches, and the status
+  icons as chips (filled while shown). Dock: when it shows and its icon size; pinning and
+  moving apps stays the dock's own right-click menu (the editor's window takes no input over
+  the dock). Moved out of Settings: Appearance's workspace dots and status icons, Windows' dock
+  rows (now a Customize button) and Weather and clock's island rows; the 24-hour clock stays
+  there (a time format, shared with the lock screen and the desktop clock).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

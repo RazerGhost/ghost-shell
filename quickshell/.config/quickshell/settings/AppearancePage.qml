@@ -8,8 +8,9 @@ import "../theme/ThemeScale.js" as ThemeScale
 
 // Appearance: what isn't edited on the desktop itself (the desktop editor, customize/, has the
 // wallpaper, colors, widgets, the panels' style, sizes and fonts): the wallpaper folder and
-// slideshow, the launcher's size, animation speed, the workspace dots, status icons, and the
-// windows' border and corners (applied through Hyprland, HyprlandSettings.qml).
+// slideshow, the launcher's size, animation speed, and the windows' border and corners
+// (applied through Hyprland, HyprlandSettings.qml). The dock and island editor has the
+// workspace dots and status icons.
 Column {
     id: page
 
@@ -127,60 +128,6 @@ Column {
                 value: HyprlandConfig.animationSpeed(Settings.values.animationSpeed)
                 format: v => v === 0 ? "Off" : v === 1 ? "Normal" : v < 1 ? "Slower (" + v + "×)" : "Faster (" + v + "×)"
                 onPicked: v => Settings.values.animationSpeed = v
-            }
-        }
-    }
-
-    SettingGroup {
-        title: "Workspaces"
-
-        SettingRow {
-            title: "Workspace dots"
-            subtitle: Theme.workspace.minimum === 0 ? "Only the workspaces you use (and the one you're on)"
-                    : "Always " + Theme.workspace.minimum + ", more when you use a higher one"
-
-            Stepper {
-                label: "Workspace dots"
-                values: ThemeScale.workspaceDots
-                value: Theme.workspace.minimum
-                format: v => v === 0 ? "In use" : String(v)
-                onPicked: v => Settings.values.workspaceDots = v
-            }
-        }
-    }
-
-    // The island's status icons, each on or off (bar/StatusIcons.qml). The privacy ones
-    // (recording, microphone, camera, screen sharing) always show, so they aren't listed.
-    SettingGroup {
-        title: "Status icons"
-
-        Repeater {
-            model: [
-                { key: "wifi", title: "Wi-Fi or cable" },
-                { key: "bluetooth", title: "Bluetooth device connected" },
-                { key: "vpn", title: "VPN connected" },
-                { key: "airplane", title: "Airplane mode" },
-                { key: "timer", title: "Timer running" },
-                { key: "updates", title: "Updates waiting" },
-                { key: "muted", title: "Sound muted" },
-                { key: "battery", title: "Battery" }
-            ]
-
-            SettingRow {
-                id: iconRow
-
-                required property var modelData
-                readonly property var hidden: Array.from(Settings.values.hiddenStatusIcons ?? [])
-
-                title: modelData.title
-
-                Switch {
-                    label: "Show " + iconRow.modelData.title
-                    checked: !iconRow.hidden.includes(iconRow.modelData.key)
-                    onToggled: Settings.values.hiddenStatusIcons = checked
-                        ? [...iconRow.hidden, iconRow.modelData.key]
-                        : iconRow.hidden.filter(k => k !== iconRow.modelData.key)
-                }
             }
         }
     }

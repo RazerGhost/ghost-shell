@@ -66,37 +66,5 @@ Column {
                 onToggled: Settings.values.clock24Hour = !checked
             }
         }
-
-        SettingRow {
-            title: "Show the day"
-            subtitle: "In the island: Thu 29  14:32"
-
-            Switch {
-                label: "Show the day in the island"
-                checked: Settings.values.clockDate
-                onToggled: Settings.values.clockDate = !checked
-            }
-        }
-
-        SettingRow {
-            title: "Show seconds"
-
-            Switch {
-                label: "Show seconds in the island"
-                checked: Settings.values.clockSeconds
-                onToggled: Settings.values.clockSeconds = !checked
-            }
-        }
-
-        SettingRow {
-            title: "Music takes the clock's place"
-            subtitle: "While music plays the island shows its cover; hover it for the time"
-
-            Switch {
-                label: "Music takes the clock's place"
-                checked: Settings.values.islandMedia
-                onToggled: Settings.values.islandMedia = !checked
-            }
-        }
     }
 }

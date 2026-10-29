@@ -51,7 +51,7 @@ Singleton {
         { id: "sound", section: "System", icon: "volume_up", title: "Sound",
           words: "equalizer audio bass treble mids voice speakers headphones preset eq sound events chime notification charger usb plug volume screenshot shutter battery" },
         { id: "windows", section: "System", icon: "select_window", title: "Windows",
-          words: "dock taskbar pins hide always gaps tiling hot corner overview reopen floating position wobble wobbly jelly" },
+          words: "customize dock island workspace dots status icons clock day seconds music dock taskbar pins hide always gaps tiling hot corner overview reopen floating position wobble wobbly jelly" },
         { id: "notifications", section: "System", icon: "notifications", title: "Notifications",
           words: "do not disturb dnd quiet fullscreen game film missed schedule apps silent mute always priority pop-up popup time seconds osd volume brightness position top bottom" },
         { id: "power", section: "System", icon: "battery_charging_full", title: "Power",

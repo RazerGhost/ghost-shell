@@ -23,6 +23,10 @@ const desktopKeys = ["colorScheme", "colorStyle", "colorContrast", "accentColor"
                      "glass", "glassOpacity", "blurStyle", "uiScale", "textScale", "cornerScale",
                      "fontSans", "fontMono", "iconTheme"];
 
+// Every setting the dock and island editor changes, for its Cancel.
+const dockIslandKeys = ["dockMode", "dockIconSize", "workspaceDots", "hiddenStatusIcons",
+                        "clockDate", "clockSeconds", "islandMedia"];
+
 // The values of `keys` now, to put back with restore() when an editor is cancelled.
 function snapshot(values, keys) {
     const saved = {};

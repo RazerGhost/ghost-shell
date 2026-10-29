@@ -21,7 +21,9 @@ Scope {
         { name: "Customize the lock screen", command: "qs ipc call customize lock",
           icon: "preferences-desktop-screensaver", subtitle: "Its clock, picture and look, on the screen itself" },
         { name: "Customize the desktop", command: "qs ipc call customize desktop",
-          icon: "preferences-desktop-wallpaper", subtitle: "Wallpaper, colors, widgets and style, on the desktop itself" }
+          icon: "preferences-desktop-wallpaper", subtitle: "Wallpaper, colors, widgets and style, on the desktop itself" },
+        { name: "Customize the dock and island", command: "qs ipc call customize dock",
+          icon: "preferences-desktop-theme", subtitle: "The dock, workspace dots, clock and status icons, in place" }
     ]
 
     property bool open: false

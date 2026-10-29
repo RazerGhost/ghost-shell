@@ -21,6 +21,9 @@ Item {
     property string tab: tabs[0]?.value ?? ""
     property bool glass: false
     property Item backdrop: null
+    // In the middle of the screen instead of at the bottom (the dock and island editor: the
+    // dock is at the bottom).
+    property bool centered: false
     // A short note under the tabs while something takes a moment ("Making the colors…").
     property string status
     default property alias content: sheetColumn.data
@@ -81,8 +84,7 @@ Item {
         readonly property real radius: Theme.radius.l * 1.5
 
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: Theme.spacing.l * 2
+        y: root.centered ? (parent.height - height) / 2 : parent.height - height - Theme.spacing.l * 2
         width: Math.min(parent.width - Theme.spacing.l * 4, Theme.editor.sheet)
         height: tabsColumn.height + Theme.spacing.l
         Behavior on height { NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing } }

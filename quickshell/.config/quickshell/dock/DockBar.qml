@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
+import qs.customize
 import qs.services
 import qs.theme
 import qs.widgets
@@ -35,7 +36,7 @@ PanelWindow {
     // Settings' dockMode "always": shown all the time, with its space reserved so windows tile
     // above it.
     readonly property bool always: Settings.values.dockMode === "always"
-    readonly property bool shown: revealed || always
+    readonly property bool shown: revealed || always || Editing.dock
     onShownChanged: {
         if (shown)
             DockState.shownOn = screen.name;
