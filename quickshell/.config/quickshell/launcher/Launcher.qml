@@ -3,12 +3,10 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Wayland
-import Quickshell.Widgets
 import qs.services
 import qs.theme
 import qs.widgets
 import "Fuzzy.js" as Fuzzy
-import "Calc.js" as Calc
 
 // App launcher: type to fuzzy-search installed apps and open windows, arrow keys to pick, Enter
 // to launch or switch, Escape or a click outside to close. "/ name" searches files in the home
@@ -168,141 +166,16 @@ Scope {
                     }
                 }
 
-                // The calculator: a sum or a unit conversion typed into the search ("5 km in
-                // miles", "20 usd to eur") answered by qalc (Calc.js, tested). Selected while it
-                // shows; Enter copies the answer.
-                MouseArea {
+                CalcRow {
                     id: calc
-
-                    property string answer: ""
-                    property bool selected: false
-                    property string asked: ""
-
-                    function ask(query: string): void {
-                        if (!Calc.isExpression(query)) {
-                            answer = "";
-                            selected = false;
-                            return;
-                        }
-                        asked = query;
-                        wait.restart();
-                    }
-
-                    function copy(): void {
-                        Quickshell.execDetached(["wl-copy", answer]);
-                        root.open = false;
-                    }
-
                     width: parent.width
-                    height: Theme.launcher.rowHeight
-                    visible: answer !== ""
-                    onAnswerChanged: selected = answer !== ""
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: copy()
-
-                    Accessible.role: Accessible.Button
-                    Accessible.name: "Result: " + answer + ", press Enter to copy"
-                    Accessible.onPressAction: copy()
-
-                    // After typing pauses, so qalc doesn't run for every key.
-                    Timer {
-                        id: wait
-                        interval: 150
-                        onTriggered: qalc.start()
-                    }
-
-                    // A currency question can take a moment (qalc fetches rates); asked again
-                    // meanwhile, it answers the newest question after.
-                    LatestProcess {
-                        id: qalc
-                        // Dots for decimals whatever the regional format.
-                        command: ["qalc", "-s", "decimal comma off", "-t", Calc.prepare(calc.asked)]
-                        stdout: StdioCollector {
-                            onStreamFinished: {
-                                // An answer to an older question: the search changed since.
-                                if (calc.asked === search.text)
-                                    calc.answer = Calc.answer(text, calc.asked);
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: Theme.radius.m
-                        color: Colors.m3surfaceContainerHighest
-                        visible: calc.selected || calc.containsMouse
-                    }
-
-                    MaterialIcon {
-                        id: calcIcon
-                        anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacing.s + (Theme.icon.launcher - width) / 2
-                        anchors.verticalCenter: parent.verticalCenter
-                        icon: "calculate"
-                        color: Colors.m3primary
-                    }
-
-                    Column {
-                        anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacing.s + Theme.icon.launcher + Theme.spacing.m
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        Text {
-                            text: "= " + calc.answer
-                            color: Colors.m3onSurface
-                            font.family: Theme.font.sans
-                            font.pixelSize: Theme.font.normal
-                            font.weight: Font.DemiBold
-                        }
-
-                        Text {
-                            text: "Enter copies the result"
-                            color: Colors.m3onSurfaceVariant
-                            font.family: Theme.font.sans
-                            font.pixelSize: Theme.font.small
-                        }
-                    }
+                    current: search.text
+                    onCopied: root.open = false
                 }
 
-                // Files in the home folder for "/ name": fd (hidden and git-ignored files are left
-                // out), once typing pauses. Parsed and sorted by Fuzzy.files (tested).
-                Item {
+                FileSearch {
                     id: fileSearch
-
-                    property var found: []
-                    property string asked: ""
-
-                    // The last results stay up until the new ones are in: clearing them on every
-                    // key made the list empty and refill (and the launcher shrink and grow) as
-                    // you typed.
-                    function ask(text: string): void {
-                        asked = text;
-                        if (text === "")
-                            found = [];
-                        else
-                            waitFiles.restart();
-                    }
-
-                    Timer {
-                        id: waitFiles
-                        interval: 200
-                        onTriggered: fd.start()
-                    }
-
-                    // Asked while fd still runs for older text, it searches once more when done.
-                    LatestProcess {
-                        id: fd
-                        command: ["fd", "--absolute-path", "--ignore-case", "--fixed-strings", "--max-results", "50",
-                                  "--", fileSearch.asked, Quickshell.env("HOME")]
-                        stdout: StdioCollector {
-                            onStreamFinished: {
-                                // Results for an older search: the text changed since.
-                                if (search.query.mode === "files" && search.query.text === fileSearch.asked)
-                                    fileSearch.found = Fuzzy.files(text, Quickshell.env("HOME"));
-                            }
-                        }
-                    }
+                    current: search.query.mode === "files" ? search.query.text : ""
                 }
 
                 ListView {
@@ -333,74 +206,8 @@ Scope {
                         visible: !calc.selected // the calculator's answer is selected instead
                     }
 
-                    delegate: MouseArea {
-                        id: row
-
-                        required property var modelData // see root.launch()
-                        required property int index
-                        readonly property DesktopEntry entry: modelData.entry ?? null
-                        readonly property string title: modelData.window ? modelData.window.title
-                            : modelData.file ? modelData.file.name
-                            : modelData.command ? modelData.command
-                            : modelData.action?.name ?? entry?.name ?? ""
-                        // For a shortcut, the app it belongs to.
-                        readonly property string subtitle: modelData.window ? "Open window"
-                            : modelData.file ? modelData.file.folder
-                            : modelData.command ? "Run in the terminal"
-                            : modelData.action ? entry.name : entry?.genericName || entry?.comment || ""
-                        readonly property string icon: modelData.window ? Windows.iconFor(modelData.window)
-                            : modelData.file ? Fuzzy.fileIcon(modelData.file.name)
-                            : modelData.command ? "utilities-terminal"
-                            : entry?.icon ?? ""
-
-                        width: ListView.view.width
-                        height: Theme.launcher.rowHeight
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onEntered: list.currentIndex = index
-                        onClicked: root.launch(modelData)
-
-                        Accessible.role: Accessible.ListItem
-                        Accessible.name: subtitle !== "" ? title + ", " + subtitle : title
-                        Accessible.onPressAction: root.launch(modelData)
-
-                        IconImage {
-                            id: appIcon
-                            anchors.left: parent.left
-                            anchors.leftMargin: Theme.spacing.s
-                            anchors.verticalCenter: parent.verticalCenter
-                            implicitSize: Theme.icon.launcher
-                            // Falls back to a generic icon when the theme has no match.
-                            source: Quickshell.iconPath(row.icon, "application-x-executable")
-                        }
-
-                        Column {
-                            anchors.left: appIcon.right
-                            anchors.right: parent.right
-                            anchors.leftMargin: Theme.spacing.m
-                            anchors.rightMargin: Theme.spacing.s
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            Text {
-                                width: parent.width
-                                text: row.title
-                                color: Colors.m3onSurface
-                                font.family: Theme.font.sans
-                                font.pixelSize: Theme.font.normal
-                                font.weight: Font.DemiBold
-                                elide: Text.ElideRight
-                            }
-
-                            Text {
-                                width: parent.width
-                                visible: text !== ""
-                                text: row.subtitle
-                                color: Colors.m3onSurfaceVariant
-                                font.family: Theme.font.sans
-                                font.pixelSize: Theme.font.small
-                                elide: Text.ElideRight
-                            }
-                        }
+                    delegate: LauncherRow {
+                        onActivated: root.launch(modelData)
                     }
                 }
 
@@ -410,7 +217,7 @@ Scope {
                     horizontalAlignment: Text.AlignHCenter
                     topPadding: Theme.spacing.s
                     bottomPadding: Theme.spacing.s
-                    text: search.query.mode === "files" ? (search.query.text === "" ? "Type a file or folder name" : fd.running || waitFiles.running ? "Searching…" : "No files found")
+                    text: search.query.mode === "files" ? (search.query.text === "" ? "Type a file or folder name" : fileSearch.busy ? "Searching…" : "No files found")
                         : search.query.mode === "command" ? "Type a command to run in the terminal"
                         : "No apps found"
                     color: Colors.m3onSurfaceVariant

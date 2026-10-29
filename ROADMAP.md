@@ -696,6 +696,9 @@ shell's cost, features and customization), checked before acting. Done so far:
   393 MB resident, 289 MB proportional (was 464 / 332).
   Tried and dropped: `QSG_RENDER_LOOP=basic` (another ~32 MB, but the Settings window stuttered
   while Hyprland resized it into its tile).
+- Splits: the Wi-Fi page's QR sharing is `WifiShare.qml` (387 -> 289 lines); the launcher's
+  calculator, file search and result row are `CalcRow`, `FileSearch` and `LauncherRow`
+  (433 -> 232). The touchpad rule watches udev's input events instead of polling every 3 s.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
