@@ -36,7 +36,8 @@ function minutesOf(time) {
     return match ? Number(match[1]) * 60 + Number(match[2]) : null;
 }
 
-// A forecast answer as { temperature, high, low, icon, label, sunrise, sunset } (rounded °C;
+// A forecast answer as { temperature, high, low, icon, label, sunrise, sunset } (rounded degrees,
+// in the unit asked for;
 // sunrise and sunset in minutes since midnight, or null); null if incomplete.
 function forecast(answer) {
     const now = answer && answer.current;

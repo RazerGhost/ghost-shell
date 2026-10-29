@@ -39,6 +39,18 @@ Column {
             visible: Weather.error !== ""
             title: Weather.error
         }
+
+        SettingRow {
+            title: "Temperature"
+
+            Stepper {
+                label: "Temperature unit"
+                values: ["celsius", "fahrenheit"]
+                value: Settings.values.temperatureUnit
+                format: v => v === "fahrenheit" ? "°F" : "°C"
+                onPicked: v => Settings.values.temperatureUnit = v
+            }
+        }
     }
 
     SettingGroup {

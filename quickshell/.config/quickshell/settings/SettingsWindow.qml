@@ -67,7 +67,7 @@ Singleton {
         { id: "keybinds", section: "Apps", icon: "keyboard", title: "Keybinds",
           words: "shortcuts keys welcome tour help" },
         { id: "clock", section: "Apps", icon: "partly_cloudy_day", title: "Weather and clock",
-          words: "weather town location 24-hour 12-hour time" }
+          words: "fahrenheit celsius temperature unit weather town location 24-hour 12-hour time" }
     ]
     property string search: ""
     // The pages the search finds (all of them without one).

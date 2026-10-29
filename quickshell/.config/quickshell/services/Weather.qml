@@ -58,11 +58,16 @@ Singleton {
             return;
         get(`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}`
             + "&current=temperature_2m,weather_code,is_day&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset"
-            + "&timezone=auto&forecast_days=1", answer => {
+            + "&timezone=auto&forecast_days=1"
+            + (root.fahrenheit ? "&temperature_unit=fahrenheit" : ""), answer => {
             root.current = WeatherJs.forecast(answer);
             root.error = root.current ? "" : "Unexpected answer from the weather service";
         });
     }
+
+    // Settings -> Weather and clock: °F instead of °C (open-meteo converts).
+    readonly property bool fahrenheit: Settings.values.temperatureUnit === "fahrenheit"
+    onFahrenheitChanged: update()
 
     onLocationChanged: refresh()
     Component.onCompleted: refresh()

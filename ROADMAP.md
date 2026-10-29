@@ -727,6 +727,7 @@ shell's cost, features and customization), checked before acting. Done so far:
   `-dark`), sets it for GTK and writes it to `icon-theme`, which `hypr/shell.sh` exports as
   `QS_ICON_THEME` at every start, so "Restart the shell" applies it to the shell's own icons
   too (env.lua's Colloid-Dark stays the fallback). Moved out of wallpaper.sh's fixed Colloid.
+- Settings -> Weather and clock -> Temperature: °C or °F (open-meteo's `temperature_unit`).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

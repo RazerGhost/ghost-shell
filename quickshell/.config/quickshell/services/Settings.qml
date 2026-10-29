@@ -106,6 +106,7 @@ Singleton {
 
             // The town for the weather in the today menu (services/Weather.qml); "" = no weather.
             property string weatherLocation: ""
+            property string temperatureUnit: "celsius" // or "fahrenheit"
 
             // "dark", "light" or "auto" (dark from sunset to sunrise; services/ColorScheme.qml).
             property string colorScheme: "dark"
