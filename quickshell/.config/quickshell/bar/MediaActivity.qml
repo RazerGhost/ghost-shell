@@ -13,6 +13,6 @@ Row {
         height: Theme.media.activityArt
         radius: Theme.radius.s
         iconSize: Theme.icon.small
-        source: Media.player?.trackArtUrl ?? ""
+        source: Media.cover(Media.player)
     }
 }

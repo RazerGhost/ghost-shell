@@ -47,7 +47,7 @@ Column {
         height: Theme.media.menuArt
         radius: Theme.radius.l
         iconSize: Theme.icon.launcher
-        source: root.player?.trackArtUrl ?? ""
+        source: Media.cover(root.player)
 
         // Click the cover to bring the player to the front.
         MouseArea {

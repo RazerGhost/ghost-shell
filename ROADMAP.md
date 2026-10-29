@@ -686,6 +686,10 @@ shell's cost, features and customization), checked before acting. Done so far:
   clipboard, emoji, background apps, power) are built only while shown and freed after (on
   every screen), the lock preview is a `LazyLoader`, and Settings builds only the chosen page
   (it kept all 13 up to date while hidden). `MALLOC_ARENA_MAX=2` was tried: no difference.
+  The island's and the small player's cover come from the one downloaded copy (`Media.cover`;
+  each track's cover was fetched twice). Kept: the wallpaper picker's thumbnails stay decoded
+  after the first open (~18 MB for 44 pictures; freeing them would decode up to 5K pictures again
+  on every open).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

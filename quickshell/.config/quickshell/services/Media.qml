@@ -39,6 +39,19 @@ Singleton {
         }
     }
 
+    // The cover to show for `player`: for the current player the downloaded copy, so a cover is
+    // fetched once rather than again by every image showing it (nothing while it downloads: the
+    // placeholder shows); for another player its own address.
+    function cover(player: var): string {
+        if (!player)
+            return "";
+        if (player !== root.player)
+            return player.trackArtUrl ?? "";
+        if (artFile !== "")
+            return "file://" + artFile;
+        return artUrl.startsWith("http") ? "" : artUrl;
+    }
+
     // Skipping tracks while one downloads: the newest track's cover downloads after it.
     LatestProcess {
         id: download

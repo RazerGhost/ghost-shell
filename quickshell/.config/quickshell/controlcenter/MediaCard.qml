@@ -39,7 +39,7 @@ Rectangle {
         width: Theme.tile.height
         height: Theme.tile.height
         color: Colors.m3surfaceContainerHigh
-        source: root.player?.trackArtUrl ?? ""
+        source: Media.cover(root.player)
     }
 
     Column {

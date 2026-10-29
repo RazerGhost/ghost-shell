@@ -7,7 +7,7 @@ import qs.theme
 ClippingRectangle {
     id: root
 
-    property string source // the player's trackArtUrl
+    property string source // Media.cover(player)
     property int iconSize: Theme.icon.normal
 
     color: Colors.m3surfaceContainerHighest
