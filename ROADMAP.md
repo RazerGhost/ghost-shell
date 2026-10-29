@@ -848,6 +848,10 @@ audit of our own UI): all sixteen, built in batches.
   and Hyprland together: look.lua's animations are one table set by `GhostAnimations(factor)`,
   which shell-settings.lua calls again at the chosen speed (`HyprlandConfig.animationLua`,
   tested).
+- Size (Settings -> Appearance): the shell's size (85-125 %), its text on top of that (90-130 %)
+  and its corners (square to rounder). Theme's sizes go through `px`, font sizes through
+  `text` and radii through `round` (`theme/ThemeScale.js`, tested); timings, counts, outline
+  widths and the webcam offset don't change. Checked at 125 % with square corners.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

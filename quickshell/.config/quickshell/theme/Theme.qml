@@ -6,21 +6,39 @@ import QtQuick
 import Quickshell
 import qs.services
 import "../settings/HyprlandConfig.js" as HyprlandConfig
+import "ThemeScale.js" as ThemeScale
 
 Singleton {
+    id: root
+
+    // Settings -> Appearance -> Size (ThemeScale.js, tested): the shell's sizes, its text on top
+    // of that, and its corners. Timings, counts and outline widths don't change.
+    readonly property real scale: ThemeScale.pick(Settings.values.uiScale, ThemeScale.sizes)
+    readonly property real textScale: ThemeScale.pick(Settings.values.textScale, ThemeScale.textSizes)
+    readonly property real cornerScale: ThemeScale.pick(Settings.values.cornerScale, ThemeScale.corners)
+
+    function px(base: int): int {
+        return ThemeScale.px(base, scale);
+    }
+    function text(base: int): int {
+        return ThemeScale.px(base, scale * textScale);
+    }
+    function round(base: int): int {
+        return ThemeScale.radius(base, scale, cornerScale);
+    }
     readonly property QtObject spacing: QtObject {
-        readonly property int xs: 4
-        readonly property int s:  8
-        readonly property int m:  12
-        readonly property int l:  16
+        readonly property int xs: root.px(4)
+        readonly property int s:  root.px(8)
+        readonly property int m:  root.px(12)
+        readonly property int l:  root.px(16)
     }
 
     readonly property QtObject radius: QtObject {
-        readonly property int s:    8
-        readonly property int m:    12
-        readonly property int l:    20
-        readonly property int xl:   28
-        readonly property int full: 999 // clamped to half the height: a pill
+        readonly property int s:    root.round(8)
+        readonly property int m:    root.round(12)
+        readonly property int l:    root.round(20)
+        readonly property int xl:   root.round(28)
+        readonly property int full: root.round(999) // clamped to half the height: a pill
     }
 
     readonly property QtObject font: QtObject {
@@ -31,17 +49,17 @@ Singleton {
         readonly property string icon: "Material Symbols Rounded"
         readonly property int iconWeight: 300 // Material Symbols line weight (400 is the font's default)
 
-        readonly property int small:  11
-        readonly property int normal: 13
-        readonly property int large:  16
-        readonly property int title:  22
+        readonly property int small:  root.text(11)
+        readonly property int normal: root.text(13)
+        readonly property int large:  root.text(16)
+        readonly property int title:  root.text(22)
     }
 
     readonly property QtObject icon: QtObject {
-        readonly property int small:    16 // status icons in the closed island
-        readonly property int normal:   20 // buttons, tiles, sliders
-        readonly property int launcher: 32 // app icons in the launcher list
-        readonly property int osd:      18 // the OSD's icon
+        readonly property int small:    root.px(16) // status icons in the closed island
+        readonly property int normal:   root.px(20) // buttons, tiles, sliders
+        readonly property int launcher: root.px(32) // app icons in the launcher list
+        readonly property int osd:      root.px(18) // the OSD's icon
     }
 
     // Durations follow Settings' animation speed (2 = twice as fast, 0 = none; the same factor
@@ -64,18 +82,18 @@ Singleton {
 
     // The on/off switch (widgets/Switch.qml), Material 3's size.
     readonly property QtObject toggle: QtObject {
-        readonly property int width:  52
-        readonly property int height: 32
+        readonly property int width:  root.px(52)
+        readonly property int height: root.px(32)
         readonly property int border: 2 // the outline while off
-        readonly property int thumbOff: 16
-        readonly property int thumbOn: 24
-        readonly property int thumbPressed: 28 // grows while held, like Material 3's
+        readonly property int thumbOff: root.px(16)
+        readonly property int thumbOn: root.px(24)
+        readonly property int thumbPressed: root.px(28) // grows while held, like Material 3's
     }
 
     // A tooltip (widgets/Tooltip.qml): how long the pointer rests before it shows, and its gap.
     readonly property QtObject tooltip: QtObject {
         readonly property int delay: 500 // ms
-        readonly property int gap: 4
+        readonly property int gap: root.px(4)
     }
 
     // Outlines that mark a picture or window: the chosen one, and one hovered or picked with the
@@ -108,114 +126,114 @@ Singleton {
     }
 
     readonly property QtObject island: QtObject {
-        readonly property int height:     36  // when closed; also the space reserved at the top
-        readonly property int padding:    14  // left/right padding inside the closed island
+        readonly property int height:     root.px(36)  // when closed; also the space reserved at the top
+        readonly property int padding:    root.px(14)  // left/right padding inside the closed island
         // The whole island moves this many px right of the screen's middle: the laptop's webcam
         // sits a pixel right of the panel's exact middle (the user lined it up by eye).
         readonly property int offset:     1
-        readonly property int fillet:     14  // radius of the concave joins to the screen edge
-        readonly property int openRadius: 32  // bottom corners when open (closed: half the height)
-        readonly property int panelWidth: 380 // width of the open menus
+        readonly property int fillet:     root.px(14)  // radius of the concave joins to the screen edge
+        readonly property int openRadius: root.round(32)  // bottom corners when open (closed: half the height)
+        readonly property int panelWidth: root.px(380) // width of the open menus
         // Height of the island's window. The open island never grows past this; the rest of
         // the window is transparent and lets clicks through.
-        readonly property int maxHeight:  840
+        readonly property int maxHeight:  root.px(840)
     }
 
     readonly property QtObject tile: QtObject {
-        readonly property int height: 64
-        readonly property int round:  52 // the round on/off buttons under the tiles
+        readonly property int height: root.px(64)
+        readonly property int round:  root.px(52) // the round on/off buttons under the tiles
     }
 
     readonly property QtObject slider: QtObject {
-        readonly property int height: 44
+        readonly property int height: root.px(44)
     }
 
     readonly property QtObject wifi: QtObject {
-        readonly property int qr: 200 // the "join this network" QR code (WifiPage.qml)
+        readonly property int qr: root.px(200) // the "join this network" QR code (WifiPage.qml)
     }
 
     readonly property QtObject list: QtObject {
-        readonly property int rowHeight: 52
+        readonly property int rowHeight: root.px(52)
         readonly property int rows:      6  // visible rows in the Wi-Fi / Bluetooth lists
     }
 
     readonly property QtObject workspace: QtObject {
-        readonly property int dot:       6  // inactive indicator: a dot
-        readonly property int activeDot: 16 // active indicator stretches into a pill
-        readonly property int spacing:   4  // between the dots
+        readonly property int dot:       root.px(6)  // inactive indicator: a dot
+        readonly property int activeDot: root.px(16) // active indicator stretches into a pill
+        readonly property int spacing:   root.px(4)  // between the dots
         readonly property int minimum:   5  // numbers shown on hover even when those workspaces are empty
-        readonly property int number:    28 // a number on hover (WorkspaceNumbers.qml)
+        readonly property int number:    root.px(28) // a number on hover (WorkspaceNumbers.qml)
     }
 
     // Media in the island: the live activity, the hover player and the media menu.
     readonly property QtObject media: QtObject {
-        readonly property int activityArt: 22   // cover in the closed island
+        readonly property int activityArt: root.px(22)   // cover in the closed island
         readonly property int hoverDelay:  250  // ms of hover before the player opens, and of
                                                 // absence before it closes again
-        readonly property int menuArt:     160  // cover in the media menu
+        readonly property int menuArt:     root.px(160)  // cover in the media menu
     }
 
     readonly property QtObject dock: QtObject {
-        readonly property int height:    60  // the bar
-        readonly property int margin:    8   // between the bar and the screen edge
-        readonly property int icon:      44  // app icons at rest
-        readonly property int radius:    22  // the bar's corners
+        readonly property int height:    root.px(60)  // the bar
+        readonly property int margin:    root.px(8)   // between the bar and the screen edge
+        readonly property int icon:      root.px(44)  // app icons at rest
+        readonly property int radius:    root.round(22)  // the bar's corners
         readonly property int trigger:   3   // the strip at the bottom edge that brings a hidden dock back
         readonly property int hideDelay: 500 // ms the dock stays after the pointer leaves
-        readonly property int menuSpace: 240 // room above the dock for tooltips and the menu
-        readonly property int menuWidth: 220 // the right-click menu
-        readonly property int badge:     18  // notification count on an icon
-        readonly property int preview:   130 // window previews on hover: their height
+        readonly property int menuSpace: root.px(240) // room above the dock for tooltips and the menu
+        readonly property int menuWidth: root.px(220) // the right-click menu
+        readonly property int badge:     root.px(18)  // notification count on an icon
+        readonly property int preview:   root.px(130) // window previews on hover: their height
         readonly property int previewDelay: 400 // ms resting on an app before its previews show
     }
 
     readonly property QtObject switcher: QtObject {
-        readonly property int thumbHeight: 220 // window previews in Alt+Tab; widths follow each window's shape
+        readonly property int thumbHeight: root.px(220) // window previews in Alt+Tab; widths follow each window's shape
         readonly property real maxAspect:  2.2 // the widest a preview gets, relative to its height
-        readonly property int labelHeight: 32  // app icon and title under each preview
+        readonly property int labelHeight: root.px(32)  // app icon and title under each preview
     }
 
     readonly property QtObject overview: QtObject {
-        readonly property int margin:     48  // around the window grid
-        readonly property int gap:        24  // between window previews
-        readonly property int label:      32  // app icon and title under each preview
-        readonly property int workspace:  168 // width of a workspace in the strip (16:9)
-        readonly property int stripSpace: 140 // height of the strip at the bottom
+        readonly property int margin:     root.px(48)  // around the window grid
+        readonly property int gap:        root.px(24)  // between window previews
+        readonly property int label:      root.px(32)  // app icon and title under each preview
+        readonly property int workspace:  root.px(168) // width of a workspace in the strip (16:9)
+        readonly property int stripSpace: root.px(140) // height of the strip at the bottom
     }
 
     readonly property QtObject snap: QtObject {
-        readonly property int width: 56 // one layout picture in the snap picker (16:9)
+        readonly property int width: root.px(56) // one layout picture in the snap picker (16:9)
     }
 
     readonly property QtObject welcome: QtObject {
-        readonly property int width: 440 // the tour's card
-        readonly property int icon:  48  // the symbol at the top of each card
-        readonly property int dot:   6   // the progress dots
+        readonly property int width: root.px(440) // the tour's card
+        readonly property int icon:  root.px(48)  // the symbol at the top of each card
+        readonly property int dot:   root.px(6)   // the progress dots
     }
 
     readonly property QtObject lock: QtObject {
-        readonly property int clock:      112 // the big clock
-        readonly property int fieldWidth: 340 // password field
+        readonly property int clock:      root.text(112) // the big clock
+        readonly property int fieldWidth: root.px(340) // password field
         readonly property int blur:       64  // wallpaper blur radius
     }
 
     readonly property QtObject wallpaper: QtObject {
-        readonly property int thumbHeight: 120 // thumbnails in the picker (16:9)
+        readonly property int thumbHeight: root.px(120) // thumbnails in the picker (16:9)
     }
 
     readonly property QtObject emoji: QtObject {
-        readonly property int cell: 42 // one emoji in the picker's grid
-        readonly property int size: 26 // the emoji glyph
+        readonly property int cell: root.px(42) // one emoji in the picker's grid
+        readonly property int size: root.px(26) // the emoji glyph
         readonly property int rows: 7  // visible rows; the grid scrolls past that
     }
 
     readonly property QtObject clipboard: QtObject {
-        readonly property int height:      360 // the list scrolls past this
-        readonly property int imageHeight: 56  // image thumbnails
+        readonly property int height:      root.px(360) // the list scrolls past this
+        readonly property int imageHeight: root.px(56)  // image thumbnails
     }
 
     readonly property QtObject notifications: QtObject {
-        readonly property int historyHeight: 300  // the history in the "today" menu scrolls past this
+        readonly property int historyHeight: root.px(300)  // the history in the "today" menu scrolls past this
     }
 
     readonly property QtObject battery: QtObject {
@@ -223,39 +241,39 @@ Singleton {
         readonly property real warn: 0.20     // a "battery low" notification (services/BatteryAlerts.qml)
         readonly property real critical: 0.10 // a critical one, which stays until dismissed
         // The battery pill in the island (bar/BatteryPill.qml).
-        readonly property int width:  22
-        readonly property int height: 11
-        readonly property int radius: 4
-        readonly property int nub:    3  // the terminal on the right end
+        readonly property int width:  root.px(22)
+        readonly property int height: root.px(11)
+        readonly property int radius: root.round(4)
+        readonly property int nub:    root.px(3)  // the terminal on the right end
     }
 
     readonly property QtObject launcher: QtObject {
-        readonly property int width:     560
+        readonly property int width:     root.px(560)
         readonly property int rows:      8  // visible result rows; the list scrolls past that
-        readonly property int rowHeight: 52
+        readonly property int rowHeight: root.px(52)
     }
 
     readonly property QtObject settings: QtObject {
-        readonly property int width:     880 // the settings window when it opens
-        readonly property int height:    620
-        readonly property int titleBar:  52  // the bar at the top: drag to move, maximize, close
-        readonly property int sidebar:   230 // the category list
-        readonly property int content:   600 // the pages' maximum width
-        readonly property int minContent: 400 // the smallest the page area (and window height) gets
-        readonly property int rowHeight: 64
-        readonly property int stepper:   96  // the value between a stepper's - and +
-        readonly property int stepperWide: 170 // a stepper showing a screen mode ("1920 × 1080, 165 Hz")
-        readonly property int screenTimeChart: 120 // the last 7 days' bars, with the day names
-        readonly property int screenTimeBar: 28    // one day's bar at most
+        readonly property int width:     root.px(880) // the settings window when it opens
+        readonly property int height:    root.px(620)
+        readonly property int titleBar:  root.px(52)  // the bar at the top: drag to move, maximize, close
+        readonly property int sidebar:   root.px(230) // the category list
+        readonly property int content:   root.px(600) // the pages' maximum width
+        readonly property int minContent: root.px(400) // the smallest the page area (and window height) gets
+        readonly property int rowHeight: root.px(64)
+        readonly property int stepper:   root.px(96)  // the value between a stepper's - and +
+        readonly property int stepperWide: root.px(170) // a stepper showing a screen mode ("1920 × 1080, 165 Hz")
+        readonly property int screenTimeChart: root.px(120) // the last 7 days' bars, with the day names
+        readonly property int screenTimeBar: root.px(28)    // one day's bar at most
     }
 
     readonly property QtObject osd: QtObject {
         // Close to the closed island's size (user's choice: it looked big next to it).
-        readonly property int width:   240
-        readonly property int height:  40
-        readonly property int gap:     64   // distance from the bottom screen edge, above the dock
-        readonly property int gapLow:  24   // the same while the dock is hidden
-        readonly property int track:   5    // height of the level bar
-        readonly property int below:   12   // under the island, when it's at the top
+        readonly property int width:   root.px(240)
+        readonly property int height:  root.px(40)
+        readonly property int gap:     root.px(64)   // distance from the bottom screen edge, above the dock
+        readonly property int gapLow:  root.px(24)   // the same while the dock is hidden
+        readonly property int track:   root.px(5)    // height of the level bar
+        readonly property int below:   root.px(12)   // under the island, when it's at the top
     }
 }

@@ -6,6 +6,7 @@ import qs.theme
 import qs.widgets
 import "../services/ColorScheme.js" as ColorSchemeJs
 import "HyprlandConfig.js" as HyprlandConfig
+import "../theme/ThemeScale.js" as ThemeScale
 
 // Appearance: the wallpaper (the colors of everything come from it), light or dark, the shell's panels (glass
 // or nearly solid: Colors.surfaceTranslucent, widgets/Surface.qml), and the windows' border and
@@ -156,6 +157,49 @@ Column {
                     })[v] ?? v
                     onPicked: v => Settings.values.accentColor = v
                 }
+            }
+        }
+    }
+
+    SettingGroup {
+        title: "Size"
+
+        SettingRow {
+            title: "Shell size"
+            subtitle: "The island, menus, dock, launcher and Settings"
+
+            Stepper {
+                label: "Shell size"
+                values: ThemeScale.sizes
+                value: Theme.scale
+                format: v => Math.round(v * 100) + " %"
+                onPicked: v => Settings.values.uiScale = v
+            }
+        }
+
+        SettingRow {
+            title: "Text size"
+            subtitle: "On top of the shell's size"
+
+            Stepper {
+                label: "Text size"
+                values: ThemeScale.textSizes
+                value: Theme.textScale
+                format: v => Math.round(v * 100) + " %"
+                onPicked: v => Settings.values.textScale = v
+            }
+        }
+
+        SettingRow {
+            title: "Corners"
+            subtitle: "The shell's own; windows have theirs under Windows"
+
+            Stepper {
+                label: "Corners"
+                values: ThemeScale.corners
+                value: Theme.cornerScale
+                format: v => ({ 0: "Square", 0.5: "Less round", 1: "Round", 1.5: "Rounder" })[v] ?? v
+                onPicked: v => Settings.values.cornerScale = v
             }
         }
     }

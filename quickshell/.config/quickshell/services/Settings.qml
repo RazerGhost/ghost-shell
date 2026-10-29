@@ -158,6 +158,10 @@ Singleton {
             property int gapsOut: 20             // between windows and the screen's edges
             property int borderSize: 2
             property int rounding: 10            // window corners
+            // Settings -> Appearance -> Size (theme/ThemeScale.js lists the steps).
+            property real uiScale: 1
+            property real textScale: 1
+            property real cornerScale: 1
             property real animationSpeed: 1 // 0 = off, 0.5-2 (HyprlandConfig.animationSpeeds)
             property string blurStyle: "kawase"  // Hyprland's blur variant (HyprlandConfig.js lists them)
             property bool wobble: false          // windows wobble while moved or resized
