@@ -224,18 +224,13 @@ Singleton {
                         Accessible.selected: selected
                         Accessible.onPressAction: root.page = modelData.id
 
-                        Text {
+                        SectionHeading {
                             id: header
                             visible: entry.firstOfSection
                             leftPadding: Theme.spacing.l
                             topPadding: entry.index === 0 ? Theme.spacing.s : Theme.spacing.m
                             bottomPadding: Theme.spacing.xs
                             text: entry.modelData.section
-                            color: Colors.m3primary
-                            font.family: Theme.font.sans
-                            font.pixelSize: Theme.font.small
-                            font.weight: Font.DemiBold
-                            Accessible.role: Accessible.Heading
                         }
 
                         Rectangle {

@@ -49,13 +49,9 @@ Column {
         onBack: root.back()
     }
 
-    component Heading: Text {
+    component Heading: SectionHeading {
         leftPadding: Theme.spacing.m
         topPadding: Theme.spacing.xs
-        color: Colors.m3primary
-        font.family: Theme.font.sans
-        font.pixelSize: Theme.font.small
-        font.weight: Font.DemiBold
     }
 
     Heading {

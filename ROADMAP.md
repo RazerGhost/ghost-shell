@@ -671,7 +671,8 @@ shell's cost, features and customization), checked before acting. Done so far:
   updates) are one `StatusRow` (icon, text, optional button); QuickSettings 429 -> 351 lines.
   `widgets/TextField.qml` (rounded field with a placeholder) for the Wi-Fi password, the new
   task and a notification's quick reply; the polkit prompt keeps its own (focus border, show
-  password, read-only while waiting).
+  password, read-only while waiting). `widgets/SectionHeading.qml` for the small accent headings
+  (Settings' groups and sidebar, the Sound page), all announced as headings now.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

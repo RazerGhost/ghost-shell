@@ -1,5 +1,6 @@
 import QtQuick
 import qs.theme
+import qs.widgets
 
 // A card of related settings, with an optional heading above it.
 Column {
@@ -11,14 +12,10 @@ Column {
     width: parent?.width ?? 0
     spacing: Theme.spacing.s
 
-    Text {
+    SectionHeading {
         visible: root.title !== ""
         leftPadding: Theme.spacing.l
         text: root.title
-        color: Colors.m3primary
-        font.family: Theme.font.sans
-        font.pixelSize: Theme.font.small
-        font.weight: Font.DemiBold
     }
 
     Rectangle {
