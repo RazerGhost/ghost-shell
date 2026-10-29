@@ -1,7 +1,9 @@
 // Turns the touchpad off while a mouse is connected (Settings -> Keyboard and mouse; off by
 // default), and on again when it's gone. Hyprland sends no event when a mouse is plugged in, so
-// its devices are read every 3 seconds while the setting is on (TouchpadDevices.js, tested);
-// the touchpads are switched with `hl.device` through `hyprctl eval`, only when that changes.
+// udev's input events are watched while the setting is on (USB and Bluetooth mice both show up
+// there), and Hyprland's devices are read a second after one (TouchpadDevices.js, tested); it
+// polled every 3 s before (review 2026-10-29). The touchpads are switched with `hl.device`
+// through `hyprctl eval`, only when that changes.
 pragma Singleton
 
 import QtQuick
@@ -27,21 +29,30 @@ Singleton {
             Quickshell.execDetached(["hyprctl", "eval", lua]);
     }
 
-    // The setting switched off: the touchpad back on.
-    onEnabledChanged: {
-        if (!enabled)
-            check.running = true;
+    // Switched on: look now. Switched off: the touchpad back on.
+    onEnabledChanged: check.start()
+    Component.onCompleted: {
+        if (enabled)
+            checkSoon.restart();
     }
 
+    // A device plugged in or out: Hyprland takes a moment to list it, and one device sends
+    // several events, so look once, a second after the last.
     Timer {
-        interval: 3000
-        running: root.enabled
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: check.running = true
+        id: checkSoon
+        interval: 1000
+        onTriggered: check.start()
     }
 
     Process {
+        command: ["udevadm", "monitor", "--udev", "--subsystem-match=input"]
+        running: root.enabled
+        stdout: SplitParser {
+            onRead: checkSoon.restart()
+        }
+    }
+
+    LatestProcess {
         id: check
         command: ["hyprctl", "devices", "-j"]
         stdout: StdioCollector {

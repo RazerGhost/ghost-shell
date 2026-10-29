@@ -435,8 +435,9 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
 
 ### Touchpad off with a mouse (built 2026-10-28; untested: needs a mouse and a finger)
 - Settings -> Keyboard and mouse: "Touchpad off while a mouse is connected" (off by default;
-  `services/Touchpad.qml`). Hyprland sends no device events, so `hyprctl devices -j` is read every
-  3 s while it's on; a mouse is any pointer device other than the touchpad's own two
+  `services/Touchpad.qml`). Hyprland sends no device events, so udev's input events are watched
+  while it's on and `hyprctl devices -j` is read a second after one (it polled every 3 s until
+  2026-10-29's review); a mouse is any pointer device other than the touchpad's own two
   (`TouchpadDevices.js`, tested); the touchpads switch with `hl.device` through `hyprctl eval`.
   Not a plain "off": a laptop without its touchpad and no mouse can't easily get it back.
 - No keyboard backlight control: the Omen's RGB keyboard isn't exposed to Linux (no
