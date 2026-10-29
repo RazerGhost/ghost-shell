@@ -546,6 +546,13 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   the settings, `HyprlandConfig.js`, tested), pop-ups wait in the history like Do Not Disturb
   (critical ones still show) and the power mode is Performance, back to the previous one after.
 
+### Caps lock, keyboard layout and power mode pop-ups (built 2026-10-29)
+- The OSD shows "Caps lock on/off", a new keyboard layout's name (Hyprland's `activelayout`
+  event; repeats for the same layout are skipped) and the power mode when it changes. Caps lock
+  sends no event: a bind on the key's release that doesn't take it (`non_consuming`) calls
+  `qs ipc call osd capsLock`, which reads the main keyboard's state from `hyprctl devices -j`
+  (`osd/Keyboard.js`, tested).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

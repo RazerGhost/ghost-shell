@@ -1,13 +1,17 @@
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Io
+import Quickshell.Services.UPower
 import Quickshell.Wayland
 import qs.services
 import qs.theme
 import qs.widgets
+import "Keyboard.js" as Keyboard
 
 // Popup for volume, mic mute and brightness changes: an icon and a level bar at the bottom
-// of the focused monitor, hidden again a moment after the last change.
+// of the focused monitor, hidden again a moment after the last change. Caps lock, the keyboard
+// layout and the power mode show there too, as a label.
 Scope {
     id: root
 
@@ -69,6 +73,59 @@ Scope {
             const level = Brightness.level;
             root.show(level < 0.34 ? "brightness_low" : level < 0.67 ? "brightness_medium" : "brightness_high",
                       "Brightness", level);
+        }
+    }
+
+    Connections {
+        target: PowerProfiles
+
+        function onProfileChanged(): void {
+            const profile = PowerProfiles.profile;
+            root.show(profile === PowerProfile.PowerSaver ? "eco" : profile === PowerProfile.Performance ? "speed" : "balance",
+                      profile === PowerProfile.PowerSaver ? "Power saver" : profile === PowerProfile.Performance ? "Performance" : "Balanced",
+                      -1);
+        }
+    }
+
+    // Hyprland sends activelayout for every keyboard (and again for the same layout), so only a
+    // new layout name shows.
+    property string layout: ""
+
+    Connections {
+        target: Hyprland
+
+        function onRawEvent(event): void {
+            if (event.name !== "activelayout")
+                return;
+            const name = Keyboard.layoutName(event.data);
+            if (name === "" || name === root.layout)
+                return;
+            const first = root.layout === "";
+            root.layout = name;
+            if (!first)
+                root.show("keyboard", name, -1);
+        }
+    }
+
+    // Caps lock sends no event: binds.lua calls `qs ipc call osd capsLock` when the key is let go
+    // (a bind that doesn't take the key away), and its state is read from Hyprland.
+    IpcHandler {
+        target: "osd"
+
+        function capsLock(): void {
+            devices.running = true;
+        }
+    }
+
+    Process {
+        id: devices
+        command: ["hyprctl", "devices", "-j"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const on = Keyboard.capsLock(text);
+                if (on !== null)
+                    root.show("keyboard_capslock", on ? "Caps lock on" : "Caps lock off", -1);
+            }
         }
     }
 
