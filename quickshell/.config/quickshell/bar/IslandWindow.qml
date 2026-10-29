@@ -8,6 +8,7 @@ import qs.controlcenter
 import qs.services
 import qs.theme
 import qs.widgets
+import "IslandViews.js" as IslandViews
 
 // The island on one monitor (see Island.qml): the top row, and below it whichever menu,
 // pop-up or hover view is shown.
@@ -37,12 +38,9 @@ PanelWindow {
                                                         ? Windows.needsAttention : null
 
     // What's shown below the top row: a menu, a pop-up, a hover view ("peek-media", ...)
-    // or nothing.
-    readonly property string shown: open ? panel
-                                  : island.reloadShown && focusedScreen ? "reload"
-                                  : popup ? "notification"
-                                  : attentionWindow ? "attention"
-                                  : peek ? "peek-" + peek : ""
+    // or nothing (IslandViews.js, tested).
+    readonly property string shown: IslandViews.shown(panel, island.reloadShown && focusedScreen,
+                                                      popup !== null, attentionWindow !== null, peek)
     readonly property bool expanded: shown !== ""
     readonly property real menuWidth: Theme.island.panelWidth
 
