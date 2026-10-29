@@ -17,8 +17,8 @@ Item {
     readonly property var spot: DesktopWidgets.place(Settings.values.desktopWidgets, name)
 
     // How far the handle has been dragged; follows the drag while it lasts, and the place is
-    // saved when it ends. Kept here, not read from the handler at the end: a cancelled drag
-    // (the pointer reaching another surface at the screen's edge) leaves its translation empty.
+    // saved when it ends. Kept here, not read from the handler at the end: by then its
+    // translation is already back to nothing (NOTES).
     property point dragged: Qt.point(0, 0)
     property bool moving: false
 
@@ -82,7 +82,6 @@ Item {
                 Settings.values.desktopWidgets = DesktopWidgets.withPlace(Settings.values.desktopWidgets, root.name, place);
                 root.moving = false;
             }
-            onCanceled: console.info("DesktopCard: the " + root.name + " drag was cancelled at", root.dragged)
         }
     }
 }

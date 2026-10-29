@@ -900,8 +900,8 @@ audit of our own UI): all sixteen, built in batches.
   (`desktop/DesktopWidgets.qml`, a `Bottom`-layer surface on the first screen, so windows
   cover them; input and blur only on the cards). Resting on one shows a handle in its corner;
   dragging that moves it, saved as fractions of the screen in `desktopWidgets` and kept on
-  screen (`DesktopWidgets.js`, tested). Checked live on an empty workspace; dragging is for the
-  user's checklist.
+  screen (`DesktopWidgets.js`, tested). Checked live on an empty workspace; dragging verified
+  by the user on all four edges. The user wants a refinement and polish pass over these later.
 
 ### Visual Settings (planned, after the UI research round)
 User's request (2026-10-29): settings like the lock screen's clock should be picked by sight,
