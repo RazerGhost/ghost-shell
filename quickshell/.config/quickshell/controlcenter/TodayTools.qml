@@ -45,29 +45,6 @@ Column {
         }
     }
 
-    // A rounded text field, like the Wi-Fi password's.
-    component Field: Rectangle {
-        property alias input: field
-
-        implicitHeight: Theme.slider.height
-        radius: Theme.radius.full
-        color: Colors.m3surfaceContainerHighest
-
-        TextInput {
-            id: field
-            anchors.fill: parent
-            anchors.leftMargin: Theme.spacing.l
-            anchors.rightMargin: Theme.spacing.l
-            verticalAlignment: TextInput.AlignVCenter
-            color: Colors.m3onSurface
-            selectionColor: Colors.m3primary
-            selectedTextColor: Colors.m3onPrimary
-            font.family: Theme.font.sans
-            font.pixelSize: Theme.font.normal
-            clip: true
-        }
-    }
-
     // To-do: type and Enter to add; click a task to tick it off.
     Column {
         visible: root.open === "todo"
@@ -76,28 +53,16 @@ Column {
 
         onVisibleChanged: {
             if (visible)
-                newTask.input.forceActiveFocus();
+                newTask.focusInput();
         }
 
-        Field {
+        TextField {
             id: newTask
             width: parent.width
-            input.Accessible.role: Accessible.EditableText
-            input.Accessible.name: "New task"
-            input.onAccepted: {
-                Planner.add(input.text);
-                input.text = "";
-            }
-
-            Text {
-                anchors.left: parent.left
-                anchors.leftMargin: Theme.spacing.l
-                anchors.verticalCenter: parent.verticalCenter
-                visible: newTask.input.text === ""
-                text: "Add a task"
-                color: Colors.m3onSurfaceVariant
-                font.family: Theme.font.sans
-                font.pixelSize: Theme.font.normal
+            placeholder: "Add a task"
+            onAccepted: {
+                Planner.add(text);
+                text = "";
             }
         }
 

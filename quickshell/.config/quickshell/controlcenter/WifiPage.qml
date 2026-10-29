@@ -193,7 +193,7 @@ Column {
         onVisibleChanged: {
             if (visible) {
                 password.text = "";
-                password.forceActiveFocus();
+                password.focusInput();
             }
         }
 
@@ -206,35 +206,14 @@ Column {
             font.weight: Font.DemiBold
         }
 
-        Rectangle {
+        TextField {
+            id: password
             width: parent.width
-            implicitHeight: Theme.slider.height
-            radius: Theme.radius.full
-            color: Colors.m3surfaceContainerHighest
-
-            TextInput {
-                id: password
-
-                anchors.fill: parent
-                anchors.leftMargin: Theme.spacing.l
-                anchors.rightMargin: Theme.spacing.l
-                verticalAlignment: TextInput.AlignVCenter
-                echoMode: TextInput.Password
-                color: Colors.m3onSurface
-                selectionColor: Colors.m3primary
-                selectedTextColor: Colors.m3onPrimary
-                font.family: Theme.font.sans
-                font.pixelSize: Theme.font.normal
-                clip: true
-
-                Accessible.role: Accessible.EditableText
-                Accessible.name: "Wi-Fi password"
-                Accessible.passwordEdit: true
-
-                onAccepted: {
-                    if (text !== "")
-                        root.submit(text);
-                }
+            password: true
+            placeholder: "Wi-Fi password"
+            onAccepted: {
+                if (text !== "")
+                    root.submit(text);
             }
         }
 

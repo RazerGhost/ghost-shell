@@ -168,43 +168,16 @@ MouseArea {
             }
 
             // Quick reply, when the app offers it.
-            Rectangle {
+            TextField {
                 visible: root.canType && (root.notification?.hasInlineReply ?? false)
                 width: parent.width
-                height: Theme.slider.height - Theme.spacing.s
-                radius: Theme.radius.full
-                color: Colors.m3surfaceContainerHighest
-
-                TextInput {
-                    id: reply
-
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.margins: Theme.spacing.m
-                    anchors.verticalCenter: parent.verticalCenter
-                    color: Colors.m3onSurface
-                    font.family: Theme.font.sans
-                    font.pixelSize: Theme.font.normal
-                    clip: true
-
-                    Accessible.role: Accessible.EditableText
-                    Accessible.name: placeholder.text
-
-                    onAccepted: {
-                        if (text === "")
-                            return;
-                        root.notification.sendInlineReply(text);
-                        root.notification.dismiss();
-                    }
-
-                    Text {
-                        id: placeholder
-                        visible: reply.text === ""
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: root.notification?.inlineReplyPlaceholder || "Reply"
-                        color: Colors.m3onSurfaceVariant
-                        font: reply.font
-                    }
+                implicitHeight: Theme.slider.height - Theme.spacing.s
+                placeholder: root.notification?.inlineReplyPlaceholder || "Reply"
+                onAccepted: {
+                    if (text === "")
+                        return;
+                    root.notification.sendInlineReply(text);
+                    root.notification.dismiss();
                 }
             }
 
