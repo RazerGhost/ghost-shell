@@ -662,7 +662,9 @@ shell's cost, features and customization), checked before acting. Done so far:
   (`modprobe.d/50-nvidia-power.conf`; it was "Disabled by default" and never slept), Plymouth's
   initramfs hook and packages removed, systemd-resolved's mDNS and LLMNR off (Avahi does mDNS).
   Removed by hand: unused icon themes (Papirus, WhiteSur, Tela), AUR build leftovers (cmake, go,
-  zip), iwd, xf86-video-amdgpu, profile-sync-daemon, nss-mdns and Haunt's build tools.
+  zip), iwd, xf86-video-amdgpu, profile-sync-daemon, nss-mdns and Haunt's build tools. Removing
+  iwd renamed the Wi-Fi card (wlan0 -> wlo1, see NOTES), so the saved network had to be joined
+  again; the name stays wlo1 (nothing in the repo uses it).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

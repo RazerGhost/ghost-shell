@@ -331,6 +331,11 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   runs (from a Timer it's true at once). `services/LatestProcess.qml` (run once more with the
   newest command when asked while running) relies on it reading true; verified with `qs -p`.
 
+- Removing `iwd` renamed the Wi-Fi card from `wlan0` to `wlo1` at the next boot (2026-10-29): iwd's
+  systemd `.link` file keeps wireless cards on their kernel names. NetworkManager profiles saved
+  with `connection.interface-name = wlan0` then no longer start, so the password is asked again.
+  Before removing a package, check its files (`pacman -Ql`), not only what depends on it.
+
 ## Testing on the laptop
 
 - README screenshots: an empty workspace up to 5 (higher ones add workspace dots), `grim -s 0.75`
