@@ -31,3 +31,21 @@ function filter(entries, query) {
         return entries;
     return entries.filter(e => e.image ? "image".startsWith(q) : e.text.toLowerCase().includes(q));
 }
+
+// The menu's list: pinned texts first (kept apart from cliphist, so they survive "Clear all"),
+// then the history. A pin is { pinned: true, text, id: "pin:<n>", line: "", image: null }.
+function withPins(pins, entries) {
+    const pinned = Array.from(pins ?? []).filter(t => typeof t === "string" && t !== "")
+        .map((text, i) => ({ pinned: true, text: text, id: "pin:" + i, line: "", image: null }));
+    return pinned.concat(entries);
+}
+
+// The pins with `text` added at the end (once), or taken out.
+function pin(pins, text) {
+    const list = Array.from(pins ?? []);
+    return text === "" || list.includes(text) ? list : list.concat([text]);
+}
+
+function unpin(pins, text) {
+    return Array.from(pins ?? []).filter(t => t !== text);
+}

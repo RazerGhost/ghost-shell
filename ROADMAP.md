@@ -764,6 +764,10 @@ shell's cost, features and customization), checked before acting. Done so far:
   muted), the OSD says "Microphone is muted" and the island's mic icon turns into a red crossed
   out one for as long as it lasts (`Audio.mutedWhileRecording`). Not voice detection: that would
   mean reading the microphone's level all the time. Verified with pw-record.
+- Pinned clipboard texts: the pin button on a text entry (hover) keeps its whole text (from
+  `cliphist decode`) in `~/.local/state/quickshell/clipboard-pins.json`, shown first in the
+  menu with a pin mark, searched like the rest, kept through "Clear all"; × or Delete unpins
+  (`ClipboardEntries.withPins/pin/unpin`, tested). Images can't be pinned.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

@@ -6,15 +6,23 @@ import qs.theme
 import qs.widgets
 import "../services/ClipboardEntries.js" as ClipboardEntries
 
-// The clipboard menu (Super+V): what you copied, newest first, with a search field. Click an
-// entry or press Enter to paste it; Delete or × removes one.
+// The clipboard menu (Super+V): your pinned texts, then what you copied, newest first, with a
+// search field. Click an entry or press Enter to paste it; Delete or × removes one (or unpins
+// it); the pin button keeps a text at the top, also through "Clear all".
 Column {
     id: root
 
     // An entry was picked; the island closes and then it's pasted.
     signal picked(var entry)
 
-    readonly property var shown: ClipboardEntries.filter(Clipboard.entries, search.text)
+    readonly property var shown: ClipboardEntries.filter(ClipboardEntries.withPins(Clipboard.pins, Clipboard.entries), search.text)
+
+    function removeEntry(entry: var): void {
+        if (entry.pinned)
+            Clipboard.unpin(entry.text);
+        else
+            Clipboard.remove(entry);
+    }
 
     padding: Theme.spacing.l
     topPadding: Theme.spacing.s
@@ -50,7 +58,7 @@ Column {
                 break;
             case Qt.Key_Delete:
                 if (list.currentItem)
-                    Clipboard.remove(list.currentItem.modelData);
+                    root.removeEntry(list.currentItem.modelData);
                 break;
             default:
                 return; // typing goes to the field
@@ -97,14 +105,27 @@ Column {
             onClicked: root.picked(modelData)
 
             Accessible.role: Accessible.ListItem
-            Accessible.name: modelData.image ? "Image, " + modelData.image.width + " by " + modelData.image.height : modelData.text
+            Accessible.name: modelData.image ? "Image, " + modelData.image.width + " by " + modelData.image.height
+                           : (modelData.pinned ? "Pinned, " : "") + modelData.text
             Accessible.onPressAction: root.picked(modelData)
+
+            // A pin's mark.
+            MaterialIcon {
+                id: pinMark
+                visible: row.modelData.pinned ?? false
+                anchors.left: parent.left
+                anchors.leftMargin: Theme.spacing.m
+                anchors.verticalCenter: parent.verticalCenter
+                icon: "keep"
+                color: Colors.m3primary
+                font.pixelSize: Theme.icon.small
+            }
 
             Text {
                 id: preview
                 visible: !row.modelData.image
-                anchors.left: parent.left
-                anchors.right: remove.left
+                anchors.left: pinMark.visible ? pinMark.right : parent.left
+                anchors.right: buttons.left
                 anchors.leftMargin: Theme.spacing.m
                 anchors.verticalCenter: parent.verticalCenter
                 text: row.modelData.text
@@ -146,15 +167,27 @@ Column {
                 }
             }
 
-            IconButton {
-                id: remove
+            Row {
+                id: buttons
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                visible: row.containsMouse
-                icon: "close"
-                iconSize: Theme.icon.small
-                label: "Remove from clipboard history"
-                onClicked: Clipboard.remove(row.modelData)
+
+                // Keep it at the top (text only).
+                IconButton {
+                    visible: row.containsMouse && !row.modelData.image && !row.modelData.pinned
+                    icon: "keep"
+                    iconSize: Theme.icon.small
+                    label: "Pin to the top"
+                    onClicked: Clipboard.pin(row.modelData)
+                }
+
+                IconButton {
+                    visible: row.containsMouse
+                    icon: "close"
+                    iconSize: Theme.icon.small
+                    label: row.modelData.pinned ? "Unpin" : "Remove from clipboard history"
+                    onClicked: root.removeEntry(row.modelData)
+                }
             }
         }
     }

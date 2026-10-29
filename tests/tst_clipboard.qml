@@ -53,4 +53,17 @@ TestCase {
         compare(Entries.filter(all, "WORLD").map(e => e.id), ["2"]);
         compare(Entries.filter(all, "ima").map(e => e.id), ["3"]);
     }
+
+    function test_pins() {
+        const entries = Entries.parseAll("12\thello\n");
+        const list = Entries.withPins(["my address", "", "IBAN NL00"], entries);
+        compare(list.map(e => e.text), ["my address", "IBAN NL00", "hello"]);
+        verify(list[0].pinned);
+        verify(!list[2].pinned);
+        compare(Entries.pin(["a"], "b"), ["a", "b"]);
+        compare(Entries.pin(["a"], "a"), ["a"]);
+        compare(Entries.unpin(["a", "b"], "a"), ["b"]);
+        // The search finds pins too.
+        compare(Entries.filter(list, "iban").map(e => e.text), ["IBAN NL00"]);
+    }
 }

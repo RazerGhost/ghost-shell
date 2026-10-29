@@ -1,6 +1,8 @@
 // Clipboard history from cliphist (it records everything copied; see hypr/autostart.lua).
 // Picking an entry copies it again and pastes it into the window you were in, like Windows'
 // Win+V: wtype presses Ctrl+V once the island has closed and that window has the keyboard back.
+// Pinned texts are kept apart from cliphist (~/.local/state/quickshell/clipboard-pins.json), so
+// "Clear all" leaves them; the menu shows them first (ClipboardEntries.withPins, tested).
 pragma Singleton
 
 import QtQuick
@@ -16,14 +18,52 @@ Singleton {
     // Image entries are decoded into files here to show them as thumbnails.
     readonly property string thumbnailDir: Quickshell.env("XDG_RUNTIME_DIR") + "/qs-clipboard"
 
+    // The pinned texts, oldest first.
+    readonly property var pins: Array.from(pinState.texts ?? [])
+
     function refresh(): void {
         list.start();
     }
 
-    // Copies `entry` and pastes it. Call after closing the menu.
+    // Copies `entry` (from the history, or a pin) and pastes it. Call after closing the menu.
     function paste(entry: var): void {
-        copy.command = ["sh", "-c", 'cliphist decode "$1" | wl-copy', "sh", entry.id];
+        copy.command = entry.pinned ? ["sh", "-c", 'printf %s "$1" | wl-copy', "sh", entry.text]
+                                    : ["sh", "-c", 'cliphist decode "$1" | wl-copy', "sh", entry.id];
         copy.running = true;
+    }
+
+    // Pins a text entry: its whole text (cliphist's list only has a shortened preview).
+    function pin(entry: var): void {
+        if (entry.image || entry.pinned)
+            return;
+        decodePin.command = ["cliphist", "decode", entry.id];
+        decodePin.running = true;
+    }
+
+    function unpin(text: string): void {
+        pinState.texts = ClipboardEntries.unpin(pins, text);
+        pinFile.writeAdapter();
+    }
+
+    Process {
+        id: decodePin
+        stdout: StdioCollector {
+            onStreamFinished: {
+                pinState.texts = ClipboardEntries.pin(root.pins, text);
+                pinFile.writeAdapter();
+            }
+        }
+    }
+
+    FileView {
+        id: pinFile
+        path: Quickshell.env("HOME") + "/.local/state/quickshell/clipboard-pins.json"
+        printErrors: false // missing until the first pin
+
+        adapter: JsonAdapter {
+            id: pinState
+            property var texts: []
+        }
     }
 
     function remove(entry: var): void {
