@@ -87,6 +87,8 @@ Singleton {
             // Screens set up in Settings -> Display, by output name: { mode, scale, transform, vrr }
             // (settings/DisplayModes.js); the others use monitors.lua's "preferred".
             property var monitors: ({})
+            // Per-app notifications, by app name: { mode } (services/NotificationRules.js).
+            property var notificationApps: ({})
             // Equalizer gains in dB per output, by PipeWire node name (services/Equalizer.qml).
             property var equalizer: ({})
             // Sound events (services/Sounds.qml): all of them, then each kind.

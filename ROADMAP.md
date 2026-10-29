@@ -569,6 +569,12 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   tested). "End task" sends SIGTERM to all of them after a second click; processes the session
   needs (Hyprland, the shell, PipeWire, D-Bus, portals) have no button.
 
+### Per-app notification settings (built 2026-10-29)
+- Settings -> Notifications -> Apps: every app that has sent a notification (remembered by name
+  in `notificationApps`), each Silent (only into the list, no sound), Pop up (the default) or
+  Always pop up (also during Do Not Disturb and game mode). Critical ones always pop up
+  (`services/NotificationRules.js`, tested).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

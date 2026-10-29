@@ -4,11 +4,14 @@
 // except critical ones; the history still collects everything. With a schedule (settings
 // window) it turns on at the start time and off at the end time; toggling in between lasts
 // until the next of those, like night light. Game mode holds the pop-ups back the same way.
+// Each app can be silent (never pops up) or always pop up, even then (Settings -> Notifications,
+// NotificationRules.js).
 pragma Singleton
 
 import QtQuick
 import Quickshell
 import Quickshell.Services.Notifications
+import "NotificationRules.js" as Rules
 import "Schedule.js" as Schedule
 
 Singleton {
@@ -80,7 +83,11 @@ Singleton {
                 return;
             root.received[notification.id] = Date.now();
             const critical = notification.urgency === NotificationUrgency.Critical;
-            if ((!root.doNotDisturb && !GameMode.on) || critical) {
+            const apps = Rules.remember(Settings.values.notificationApps, notification.appName);
+            if (apps !== null)
+                Settings.values.notificationApps = apps;
+            const mode = Rules.mode(Settings.values.notificationApps, notification.appName);
+            if (Rules.popsUp(mode, root.doNotDisturb || GameMode.on, critical)) {
                 root.queue = [...root.queue, notification];
                 Sounds.playNotification(notification.hints, critical);
             }
