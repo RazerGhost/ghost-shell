@@ -21,11 +21,10 @@ Rectangle {
     Accessible.onPressAction: root.clicked()
 
     // Hover highlight.
-    Rectangle {
-        anchors.fill: parent
+    StateLayer {
         radius: parent.radius
         color: label.color
-        opacity: mouse.containsMouse ? Theme.state.hover : 0
+        hovered: mouse.containsMouse
     }
 
     Text {

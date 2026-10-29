@@ -1,5 +1,6 @@
 import QtQuick
 import qs.theme
+import qs.widgets
 
 // A clickable area in the closed island (the clock, the status icons) that opens a menu.
 // Highlighted on hover, and while its menu is open.
@@ -23,15 +24,10 @@ MouseArea {
     Accessible.onPressAction: root.activated()
     onClicked: root.activated()
 
-    Rectangle {
-        anchors.fill: parent
+    StateLayer {
         radius: Theme.radius.full
-        color: Colors.m3onSurface
-        opacity: root.active ? Theme.state.active : root.containsMouse ? Theme.state.hover : 0
-
-        Behavior on opacity {
-            NumberAnimation { duration: Theme.anim.fast }
-        }
+        hovered: root.containsMouse
+        active: root.active
     }
 
     Row {

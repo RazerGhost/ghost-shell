@@ -87,11 +87,9 @@ Column {
                 Accessible.checked: modelData.done
                 Accessible.onPressAction: Planner.toggle(index)
 
-                Rectangle {
-                    anchors.fill: parent
+                StateLayer {
                     radius: Theme.radius.m
-                    color: Colors.m3onSurface
-                    opacity: task.containsMouse ? Theme.state.hover : 0
+                    hovered: task.containsMouse
                 }
 
                 MaterialIcon {

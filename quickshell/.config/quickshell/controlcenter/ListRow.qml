@@ -32,15 +32,9 @@ MouseArea {
     Accessible.onPressAction: root.activated()
     onClicked: root.activated()
 
-    Rectangle {
-        anchors.fill: parent
+    StateLayer {
         radius: Theme.radius.m
-        color: Colors.m3onSurface
-        opacity: root.containsMouse ? Theme.state.hover : 0
-
-        Behavior on opacity {
-            NumberAnimation { duration: Theme.anim.fast }
-        }
+        hovered: root.containsMouse
     }
 
     Item {

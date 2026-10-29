@@ -30,15 +30,10 @@ Rectangle {
     }
 
     // Hover highlight.
-    Rectangle {
-        anchors.fill: parent
+    StateLayer {
         radius: parent.radius
         color: root.contentColor
-        opacity: mouse.containsMouse ? Theme.state.hover : 0
-
-        Behavior on opacity {
-            NumberAnimation { duration: Theme.anim.fast }
-        }
+        hovered: mouse.containsMouse
     }
 
     // WifiIcon: a weak Wi-Fi signal keeps its unlit arcs visible (dimmed); other symbols

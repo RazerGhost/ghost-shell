@@ -236,11 +236,9 @@ PanelWindow {
                 Accessible.name: text
                 Accessible.onPressAction: entryRow.clicked(null)
 
-                Rectangle {
-                    anchors.fill: parent
+                StateLayer {
                     radius: Theme.radius.m
-                    color: Colors.m3onSurface
-                    opacity: entryRow.containsMouse ? Theme.state.hover : 0
+                    hovered: entryRow.containsMouse
                 }
 
                 Row {

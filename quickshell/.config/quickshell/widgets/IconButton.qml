@@ -22,15 +22,10 @@ Item {
     Accessible.onPressAction: root.clicked(Qt.LeftButton)
 
     // Hover highlight (a Material "state layer").
-    Rectangle {
-        anchors.fill: parent
+    StateLayer {
         radius: Theme.radius.full
         color: glyph.color
-        opacity: mouse.containsMouse ? Theme.state.hover : 0
-
-        Behavior on opacity {
-            NumberAnimation { duration: Theme.anim.fast }
-        }
+        hovered: mouse.containsMouse
     }
 
     MaterialIcon {

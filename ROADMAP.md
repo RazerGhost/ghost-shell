@@ -679,6 +679,8 @@ shell's cost, features and customization), checked before acting. Done so far:
   template strings in Screenshot.qml into `screenshot/capture.sh`.
   `stow_packages` in `modules/lib.sh` (ghost doctor and the core module each listed them). The
   11 layer rules in `rules.lua` are a table and a loop (same rules, checked).
+  `widgets/StateLayer.qml`, the hover/active highlight, in eight controls (it was written out in
+  each; three didn't fade); the overview opens through one `show()`.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
