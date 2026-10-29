@@ -5,7 +5,7 @@ import qs.theme
 import qs.widgets
 
 // A row in the Wi-Fi, Bluetooth and minimized-window lists: icon, name, state, and an optional
-// trailing icon. `icon` is a Material Symbol; `appIcon` (an icon theme name) replaces it with an
+// trailing icon. `icon` is a Material Symbol; `appIcon` (an icon theme name or an image address) replaces it with an
 // app's own icon. `highlighted` (the connected network or device) draws it in the accent color.
 MouseArea {
     id: root
@@ -61,7 +61,10 @@ MouseArea {
         IconImage {
             anchors.fill: parent
             visible: root.appIcon !== ""
-            source: visible ? Quickshell.iconPath(root.appIcon, "application-x-executable") : ""
+            // An icon theme name, or already an image (the tray's image:// addresses, file paths).
+            source: !visible ? ""
+                  : root.appIcon.includes("://") || root.appIcon.startsWith("/") ? root.appIcon
+                  : Quickshell.iconPath(root.appIcon, "application-x-executable")
         }
     }
 
