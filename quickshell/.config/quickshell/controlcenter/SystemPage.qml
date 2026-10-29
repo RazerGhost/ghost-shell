@@ -68,7 +68,7 @@ Column {
                 color: row.value > 0.9 ? Colors.m3error : Colors.m3primary
 
                 Behavior on width {
-                    NumberAnimation { duration: Theme.anim.normal }
+                    NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }
                 }
             }
         }

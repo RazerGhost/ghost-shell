@@ -52,11 +52,23 @@ MouseArea {
     Keys.onEnterPressed: Notifications.activate(notification)
     Keys.onSpacePressed: Notifications.activate(notification)
 
+    readonly property bool critical: notification?.urgency === NotificationUrgency.Critical
+    // Text on the card: on a critical one, the error container's own text color.
+    readonly property color textColor: critical ? Colors.m3onErrorContainer : Colors.m3onSurface
+    readonly property color subtleColor: critical ? Colors.m3onErrorContainer : Colors.m3onSurfaceVariant
+
+    // Critical ones (a low battery, the timer) in Material's error colors, so they stand out
+    // from the attention card's accent.
     Rectangle {
         anchors.fill: parent
         radius: Theme.radius.l
-        color: root.notification?.urgency === NotificationUrgency.Critical ? Colors.m3primaryContainer
-                                                                            : Colors.m3surfaceContainerHigh
+        color: root.critical ? Colors.m3errorContainer : Colors.m3surfaceContainerHigh
+    }
+
+    StateLayer {
+        radius: Theme.radius.l
+        color: root.textColor
+        hovered: root.containsMouse
     }
 
     FocusRing {
@@ -81,7 +93,7 @@ MouseArea {
                 anchors.centerIn: parent
                 visible: image.status !== Image.Ready
                 icon: "notifications"
-                color: Colors.m3onSurfaceVariant
+                color: root.subtleColor
             }
 
             // IconImage, not Image: it asks icon themes for the right size instead of scaling
@@ -110,7 +122,7 @@ MouseArea {
                     text: [root.notification?.appName,
                            NotificationTime.format(Notifications.received[root.notification?.id] ?? root.now, root.now)]
                           .filter(s => s).join(" · ")
-                    color: Colors.m3onSurfaceVariant
+                    color: root.subtleColor
                     font.family: Theme.font.sans
                     font.pixelSize: Theme.font.small
                     elide: Text.ElideRight
@@ -130,7 +142,7 @@ MouseArea {
                 width: parent.width
                 text: root.notification?.summary ?? ""
                 textFormat: Text.PlainText
-                color: Colors.m3onSurface
+                color: root.textColor
                 font.family: Theme.font.sans
                 font.pixelSize: Theme.font.normal
                 font.weight: Font.DemiBold
@@ -143,7 +155,7 @@ MouseArea {
                 text: root.notification?.body ?? ""
                 // Apps may send markup; show it as text rather than render it.
                 textFormat: Text.PlainText
-                color: Colors.m3onSurfaceVariant
+                color: root.subtleColor
                 font.family: Theme.font.sans
                 font.pixelSize: Theme.font.normal
                 wrapMode: Text.Wrap
@@ -172,7 +184,7 @@ MouseArea {
                     color: Colors.m3primary
 
                     Behavior on width {
-                        NumberAnimation { duration: Theme.anim.normal }
+                        NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }
                     }
                 }
             }

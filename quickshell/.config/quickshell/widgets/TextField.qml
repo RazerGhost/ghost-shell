@@ -21,6 +21,9 @@ Rectangle {
     implicitHeight: Theme.slider.height
     radius: Theme.radius.full
     color: Colors.m3surfaceContainerHighest
+    // Where the typing goes, like the lock screen's and the password prompt's fields.
+    border.width: input.activeFocus ? Theme.outline.normal : 0
+    border.color: Colors.m3primary
 
     TextInput {
         id: input

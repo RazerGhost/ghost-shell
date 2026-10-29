@@ -39,11 +39,13 @@ Rectangle {
         radius: root.radius
     }
 
-    // The thumb grows and slides to the right when on.
+    // The thumb grows and slides to the right when on, and grows more while held.
     Rectangle {
+        readonly property real inset: (root.height - width) / 2
+
         anchors.verticalCenter: parent.verticalCenter
-        x: root.checked ? root.width - width - 4 : 8
-        width: root.checked ? 24 : 16
+        x: root.checked ? root.width - width - inset : inset
+        width: press.pressed ? Theme.toggle.thumbPressed : root.checked ? Theme.toggle.thumbOn : Theme.toggle.thumbOff
         height: width
         radius: Theme.radius.full
         color: root.checked ? Colors.m3onPrimary : Colors.m3onSurfaceVariant
@@ -57,8 +59,16 @@ Rectangle {
     }
 
     MouseArea {
+        id: press
         anchors.fill: parent
+        hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: root.toggled()
+    }
+
+    StateLayer {
+        radius: root.radius
+        color: root.checked ? Colors.m3onPrimary : Colors.m3onSurface
+        hovered: press.containsMouse
     }
 }

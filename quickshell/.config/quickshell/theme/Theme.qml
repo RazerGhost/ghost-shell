@@ -63,6 +63,16 @@ Singleton {
         readonly property int width:  52
         readonly property int height: 32
         readonly property int border: 2 // the outline while off
+        readonly property int thumbOff: 16
+        readonly property int thumbOn: 24
+        readonly property int thumbPressed: 28 // grows while held, like Material 3's
+    }
+
+    // Outlines that mark a picture or window: the chosen one, and one hovered or picked with the
+    // keyboard (wallpaper and lock pictures, overview and switcher previews).
+    readonly property QtObject outline: QtObject {
+        readonly property int strong: 3
+        readonly property int normal: 2
     }
 
     // The ring around the control that has the keyboard (widgets/FocusRing.qml).
@@ -75,6 +85,7 @@ Singleton {
         readonly property real hover:  0.08 // the pointer is over it
         readonly property real active: 0.14 // its menu is open (the island's buttons)
         readonly property real disabled: 0.4 // can't be used right now
+        readonly property real subtitle: 0.8 // a second line on a colored card or tile
     }
 
     // Backgrounds of the island, menus, launcher, OSD...; Hyprland blurs what's behind them. This

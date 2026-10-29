@@ -172,9 +172,17 @@ Column {
                     }
 
                     MouseArea {
+                        id: pillArea
                         anchors.fill: parent
+                        hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: root.act(w => Windows.moveToWorkspace(w, pill.workspace))
+                    }
+
+                    StateLayer {
+                        radius: pill.radius
+                        color: pill.current ? Colors.m3onPrimary : Colors.m3onSurface
+                        hovered: pillArea.containsMouse
                     }
                 }
             }

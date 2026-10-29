@@ -96,7 +96,7 @@ local panels = {
     { "qs-switcher",         "popin 90%" },    -- Alt+Tab
     { "qs-dock",             false },          -- slides itself
     { "qs-launcher",         "popin 90%" },    -- from its center
-    { "qs-osd",              "slide bottom" }, -- volume / brightness pop-up
+    { "qs-osd",              "popin 90%" },    -- volume / brightness pop-up, at the bottom or top
     { "qs-polkit",           "fade" },         -- apps' password prompt
     { "qs-overview",         "fade" },         -- Super+Tab
     { "qs-wallpaper-picker", "slide top" },    -- the strip under the island

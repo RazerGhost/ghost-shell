@@ -134,7 +134,7 @@ Item {
             height: Theme.slider.height + Theme.spacing.s
             radius: Theme.radius.full
             color: Colors.surfaceTranslucent
-            border.width: password.activeFocus ? 2 : 0
+            border.width: password.activeFocus ? Theme.outline.normal : 0
             border.color: root.messageIsError ? Colors.m3error : Colors.m3primary
 
             MaterialIcon {

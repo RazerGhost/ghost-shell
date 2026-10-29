@@ -30,6 +30,12 @@ MouseArea {
         color: Colors.m3primaryContainer
     }
 
+    StateLayer {
+        radius: Theme.radius.l
+        color: Colors.m3onPrimaryContainer
+        hovered: root.containsMouse
+    }
+
     Row {
         anchors.left: parent.left
         anchors.right: parent.right
@@ -62,7 +68,7 @@ MouseArea {
                 width: parent.width
                 text: "Wants your attention · click to switch"
                 color: Colors.m3onPrimaryContainer
-                opacity: 0.8
+                opacity: Theme.state.subtitle
                 font.family: Theme.font.sans
                 font.pixelSize: Theme.font.small
                 elide: Text.ElideRight

@@ -124,7 +124,7 @@ Scope {
                     height: Theme.slider.height
                     radius: Theme.radius.full
                     color: Colors.m3surfaceContainerHighest
-                    border.width: password.activeFocus ? 2 : 0
+                    border.width: password.activeFocus ? Theme.outline.normal : 0
                     border.color: root.flow?.supplementaryIsError ? Colors.m3error : Colors.m3primary
 
                     TextInput {

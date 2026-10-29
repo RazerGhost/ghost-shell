@@ -33,7 +33,7 @@ Item {
         height: root.previewHeight
         radius: Theme.radius.m
         color: Colors.m3surfaceContainerHigh
-        border.width: root.highlighted ? 3 : 0
+        border.width: root.highlighted ? Theme.outline.strong : 0
         border.color: Colors.m3primary
 
         ScreencopyView {

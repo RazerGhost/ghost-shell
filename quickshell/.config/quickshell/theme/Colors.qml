@@ -23,6 +23,8 @@ Singleton {
     readonly property color m3outlineVariant:          json.outline_variant
     readonly property color m3error:                   json.error
     readonly property color m3onError:                 json.on_error
+    readonly property color m3errorContainer:          json.error_container
+    readonly property color m3onErrorContainer:        json.on_error_container
 
     // Background of the shell's panels (widgets/Surface.qml): translucent so Hyprland's blur shows
     // through; more so with the glass setting, which also gives them a thin light edge.
@@ -61,6 +63,8 @@ Singleton {
             property string outline_variant:           "#49454f"
             property string error:                     "#f2b8b5"
             property string on_error:                  "#601410"
+            property string error_container:           "#8c1d18"
+            property string on_error_container:        "#f9dedc"
             property string scrim:                     "#000000"
         }
     }

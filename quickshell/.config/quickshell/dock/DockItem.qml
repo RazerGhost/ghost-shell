@@ -111,7 +111,7 @@ MouseArea {
                 color: root.focused ? Colors.m3primary : Colors.m3onSurfaceVariant
 
                 Behavior on width {
-                    NumberAnimation { duration: Theme.anim.fast }
+                    NumberAnimation { duration: Theme.anim.fast; easing.type: Theme.anim.easing }
                 }
             }
         }

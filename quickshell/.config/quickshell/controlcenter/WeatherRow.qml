@@ -41,14 +41,18 @@ Item {
         }
     }
 
+    // Up to the town: a long sky ("Moderate freezing drizzle") ends in "…" before reaching it.
     Row {
         anchors.left: parent.left
+        anchors.right: townArea.left
         anchors.leftMargin: Theme.spacing.xs
+        anchors.rightMargin: Theme.spacing.s
         anchors.verticalCenter: parent.verticalCenter
         visible: !root.asking
         spacing: Theme.spacing.s
 
         MaterialIcon {
+            id: weatherIcon
             anchors.verticalCenter: parent.verticalCenter
             visible: Weather.current !== null
             icon: Weather.current?.icon ?? ""
@@ -63,11 +67,14 @@ Item {
             color: Weather.current ? Colors.m3onSurface : Colors.m3onSurfaceVariant
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.normal
+            width: parent.width - (weatherIcon.visible ? weatherIcon.width + parent.spacing : 0)
+            elide: Text.ElideRight
         }
     }
 
     // The town; click to change it.
     MouseArea {
+        id: townArea
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         visible: !root.asking
@@ -75,6 +82,8 @@ Item {
         height: parent.height
         cursorShape: Qt.PointingHandCursor
         onClicked: root.editing = true
+
+        hoverEnabled: true
 
         Accessible.role: Accessible.Button
         Accessible.name: "Weather location: " + town.text + ", change"
@@ -85,6 +94,11 @@ Item {
         Keys.onReturnPressed: root.editing = true
         Keys.onEnterPressed: root.editing = true
         Keys.onSpacePressed: root.editing = true
+
+        StateLayer {
+            radius: Theme.radius.s
+            hovered: townArea.containsMouse
+        }
 
         FocusRing {
             radius: Theme.radius.s

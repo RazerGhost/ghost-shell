@@ -222,7 +222,7 @@ Scope {
                 height: parent.hole.height
                 visible: width > 0
                 color: "transparent"
-                border.width: 2
+                border.width: Theme.outline.normal
                 border.color: Colors.m3primary
 
                 Surface {

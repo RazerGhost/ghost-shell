@@ -78,7 +78,7 @@ Rectangle {
             width: parent.width
             text: root.subtitle
             color: root.contentColor
-            opacity: 0.8
+            opacity: Theme.state.subtitle
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.small
             elide: Text.ElideRight

@@ -248,7 +248,7 @@ Scope {
                             color: index === root.step ? Colors.m3primary : Colors.m3outlineVariant
 
                             Behavior on width {
-                                NumberAnimation { duration: Theme.anim.fast }
+                                NumberAnimation { duration: Theme.anim.fast; easing.type: Theme.anim.easing }
                             }
                         }
                     }

@@ -190,6 +190,14 @@ Scope {
                 height: parent.height
                 spacing: Theme.spacing.m
 
+                // From a level bar to a label (volume, then the output's name) without a jump.
+                Behavior on x {
+                    NumberAnimation { duration: Theme.anim.fast; easing.type: Theme.anim.easing }
+                }
+                Behavior on width {
+                    NumberAnimation { duration: Theme.anim.fast; easing.type: Theme.anim.easing }
+                }
+
                 MaterialIcon {
                     id: glyph
                     anchors.verticalCenter: parent.verticalCenter

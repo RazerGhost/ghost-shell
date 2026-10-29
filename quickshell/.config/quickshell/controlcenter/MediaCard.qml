@@ -21,9 +21,16 @@ Rectangle {
 
     // Under everything else, so the buttons keep their own clicks.
     MouseArea {
+        id: cardArea
         anchors.fill: parent
+        hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: root.activated()
+    }
+
+    StateLayer {
+        radius: root.radius
+        hovered: cardArea.containsMouse
     }
 
     Accessible.role: Accessible.Button

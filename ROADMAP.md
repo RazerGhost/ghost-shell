@@ -831,6 +831,17 @@ Two read-only reviews of everything since the optimization review, findings chec
 - Not done: with the dock set to "always" on several screens the OSD's height follows one of
   them (only matters with an external monitor, none to test with).
 
+### UI research round (2026-10-29, in progress)
+User's picks from two read-only researches (other Quickshell shells and Hyprland 0.56/0.57; an
+audit of our own UI): all sixteen, built in batches.
+- Audit fixes: hover on the cards that had none (notifications, attention, the small player,
+  the date, the weather town, the window menu's workspaces); critical notifications in
+  Material's error colors (`m3errorContainer`, its text in `m3onErrorContainer`); the weather
+  line ends in "…" before the town; the OSD pops in from its center (it slid up from the bottom
+  even when shown at the top) and moves smoothly between a level and a label; text fields show
+  where the typing goes; the switch's thumb grows while held and has hover; outline widths,
+  the switch's thumb and a subtitle's dimming are Theme tokens; size animations ease.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

@@ -49,7 +49,9 @@ Column {
 
     // The date; click it to show or hide the month calendar.
     MouseArea {
+        id: dateArea
         width: parent.width - root.leftPadding - root.rightPadding
+        hoverEnabled: true
         implicitHeight: date.implicitHeight
         cursorShape: Qt.PointingHandCursor
         onClicked: root.calendarOpen = !root.calendarOpen
@@ -63,6 +65,11 @@ Column {
         Keys.onReturnPressed: root.calendarOpen = !root.calendarOpen
         Keys.onEnterPressed: root.calendarOpen = !root.calendarOpen
         Keys.onSpacePressed: root.calendarOpen = !root.calendarOpen
+
+        StateLayer {
+            radius: Theme.radius.s
+            hovered: dateArea.containsMouse
+        }
 
         FocusRing {
             radius: Theme.radius.s

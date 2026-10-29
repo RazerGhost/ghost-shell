@@ -336,7 +336,7 @@ Scope {
                             anchors.fill: parent
                             radius: Theme.radius.m
                             color: "transparent"
-                            border.width: ws.current || drop.containsDrag ? 3 : ws.containsMouse ? 2 : 0
+                            border.width: ws.current || drop.containsDrag ? Theme.outline.strong : ws.containsMouse ? Theme.outline.normal : 0
                             border.color: ws.current || drop.containsDrag ? Colors.m3primary : Colors.m3onSurface
                         }
 
@@ -388,7 +388,7 @@ Scope {
                         anchors.fill: parent
                         radius: Theme.radius.m
                         color: Colors.m3surfaceContainer
-                        border.width: add.containsMouse || addDrop.containsDrag ? 2 : 0
+                        border.width: add.containsMouse || addDrop.containsDrag ? Theme.outline.normal : 0
                         border.color: Colors.m3onSurface
                     }
 

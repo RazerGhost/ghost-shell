@@ -134,7 +134,7 @@ Column {
                     anchors.fill: parent
                     radius: Theme.radius.m
                     color: "transparent"
-                    border.width: cell.current ? 3 : cell.containsMouse ? 2 : 0
+                    border.width: cell.current ? Theme.outline.strong : cell.containsMouse ? Theme.outline.normal : 0
                     border.color: cell.current ? Colors.m3primary : Colors.m3onSurface
                 }
             }
