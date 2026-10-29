@@ -529,6 +529,11 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   and Proton Pass (`proton-mail-bin`, `proton-pass-bin`, AUR; Proton's own builds). Proton
   Drive has no Linux app. Proton VPN's connections are NetworkManager connections.
 
+### Low disk space warning (built 2026-10-29)
+- `services/DiskAlerts.qml`: a notification under 10 % free on `/` (the same Btrfs as /home) and
+  a critical one under 5 %, each once until there's room again above 15 % (`DiskAlerts.js`,
+  tested); it points at old snapshots. `df` a minute after login and every 10 minutes.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
