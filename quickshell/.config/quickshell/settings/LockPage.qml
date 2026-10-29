@@ -190,6 +190,32 @@ Column {
     }
 
     SettingGroup {
+        title: "Lock screen"
+
+        SettingRow {
+            title: "Media controls"
+            subtitle: "Play, pause and skip without unlocking"
+
+            Switch {
+                label: "Media controls"
+                checked: Settings.values.lockMedia
+                onToggled: Settings.values.lockMedia = !checked
+            }
+        }
+
+        SettingRow {
+            title: "Notification count"
+            subtitle: "How many came in, never what they say"
+
+            Switch {
+                label: "Notification count"
+                checked: Settings.values.lockNotificationCount
+                onToggled: Settings.values.lockNotificationCount = !checked
+            }
+        }
+    }
+
+    SettingGroup {
         title: "Login screen"
 
         SettingRow {

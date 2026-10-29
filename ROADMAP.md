@@ -534,6 +534,12 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   a critical one under 5 %, each once until there's room again above 15 % (`DiskAlerts.js`,
   tested); it points at old snapshots. `df` a minute after login and every 10 minutes.
 
+### Media and notifications on the lock screen (built 2026-10-29; waiting on the user's test results)
+- `lock/LockStatus.qml` under the date on the lock screen (not the login screen: `LockContent`
+  only has a slot for it, so the greeter never starts the notification server): the island's
+  `MediaCard` (play, pause, skip without unlocking) and the number of notifications, never
+  their content. Settings -> Lock screen: "Media controls" and "Notification count", both on.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

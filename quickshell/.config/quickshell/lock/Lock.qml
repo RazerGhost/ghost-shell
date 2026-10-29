@@ -45,6 +45,10 @@ Scope {
                 busy: root.busy
                 onSubmitted: password => root.unlock(password)
 
+                LockStatus {
+                    width: parent.width
+                }
+
                 Connections {
                     target: root
                     function onTried(): void {
@@ -141,6 +145,10 @@ Scope {
             wallpaper: root.wallpaper
             message: "Preview: nothing is locked"
             onSubmitted: preview.visible = false
+
+            LockStatus {
+                width: parent.width
+            }
         }
     }
 }

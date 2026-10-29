@@ -9,8 +9,11 @@ import qs.widgets
 // and the date, and the password field. Lock.qml checks the password. The login screen
 // (greeter/Greeter.qml) uses it too, with the user's name above the field and power buttons.
 // The look (blur, dimming, clock, date) follows the settings window's "Lock and login screen".
+// Children go under the date (the lock screen's LockStatus: media and the notification count).
 Item {
     id: root
+
+    default property alias status: statusSlot.data
 
     // Shown under the field: "Wrong password", or PAM's own messages.
     property string message
@@ -87,6 +90,13 @@ Item {
             color: Colors.m3onSurfaceVariant
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.title
+        }
+
+        Column {
+            id: statusSlot
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: Theme.lock.fieldWidth
+            topPadding: Theme.spacing.l * 2
         }
     }
 

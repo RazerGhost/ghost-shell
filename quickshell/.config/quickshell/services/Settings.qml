@@ -95,6 +95,9 @@ Singleton {
             property bool soundDevices: true    // charger, USB
             property bool soundFeedback: true   // volume keys, screenshots
             property bool soundBattery: true    // low battery
+            // Under the clock on the lock screen (lock/LockStatus.qml); never on the login screen.
+            property bool lockMedia: true
+            property bool lockNotificationCount: true
             property bool welcomeSeen: false // the welcome tour (welcome/Welcome.qml) has been shown
             property bool rememberPositions: true // floating apps reopen where they were (positions.lua)
 
