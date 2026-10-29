@@ -4,8 +4,8 @@ import qs.theme
 import qs.widgets
 
 // Small status glyphs on the right of the closed island, like Android's status bar.
-// Airplane mode, a VPN, Bluetooth, the microphone in use, waiting updates and mute only show up
-// when they have something to say.
+// Airplane mode, a VPN, Bluetooth, the microphone, camera or screen in use, waiting updates and
+// mute only show up when they have something to say.
 Row {
     anchors.verticalCenter: parent.verticalCenter
     spacing: Theme.spacing.xs
@@ -74,6 +74,24 @@ Row {
         color: Colors.m3primary
         font.pixelSize: Theme.icon.small
         Accessible.name: "Microphone in use by " + Audio.recordingApps.join(", ")
+    }
+
+    MaterialIcon {
+        anchors.verticalCenter: parent.verticalCenter
+        visible: Privacy.cameraInUse
+        icon: "videocam"
+        color: Colors.m3primary
+        font.pixelSize: Theme.icon.small
+        Accessible.name: "Camera in use"
+    }
+
+    MaterialIcon {
+        anchors.verticalCenter: parent.verticalCenter
+        visible: Privacy.screenShared
+        icon: "screen_share"
+        color: Colors.m3primary
+        font.pixelSize: Theme.icon.small
+        Accessible.name: "Your screen is being shared"
     }
 
     MaterialIcon {

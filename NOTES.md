@@ -302,6 +302,15 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   partial `theme.toml` is merged with the defaults; Yazi reads it at startup.
 - tuigreet 0.11 (`greetd-tuigreet`): `--time --remember --asterisks --cmd <command>`.
 
+- Hyprland sends `screencast>>1,monitor` / `screencast>>0,monitor` (and `screencastv2` with the
+  output) for any screencopy client, grim included, so it can't tell real screen sharing apart.
+  The portal's own PipeWire stream is named `xdph-streaming-<n>` (string in the xdph binary).
+- A USB webcam (uvcvideo, power control `auto`) is `runtime_status` "active" only while an app has
+  it open, "suspended" otherwise (the Omen's HP True Vision camera, checked idle).
+- An inline component (`component InUse: Row {...}`) in `controlcenter/QuickSettings.qml` failed
+  to load with "InUse is not a type" at its own declaration, while the same pattern loads in plain
+  `qml` and in other files of the shell; cause unknown. A separate file works.
+
 ## Testing on the laptop
 
 - Quickshell reloads on file changes, but a reload after adding a property to a singleton

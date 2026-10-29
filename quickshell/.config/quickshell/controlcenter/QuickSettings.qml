@@ -244,25 +244,24 @@ Item {
             }
         }
 
-        // An app recording from the microphone, like Android's privacy indicator.
-        Row {
+        // Who's using the microphone, camera or screen right now, like Android's privacy
+        // indicators.
+        InUseRow {
             visible: Audio.recordingApps.length > 0
-            leftPadding: Theme.spacing.s
-            spacing: Theme.spacing.s
+            icon: "mic"
+            text: "Microphone in use by " + Audio.recordingApps.join(", ")
+        }
 
-            MaterialIcon {
-                anchors.verticalCenter: parent.verticalCenter
-                icon: "mic"
-                color: Colors.m3primary
-            }
+        InUseRow {
+            visible: Privacy.cameraInUse
+            icon: "videocam"
+            text: Privacy.cameraApps.length > 0 ? "Camera in use by " + Privacy.cameraApps.join(", ") : "Camera in use"
+        }
 
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Microphone in use by " + Audio.recordingApps.join(", ")
-                color: Colors.m3onSurfaceVariant
-                font.family: Theme.font.sans
-                font.pixelSize: Theme.font.normal
-            }
+        InUseRow {
+            visible: Privacy.screenShared
+            icon: "screen_share"
+            text: "Your screen is being shared"
         }
 
         // Waiting updates (services/Updates.qml), only when there are some.

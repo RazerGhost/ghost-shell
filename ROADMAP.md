@@ -580,6 +580,14 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   GTK 4, so it follows the wallpaper's colors): arrows, boxes, text, blur. Enter saves the drawing
   over the screenshot and copies it. Without satty the button isn't offered.
 
+### Camera and screen sharing indicators (built 2026-10-29; untested with a real call)
+- Like the microphone: a camera and a screen icon in the island, and "Camera in use by ..." /
+  "Your screen is being shared" in quick settings (`services/Privacy.qml`, `InUseRow`). The
+  camera's USB power state is read every 3 s (`services/camera.sh`; `fuser` names the apps only
+  while it's on; `Privacy.js`, tested). Screen sharing is the portal's PipeWire stream
+  (`xdph-streaming-<n>`): Hyprland's `screencast` event also fires for grim and the shell's own
+  previews.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
