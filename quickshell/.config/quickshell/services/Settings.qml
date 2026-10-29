@@ -114,6 +114,9 @@ Singleton {
             property string colorStyle: "scheme-tonal-spot"
             property real colorContrast: 0
             property string accentColor: ""
+            // The shell's fonts: UI text and the monospaced one ("" = Inter and MesloLGS Nerd Font).
+            property string fontSans: ""
+            property string fontMono: ""
             // The shell's panels (island, menus, dock, launcher...): glass, see-through over
             // Hyprland's blur with a thin light edge (like the Ghost Spotify theme), or nearly solid.
             property bool glass: true

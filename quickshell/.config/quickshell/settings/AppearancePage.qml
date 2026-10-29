@@ -151,6 +151,41 @@ Column {
         }
     }
 
+    // Fonts: a short list of good ones, only those installed (Qt.fontFamilies()).
+    readonly property var installedFonts: Qt.fontFamilies()
+
+    SettingGroup {
+        title: "Fonts"
+
+        SettingRow {
+            title: "Text"
+            subtitle: "The shell's menus, island and Settings"
+
+            Stepper {
+                label: "Text font"
+                values: ["Inter", "Adwaita Sans", "Cantarell", "Noto Sans", "Open Sans", "Roboto",
+                         "IBM Plex Sans", "Fira Sans", "Ubuntu", "DejaVu Sans"].filter(f => page.installedFonts.includes(f))
+                valueWidth: Theme.settings.stepperWide
+                value: Theme.font.sans
+                onPicked: v => Settings.values.fontSans = v === "Inter" ? "" : v
+            }
+        }
+
+        SettingRow {
+            title: "Monospaced"
+            subtitle: "Error messages and code"
+
+            Stepper {
+                label: "Monospaced font"
+                values: ["MesloLGS Nerd Font", "JetBrainsMono Nerd Font", "JetBrains Mono", "Fira Code",
+                         "Adwaita Mono", "Noto Sans Mono", "DejaVu Sans Mono", "Source Code Pro", "Hack"].filter(f => page.installedFonts.includes(f))
+                valueWidth: Theme.settings.stepperWide
+                value: Theme.font.mono
+                onPicked: v => Settings.values.fontMono = v === "MesloLGS Nerd Font" ? "" : v
+            }
+        }
+    }
+
     // The island's status icons, each on or off (bar/StatusIcons.qml). The privacy ones
     // (recording, microphone, camera, screen sharing) always show, so they aren't listed.
     SettingGroup {

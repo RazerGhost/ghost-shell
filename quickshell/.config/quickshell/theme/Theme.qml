@@ -4,6 +4,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import qs.services
 
 Singleton {
     readonly property QtObject spacing: QtObject {
@@ -22,8 +23,9 @@ Singleton {
     }
 
     readonly property QtObject font: QtObject {
-        readonly property string sans: "Inter"
-        readonly property string mono: "MesloLGS Nerd Font" // error messages
+        // Settings -> Appearance -> Fonts; Inter and MesloLGS by default.
+        readonly property string sans: Settings.values.fontSans || "Inter"
+        readonly property string mono: Settings.values.fontMono || "MesloLGS Nerd Font" // error messages
         readonly property string emoji: "Noto Color Emoji"
         readonly property string icon: "Material Symbols Rounded"
         readonly property int iconWeight: 300 // Material Symbols line weight (400 is the font's default)
