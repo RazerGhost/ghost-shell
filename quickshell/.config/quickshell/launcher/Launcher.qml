@@ -16,6 +16,12 @@ import "../settings/Keybinds.js" as Keybinds
 Scope {
     id: root
 
+    // The shell's own entries, found like your commands: the on-screen editors (customize/).
+    readonly property var shellCommands: [
+        { name: "Customize the lock screen", command: "qs ipc call customize lock",
+          icon: "preferences-desktop-screensaver", subtitle: "Its clock, picture and look, on the screen itself" }
+    ]
+
     property bool open: false
 
     // A result: an app or one of its shortcuts ({ entry, action }; action null for the app), a
@@ -51,7 +57,7 @@ Scope {
         const found = Fuzzy.results(DesktopEntries.applications.values, text,
                                     open && text.trim() !== "" ? windowList() : [],
                                     { favorites: Settings.values.launcherFavorites, hidden: Settings.values.launcherHidden,
-                                      commands: Settings.values.launcherCommands });
+                                      commands: Settings.values.launcherCommands.concat(root.shellCommands) });
         return (color ? [{ color: color }] : []).concat(found, text.trim() !== "" ? [{ web: text.trim() }] : []);
     }
 

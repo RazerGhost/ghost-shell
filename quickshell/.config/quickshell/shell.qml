@@ -17,6 +17,7 @@ import qs.services
 import qs.settings
 import qs.snap
 import qs.switcher
+import qs.customize
 import qs.desktop
 import qs.wallpaper
 import qs.welcome
@@ -29,6 +30,7 @@ ShellRoot {
     Dock {}
     Launcher {}
     Lock {}
+    LockEditor {}
     LoginScreenSync {}
     PolkitPrompt {}
     Welcome {}

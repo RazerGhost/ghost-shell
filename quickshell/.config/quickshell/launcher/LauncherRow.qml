@@ -29,7 +29,7 @@ MouseArea {
         : modelData.window ? "Open window"
         : modelData.file ? modelData.file.folder
         : modelData.command ? "Run in the terminal"
-        : modelData.custom ? "Your command: " + modelData.custom.command
+        : modelData.custom ? modelData.custom.subtitle ?? "Your command: " + modelData.custom.command
         : modelData.action ? entry.name : entry?.genericName || entry?.comment || ""
     readonly property string icon: modelData.web !== undefined ? "system-search"
         : modelData.keybind ? "input-keyboard"

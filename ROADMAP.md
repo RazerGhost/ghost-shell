@@ -903,13 +903,23 @@ audit of our own UI): all sixteen, built in batches.
   screen (`DesktopWidgets.js`, tested). Checked live on an empty workspace; dragging verified
   by the user on all four edges. The user wants a refinement and polish pass over these later.
 
-### Visual Settings (planned, after the UI research round)
-User's request (2026-10-29): settings like the lock screen's clock should be picked by sight,
-not through − / + steppers. User's choices: on the Lock screen, Appearance, Dock and island, and
-Windows pages, a live scaled-down copy of what the page changes at the top (the lock screen; the
-island, a menu and the dock; a desktop with two tiled windows), cards with a small picture for
-visual choices, and a row of built-in presets per page that set several settings at once (each
-still changeable after; no saving your own).
+### On-screen editors (in progress, 2026-10-30)
+User's request: settings like the lock screen's clock should be picked by sight, and edited
+on the screen itself, not inside Settings (first planned as previews and cards in Settings;
+changed the same day). The direction: Android's customization with iOS's and macOS's polish.
+User's choices: four editors (lock screen, desktop, dock and island, windows look), opened
+from a Customize button on the matching Settings page and from the launcher (not a long-press
+or a key); their visual options leave Settings, which keeps only what isn't seen.
+- Lock screen editor (`customize/LockEditor.qml`, `qs ipc call customize lock|close`): the real
+  lock screen, live, with Cancel and Done (Escape, Enter; Cancel writes the earlier values
+  back), the clock outlined (click for its tab) and a sheet with Looks (presets as picture
+  cards: your picture with each look's clock, `customize/Presets.js`, tested), Clock (style
+  and font cards, place and size as segments, time and date) and Picture (the desktop's or
+  one of yours, blur, darkening). The editor's surfaces are nearly solid: the lock screen is
+  inside its own window, so Hyprland's blur can't reach under them. Shared pieces:
+  `widgets/ChoiceCards.qml` (picture cards, wrapping or one scrolling row),
+  `widgets/Segmented.qml`, `lock/MiniClock.qml`. Settings -> Lock screen keeps the message,
+  what shows under the clock, the grace period and the login screen's options.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

@@ -23,7 +23,7 @@ Rectangle {
         y = below + height <= parent.height ? below : at.y - height - Theme.tooltip.gap;
     }
 
-    parent: target?.Window.contentItem ?? null
+    parent: target?.Window?.contentItem ?? null
     z: 1000
     width: label.implicitWidth + Theme.spacing.m * 2
     height: label.implicitHeight + Theme.spacing.xs * 2

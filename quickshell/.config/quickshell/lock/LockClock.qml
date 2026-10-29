@@ -11,10 +11,13 @@ Item {
 
     required property date date
 
-    readonly property string style: LockClock.pick(Settings.values.lockClockStyle, LockClock.styles)
-    readonly property int size: Math.round(Theme.lock.clock * LockClock.pick(Settings.values.lockClockSize, LockClock.sizes) / 100)
+    // The settings' by default; Settings' picture cards set them to show each choice.
+    property string style: LockClock.pick(Settings.values.lockClockStyle, LockClock.styles)
+    property int percent: LockClock.pick(Settings.values.lockClockSize, LockClock.sizes)
+    property string family: Settings.values.lockClockFont || Theme.font.sans
+
+    readonly property int size: Math.round(Theme.lock.clock * percent / 100)
     readonly property var digits: LockClock.digits(date, Settings.values.clock24Hour)
-    readonly property string family: Settings.values.lockClockFont || Theme.font.sans
 
     implicitWidth: style === "analog" ? analog.width : style === "stacked" ? stacked.width : line.width
     implicitHeight: style === "analog" ? analog.height : style === "stacked" ? stacked.height : line.height

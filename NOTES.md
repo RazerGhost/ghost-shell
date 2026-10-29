@@ -268,6 +268,8 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   is already reset, so a place computed from it there is the starting one (the desktop widgets
   went back where they were). Follow `activeTranslation` into a property of your own while
   `active`, and use that at the end (desktop/DesktopCard.qml). Verified by the user's drags.
+- A new folder (a new `qs.<folder>` module) imported in the same change can fail the reload
+  with 'module "qs.<folder>" is not installed'; the next reload (touch shell.qml) finds it.
 - An IPC function named `show` can't be called with arguments: `qs ipc call settings show lock`
   fails with "The following argument was not expected: lock" (the CLI's own `show` subcommand
   takes it). Named `page` instead.

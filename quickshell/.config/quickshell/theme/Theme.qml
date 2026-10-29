@@ -269,6 +269,11 @@ Singleton {
         readonly property int rowHeight: root.px(52)
     }
 
+    // The on-screen editors (customize/).
+    readonly property QtObject editor: QtObject {
+        readonly property int sheet: root.px(720) // the sheet at the bottom, at most
+    }
+
     readonly property QtObject settings: QtObject {
         readonly property int width:     root.px(880) // the settings window when it opens
         readonly property int height:    root.px(620)
@@ -279,6 +284,7 @@ Singleton {
         readonly property int rowHeight: root.px(64)
         readonly property int stepper:   root.px(96)  // the value between a stepper's - and +
         readonly property int stepperWide: root.px(170) // a stepper showing a screen mode ("1920 × 1080, 165 Hz")
+        readonly property int card:      root.px(124) // a picture card (ChoiceCards.qml), 16:10
         readonly property int screenTimeChart: root.px(120) // the last 7 days' bars, with the day names
         readonly property int screenTimeBar: root.px(28)    // one day's bar at most
     }

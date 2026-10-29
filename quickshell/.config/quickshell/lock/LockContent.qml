@@ -31,6 +31,9 @@ Item {
     // Suspend, restart and shut down in the bottom right corner (the login screen).
     property bool powerButtons
 
+    // The clock, for the lock screen editor's outline around it (customize/LockEditor.qml).
+    readonly property Item clockItem: bigClock
+
     signal submitted(string password)
     // A key or a real pointer move: Lock.qml unlocks during the idle lock's grace period.
     signal activity()
