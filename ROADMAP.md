@@ -82,7 +82,7 @@ new setup step.
   percentage is in quick settings) (`bar/BatteryPill.qml`). Opens
   `controlcenter/TodayPanel.qml` (calendar, `MediaCard`) or `QuickSettings.qml` (tiles for Wi-Fi,
   Bluetooth, power mode, microphone; volume and brightness `LevelSlider`s; battery; `Tray`: since 2026-10-29 its own island menu, "Background apps", opened by an arrow at the
-  island's outer right (user's choice) while there are some, a row per app (user's choice: the chips per app in
+  island's outer right (user's choice) while there are some (verified 2026-10-29), a row per app (user's choice: the chips per app in
   quick settings, 2026-10-28, looked cluttered)), with
   `WifiPage` (scan, connect, password prompt; the connected network can be shared as a QR code a
   phone scans to join, `WifiQr.js` tested, and saved ones forgotten) and `BluetoothPage` (scan, pair, connect). Super+N /
@@ -542,7 +542,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   `MediaCard` (play, pause, skip without unlocking) and the number of notifications, never
   their content. Settings -> Lock screen: "Media controls" and "Notification count", both on.
 
-### Game mode (built 2026-10-29)
+### Game mode (done, verified on the laptop 2026-10-29)
 - A round button in quick settings (`services/GameMode.qml`; not saved, like Keep awake): while
   on, Hyprland's animations, blur and shadows are off (appended to `shell-settings.lua` after
   the settings, `HyprlandConfig.js`, tested), pop-ups wait in the history like Do Not Disturb
