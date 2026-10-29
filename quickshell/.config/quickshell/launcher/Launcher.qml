@@ -273,10 +273,14 @@ Scope {
                     // Asked while fd still ran for older text: search once more when it's done.
                     property bool again: false
 
+                    // The last results stay up until the new ones are in: clearing them on every
+                    // key made the list empty and refill (and the launcher shrink and grow) as
+                    // you typed.
                     function ask(text: string): void {
                         asked = text;
-                        found = [];
-                        if (text !== "")
+                        if (text === "")
+                            found = [];
+                        else
                             waitFiles.restart();
                     }
 
