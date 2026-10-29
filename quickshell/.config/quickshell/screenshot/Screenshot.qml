@@ -6,13 +6,14 @@ import Quickshell.Wayland
 import qs.services
 import qs.theme
 import qs.widgets
+import "../services/CaptureFolders.js" as CaptureFolders
 
 // Screenshots, like Windows' Snipping Tool (user's choice). Super+Shift+S freezes the focused
 // monitor and dims it; a bar at the top picks what to do (a screenshot, the text in it (OCR), a
 // QR code in it, or a recording) and where: Region (drag a rectangle), Window (click one) or
 // Screen (click anywhere); and has the color picker. Escape cancels. Print Screen takes the whole
 // screen at once; Super+Shift+R starts (or stops) a recording.
-// Every screenshot is saved to ~/Pictures/Screenshots, copied to the clipboard, and announced
+// Every screenshot is saved to ~/Pictures/Screenshots (or Settings' folder), copied to the clipboard, and announced
 // with a notification showing it (click it to open the picture). Text and QR codes are copied
 // (the picture they came from isn't kept); recordings are services/Recorder.qml's.
 //
@@ -24,7 +25,9 @@ Scope {
     property bool open: false
     property string mode: "region" // "region", "window" or "screen"
     property string action: "shot" // "shot", "text", "qr" or "record"
-    readonly property string folder: Quickshell.env("HOME") + "/Pictures/Screenshots"
+    // Settings -> Screenshots and recordings (CaptureFolders.js, tested).
+    readonly property string folder: CaptureFolders.folder(Settings.values.screenshotFolder, Quickshell.env("HOME"),
+                                                           Quickshell.env("HOME") + "/Pictures/Screenshots")
 
     function start(withMode: string, withAction: string): void {
         mode = withMode;
@@ -44,7 +47,7 @@ Scope {
     function done(path: string): void {
         open = false;
         Sounds.play("feedback", "screen-capture");
-        follow(["save", path]);
+        follow(["save", path, CaptureFolders.short(folder, Quickshell.env("HOME"))]);
     }
 
     function fileName(): string {

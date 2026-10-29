@@ -105,6 +105,14 @@ Singleton {
             property bool clock24Hour: true // the island's and the lock screen's clock ("9:41 PM" off)
 
             // The town for the weather in the today menu (services/Weather.qml); "" = no weather.
+            // Screenshots and recordings: folders ("" = ~/Pictures/Screenshots, ~/Videos/Recordings),
+            // the recording's frame rate, quality (gpu-screen-recorder's presets) and whether the
+            // microphone is mixed in with the desktop's sound.
+            property string screenshotFolder: ""
+            property string recordingFolder: ""
+            property int recordingFps: 60
+            property string recordingQuality: "very_high"
+            property bool recordingMic: false
             property string weatherLocation: ""
             property string temperatureUnit: "celsius" // or "fahrenheit"
 

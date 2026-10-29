@@ -66,6 +66,8 @@ Singleton {
           words: "usage time apps today week hours digital wellbeing" },
         { id: "keybinds", section: "Apps", icon: "keyboard", title: "Keybinds",
           words: "shortcuts keys welcome tour help" },
+        { id: "capture", section: "Apps", icon: "screenshot_monitor", title: "Screenshots and recordings",
+          words: "screenshot capture record recording video folder quality fps frame rate microphone" },
         { id: "clock", section: "Apps", icon: "partly_cloudy_day", title: "Weather and clock",
           words: "fahrenheit celsius temperature unit weather town location 24-hour 12-hour time" }
     ]
@@ -294,7 +296,7 @@ Singleton {
                 // Centered when the window is wider than a page (maximized).
                 x: Math.max(Theme.spacing.l, (content.width - width) / 2)
                 width: Math.min(Theme.settings.content, content.width - Theme.spacing.l * 2)
-                sourceComponent: ({ appearance: appearancePage, display: displayPage, lock: lockPage, sound: soundPage, windows: windowsPage, notifications: notificationsPage, power: powerPage, input: inputPage, snapshots: snapshotsPage, apps: appsPage, screentime: screentimePage, keybinds: keybindsPage, clock: clockPage })[root.page] ?? null
+                sourceComponent: ({ appearance: appearancePage, display: displayPage, lock: lockPage, sound: soundPage, windows: windowsPage, notifications: notificationsPage, power: powerPage, input: inputPage, snapshots: snapshotsPage, apps: appsPage, screentime: screentimePage, keybinds: keybindsPage, capture: capturePage, clock: clockPage })[root.page] ?? null
 
                 Component { id: appearancePage; AppearancePage {} }
                 Component { id: displayPage; DisplayPage {} }
@@ -308,6 +310,7 @@ Singleton {
                 Component { id: appsPage; AppsPage {} }
                 Component { id: screentimePage; ScreenTimePage {} }
                 Component { id: keybindsPage; KeybindsPage {} }
+                Component { id: capturePage; CapturePage {} }
                 Component { id: clockPage; ClockWeatherPage {} }
             }
         }

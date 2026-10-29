@@ -1,19 +1,22 @@
 // Screen recording with gpu-screen-recorder (the capture module; hardware encoding on the AMD
 // and NVIDIA GPUs): started from the screenshot tool's Record action, for a region, a window or
 // a whole monitor; the island shows a red dot and the time while it runs. Saved to
-// ~/Videos/Recordings with the desktop's sound, announced with a notification (click: play it).
+// ~/Videos/Recordings (or Settings' folder) with the desktop's sound (and the microphone, if set), announced with a notification (click: play it).
 // Stop it from quick settings, Super+Shift+R or `qs ipc call recorder stop`.
 pragma Singleton
 
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "CaptureFolders.js" as CaptureFolders
 
 Singleton {
     id: root
 
     readonly property bool recording: recorder.running
-    readonly property string folder: Quickshell.env("HOME") + "/Videos/Recordings"
+    // Settings -> Screenshots and recordings (CaptureFolders.js, tested).
+    readonly property string folder: CaptureFolders.folder(Settings.values.recordingFolder, Quickshell.env("HOME"),
+                                                           Quickshell.env("HOME") + "/Videos/Recordings")
     property string file: ""
     property real startedAt: 0
     // Seconds since the start, updated every second while recording.
@@ -28,7 +31,12 @@ Singleton {
         if (recording)
             return;
         file = folder + "/Recording_" + Qt.formatDateTime(new Date(), "yyyy-MM-dd_HH-mm-ss") + ".mp4";
-        const args = ["gpu-screen-recorder", "-w", target, "-f", "60", "-a", "default_output", "-o", file];
+        // The settings' frame rate and quality preset, checked here (they come from a file).
+        const fps = [30, 60].includes(Settings.values.recordingFps) ? Settings.values.recordingFps : 60;
+        const quality = ["medium", "high", "very_high", "ultra"].includes(Settings.values.recordingQuality)
+            ? Settings.values.recordingQuality : "very_high";
+        const audio = Settings.values.recordingMic ? "default_output|default_input" : "default_output";
+        const args = ["gpu-screen-recorder", "-w", target, "-f", String(fps), "-q", quality, "-a", audio, "-o", file];
         if (target === "region")
             args.splice(3, 0, "-region", `${Math.round(region.width)}x${Math.round(region.height)}+${Math.round(region.x)}+${Math.round(region.y)}`);
         recorder.command = ["sh", "-c", `mkdir -p "$1" && shift && exec "$@"`, "sh", folder, ...args];
@@ -48,9 +56,9 @@ Singleton {
         onExited: code => {
             if (code === 0) {
                 Quickshell.execDetached(["sh", "-c", `
-                    action=$(notify-send -a Recorder -i video-x-generic -A default=Play "Recording saved" "In Videos/Recordings")
+                    action=$(notify-send -a Recorder -i video-x-generic -A default=Play "Recording saved" "In $2")
                     [ "$action" = default ] && xdg-open "$1"
-                `, "sh", root.file]);
+                `, "sh", root.file, CaptureFolders.short(root.folder, Quickshell.env("HOME"))]);
             } else {
                 Quickshell.execDetached(["notify-send", "-a", "Recorder", "-u", "critical", "Recording failed",
                     "gpu-screen-recorder exited with code " + code]);

@@ -1,18 +1,20 @@
 #!/bin/sh
 # The screenshot tool's follow-ups (screenshot/Screenshot.qml), each run detached:
-#   capture.sh save <picture>   copy it, and notify: Open, or "Draw on it" in satty (Enter there
-#                               saves the drawing over the picture and copies it)
+#   capture.sh save <picture> <folder>
+#                               copy it, and notify (naming the folder it's saved in): Open, or
+#                               "Draw on it" in satty (Enter there saves the drawing over the
+#                               picture and copies it)
 #   capture.sh text <picture>   the text in it (tesseract), copied; the picture is removed
 #   capture.sh qr <picture>     the QR code in it (zbarimg), copied; a link can be opened from the
 #                               notification; the picture is removed
 #   capture.sh color            the color picker (hyprpicker), #rrggbb copied
 case "${1-}" in
     save)
-        file=$2
+        file=$2 where=${3:-Pictures/Screenshots}
         wl-copy --type image/png < "$file"
         set -- -A default=Open
         command -v satty >/dev/null && set -- "$@" -A "draw=Draw on it"
-        action=$(notify-send -a Screenshot -i "$file" "$@" "Screenshot saved" "Copied to the clipboard, and saved in Pictures/Screenshots")
+        action=$(notify-send -a Screenshot -i "$file" "$@" "Screenshot saved" "Copied to the clipboard, and saved in $where")
         case "$action" in
             default) xdg-open "$file" ;;
             draw) satty --filename "$file" --output-filename "$file" --copy-command wl-copy \

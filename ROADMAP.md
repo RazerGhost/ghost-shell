@@ -728,6 +728,10 @@ shell's cost, features and customization), checked before acting. Done so far:
   `QS_ICON_THEME` at every start, so "Restart the shell" applies it to the shell's own icons
   too (env.lua's Colloid-Dark stays the fallback). Moved out of wallpaper.sh's fixed Colloid.
 - Settings -> Weather and clock -> Temperature: °C or °F (open-meteo's `temperature_unit`).
+- Settings -> Screenshots and recordings (new page): both folders (typed; empty for the default,
+  `~/` works; `CaptureFolders.js`, tested), the recording's frame rate (30/60), quality
+  (gpu-screen-recorder's medium to ultra) and the microphone mixed in. The notifications name
+  the folder.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
