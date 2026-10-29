@@ -554,8 +554,8 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
 
 ### Caps lock, keyboard layout and power mode pop-ups (done; caps lock verified on the laptop 2026-10-29)
 - The OSD shows "Caps lock on/off", a new keyboard layout's name (Hyprland's `activelayout`
-  event for the main keyboard, seeded from `hyprctl devices -j` at start; `osd/Keyboard.js`,
-  tested) and the power mode when it changes. Caps lock sends no event, and a release bind on
+  event for the main keyboard, seeded from `hyprctl devices -j` at start; `services/Keyboard.qml`,
+  parsing in `KeyboardDevices.js`, tested) and the power mode when it changes. Caps lock sends no event, and a release bind on
   the key that leaves it alone never fired (user's test), so the shell reads the keyboard's
   caps lock LED (`/sys/class/leds/*::capslock/brightness`) 4 times a second, in-process.
 - The OSD got smaller (240 x 40, close to the closed island; user's choice), label pop-ups are
@@ -673,6 +673,8 @@ shell's cost, features and customization), checked before acting. Done so far:
   task and a notification's quick reply; the polkit prompt keeps its own (focus border, show
   password, read-only while waiting). `widgets/SectionHeading.qml` for the small accent headings
   (Settings' groups and sidebar, the Sound page), all announced as headings now.
+  The keyboard's layout and caps lock moved from the OSD into `services/Keyboard.qml` (signals
+  on real changes only); the OSD only shows them (262 -> 202 lines).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

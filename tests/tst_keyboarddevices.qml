@@ -1,9 +1,9 @@
 import QtQuick
 import QtTest
-import "../quickshell/.config/quickshell/osd/Keyboard.js" as Keyboard
+import "../quickshell/.config/quickshell/services/KeyboardDevices.js" as Keyboard
 
 TestCase {
-    name: "OsdKeyboard"
+    name: "KeyboardDevices"
 
     function test_activeLayout() {
         compare(Keyboard.activeLayout("at-translated-set-2-keyboard,English (US)"), { keyboard: "at-translated-set-2-keyboard", layout: "English (US)" });

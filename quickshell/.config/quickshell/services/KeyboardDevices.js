@@ -1,6 +1,6 @@
-// The OSD's layout pop-up (osd/Osd.qml): Hyprland's activelayout event and the main keyboard
+// The keyboard service (services/Keyboard.qml): Hyprland's activelayout event and the main keyboard
 // from `hyprctl devices -j`. Plain JavaScript, so it can be tested on its own
-// (tests/tst_osdkeyboard.qml).
+// (tests/tst_keyboarddevices.qml).
 .pragma library
 
 // "at-translated-set-2-keyboard,English (US, intl., with dead keys)" -> { keyboard, layout }.

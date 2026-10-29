@@ -1,13 +1,11 @@
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
-import Quickshell.Io
 import Quickshell.Services.UPower
 import Quickshell.Wayland
 import qs.services
 import qs.theme
 import qs.widgets
-import "Keyboard.js" as Keyboard
 
 // Popup for volume, mic mute and brightness changes: an icon and a level bar at the bottom
 // of the focused monitor, hidden again a moment after the last change. Caps lock, the keyboard
@@ -87,75 +85,16 @@ Scope {
         }
     }
 
-    // Hyprland sends activelayout for every keyboard (virtual ones too, like wtype's for the emoji
-    // picker), and again for the same layout: only the main keyboard's, and only a new name, shows.
-    // Both are read from Hyprland at start (it sends no event then), so the first switch shows.
-    property string layout: ""
-    property string mainKeyboard: ""
-
+    // The keyboard's layout and caps lock (services/Keyboard.qml).
     Connections {
-        target: Hyprland
+        target: Keyboard
 
-        function onRawEvent(event): void {
-            if (event.name !== "activelayout")
-                return;
-            const active = Keyboard.activeLayout(event.data);
-            if (!active || active.keyboard !== root.mainKeyboard || active.layout === root.layout)
-                return;
-            root.layout = active.layout;
-            root.show("keyboard", active.layout, -1);
+        function onLayoutSwitched(name: string): void {
+            root.show("keyboard", name, -1);
         }
-    }
 
-    // The main keyboard's name and layout, once at start (Hyprland sends no activelayout then).
-    Process {
-        command: ["hyprctl", "devices", "-j"]
-        running: true
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const main = Keyboard.mainKeyboard(text);
-                if (main) {
-                    root.mainKeyboard = main.name;
-                    root.layout = main.layout;
-                }
-            }
-        }
-    }
-
-    // Caps lock sends no event, and Hyprland doesn't run a bind on the key (tried: a release bind
-    // that leaves the key alone never fired). Its light does follow it: the keyboard's
-    // `::capslock` LED in sysfs, read in-process 4 times a second (sysfs files send no change
-    // events, like the backlight's).
-    property string capsLed: ""
-    property string capsState: ""
-
-    Process {
-        command: ["sh", "-c", "ls -d /sys/class/leds/*::capslock 2>/dev/null | head -n 1"]
-        running: true
-        stdout: StdioCollector {
-            onStreamFinished: root.capsLed = text.trim()
-        }
-    }
-
-    FileView {
-        id: capsFile
-        path: root.capsLed !== "" ? root.capsLed + "/brightness" : ""
-        blockLoading: true // read right away in the timer
-    }
-
-    Timer {
-        interval: 250
-        running: root.capsLed !== ""
-        repeat: true
-        onTriggered: {
-            capsFile.reload();
-            const state = capsFile.text().trim();
-            if (state === "" || state === root.capsState)
-                return;
-            const first = root.capsState === "";
-            root.capsState = state;
-            if (!first)
-                root.show("keyboard_capslock", state !== "0" ? "Caps lock on" : "Caps lock off", -1);
+        function onCapsLockSwitched(on: bool): void {
+            root.show("keyboard_capslock", on ? "Caps lock on" : "Caps lock off", -1);
         }
     }
 
