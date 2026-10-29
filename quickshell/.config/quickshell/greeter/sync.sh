@@ -1,7 +1,7 @@
 #!/bin/sh
 # Copies what the login screen shows into the folder it reads, /var/lib/qs-greeter/shared/:
-# your settings (its look options), your colors, and the lock screen's picture (the first
-# argument). The login screen runs as greetd's "greeter" user, which can't
+# your settings (its look options), your colors, your picture (~/.face) and the lock screen's
+# picture (the first argument). The login screen runs as greetd's "greeter" user, which can't
 # read your home folder; modules/core/greeter.sh made that folder yours, so no sudo is needed here.
 # The shell runs this whenever one of those changes (lock/LoginScreenSync.qml), and
 # modules/core/greeter.sh runs it too.
@@ -24,6 +24,13 @@ for file in settings.json colors.json; do
         copy "$state/$file" "$shared/$file"
     fi
 done
+
+# Your picture (~/.face, chosen in Settings -> Lock screen), shown above your name.
+if [ -f "$HOME/.face" ]; then
+    cmp -s "$HOME/.face" "$shared/face" || copy "$HOME/.face" "$shared/face"
+else
+    rm -f "$shared/face"
+fi
 
 # The keyboard layout and touchpad settings (written by the shell's settings window); the login
 # screen's Hyprland loads this copy (system/etc/greetd/hypr/hyprland.lua). Without game mode's

@@ -112,6 +112,7 @@ Singleton {
             property int lockClockSize: 100       // percent
             property string lockClockFont: ""     // "" = the shell's text font
             property string lockLayout: "top"     // top, center, left (the bottom-left corner)
+            property string lockMessage: ""       // a line at the bottom, "If found, call ..."
             property bool greeterShowName: true     // your user name above the password field
             property bool greeterPowerButtons: true // suspend, restart and shut down
 
@@ -199,6 +200,8 @@ Singleton {
             property bool lockWeather: true
             property bool lockBattery: true
             property bool lockEvent: false // its title shows to anyone at the locked screen
+            // Seconds after the idle lock in which a touch unlocks without the password; 0 = off.
+            property int lockGrace: 0
             property bool welcomeSeen: false // the welcome tour (welcome/Welcome.qml) has been shown
             property bool rememberPositions: true // floating apps reopen where they were (positions.lua)
 

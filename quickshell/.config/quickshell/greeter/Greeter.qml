@@ -45,6 +45,15 @@ Scope {
         Greetd.createSession(user);
     }
 
+    readonly property string face: "/var/lib/qs-greeter/shared/face"
+    property bool hasFace: false
+
+    Process {
+        command: ["test", "-f", root.face]
+        running: true
+        onExited: code => root.hasFace = code === 0
+    }
+
     // Written by modules/core/greeter.sh: { "user": "<your user name>" }.
     FileView {
         path: Quickshell.env("HOME") + "/.local/state/quickshell/greeter.json"
@@ -68,11 +77,12 @@ Scope {
             }
         }
 
+        // The message first: tried() shakes the field when it's an error.
         function onAuthFailure(message: string): void {
             root.busy = false;
-            root.tried();
             root.message = "Wrong password";
             root.messageIsError = true;
+            root.tried();
         }
 
         // Start the session. true: Quickshell quits once greetd has it, and the greeter's
@@ -83,9 +93,9 @@ Scope {
 
         function onError(error: string): void {
             root.busy = false;
-            root.tried();
             root.message = "Login failed: " + error;
             root.messageIsError = true;
+            root.tried();
         }
     }
 
@@ -109,6 +119,8 @@ Scope {
                 // Its own copy of the lock screen's picture (greeter/sync.sh).
                 wallpaper: Wallpaper.path
                 user: Settings.values.greeterShowName ? root.user : ""
+                // Your ~/.face, copied by greeter/sync.sh.
+                face: root.hasFace ? root.face : ""
                 powerButtons: Settings.values.greeterPowerButtons
                 message: root.message
                 messageIsError: root.messageIsError
@@ -118,7 +130,7 @@ Scope {
                 Connections {
                     target: root
                     function onTried(): void {
-                        content.clear();
+                        content.clear(root.messageIsError);
                     }
                 }
             }

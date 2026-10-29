@@ -264,6 +264,12 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `sed -E 's/\(uint32 ([0-9]+),\)/\1/'` (grepping digits catches the 32 in "uint32").
   `CloseNotification <id>` removes it from the shell's list; that works.
 - `qs ipc call` exits 0 even for an unknown target, but non-zero when no shell is running.
+- An IPC function named `show` can't be called with arguments: `qs ipc call settings show lock`
+  fails with "The following argument was not expected: lock" (the CLI's own `show` subcommand
+  takes it). Named `page` instead.
+- Material Symbols' glyph names in the font file are the icon names (`fontTools`
+  `getGlyphOrder()`), so a name can be checked before use: `screen_lock_portrait` isn't in the
+  2026 font, `desktop_access_disabled` is.
 - `hyprctl hyprsunset temperature` prints the last temperature set, also after `identity`, so it
   doesn't tell whether night light is on.
 - A singleton is only created when something uses it, so an `IpcHandler` inside one doesn't exist

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Effects
 import Quickshell
+import Quickshell.Widgets
 import qs.services
 import qs.theme
 import qs.widgets
@@ -25,17 +26,47 @@ Item {
     property string wallpaper
     // Shown above the password field when set (the login screen).
     property string user
+    // Your picture above the name (the login screen; greeter/sync.sh copies ~/.face); "" for none.
+    property string face
     // Suspend, restart and shut down in the bottom right corner (the login screen).
     property bool powerButtons
 
     signal submitted(string password)
+    // A key or a real pointer move: Lock.qml unlocks during the idle lock's grace period.
+    signal activity()
 
-    // The lock screens on other monitors clear theirs too after a try.
-    function clear(): void {
+    // The lock screens on other monitors clear theirs too after a try; a wrong password also
+    // shakes the field.
+    function clear(failed: bool): void {
         password.text = "";
+        if (failed)
+            shake.restart();
     }
 
     Component.onCompleted: password.forceActiveFocus()
+
+    // Fades in from black when it appears (Hyprland shows nothing behind a lock screen).
+    opacity: 0
+    NumberAnimation on opacity {
+        to: 1
+        duration: Theme.anim.morph
+        easing.type: Theme.anim.easing
+    }
+
+    // Where the pointer first showed up: a move away from it counts as activity, so the
+    // pointer merely being there when the lock screen appears doesn't.
+    property point pointerStart: Qt.point(-1, -1)
+
+    HoverHandler {
+        onPointChanged: {
+            const p = point.position;
+            if (root.pointerStart.x < 0) {
+                root.pointerStart = p;
+            } else if (Math.abs(p.x - root.pointerStart.x) + Math.abs(p.y - root.pointerStart.y) > Theme.lock.moved) {
+                root.activity();
+            }
+        }
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -146,6 +177,34 @@ Item {
         anchors.bottomMargin: parent.height * 0.2
         spacing: Theme.spacing.m
 
+        // A wrong password shakes the field side to side, like most lock screens.
+        SequentialAnimation {
+            id: shake
+            readonly property int step: Theme.anim.fast / 3
+            NumberAnimation { target: fieldColumn; property: "anchors.horizontalCenterOffset"; to: -Theme.lock.shake; duration: shake.step }
+            NumberAnimation { target: fieldColumn; property: "anchors.horizontalCenterOffset"; to: Theme.lock.shake; duration: shake.step * 2 }
+            NumberAnimation { target: fieldColumn; property: "anchors.horizontalCenterOffset"; to: -Theme.lock.shake / 2; duration: shake.step * 2 }
+            NumberAnimation { target: fieldColumn; property: "anchors.horizontalCenterOffset"; to: 0; duration: shake.step }
+        }
+
+        ClippingRectangle {
+            anchors.horizontalCenter: parent.horizontalCenter
+            visible: root.user !== "" && faceImage.status === Image.Ready
+            width: Theme.lock.face
+            height: width
+            radius: width / 2
+            color: "transparent"
+
+            Image {
+                id: faceImage
+                anchors.fill: parent
+                source: root.face ? "file://" + root.face : ""
+                fillMode: Image.PreserveAspectCrop
+                sourceSize: Qt.size(width * 2, height * 2)
+                Accessible.ignored: true
+            }
+        }
+
         Row {
             anchors.horizontalCenter: parent.horizontalCenter
             visible: root.user !== ""
@@ -153,6 +212,7 @@ Item {
 
             MaterialIcon {
                 anchors.verticalCenter: parent.verticalCenter
+                visible: faceImage.status !== Image.Ready
                 icon: "account_circle"
                 color: Colors.m3onSurface
                 font.pixelSize: Theme.icon.launcher
@@ -213,6 +273,11 @@ Item {
                 }
                 // Escape clears what was typed, like most lock screens.
                 Keys.onEscapePressed: text = ""
+                // Not accepted: the key still types.
+                Keys.onPressed: event => {
+                    root.activity();
+                    event.accepted = false;
+                }
                 // Tab stays here: the buttons below take the keyboard elsewhere (the media
                 // card, the login screen's power buttons), and Enter there would suspend or
                 // restart, while the password typed after it went nowhere.
@@ -229,6 +294,41 @@ Item {
             }
         }
 
+        // Hints while typing: caps lock, and the layout when there's more than one to switch to.
+        Row {
+            anchors.horizontalCenter: parent.horizontalCenter
+            visible: Keyboard.capsLock || Keyboard.layoutCount > 1
+            spacing: Theme.spacing.l
+
+            Repeater {
+                model: [
+                    { shown: Keyboard.capsLock, icon: "keyboard_capslock", text: "Caps lock is on" },
+                    { shown: Keyboard.layoutCount > 1, icon: "keyboard", text: Keyboard.layout }
+                ]
+
+                Row {
+                    required property var modelData
+                    visible: modelData.shown
+                    spacing: Theme.spacing.xs
+
+                    MaterialIcon {
+                        anchors.verticalCenter: parent.verticalCenter
+                        icon: parent.modelData.icon
+                        color: Colors.m3onSurfaceVariant
+                        font.pixelSize: Theme.icon.small
+                    }
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: parent.modelData.text
+                        color: Colors.m3onSurfaceVariant
+                        font.family: Theme.font.sans
+                        font.pixelSize: Theme.font.normal
+                    }
+                }
+            }
+        }
+
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             visible: root.message !== ""
@@ -237,6 +337,21 @@ Item {
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.normal
         }
+    }
+
+    // Your own line at the bottom (Settings -> Lock screen -> Message): "If found, call ...".
+    Text {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: Theme.spacing.l * 2
+        width: Math.min(implicitWidth, parent.width * 0.5)
+        visible: text !== ""
+        text: Settings.values.lockMessage
+        color: Colors.m3onSurfaceVariant
+        font.family: Theme.font.sans
+        font.pixelSize: Theme.font.large
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.Wrap
     }
 
     Row {

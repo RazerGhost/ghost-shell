@@ -33,7 +33,7 @@ Scope {
         // also locks if hypridle isn't running.
         onIsIdleChanged: {
             if (isIdle)
-                Session.lock();
+                Session.idleLock();
         }
     }
 
@@ -49,6 +49,32 @@ Scope {
         onIsIdleChanged: {
             if (isIdle)
                 Session.suspend();
+        }
+    }
+
+    // "Lock and turn off the screen" (the power menu): off once you've stopped touching the
+    // laptop for a second (the click that asked for it would wake it again), back on with the
+    // next input. Not held off by apps keeping the screen awake: you asked for it.
+    property bool offRequested: false
+
+    Connections {
+        target: Session
+        function onScreenOffRequested(): void {
+            root.offRequested = true;
+        }
+    }
+
+    IdleMonitor {
+        enabled: root.offRequested
+        timeout: 1
+        respectInhibitors: false
+        onIsIdleChanged: {
+            if (isIdle) {
+                Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.dpms({ action = \"disable\" })"]);
+            } else {
+                Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.dpms({ action = \"enable\" })"]);
+                root.offRequested = false;
+            }
         }
     }
 }

@@ -11,11 +11,12 @@ function activeLayout(data) {
 }
 
 // The main keyboard (the one Hyprland marks "main") from `hyprctl devices -j`, as
-// { name, layout }; null when the output can't be read.
+// { name, layout, layouts }: the active layout's name and how many it switches between
+// ("us,nl" is 2). null when the output can't be read.
 function mainKeyboard(json) {
     try {
         const main = JSON.parse(json).keyboards.find(k => k.main);
-        return main ? { name: main.name, layout: main.active_keymap } : null;
+        return main ? { name: main.name, layout: main.active_keymap, layouts: String(main.layout ?? "").split(",").length } : null;
     } catch (e) {
         return null;
     }

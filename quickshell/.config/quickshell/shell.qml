@@ -70,5 +70,11 @@ ShellRoot {
         function open(): void {
             SettingsWindow.open = true;
         }
+
+        // A page by its id ("lock", "appearance", ...; SettingsWindow's list).
+        function page(name: string): void {
+            SettingsWindow.page = name;
+            SettingsWindow.open = true;
+        }
     }
 }

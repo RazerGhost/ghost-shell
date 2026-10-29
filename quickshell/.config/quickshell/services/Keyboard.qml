@@ -1,5 +1,5 @@
-// The main keyboard's layout and caps lock, for the OSD's pop-ups. Each signal fires only on a
-// real change after start-up, never for the state found at start.
+// The main keyboard's layout and caps lock, for the OSD's pop-ups and the lock screen's hints.
+// Each signal fires only on a real change after start-up, never for the state found at start.
 // - Layout: Hyprland's activelayout event comes for every keyboard (virtual ones too, like
 //   wtype's for the emoji picker) and again for the same layout, so only a new name on the main
 //   keyboard counts. Its name and layout are read from `hyprctl devices -j` at start (Hyprland
@@ -21,8 +21,10 @@ Singleton {
 
     property string layout: ""
     property string mainKeyboard: ""
+    property int layoutCount: 1 // more than one: the lock screen names the active one
     property string capsLed: ""
     property string capsState: "" // the LED's brightness; "" until first read
+    readonly property bool capsLock: capsState !== "" && capsState !== "0"
 
     signal layoutSwitched(string name)
     signal capsLockSwitched(bool on)
@@ -50,6 +52,7 @@ Singleton {
                 if (main) {
                     root.mainKeyboard = main.name;
                     root.layout = main.layout;
+                    root.layoutCount = main.layouts;
                 }
             }
         }

@@ -218,6 +218,9 @@ Singleton {
         readonly property int clock:      root.text(112) // the big clock
         readonly property int fieldWidth: root.px(340) // password field
         readonly property int blur:       64  // wallpaper blur radius
+        readonly property int face:       root.px(96) // your picture on the login screen
+        readonly property int shake:      root.px(12) // how far a wrong password shakes the field
+        readonly property int moved:      24  // px the pointer must move to end the grace period
     }
 
     readonly property QtObject wallpaper: QtObject {

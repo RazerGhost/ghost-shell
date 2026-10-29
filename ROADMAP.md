@@ -867,6 +867,18 @@ audit of our own UI): all sixteen, built in batches.
   hours over minutes, thin, analog), size (75-150 %), its own font, and where it sits (top as
   before, in the middle with the field, or the bottom-left corner). `lock/LockClock.qml`, the
   choices, digits and hands in `LockClock.js` (tested). Checked in the preview.
+- Lock screen feedback and extras: a wrong password shakes the field and clears it; caps lock
+  and (with more than one layout, `Keyboard.layoutCount`) the active layout show under the
+  field; the lock and login screens fade in; a message line at the bottom (Settings -> Lock
+  screen -> Message, both screens); a grace period after the idle lock (off by default, 5-60 s)
+  in which a key or a pointer move of 24 px unlocks without the password (only the idle lock:
+  Super+L, the power menu and the lock before a suspend end it); your picture (~/.face, chosen
+  in Settings -> Lock screen) above your name on the login screen (`greeter/sync.sh` copies it);
+  "Lock and turn off the screen" in the power menu (off once you've stopped touching the laptop
+  for a second, back on with any input; `idle/Idle.qml`). `qs ipc call settings page <id>`
+  opens a Settings page. Checked: the message, the clock's size and font, the fade, the login
+  screen run from the repo; the shake, hints, grace period, picture and screen off are for
+  the user's checklist (they need a real lock, a picture or the caps lock key).
 
 ### Visual Settings (planned, after the UI research round)
 User's request (2026-10-29): settings like the lock screen's clock should be picked by sight,

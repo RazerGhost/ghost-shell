@@ -2,8 +2,8 @@ import QtQuick
 import qs.services
 import qs.theme
 
-// The power menu (power button in quick settings, or Ctrl+Alt+Delete): lock, suspend, log out,
-// restart and shut down. The last three end the session, so they ask for a second click.
+// The power menu (power button in quick settings, or Ctrl+Alt+Delete): lock (or lock and turn
+// off the screen), suspend, log out, restart and shut down. The last three end the session, so they ask for a second click.
 Column {
     id: root
 
@@ -27,6 +27,7 @@ Column {
     // `run` is the Session function that does it.
     readonly property var actions: [
         { name: "Lock", icon: "lock", run: "lock", confirm: false },
+        { name: "Lock and turn off the screen", icon: "desktop_access_disabled", run: "lockScreenOff", confirm: false },
         { name: "Suspend", icon: "bedtime", run: "suspend", confirm: false },
         { name: "Log out", icon: "logout", run: "logout", confirm: true },
         { name: "Restart", icon: "restart_alt", run: "reboot", confirm: true },

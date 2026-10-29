@@ -31,10 +31,10 @@ Scope {
     }
 
     // Variants, not Repeater: it creates any kind of object, not only visual items.
-    // The shell's state files, and the Hyprland settings it writes (keyboard layout).
+    // The shell's state files, the Hyprland settings it writes (keyboard layout) and your picture.
     Variants {
         model: [root.state + "settings.json", root.state + "colors.json", root.state + "wallpaper.json",
-                Quickshell.env("HOME") + "/.config/hypr/shell-settings.lua"]
+                Quickshell.env("HOME") + "/.config/hypr/shell-settings.lua", Quickshell.env("HOME") + "/.face"]
 
         FileView {
             required property string modelData

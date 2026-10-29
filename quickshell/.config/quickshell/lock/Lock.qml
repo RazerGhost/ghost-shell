@@ -45,6 +45,10 @@ Scope {
                 messageIsError: root.messageIsError
                 busy: root.busy
                 onSubmitted: password => root.unlock(password)
+                onActivity: {
+                    if (grace.running)
+                        sessionLock.locked = false;
+                }
 
                 LockStatus {
                     width: parent.width
@@ -53,7 +57,7 @@ Scope {
                 Connections {
                     target: root
                     function onTried(): void {
-                        content.clear();
+                        content.clear(root.messageIsError);
                     }
                 }
             }
@@ -72,37 +76,52 @@ Scope {
             }
         }
 
+        // The message first: tried() shakes the field when it's an error.
         onCompleted: result => {
             root.busy = false;
-            root.tried();
             if (result === PamResult.Success) {
                 root.message = "";
+                root.messageIsError = false;
                 sessionLock.locked = false;
             } else {
                 root.message = result === PamResult.MaxTries ? "Too many tries, wait a moment" : "Wrong password";
                 root.messageIsError = true;
             }
+            root.tried();
         }
 
         onError: error => {
             root.busy = false;
-            root.tried();
             root.message = "Couldn't check the password (" + PamError.toString(error) + ")";
             root.messageIsError = true;
+            root.tried();
         }
     }
 
-    function lock(): void {
+    // `withGrace`: the idle lock, which a key or a pointer move undoes without the password
+    // for Settings -> Lock screen -> Grace period (off by default). Any other lock (Super+L, the
+    // power menu, before a suspend) ends a grace period that's still running.
+    function lock(withGrace: bool): void {
         message = "";
+        messageIsError = false;
+        if (withGrace && !sessionLock.locked && Settings.values.lockGrace > 0)
+            grace.restart();
+        else
+            grace.stop();
         sessionLock.locked = true;
+    }
+
+    Timer {
+        id: grace
+        interval: Settings.values.lockGrace * 1000
     }
 
     // Session.lock(): the power menu and the idle steps.
     Connections {
         target: Session
 
-        function onLockRequested(): void {
-            root.lock();
+        function onLockRequested(grace: bool): void {
+            root.lock(grace);
         }
     }
 
@@ -110,7 +129,7 @@ Scope {
         target: "lock"
 
         function lock(): void {
-            root.lock();
+            root.lock(false);
         }
 
         function isLocked(): bool {
