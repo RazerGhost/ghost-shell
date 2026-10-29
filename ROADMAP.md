@@ -575,6 +575,11 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   Always pop up (also during Do Not Disturb and game mode). Critical ones always pop up
   (`services/NotificationRules.js`, tested).
 
+### Drawing on screenshots (built 2026-10-29; needs `ghost install capture` for satty)
+- The screenshot notification's "Draw on it" opens the picture in satty (`extra`, MPL-2.0,
+  GTK 4, so it follows the wallpaper's colors): arrows, boxes, text, blur. Enter saves the drawing
+  over the screenshot and copies it. Without satty the button isn't offered.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

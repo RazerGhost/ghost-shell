@@ -33,14 +33,23 @@ Scope {
         open = true;
     }
 
-    // Saves the picture and tells the user; `path` is where grabToImage wrote it.
+    // Saves the picture and tells the user; `path` is where grabToImage wrote it. The
+    // notification's "Draw on it" opens it in satty (the capture module): Enter saves the drawing
+    // over the picture and copies it.
     function done(path: string): void {
         open = false;
         Sounds.play("feedback", "screen-capture");
         Quickshell.execDetached(["sh", "-c", `
-            wl-copy --type image/png < "$1"
-            action=$(notify-send -a Screenshot -i "$1" -A default=Open "Screenshot saved" "Copied to the clipboard, and saved in Pictures/Screenshots")
-            [ "$action" = default ] && xdg-open "$1"
+            file=$1
+            wl-copy --type image/png < "$file"
+            set -- -A default=Open
+            command -v satty >/dev/null && set -- "$@" -A "draw=Draw on it"
+            action=$(notify-send -a Screenshot -i "$file" "$@" "Screenshot saved" "Copied to the clipboard, and saved in Pictures/Screenshots")
+            case "$action" in
+                default) xdg-open "$file" ;;
+                draw) satty --filename "$file" --output-filename "$file" --copy-command wl-copy \\
+                          --actions-on-enter save-to-clipboard,save-to-file,exit --save-after-copy ;;
+            esac
         `, "sh", path]);
     }
 
