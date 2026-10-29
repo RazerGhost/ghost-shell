@@ -933,6 +933,14 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   the windows' border and corners (the last ones move with their editors). The editors share
   `customize/EditorChrome.qml` (Cancel, Done, the tabbed sheet); `customize/Customize.qml`
   holds them and the IPC (`lock`, `desktop`, `close`).
+- Every change shows while it's made (user's review): the desktop editor's sheet and buttons
+  are glass with Hyprland's blur behind them (`BackgroundEffect`), so see-through, glass and
+  blur style show on the sheet itself; the lock screen editor's sheet blurs the lock screen
+  behind it itself (frosted, `MultiEffect`), as Hyprland's blur can't reach inside its window;
+  "Making the colors…" shows while wallpaper.sh remakes them (`Wallpaper.busy`,
+  `ColorScheme.busy`); a new icon theme offers restarting the shell (its own icons are read at
+  start); the widgets' places can go back to the start; and the Looks gallery shows "Yours"
+  first when your lock screen matches no preset.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

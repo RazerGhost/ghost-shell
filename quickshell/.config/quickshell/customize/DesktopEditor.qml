@@ -58,6 +58,9 @@ Scope {
     // Icon themes: the installed ones, their dark and light versions as one (matugen's
     // wallpaper.sh picks the version for the mode).
     property var iconThemes: ["Colloid"]
+    // The theme the shell started with (hypr/shell.sh exports it with its dark or light
+    // version's suffix): its own icons stay that until it restarts.
+    readonly property string startIconTheme: (Quickshell.env("QS_ICON_THEME") ?? "").replace(/-(Dark|Light|dark|light)$/, "")
 
     Process {
         command: ["sh", "-c", `for d in /usr/share/icons/*/index.theme "$HOME"/.local/share/icons/*/index.theme; do
@@ -94,6 +97,15 @@ Scope {
                 Region { item: chrome.donePill }
             }
 
+            // Hyprland's blur behind the sheet and buttons, like the shell's panels: the glass,
+            // see-through and blur style settings show on the sheet while they're changed.
+            BackgroundEffect.blurRegion: Region {
+                item: chrome.sheet
+                radius: chrome.sheet.radius
+                Region { item: chrome.cancelPill; radius: Theme.radius.full }
+                Region { item: chrome.donePill; radius: Theme.radius.full }
+            }
+
             EditorChrome {
                 id: chrome
                 tabs: [
@@ -103,6 +115,9 @@ Scope {
                     { value: "style", label: "Style" },
                     { value: "text", label: "Size and text" }
                 ]
+                glass: true
+                // The colors take about a second to be made again after these changes.
+                status: Wallpaper.busy || ColorScheme.busy ? "Making the colors…" : ""
                 onCancelled: root.cancel()
                 onFinished: root.close()
 
@@ -256,15 +271,15 @@ Scope {
                         }
                     }
 
-                    Text {
-                        x: Theme.spacing.l
-                        width: parent.width - Theme.spacing.l * 2
-                        bottomPadding: Theme.spacing.s
-                        text: "Drag a widget by the handle in its corner to move it."
-                        color: Colors.m3onSurfaceVariant
-                        font.family: Theme.font.sans
-                        font.pixelSize: Theme.font.small
-                        wrapMode: Text.Wrap
+                    SettingRow {
+                        title: "Places"
+                        subtitle: "Drag a widget by the handle in its corner to move it"
+
+                        TextButton {
+                            text: "Back to the start"
+                            enabled: Object.keys(Settings.values.desktopWidgets ?? {}).length > 0
+                            onClicked: Settings.values.desktopWidgets = ({})
+                        }
                     }
                 }
 
@@ -374,7 +389,7 @@ Scope {
 
                     SettingRow {
                         title: "Icons"
-                        subtitle: "Apps' icons; the shell's own change after it restarts"
+                        subtitle: "Apps' icons; the shell's own (dock, launcher) after it restarts"
 
                         Stepper {
                             label: "Icon theme"
@@ -383,6 +398,21 @@ Scope {
                             value: Settings.values.iconTheme
                             format: v => v.replace(/^Colloid-?/, "Colloid ").trim()
                             onPicked: v => Settings.values.iconTheme = v
+                        }
+                    }
+
+                    // The shell reads the icon theme when it starts (QS_ICON_THEME, hypr/shell.sh).
+                    SettingRow {
+                        visible: Settings.values.iconTheme !== root.startIconTheme
+                        title: "Restart the shell for its own icons"
+                        subtitle: "Keeps these changes; clears the notification list"
+
+                        TextButton {
+                            text: "Restart"
+                            onClicked: {
+                                root.close();
+                                Quickshell.execDetached(["sh", "-c", "pkill -x qs; sleep 1; exec \"$HOME\"/.config/hypr/shell.sh"]);
+                            }
                         }
                     }
                 }

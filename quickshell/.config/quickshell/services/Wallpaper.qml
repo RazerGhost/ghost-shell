@@ -41,6 +41,9 @@ Singleton {
         scan.start();
     }
 
+    // A new wallpaper's colors are being made (wallpaper.sh runs matugen; about a second).
+    readonly property bool busy: apply.running
+
     // matugen's wallpaper.sh saves the choice (the file below, which updates `path`) and runs
     // matugen; `ghost theme` uses the same script.
     function set(path: string): void {

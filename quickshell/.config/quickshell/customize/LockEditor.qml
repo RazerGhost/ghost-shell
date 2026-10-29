@@ -104,19 +104,27 @@ Scope {
                     { value: "clock", label: "Clock" },
                     { value: "picture", label: "Picture" }
                 ]
+                // Frosted over the lock screen, so the glass settings show on it too.
+                backdrop: lock
                 onCancelled: root.cancel()
                 onFinished: root.done()
 
-                // Looks: your picture with each preset's clock on it.
+                // Looks: your picture with each preset's clock on it, and first your own look
+                // while it matches none of them ("" is yours).
                 ChoiceCards {
                     visible: chrome.tab === "looks"
-                    options: Presets.lock.map(p => ({ value: p.name, label: p.name }))
+                    options: (Presets.current(Settings.values, Presets.lock) === "" ? [{ value: "", label: "Yours" }] : [])
+                        .concat(Presets.lock.map(p => ({ value: p.name, label: p.name })))
                     current: Presets.current(Settings.values, Presets.lock)
-                    onPicked: v => Presets.apply(Settings.values, Presets.lock, v)
+                    onPicked: v => {
+                        if (v !== "")
+                            Presets.apply(Settings.values, Presets.lock, v);
+                    }
                     art: Component {
                         Item {
                             id: look
-                            readonly property var values: Presets.lock.find(p => p.name === parent.option.value).values
+                            readonly property var values: parent.option.value === "" ? Settings.values
+                                : Presets.lock.find(p => p.name === parent.option.value).values
 
                             Image {
                                 anchors.fill: parent

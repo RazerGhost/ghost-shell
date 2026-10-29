@@ -60,6 +60,8 @@ Singleton {
     // switch to a picture's dark or light version then runs after these colors are made, not
     // alongside (both run wallpaper.sh), and only once "At sunset" knows the sunset.
     property string appliedMode: ""
+    // The colors are being made again (light or dark, color style, contrast, accent changed).
+    readonly property bool busy: apply.running || applyLater.running
 
     // Clicking through the choices quickly makes the colors once.
     Timer {
