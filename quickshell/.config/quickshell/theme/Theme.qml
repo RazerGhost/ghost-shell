@@ -39,7 +39,7 @@ Singleton {
         readonly property int normal:   20 // buttons, tiles, sliders
         readonly property int tray:     18 // tray item images
         readonly property int launcher: 32 // app icons in the launcher list
-        readonly property int osd:      18
+        readonly property int osd:      18 // the OSD's icon
     }
 
     readonly property QtObject anim: QtObject {
