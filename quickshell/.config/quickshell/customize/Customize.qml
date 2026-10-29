@@ -4,7 +4,7 @@ import Quickshell.Io
 
 // The on-screen editors (user's choice over pickers inside Settings: Android's customization
 // with iOS's and macOS's way of editing on the screen itself). Opened from Settings and the
-// launcher: `qs ipc call customize lock|desktop|dock`; `close` closes an open one, keeping its
+// launcher: `qs ipc call customize lock|desktop|dock|windows`; `close` closes an open one, keeping its
 // changes.
 Scope {
     LockEditor {
@@ -17,6 +17,10 @@ Scope {
 
     DockIslandEditor {
         id: dockIslandEditor
+    }
+
+    WindowsEditor {
+        id: windowsEditor
     }
 
     IpcHandler {
@@ -34,10 +38,15 @@ Scope {
             dockIslandEditor.open();
         }
 
+        function windows(): void {
+            windowsEditor.open();
+        }
+
         function close(): void {
             lockEditor.close();
             desktopEditor.close();
             dockIslandEditor.close();
+            windowsEditor.close();
         }
     }
 }

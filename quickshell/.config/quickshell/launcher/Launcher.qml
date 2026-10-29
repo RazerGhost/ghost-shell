@@ -23,7 +23,9 @@ Scope {
         { name: "Customize the desktop", command: "qs ipc call customize desktop",
           icon: "preferences-desktop-wallpaper", subtitle: "Wallpaper, colors, widgets and style, on the desktop itself" },
         { name: "Customize the dock and island", command: "qs ipc call customize dock",
-          icon: "preferences-desktop-theme", subtitle: "The dock, workspace dots, clock and status icons, in place" }
+          icon: "preferences-desktop-theme", subtitle: "The dock, workspace dots, clock and status icons, in place" },
+        { name: "Customize the windows", command: "qs ipc call customize windows",
+          icon: "preferences-system-windows", subtitle: "Borders, corners, gaps and animations, on your windows" }
     ]
 
     property bool open: false

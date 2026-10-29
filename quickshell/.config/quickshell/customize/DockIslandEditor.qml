@@ -10,8 +10,9 @@ import "../theme/ThemeScale.js" as ThemeScale
 import "Presets.js" as Presets
 
 // The dock and island editor, like editing macOS's menu bar and Dock in place: the real island
-// and dock (shown while it's open, wherever the dock would hide) change as you pick. The sheet
-// sits in the middle of the screen, clear of both. Island: the workspace dots, the clock and
+// and dock (shown while it's open, wherever the dock would hide) change as you pick, on an
+// empty workspace (Done or Cancel go back). The sheet sits in the middle of the screen, clear
+// of both. Island: the workspace dots, the clock and
 // which status icons show. Dock: when it shows and its icons' size; pinning and moving apps is
 // the dock's own right-click menu. Cancel writes the earlier settings back. Opened from
 // Settings -> Windows and the launcher (Customize.qml).
@@ -24,6 +25,8 @@ Scope {
         if (editor.active)
             return;
         saved = Presets.snapshot(Settings.values, Presets.dockIslandKeys);
+        // An empty workspace (user's choice): the sheet reads clearly over the wallpaper.
+        Editing.toEmptyWorkspace();
         Editing.dock = true;
         editor.active = true;
     }
@@ -33,6 +36,7 @@ Scope {
             return;
         editor.active = false;
         Editing.dock = false;
+        Editing.back();
     }
 
     function cancel(): void {

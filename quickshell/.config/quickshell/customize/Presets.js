@@ -27,6 +27,10 @@ const desktopKeys = ["colorScheme", "colorStyle", "colorContrast", "accentColor"
 const dockIslandKeys = ["dockMode", "dockIconSize", "workspaceDots", "hiddenStatusIcons",
                         "clockDate", "clockSeconds", "islandMedia"];
 
+// Every setting the windows editor changes, for its Cancel.
+const windowsKeys = ["borderSize", "rounding", "borderSpin", "windowGlow", "windowKindBorders",
+                     "gapsIn", "gapsOut", "animationSpeed", "windowAnimation", "workspaceAnimation", "wobble"];
+
 // The values of `keys` now, to put back with restore() when an editor is cancelled.
 function snapshot(values, keys) {
     const saved = {};

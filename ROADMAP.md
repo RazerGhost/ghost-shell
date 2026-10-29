@@ -903,7 +903,7 @@ audit of our own UI): all sixteen, built in batches.
   screen (`DesktopWidgets.js`, tested). Checked live on an empty workspace; dragging verified
   by the user on all four edges. The user wants a refinement and polish pass over these later.
 
-### On-screen editors (in progress, 2026-10-30)
+### On-screen editors (done 2026-10-30; lock screen, desktop, dock and island verified on the laptop)
 User's request: settings like the lock screen's clock should be picked by sight, and edited
 on the screen itself, not inside Settings (first planned as previews and cards in Settings;
 changed the same day). The direction: Android's customization with iOS's and macOS's polish.
@@ -950,6 +950,20 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   the dock). Moved out of Settings: Appearance's workspace dots and status icons, Windows' dock
   rows (now a Customize button) and Weather and clock's island rows; the 24-hour clock stays
   there (a time format, shared with the lock screen and the desktop clock).
+  It goes to an empty workspace too (user's choice: the glass sheet read poorly over windows);
+  the trip there and back is `Editing.toEmptyWorkspace()` / `back()`, shared with the desktop
+  editor.
+- Windows editor (`customize/WindowsEditor.qml`, `qs ipc call customize windows`): stays on
+  your workspace, so each change shows on your own windows ("Open a window to see these on it"
+  when there's none). Borders (width, corners, turning border, glow, floating and pinned
+  windows standing out), Space (gaps between windows and at the edges), Motion (speed, opening
+  and closing, switching workspaces, wobbly windows). Each animation has Play: a floating
+  "Animation sample" window opens and closes (a rule in rules.lua floats it, and positions.lua
+  leaves it out: it shares Quickshell's class with the Settings window, whose saved place it
+  took), or the workspace switches away and back. A step list includes your current value
+  when it isn't one of its steps. Moved out of Settings: Appearance's animation speed and window
+  border and corners, Windows' gaps and wobbly windows (now a Customize button). With this,
+  Settings keeps only what isn't seen; every visual option is in an editor.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

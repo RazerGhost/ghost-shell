@@ -24,17 +24,13 @@ Scope {
 
     property var saved: ({})
     property string savedWallpaper: ""
-    property int savedWorkspace: 1
 
     function open(): void {
         if (editor.active)
             return;
         saved = Presets.snapshot(Settings.values, Presets.desktopKeys);
         savedWallpaper = Wallpaper.path;
-        savedWorkspace = Hyprland.focusedWorkspace?.id ?? 1;
-        // A workspace past the ones in use is empty.
-        const used = Hyprland.workspaces.values.map(w => w.id).filter(id => id > 0);
-        Hyprland.dispatch(`hl.dsp.focus({ workspace = ${Math.max(0, ...used) + 1} })`);
+        Editing.toEmptyWorkspace();
         Wallpaper.rescan();
         Editing.desktop = true;
         editor.active = true;
@@ -45,7 +41,7 @@ Scope {
             return;
         editor.active = false;
         Editing.desktop = false;
-        Hyprland.dispatch(`hl.dsp.focus({ workspace = ${savedWorkspace} })`);
+        Editing.back();
     }
 
     function cancel(): void {

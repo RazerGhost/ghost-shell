@@ -59,6 +59,11 @@ end
 
 load_positions()
 
+-- Windows left out by title: the shell's windows editor's sample (customize/WindowsEditor.qml)
+-- shares the class org.quickshell with the shell's Settings window, and would take or
+-- overwrite its place.
+local skipped_titles = { ["Animation sample"] = true }
+
 -- The settings window can turn this off (ShellSettings comes from shell-settings.lua).
 local function enabled()
     return not (ShellSettings and ShellSettings.remember_positions == false)
@@ -70,7 +75,7 @@ hl.on("window.close", function(window)
     end
     local workspace = window.workspace and window.workspace.name or ""
     if window.class == "" or not window.floating or window.fullscreen ~= 0
-        or workspace:find("^special:") then
+        or workspace:find("^special:") or skipped_titles[window.title] then
         return
     end
     positions[window.class] = { x = window.at.x, y = window.at.y, w = window.size.x, h = window.size.y }
@@ -82,7 +87,8 @@ hl.on("window.open", function(window)
         return
     end
     local p = positions[window.class]
-    if not p or not window.floating or others_open(window) or not on_screen(p) then
+    if not p or not window.floating or others_open(window) or not on_screen(p)
+        or skipped_titles[window.title] then
         return
     end
     local target = "address:" .. window.address

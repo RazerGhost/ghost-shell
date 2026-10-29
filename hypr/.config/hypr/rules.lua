@@ -14,6 +14,15 @@ hl.window_rule({
     center = true,
 })
 
+-- The windows editor's sample window (customize/WindowsEditor.qml) floats in the middle, so
+-- playing an animation doesn't rearrange your tiled windows.
+hl.window_rule({
+    name   = "animation-sample",
+    match  = { class = "^org\\.quickshell$", title = "^Animation sample$" },
+    float  = true,
+    center = true,
+})
+
 -- The scratchpad (Super+`) doubles as a drop-down terminal: opened empty, it starts one. It
 -- tiles over the dimmed workspace below (decoration.dim_special, look.lua). A handler, since
 -- Hyprland 0.57 deprecated the on_created_empty workspace rule. Moving a window into a

@@ -12,32 +12,17 @@ Column {
 
     spacing: Theme.spacing.l
 
-    readonly property var pixels: v => v === 0 ? "None" : v + " px"
-
     SettingGroup {
-        title: "Tiling"
+        title: "Windows' look"
 
         SettingRow {
-            title: "Gaps between windows"
+            title: "Customize the windows"
+            subtitle: "Borders, corners, gaps and animations, shown on your windows"
 
-            Stepper {
-                label: "Gaps between windows"
-                values: Array.from({ length: 21 }, (_, i) => i)
-                value: Settings.values.gapsIn
-                format: page.pixels
-                onPicked: v => Settings.values.gapsIn = v
-            }
-        }
-
-        SettingRow {
-            title: "Gaps at the screen's edges"
-
-            Stepper {
-                label: "Gaps at the screen's edges"
-                values: Array.from({ length: 21 }, (_, i) => i * 2)
-                value: Settings.values.gapsOut
-                format: page.pixels
-                onPicked: v => Settings.values.gapsOut = v
+            TextButton {
+                text: "Customize"
+                filled: true
+                onClicked: Quickshell.execDetached(["qs", "ipc", "call", "customize", "windows"])
             }
         }
     }
@@ -59,17 +44,6 @@ Column {
 
     SettingGroup {
         title: "Behaviour"
-
-        SettingRow {
-            title: "Wobbly windows"
-            subtitle: "Windows wobble like jelly while you move or resize them"
-
-            Switch {
-                label: "Wobbly windows"
-                checked: Settings.values.wobble
-                onToggled: Settings.values.wobble = !checked
-            }
-        }
 
         SettingRow {
             title: "Hot corner"
