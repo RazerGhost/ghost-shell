@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Services.Notifications
+import Quickshell.Services.SystemTray
 import Quickshell.Wayland
 import qs.controlcenter
 import qs.services
@@ -237,7 +238,9 @@ PanelWindow {
             Row {
                 id: topRow
 
-                readonly property real sideWidth: Math.max(workspaces.implicitWidth, statusIcons.implicitWidth)
+                // The right side: the background apps' arrow (when there are some) and the status icons.
+                readonly property real sideWidth: Math.max(workspaces.implicitWidth,
+                    statusIcons.implicitWidth + (trayButton.visible ? trayButton.implicitWidth : 0))
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 height: Theme.island.height
@@ -303,6 +306,27 @@ PanelWindow {
                 Item {
                     width: topRow.sideWidth + Theme.spacing.m * 2
                     height: parent.height
+
+                    // Apps running in the background (the system tray): an arrow that opens their menu.
+                    IslandButton {
+                        id: trayButton
+                        anchors.right: status.left
+                        visible: SystemTray.items.values.length > 0
+                        label: "Background apps"
+                        active: root.panel === "tray"
+                        onActivated: root.island.toggle("tray", root.modelData.name)
+
+                        MaterialIcon {
+                            anchors.verticalCenter: parent.verticalCenter
+                            icon: "keyboard_arrow_down"
+                            font.pixelSize: Theme.icon.small
+                            rotation: root.panel === "tray" ? 180 : 0
+
+                            Behavior on rotation {
+                                NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }
+                            }
+                        }
+                    }
 
                     IslandButton {
                         id: status
@@ -444,6 +468,15 @@ PanelWindow {
                             root.island.panel = "";
                             Clipboard.paste(entry);
                         }
+                    }
+                }
+
+                MenuSlot {
+                    shown: root.shown === "tray"
+
+                    Tray {
+                        width: parent.width
+                        onDone: root.island.panel = ""
                     }
                 }
 

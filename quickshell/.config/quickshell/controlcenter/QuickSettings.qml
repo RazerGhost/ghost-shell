@@ -1,12 +1,11 @@
 import QtQuick
-import Quickshell.Services.SystemTray
 import Quickshell.Services.UPower
 import qs.services
 import qs.settings
 import qs.theme
 import qs.widgets
 
-// The quick settings menu: tiles, volume and brightness sliders, battery and tray.
+// The quick settings menu: tiles, volume and brightness sliders and the battery.
 // The Wi-Fi, Bluetooth and Sound tiles slide in a page of their own, like Android.
 Item {
     id: root
@@ -299,26 +298,6 @@ Item {
                     Updates.update();
                     root.openMenu("");
                 }
-            }
-        }
-
-        // Apps running in the background (the system tray), only when there are some.
-        Column {
-            width: parent.width
-            visible: SystemTray.items.values.length > 0
-            spacing: Theme.spacing.s
-
-            Text {
-                x: Theme.spacing.s
-                text: "Running in the background"
-                color: Colors.m3onSurfaceVariant
-                font.family: Theme.font.sans
-                font.pixelSize: Theme.font.small
-            }
-
-            Tray {
-                x: Theme.spacing.s
-                width: parent.width - Theme.spacing.s * 2
             }
         }
 

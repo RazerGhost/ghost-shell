@@ -81,8 +81,9 @@ new setup step.
   unlit ones dimmed to 45 % (`widgets/WifiIcon.qml`, also in the Wi-Fi tile and list), battery as an Android 16-style pill that fills with the charge, no text (user's choice: the
   percentage is in quick settings) (`bar/BatteryPill.qml`). Opens
   `controlcenter/TodayPanel.qml` (calendar, `MediaCard`) or `QuickSettings.qml` (tiles for Wi-Fi,
-  Bluetooth, power mode, microphone; volume and brightness `LevelSlider`s; battery; `Tray`, since 2026-10-28 its own row "Running in
-  the background" with a chip per app, icon and name, user's choice over icons next to the battery), with
+  Bluetooth, power mode, microphone; volume and brightness `LevelSlider`s; battery; `Tray`: since 2026-10-29 its own island menu, "Background apps", opened by an arrow left
+  of the status icons while there are some, a row per app (user's choice: the chips per app in
+  quick settings, 2026-10-28, looked cluttered)), with
   `WifiPage` (scan, connect, password prompt; the connected network can be shared as a QR code a
   phone scans to join, `WifiQr.js` tested, and saved ones forgotten) and `BluetoothPage` (scan, pair, connect). Super+N /
   Super+C or `qs ipc call island toggle settings|today`.

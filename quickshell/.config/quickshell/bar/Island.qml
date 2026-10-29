@@ -67,7 +67,7 @@ Scope {
         }
     }
 
-    // From Hyprland binds: qs ipc call island toggle settings (or: today, media, power,
+    // From Hyprland binds: qs ipc call island toggle settings (or: today, media, power, tray,
     // clipboard, emoji)
     IpcHandler {
         target: "island"

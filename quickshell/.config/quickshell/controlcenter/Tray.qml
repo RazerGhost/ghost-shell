@@ -1,20 +1,35 @@
 import QtQuick
 import Quickshell
 import Quickshell.Services.SystemTray
-import Quickshell.Widgets
 import qs.theme
 
-// System tray (StatusNotifierItem), the apps running in the background: a chip per app with its
-// icon and name (user's choice: its own row in quick settings, not small icons next to the
-// battery). Left click activates, middle click is the secondary action, right click opens the
-// app's menu. Wraps onto more lines when there are many.
-Flow {
-    spacing: Theme.spacing.s
+// The "Background apps" menu (system tray, StatusNotifierItem), opened by the arrow next to the
+// island's status icons (user's choice 2026-10-29, after chips in quick settings looked
+// cluttered): a row per app with its icon and name. Click activates the app (and closes the
+// menu), middle click is its secondary action, right click opens its own menu.
+Column {
+    id: root
+
+    // An app was activated; the island closes the menu.
+    signal done()
+
+    padding: Theme.spacing.l
+    topPadding: Theme.spacing.s
+    spacing: Theme.spacing.xs
+
+    Text {
+        leftPadding: Theme.spacing.s
+        bottomPadding: Theme.spacing.xs
+        text: "Running in the background"
+        color: Colors.m3onSurfaceVariant
+        font.family: Theme.font.sans
+        font.pixelSize: Theme.font.small
+    }
 
     Repeater {
         model: SystemTray.items
 
-        delegate: MouseArea {
+        ListRow {
             id: item
 
             required property SystemTrayItem modelData
@@ -22,7 +37,7 @@ Flow {
             // "kdeconnectindicatordark"): then the app's own icon, or a generic one.
             readonly property string themeIcon: modelData.icon.startsWith("image://icon/") && !modelData.icon.includes("?path=")
                 ? modelData.icon.slice("image://icon/".length) : ""
-            readonly property string icon: themeIcon !== "" && Quickshell.iconPath(themeIcon, true) === ""
+            readonly property string trayIcon: themeIcon !== "" && Quickshell.iconPath(themeIcon, true) === ""
                 ? Quickshell.iconPath((DesktopEntries.heuristicLookup(name)
                     ?? DesktopEntries.applications.values.find(e => e.name === name))?.icon ?? "", "application-x-executable")
                 : modelData.icon
@@ -33,68 +48,39 @@ Flow {
             readonly property string name: (modelData.title ? DesktopEntries.heuristicLookup(modelData.title)?.name : "")
                 || modelData.title || modelData.tooltipTitle || modelData.id
 
-            implicitWidth: chip.implicitWidth + Theme.spacing.m * 2
-            implicitHeight: Theme.icon.tray + Theme.spacing.s * 2
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
+            // The button of the click being handled (ListRow only says it was activated).
+            property int button: Qt.LeftButton
+
+            width: root.width - root.leftPadding - root.rightPadding
+            appIcon: trayIcon
+            title: name
+            subtitle: modelData.tooltipDescription || (modelData.hasMenu ? "Right-click for its menu" : "")
+            trailingIcon: modelData.hasMenu ? "more_vert" : ""
             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+            onPressed: event => button = event.button
 
-            Accessible.role: Accessible.Button
-            Accessible.name: name
-            Accessible.onPressAction: modelData.activate()
-
-            onClicked: event => {
+            onActivated: {
+                const pressed = button;
+                button = Qt.LeftButton;
                 // Some apps only have a menu (onlyMenu); open it on any click for those.
-                if (event.button === Qt.LeftButton && !modelData.onlyMenu)
-                    modelData.activate();
-                else if (event.button === Qt.MiddleButton)
+                if (pressed === Qt.MiddleButton) {
                     modelData.secondaryActivate();
-                else if (modelData.hasMenu)
-                    menu.open();
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                radius: Theme.radius.full
-                color: Colors.m3surfaceContainerHighest
-            }
-
-            // State layer on hover.
-            Rectangle {
-                anchors.fill: parent
-                radius: Theme.radius.full
-                color: Colors.m3onSurface
-                opacity: item.containsMouse ? Theme.state.hover : 0
-            }
-
-            Row {
-                id: chip
-                anchors.centerIn: parent
-                spacing: Theme.spacing.s
-
-                IconImage {
-                    anchors.verticalCenter: parent.verticalCenter
-                    implicitSize: Theme.icon.tray
-                    source: item.icon
-                }
-
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: item.name
-                    color: Colors.m3onSurface
-                    font.family: Theme.font.sans
-                    font.pixelSize: Theme.font.small
+                } else if (pressed === Qt.RightButton || modelData.onlyMenu) {
+                    if (modelData.hasMenu)
+                        menu.open();
+                } else {
+                    modelData.activate();
+                    root.done();
                 }
             }
 
-            // Opens the item's menu (exported over D-Bus by the app) just below the icon.
+            // Opens the item's menu (exported over D-Bus by the app) just below the row.
             QsMenuAnchor {
                 id: menu
                 menu: item.modelData.menu
                 anchor.item: item
-                anchor.edges: Edges.Bottom
-                anchor.gravity: Edges.Bottom
-                anchor.margins.top: Theme.spacing.m
+                anchor.edges: Edges.Bottom | Edges.Right
+                anchor.gravity: Edges.Bottom | Edges.Left
             }
         }
     }
