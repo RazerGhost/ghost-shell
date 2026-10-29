@@ -103,8 +103,13 @@ Singleton {
     LatestProcess {
         id: apply
         onExited: (code, status) => {
-            if (code !== 0)
-                console.warn("Wallpaper: wallpaper.sh exited with code " + code);
+            if (code === 0)
+                return;
+            // You picked it, so say so: otherwise the picker just seems to do nothing.
+            console.warn("Wallpaper: wallpaper.sh exited with code " + code);
+            Notifications.send("Wallpaper", "dialog-warning", "Couldn't set the wallpaper",
+                               "Making its colors failed (wallpaper.sh exited with " + code + "). Run `ghost theme <picture>` in a terminal to see why.",
+                               false, []);
         }
     }
 }
