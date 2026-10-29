@@ -599,7 +599,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   (`xdph-streaming-<n>`): Hyprland's `screencast` event also fires for grim and the shell's own
   previews.
 
-### Light mode (built 2026-10-29; untested in light)
+### Light mode (done, switching verified on the laptop 2026-10-29)
 - Settings -> Appearance -> Light or dark: Dark (default), Light or At sunset (dark from sunset
   to sunrise at the weather town, open-meteo's `sunrise`/`sunset`; 19:00-07:00 without a town;
   `ColorScheme.js`, tested). `services/ColorScheme.qml` writes the result to
@@ -609,7 +609,8 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   Zed's theme says `{{mode}}` (matugen 4.2 has it). `wallpaper.sh` with no wallpaper reuses the
   last seed color (`~/.local/state/quickshell/seed`). The cover accent in the media menu is
   darkened on a light menu. Not switched: the shell's own icon theme (`QS_ICON_THEME`, read at
-  start).
+  start). The shell remembers the mode it applied rather than re-reading the file after a run:
+  that read came back stale and made every switch run twice (~2 s; now one run after 300 ms).
 
 ### To-do, note and timer in the today menu (built 2026-10-29)
 - Three buttons under the weather, each opening its part (one at a time, folded when the menu
