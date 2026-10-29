@@ -168,6 +168,9 @@ Singleton {
             // Under the clock on the lock screen (lock/LockStatus.qml); never on the login screen.
             property bool lockMedia: true
             property bool lockNotificationCount: true
+            property bool lockWeather: true
+            property bool lockBattery: true
+            property bool lockEvent: false // its title shows to anyone at the locked screen
             property bool welcomeSeen: false // the welcome tour (welcome/Welcome.qml) has been shown
             property bool rememberPositions: true // floating apps reopen where they were (positions.lua)
 

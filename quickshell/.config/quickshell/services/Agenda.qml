@@ -29,6 +29,17 @@ Singleton {
     // minute clock is a new object every minute, which counted as a change and ran khal each time.
     readonly property var range: CalendarEventsJs.range(new Date(today + "T00:00"), year, month)
 
+    // When an event is: "Today 14:00", "Tomorrow", "Mon 2 Nov 09:30" (English day names, like
+    // the today menu's date; see the calendar locale decision). All-day ones without a time.
+    function when(event: var): string {
+        const day = new Date(event.start + "T00:00");
+        const tomorrow = new Date(Date.now() + 86400000);
+        const label = event.start <= today ? "Today"
+                    : event.start === Qt.formatDate(tomorrow, "yyyy-MM-dd") ? "Tomorrow"
+                    : day.toLocaleDateString(Qt.locale(Qt.uiLanguage), "ddd d MMM");
+        return event.allDay || event.start < today ? label : label + " " + event.startTime;
+    }
+
     function refresh(): void {
         if (enabled)
             list.start();

@@ -11,15 +11,8 @@ Column {
     visible: Agenda.enabled
     spacing: Theme.spacing.xs
 
-    readonly property var locale: Qt.locale(Qt.uiLanguage) // English day names, like the date above
-
     function when(event: var): string {
-        const day = new Date(event.start + "T00:00");
-        const tomorrow = new Date(Date.now() + 86400000);
-        const label = event.start <= Agenda.today ? "Today"
-                    : event.start === Qt.formatDate(tomorrow, "yyyy-MM-dd") ? "Tomorrow"
-                    : day.toLocaleDateString(locale, "ddd d MMM");
-        return event.allDay || event.start < Agenda.today ? label : label + " " + event.startTime;
+        return Agenda.when(event);
     }
 
     Repeater {

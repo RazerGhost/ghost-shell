@@ -213,6 +213,37 @@ Column {
                 onToggled: Settings.values.lockNotificationCount = !checked
             }
         }
+
+        SettingRow {
+            title: "Weather"
+
+            Switch {
+                label: "Weather on the lock screen"
+                checked: Settings.values.lockWeather
+                onToggled: Settings.values.lockWeather = !checked
+            }
+        }
+
+        SettingRow {
+            title: "Battery"
+
+            Switch {
+                label: "Battery on the lock screen"
+                checked: Settings.values.lockBattery
+                onToggled: Settings.values.lockBattery = !checked
+            }
+        }
+
+        SettingRow {
+            title: "Next calendar event"
+            subtitle: "Its title shows to anyone at the locked screen"
+
+            Switch {
+                label: "Next calendar event on the lock screen"
+                checked: Settings.values.lockEvent
+                onToggled: Settings.values.lockEvent = !checked
+            }
+        }
     }
 
     SettingGroup {
