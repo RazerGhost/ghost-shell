@@ -39,7 +39,7 @@ Singleton {
         readonly property int normal:   20 // buttons, tiles, sliders
         readonly property int tray:     18 // tray item images
         readonly property int launcher: 32 // app icons in the launcher list
-        readonly property int osd:      22
+        readonly property int osd:      18
     }
 
     readonly property QtObject anim: QtObject {
@@ -212,11 +212,12 @@ Singleton {
     }
 
     readonly property QtObject osd: QtObject {
-        readonly property int width:   280
-        readonly property int height:  52
+        // Close to the closed island's size (user's choice: it looked big next to it).
+        readonly property int width:   240
+        readonly property int height:  40
         readonly property int gap:     64   // distance from the bottom screen edge, above the dock
         readonly property int gapLow:  24   // the same while the dock is hidden
-        readonly property int track:   6    // height of the level bar
+        readonly property int track:   5    // height of the level bar
         readonly property int timeout: 1500 // ms the popup stays up after the last change
     }
 }
