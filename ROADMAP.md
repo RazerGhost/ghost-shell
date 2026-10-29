@@ -658,9 +658,11 @@ shell's cost, features and customization), checked before acting. Done so far:
   base-devel (paru's AUR builds) and libappindicator (udiskie runs with `--appindicator`). The
   haunt module lists nothing: haunt-bin brings its own; building from source is a note there
   (install as dependencies, then `pacman -Rns $(pacman -Qdtq)`).
-- System (user's picks, `ghost install system`): the RTX's runtime power management forced on
-  (`modprobe.d/50-nvidia-power.conf`; it was "Disabled by default" and never slept), Plymouth's
-  initramfs hook and packages removed, systemd-resolved's mDNS and LLMNR off (Avahi does mDNS).
+- System (user's picks, `ghost install system`): Plymouth's initramfs hook and packages removed,
+  systemd-resolved's mDNS and LLMNR off (Avahi does mDNS). Tried and dropped: forcing the RTX's
+  runtime power management (`NVreg_DynamicPowerManagement=0x02`): the driver then reports
+  "Runtime D3 status: Not supported" (MUX mode 0, hybrid), so the card can't power down on this
+  laptop; it idles at about 1.6 W (P8).
   Removed by hand: unused icon themes (Papirus, WhiteSur, Tela), AUR build leftovers (cmake, go,
   zip), iwd, xf86-video-amdgpu, profile-sync-daemon, nss-mdns and Haunt's build tools. Removing
   iwd renamed the Wi-Fi card (wlan0 -> wlo1, see NOTES), so the saved network had to be joined

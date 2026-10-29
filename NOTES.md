@@ -336,6 +336,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   with `connection.interface-name = wlan0` then no longer start, so the password is asked again.
   Before removing a package, check its files (`pacman -Ql`), not only what depends on it.
 
+- The RTX can't runtime-suspend on this Omen: with `NVreg_DynamicPowerManagement=0x02`,
+  `/proc/driver/nvidia/gpus/*/power` says "Runtime D3 status: Not supported" (the default 3 says
+  "Disabled by default"); `/sys/devices/platform/hp-wmi/gpu_mux_mode` is 0. It idles in P8 (~1.6 W).
+
 ## Testing on the laptop
 
 - README screenshots: an empty workspace up to 5 (higher ones add workspace dots), `grim -s 0.75`

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# System setup for this laptop (needs sudo): the GPU udev rule and the RTX's power saving, early
-# KMS and no Plymouth, greetd, one mDNS service, and the services the shell reads.
+# System setup for this laptop (needs sudo): the GPU udev rule, early KMS and no Plymouth,
+# greetd, one mDNS service, and the services the shell reads.
 # Run by `ghost install`; alone: `ghost install system`. Safe to re-run.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
@@ -32,14 +32,6 @@ fi
 echo "Compare with the PCI addresses below (1002 = AMD, 10de = NVIDIA):"
 lspci -nn -d ::03xx
 ls -l /dev/dri/by-path/ | grep -- '-card'
-
-step "RTX power saving (takes effect after a reboot)"
-# The driver reads modprobe.d when it loads (it isn't in the initramfs), so no rebuild.
-power=system/etc/modprobe.d/50-nvidia-power.conf
-if ! cmp -s "$power" "/etc/modprobe.d/$(basename "$power")"; then
-    sudo install -Dm644 "$power" "/etc/modprobe.d/$(basename "$power")"
-    echo "Reboot, then check: grep 'Runtime D3' /proc/driver/nvidia/gpus/*/power"
-fi
 
 step "Boot: early KMS, no Plymouth splash"
 rebuild_boot=false
