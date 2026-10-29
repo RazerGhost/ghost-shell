@@ -44,6 +44,17 @@ from_image() {
         scheme image "$1" --source-color-index 0
     fi
 }
+# The picture to make colors from: the picture itself, or for a video (a live wallpaper) a frame
+# of it, kept as video-frame.jpg (the lock and login screens show that frame).
+picture_of() {
+    case "$1" in
+        *.[mM][pP]4 | *.[wW][eE][bB][mM] | *.[mM][kK][vV] | *.[mM][oO][vV])
+            ffmpeg -nostdin -loglevel error -y -ss 1 -i "$1" -frames:v 1 "$state/video-frame.jpg" \
+                && echo "$state/video-frame.jpg"
+            ;;
+        *) echo "$1" ;;
+    esac
+}
 from_seed() {
     mkdir -p "$state"
     printf '%s\n' "$1" > "$state/seed"
@@ -59,7 +70,7 @@ case "${1-}" in
             "$state/wallpaper.json" 2>/dev/null || true)
         if [ -n "$current" ] && [ -f "$current" ]; then
             echo "Colors from the current wallpaper: $current"
-            from_image "$current"
+            from_image "$(picture_of "$current")"
         else
             seed=$(cat "$state/seed" 2>/dev/null || echo "$default_seed")
             echo "No wallpaper: colors from the seed color $seed"
@@ -73,7 +84,7 @@ case "${1-}" in
         WALLPAPER=$(realpath "$1") bun -e '
             require("fs").writeFileSync(process.argv[1], JSON.stringify({ path: process.env.WALLPAPER }, null, 4) + "\n");
         ' "$state/wallpaper.json"
-        from_image "$(realpath "$1")"
+        from_image "$(picture_of "$(realpath "$1")")"
         ;;
 esac
 

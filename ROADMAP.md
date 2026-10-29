@@ -705,7 +705,7 @@ shell's cost, features and customization), checked before acting. Done so far:
   media, peeks, the tray arrow, the symmetric widths), so a separate file would only pass all
   of that through properties.
 
-### More settings (2026-10-29, in progress; user's picks from the research)
+### More settings and live wallpapers (2026-10-29; user's picks from the research)
 - Settings -> Notifications -> Pop-ups: how long a notification stays (3-30 s, 5 by default;
   the attention card too) and the volume and brightness pop-up's place (bottom, or top under the
   island) and time (1-5 s).
@@ -745,6 +745,13 @@ shell's cost, features and customization), checked before acting. Done so far:
   ones. Core gained the KDE Plasma, nwg-shell and Ubuntu art contest sets (user's picks).
   Settings -> Appearance -> Wallpaper: your folder, a slideshow (15 min to 4 h, from yours or
   all; each change recolors), and following light and dark for pictures with a dark version.
+- Live wallpapers (user's request, "anime cinematics"): video files (mp4, webm, mkv, mov) in your
+  folder are wallpapers too, played by Qt Multimedia (already installed with its FFmpeg backend;
+  no new package) over a still frame, muted, only while seen: no window on that screen's
+  workspace, not in game mode, on battery or locked (`Session.locked`). The scan makes a
+  thumbnail per video once (`~/.cache/quickshell/wallpaper-thumbs`), wallpaper.sh makes the
+  colors from a frame (`video-frame.jpg`, which the lock and login screens show). Wallpaper
+  Engine scenes (linux-wallpaperengine) aren't built: it isn't installed here.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

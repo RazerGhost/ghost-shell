@@ -346,6 +346,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   -> 361, but rejected: Settings' window stuttered while Hyprland animated it to its tile size
   (the basic loop draws on the main thread). `MALLOC_ARENA_MAX=2` made no difference.
 
+- QtMultimedia's `Video` plays local files here (qt6-multimedia-ffmpeg): a test mp4 in a throwaway
+  `qs -p` reached PlayingState and 1.37 s after 1.5 s. `HyprlandWorkspace.toplevels.values` is a
+  workspace's windows (empty workspace: length 0).
+
 ## Testing on the laptop
 
 - README screenshots: an empty workspace up to 5 (higher ones add workspace dots), `grim -s 0.75`

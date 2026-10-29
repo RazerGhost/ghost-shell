@@ -93,7 +93,8 @@ Column {
             spacing: Theme.spacing.s
             clip: true
             boundsBehavior: Flickable.StopAtBounds
-            model: Wallpaper.pictures
+            // Pictures only: the lock and login screens can't play a video.
+            model: Wallpaper.pictures.filter(p => !p.video)
 
             Accessible.role: Accessible.List
             Accessible.name: "Pictures"

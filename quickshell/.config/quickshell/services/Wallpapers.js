@@ -25,11 +25,25 @@ function baseName(path) {
     return dot > 0 ? file.slice(0, dot) : file;
 }
 
-// The paths (one per line, yours first) as [{ filePath, fileName, darkPath, own }], in their
-// order: a Plasma folder is one picture at the size for a screenW x screenH screen; a dark
-// version is paired with its light one (`darkPath`, "" when there's none). `own`: in `ownFolder`.
+// A live wallpaper: a video file.
+function isVideo(path) {
+    return /\.(mp4|webm|mkv|mov)$/i.test(path);
+}
+
+// The paths (one per line, yours first) as [{ filePath, fileName, darkPath, own, video, thumb }],
+// in their order: a Plasma folder is one picture at the size for a screenW x screenH screen; a
+// dark version is paired with its light one (`darkPath`, "" when there's none). `own`: in
+// `ownFolder`. A video's line is "<video><tab><thumbnail>" (`thumb`, "" when none was made); its
+// own entry, never paired.
 function entries(text, screenW, screenH, ownFolder) {
-    const paths = text.split("\n").map(l => l.trim()).filter(l => l !== "");
+    const thumbs = {};
+    const paths = text.split("\n").map(l => l.trim()).filter(l => l !== "").map(line => {
+        const tab = line.indexOf("\t");
+        if (tab === -1)
+            return line;
+        thumbs[line.slice(0, tab)] = line.slice(tab + 1);
+        return line.slice(0, tab);
+    });
     const order = [];
     const groups = {};
     function group(key, name, folder) {
@@ -50,6 +64,10 @@ function entries(text, screenW, screenH, ownFolder) {
             continue; // a Plasma folder's preview (screenshot.png)
         const folder = path.slice(0, path.lastIndexOf("/"));
         const base = baseName(path);
+        if (isVideo(path)) {
+            group("video:" + path, base, folder).light.push({ path: path, w: 0, h: 0 });
+            continue;
+        }
         const v = variant.exec(base);
         const key = folder + "/" + (v ? v[1] : base);
         const g = group(key, v ? v[1] : base, folder);
@@ -73,7 +91,9 @@ function entries(text, screenW, screenH, ownFolder) {
             filePath: light,
             fileName: fileName,
             darkPath: dark,
-            own: ownFolder !== "" && light.startsWith(ownFolder + "/")
+            own: ownFolder !== "" && light.startsWith(ownFolder + "/"),
+            video: isVideo(light),
+            thumb: thumbs[light] ?? ""
         });
     }
     return result;

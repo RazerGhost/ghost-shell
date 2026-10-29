@@ -8,6 +8,9 @@ import Quickshell
 Singleton {
     // lock/Lock.qml locks the screen when this fires.
     signal lockRequested()
+    // The screen is locked (kept up to date by lock/Lock.qml), e.g. for a video wallpaper to
+    // pause behind the lock screen.
+    property bool locked: false
 
     function lock(): void {
         lockRequested();

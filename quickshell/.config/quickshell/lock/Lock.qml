@@ -32,6 +32,7 @@ Scope {
 
     WlSessionLock {
         id: sessionLock
+        onLockedChanged: Session.locked = locked
 
         WlSessionLockSurface {
             color: "black"

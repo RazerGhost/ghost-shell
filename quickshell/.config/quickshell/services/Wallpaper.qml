@@ -18,8 +18,12 @@ Singleton {
                                                            Quickshell.env("HOME") + "/Pictures/Wallpapers")
     // The current wallpaper's path; "" until one is chosen (Hyprland's default shows then).
     readonly property string path: state.path
+    // A live wallpaper (a video), and the still picture for it: a frame that matugen's
+    // wallpaper.sh made (the colors come from it; the lock and login screens show it).
+    readonly property bool isVideo: WallpapersJs.isVideo(path)
+    readonly property string stillPath: isVideo ? Quickshell.env("HOME") + "/.local/state/quickshell/video-frame.jpg" : path
     // The lock and login screens' picture: the one chosen in settings, or else the desktop's.
-    readonly property string lockPath: Settings.values.lockWallpaper || path
+    readonly property string lockPath: Settings.values.lockWallpaper || stillPath
     // The picker strip is open (wallpaper/WallpaperPicker.qml): quick settings' button, or
     // `qs ipc call wallpaper picker`.
     property bool pickerOpen: false
