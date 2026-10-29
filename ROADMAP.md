@@ -712,6 +712,9 @@ shell's cost, features and customization), checked before acting. Done so far:
 - Settings -> Appearance -> Status icons: Wi-Fi, Bluetooth, VPN, airplane mode, timer, updates,
   muted and battery can each be hidden (`hiddenStatusIcons`). The privacy icons (recording,
   microphone, camera, screen sharing) always show.
+- Settings -> Windows -> Dock: at the edge (as before), always (it reserves its space, so windows
+  tile above it), or off. Pins move left or right from the dock's right-click menu
+  (`DockApps.movePin`, tested).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

@@ -42,6 +42,26 @@ Column {
     }
 
     SettingGroup {
+        title: "Dock"
+
+        SettingRow {
+            title: "Show the dock"
+            subtitle: Settings.values.dockMode === "always" ? "Always there; windows tile above it"
+                    : Settings.values.dockMode === "off" ? "No dock: open apps with the launcher (Super)"
+                    : "Touch the bottom edge with the pointer to show it"
+
+            Stepper {
+                label: "Show the dock"
+                values: ["hide", "always", "off"]
+                valueWidth: Theme.settings.stepperWide
+                value: Settings.values.dockMode
+                format: v => ({ hide: "At the edge", always: "Always", off: "Off" })[v]
+                onPicked: v => Settings.values.dockMode = v
+            }
+        }
+    }
+
+    SettingGroup {
         title: "Behaviour"
 
         SettingRow {

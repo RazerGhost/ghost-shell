@@ -6,7 +6,8 @@ import "DockApps.js" as DockApps
 
 // The dock: an island along the bottom edge with your pinned apps and the other running ones
 // (dock/DockBar.qml draws it on each monitor). Hidden until the pointer touches the bottom edge
-// (user's choice, since windows tile).
+// (user's choice, since windows tile); Settings -> Windows -> Dock can keep it shown (then it
+// reserves its space, like a taskbar) or turn it off.
 Scope {
     id: root
 
@@ -19,6 +20,11 @@ Scope {
         Windows.recent.map(t => ({ appId: t.wayland.appId, window: t })),
         pinned,
         appId => DesktopEntries.heuristicLookup(appId)?.id ?? "")
+
+    function movePin(id: string, by: int): void {
+        state.pinned = DockApps.movePin(pinned, id, by);
+        file.writeAdapter();
+    }
 
     function togglePin(id: string): void {
         state.pinned = pinned.includes(id) ? pinned.filter(p => p !== id) : [...pinned, id];
@@ -37,8 +43,9 @@ Scope {
         }
     }
 
+    // Settings -> Windows -> Dock: "off" shows none.
     Variants {
-        model: Quickshell.screens
+        model: Settings.values.dockMode === "off" ? [] : Quickshell.screens
 
         DockBar {
             required property ShellScreen modelData

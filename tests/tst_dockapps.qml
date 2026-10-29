@@ -50,4 +50,11 @@ TestCase {
         compare(DockApps.notificationCount(notifications, "zen", "Zen Browser"), 0);
         compare(DockApps.notificationCount([], "zen", "Zen Browser"), 0);
     }
+
+    function test_movePin() {
+        compare(DockApps.movePin(["zen", "ghostty", "files"], "ghostty", -1), ["ghostty", "zen", "files"]);
+        compare(DockApps.movePin(["zen", "ghostty", "files"], "ghostty", 1), ["zen", "files", "ghostty"]);
+        compare(DockApps.movePin(["zen", "ghostty"], "zen", -1), ["zen", "ghostty"]); // already first
+        compare(DockApps.movePin(["zen"], "steam", 1), ["zen"]); // not pinned
+    }
 }

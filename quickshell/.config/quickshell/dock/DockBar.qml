@@ -32,7 +32,10 @@ PanelWindow {
         }
     }
 
-    readonly property bool shown: revealed
+    // Settings' dockMode "always": shown all the time, with its space reserved so windows tile
+    // above it.
+    readonly property bool always: Settings.values.dockMode === "always"
+    readonly property bool shown: revealed || always
     onShownChanged: {
         if (shown)
             DockState.shownOn = screen.name;
@@ -51,7 +54,8 @@ PanelWindow {
     anchors.right: true
     // Room above the dock for the tooltips and the right-click menu.
     implicitHeight: Theme.dock.height + Theme.dock.margin + Theme.dock.menuSpace
-    exclusionMode: ExclusionMode.Ignore
+    exclusionMode: always ? ExclusionMode.Normal : ExclusionMode.Ignore
+    exclusiveZone: always ? Theme.dock.height + Theme.dock.margin : 0
     color: "transparent"
     // Input only on the dock (or, while hidden, the thin strip at the bottom edge) and the menu.
     // While shown it's hitArea: where the dock ends up, down to the screen edge. Not the sliding
@@ -288,6 +292,21 @@ PanelWindow {
                 icon: menu.item?.pinned ? "keep_off" : "keep"
                 text: menu.item?.pinned ? "Unpin from dock" : "Pin to dock"
                 onClicked: menu.run(() => window.dock.togglePin(menu.item.id))
+            }
+
+            // Reordering the pins.
+            MenuRow {
+                visible: (menu.item?.pinned ?? false) && window.dock.pinned.indexOf(menu.item.id) > 0
+                icon: "arrow_back"
+                text: "Move left"
+                onClicked: menu.run(() => window.dock.movePin(menu.item.id, -1))
+            }
+
+            MenuRow {
+                visible: (menu.item?.pinned ?? false) && window.dock.pinned.indexOf(menu.item.id) < window.dock.pinned.length - 1
+                icon: "arrow_forward"
+                text: "Move right"
+                onClicked: menu.run(() => window.dock.movePin(menu.item.id, 1))
             }
 
             MenuRow {

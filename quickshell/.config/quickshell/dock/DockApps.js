@@ -47,3 +47,15 @@ function notificationCount(notifications, id, name) {
     return notifications.filter(n => lower(n.desktopEntry) === lower(id)
         || (n.appName && (lower(n.appName) === lower(id) || lower(n.appName) === lower(name)))).length;
 }
+
+// The pins with `id` moved `by` places (-1 left, 1 right); the same list when it can't move.
+function movePin(pinned, id, by) {
+    const list = Array.from(pinned);
+    const from = list.indexOf(id);
+    const to = from + by;
+    if (from === -1 || to < 0 || to >= list.length)
+        return list;
+    list.splice(from, 1);
+    list.splice(to, 0, id);
+    return list;
+}

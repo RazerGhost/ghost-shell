@@ -69,6 +69,8 @@ Singleton {
             // The island's status icons you've hidden, by key (bar/StatusIcons.qml); the privacy
             // ones (recording, microphone, camera, screen sharing) always show.
             property var hiddenStatusIcons: []
+            // The dock: "hide" (shows at the bottom edge), "always" (reserves its space) or "off".
+            property string dockMode: "hide"
             property real notificationSeconds: 5
             property string osdPosition: "bottom"
             property real osdSeconds: 1.5
