@@ -841,6 +841,13 @@ audit of our own UI): all sixteen, built in batches.
   even when shown at the top) and moves smoothly between a level and a label; text fields show
   where the typing goes; the switch's thumb grows while held and has hover; outline widths,
   the switch's thumb and a subtitle's dimming are Theme tokens; size animations ease.
+- Tooltips (`widgets/Tooltip.qml`): an icon-only button's label after the pointer rests 0.5 s,
+  under it or above when there's no room, moved to the top of its window so no clip cuts it
+  off; the round buttons' names use it too.
+- Animation speed (Settings -> Appearance): off, 0.5x to 2x, for the shell (Theme's durations)
+  and Hyprland together: look.lua's animations are one table set by `GhostAnimations(factor)`,
+  which shell-settings.lua calls again at the chosen speed (`HyprlandConfig.animationLua`,
+  tested).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

@@ -5,6 +5,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import qs.services
+import "../settings/HyprlandConfig.js" as HyprlandConfig
 
 Singleton {
     readonly property QtObject spacing: QtObject {
@@ -43,14 +44,17 @@ Singleton {
         readonly property int osd:      18 // the OSD's icon
     }
 
+    // Durations follow Settings' animation speed (2 = twice as fast, 0 = none; the same factor
+    // as Hyprland's, HyprlandConfig.js).
     readonly property QtObject anim: QtObject {
-        readonly property int fast:   150
-        readonly property int normal: 250
+        readonly property real speed: HyprlandConfig.animationSpeed(Settings.values.animationSpeed)
+        readonly property int fast:   speed > 0 ? Math.round(150 / speed) : 0
+        readonly property int normal: speed > 0 ? Math.round(250 / speed) : 0
         readonly property int easing: Easing.OutCubic
 
         // The island's open/close morph: Material 3's "emphasized decelerate" curve, which
         // starts fast and settles gently. Used with easing.type: Easing.BezierSpline.
-        readonly property int morph: 450
+        readonly property int morph: speed > 0 ? Math.round(450 / speed) : 0
         readonly property list<real> emphasized: [0.05, 0.7, 0.1, 1, 1, 1]
     }
 
@@ -66,6 +70,12 @@ Singleton {
         readonly property int thumbOff: 16
         readonly property int thumbOn: 24
         readonly property int thumbPressed: 28 // grows while held, like Material 3's
+    }
+
+    // A tooltip (widgets/Tooltip.qml): how long the pointer rests before it shows, and its gap.
+    readonly property QtObject tooltip: QtObject {
+        readonly property int delay: 500 // ms
+        readonly property int gap: 4
     }
 
     // Outlines that mark a picture or window: the chosen one, and one hovered or picked with the

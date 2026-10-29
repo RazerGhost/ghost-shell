@@ -53,30 +53,11 @@ Rectangle {
         color: root.contentColor
     }
 
-    // The name, under the button while hovered or chosen with the keyboard.
-    Rectangle {
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.bottom
-        anchors.topMargin: Theme.spacing.xs
-        width: name.implicitWidth + Theme.spacing.m * 2
-        height: name.implicitHeight + Theme.spacing.xs * 2
-        radius: Theme.radius.full
-        color: Colors.m3surfaceContainerHighest
-        opacity: mouse.containsMouse || root.activeFocus ? 1 : 0
-        visible: opacity > 0
-
-        Behavior on opacity {
-            NumberAnimation { duration: Theme.anim.fast }
-        }
-
-        Text {
-            id: name
-            anchors.centerIn: parent
-            text: root.title
-            color: Colors.m3onSurface
-            font.family: Theme.font.sans
-            font.pixelSize: Theme.font.small
-        }
+    // The name, while hovered or chosen with the keyboard.
+    Tooltip {
+        target: root
+        text: root.title
+        shown: mouse.containsMouse || root.activeFocus
     }
 
     MouseArea {

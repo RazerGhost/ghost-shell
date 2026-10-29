@@ -43,6 +43,13 @@ Item {
         anchors.centerIn: parent
     }
 
+    // What it does, while the pointer rests on it.
+    Tooltip {
+        target: root
+        text: root.label
+        shown: mouse.containsMouse
+    }
+
     MouseArea {
         id: mouse
         anchors.fill: parent

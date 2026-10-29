@@ -62,4 +62,17 @@ TestCase {
         // After the settings' own hl.config, so it overrides them.
         verify(on.indexOf("animations") > on.indexOf("wobble"));
     }
+
+    function test_animationSpeed() {
+        // Normal (or not set): nothing extra, look.lua's own speeds stand.
+        verify(!HyprlandConfig.lua(defaults, false).includes("GhostAnimations"));
+        const fast = HyprlandConfig.lua(Object.assign({}, defaults, { animationSpeed: 2 }), false);
+        verify(fast.includes("if GhostAnimations then GhostAnimations(2) end"));
+        const off = HyprlandConfig.lua(Object.assign({}, defaults, { animationSpeed: 0 }), false);
+        verify(off.includes("hl.config({ animations = { enabled = false } })"));
+        // Hand-edited nonsense is normal speed.
+        compare(HyprlandConfig.animationSpeed(7), 1);
+        compare(HyprlandConfig.animationSpeed("2"), 1);
+        compare(HyprlandConfig.animationSpeed(0.5), 0.5);
+    }
 }

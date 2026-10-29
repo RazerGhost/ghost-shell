@@ -21,6 +21,24 @@ function number(value, fallback) {
     return typeof value === "number" && isFinite(value) ? value : fallback;
 }
 
+// Settings' animation speeds: 0 is off, 1 normal, 2 twice as fast. Anything else is normal.
+// The shell's own animations use the same factor (theme/Theme.qml).
+const animationSpeeds = [0, 0.5, 0.75, 1, 1.5, 2];
+
+function animationSpeed(value) {
+    return animationSpeeds.includes(value) ? value : 1;
+}
+
+// Hyprland's side: look.lua's GhostAnimations at the factor, or animations off.
+function animationLua(value) {
+    const speed = animationSpeed(value);
+    if (speed === 1)
+        return [];
+    if (speed === 0)
+        return ["-- Animations off (Settings -> Appearance).", "hl.config({ animations = { enabled = false } })", ""];
+    return ["-- Animation speed (Settings -> Appearance).", `if GhostAnimations then GhostAnimations(${speed}) end`, ""];
+}
+
 // Game mode (services/GameMode.qml): what it switches off, after the settings so it wins.
 const gameModeLua = [
     "-- Game mode is on (quick settings).",
@@ -58,6 +76,7 @@ function lua(v, gameMode) {
         "    },",
         "})",
         "",
+        ...animationLua(v.animationSpeed),
         ...(gameMode === true ? gameModeLua : []),
         // Screens set up in the Display page, by output name (the rest keep monitors.lua's
         // "preferred"); one that isn't safe to write is left out.

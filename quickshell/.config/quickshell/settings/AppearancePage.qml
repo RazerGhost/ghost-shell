@@ -5,6 +5,7 @@ import qs.services
 import qs.theme
 import qs.widgets
 import "../services/ColorScheme.js" as ColorSchemeJs
+import "HyprlandConfig.js" as HyprlandConfig
 
 // Appearance: the wallpaper (the colors of everything come from it), light or dark, the shell's panels (glass
 // or nearly solid: Colors.surfaceTranslucent, widgets/Surface.qml), and the windows' border and
@@ -170,6 +171,19 @@ Column {
                 label: "Glass panels"
                 checked: Settings.values.glass
                 onToggled: Settings.values.glass = !checked
+            }
+        }
+
+        SettingRow {
+            title: "Animation speed"
+            subtitle: "The shell's and the windows' together"
+
+            Stepper {
+                label: "Animation speed"
+                values: HyprlandConfig.animationSpeeds
+                value: HyprlandConfig.animationSpeed(Settings.values.animationSpeed)
+                format: v => v === 0 ? "Off" : v === 1 ? "Normal" : v < 1 ? "Slower (" + v + "×)" : "Faster (" + v + "×)"
+                onPicked: v => Settings.values.animationSpeed = v
             }
         }
 

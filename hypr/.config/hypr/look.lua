@@ -101,21 +101,34 @@ hl.curve("almostLinear",   { type = "bezier", points = { {0.5, 0.5},   {0.75, 1}
 hl.curve("quick",          { type = "bezier", points = { {0.15, 0},    {0.1, 1}  } })
 hl.curve("easy",           { type = "spring", mass = 1, stiffness = 238.1191, damping = 24.21279333 })
 
--- Animations
-hl.animation({ leaf = "global",        enabled = true, speed = 10,   bezier = "default" })
-hl.animation({ leaf = "border",        enabled = true, speed = 5.39, bezier = "easeOutQuint" })
-hl.animation({ leaf = "windows",       enabled = true, speed = 4.79, spring = "easy" })
-hl.animation({ leaf = "windowsIn",     enabled = true, speed = 4.1,  spring = "easy",         style = "popin 87%" })
-hl.animation({ leaf = "windowsOut",    enabled = true, speed = 1.49, bezier = "linear",       style = "popin 87%" })
-hl.animation({ leaf = "fadeIn",        enabled = true, speed = 1.73, bezier = "almostLinear" })
-hl.animation({ leaf = "fadeOut",       enabled = true, speed = 1.46, bezier = "almostLinear" })
-hl.animation({ leaf = "fade",          enabled = true, speed = 3.03, bezier = "quick" })
-hl.animation({ leaf = "layers",        enabled = true, speed = 3.81, bezier = "easeOutQuint" })
-hl.animation({ leaf = "layersIn",      enabled = true, speed = 4,    bezier = "easeOutQuint", style = "fade" })
-hl.animation({ leaf = "layersOut",     enabled = true, speed = 1.5,  bezier = "linear",       style = "fade" })
-hl.animation({ leaf = "fadeLayersIn",  enabled = true, speed = 1.79, bezier = "almostLinear" })
-hl.animation({ leaf = "fadeLayersOut", enabled = true, speed = 1.39, bezier = "almostLinear" })
-hl.animation({ leaf = "workspaces",    enabled = true, speed = 1.94, bezier = "almostLinear", style = "fade" })
-hl.animation({ leaf = "workspacesIn",  enabled = true, speed = 1.21, bezier = "almostLinear", style = "fade" })
-hl.animation({ leaf = "workspacesOut", enabled = true, speed = 1.94, bezier = "almostLinear", style = "fade" })
-hl.animation({ leaf = "zoomFactor",    enabled = true, speed = 7,    bezier = "quick" })
+-- Animations. `speed` is how long each takes, in tenths of a second, at normal speed.
+-- GhostAnimations(factor) sets them all; shell-settings.lua calls it again with Settings'
+-- animation speed (2 = twice as fast), so the windows keep pace with the shell.
+local animations = {
+    { leaf = "global",        speed = 10,   bezier = "default" },
+    { leaf = "border",        speed = 5.39, bezier = "easeOutQuint" },
+    { leaf = "windows",       speed = 4.79, spring = "easy" },
+    { leaf = "windowsIn",     speed = 4.1,  spring = "easy",         style = "popin 87%" },
+    { leaf = "windowsOut",    speed = 1.49, bezier = "linear",       style = "popin 87%" },
+    { leaf = "fadeIn",        speed = 1.73, bezier = "almostLinear" },
+    { leaf = "fadeOut",       speed = 1.46, bezier = "almostLinear" },
+    { leaf = "fade",          speed = 3.03, bezier = "quick" },
+    { leaf = "layers",        speed = 3.81, bezier = "easeOutQuint" },
+    { leaf = "layersIn",      speed = 4,    bezier = "easeOutQuint", style = "fade" },
+    { leaf = "layersOut",     speed = 1.5,  bezier = "linear",       style = "fade" },
+    { leaf = "fadeLayersIn",  speed = 1.79, bezier = "almostLinear" },
+    { leaf = "fadeLayersOut", speed = 1.39, bezier = "almostLinear" },
+    { leaf = "workspaces",    speed = 1.94, bezier = "almostLinear", style = "fade" },
+    { leaf = "workspacesIn",  speed = 1.21, bezier = "almostLinear", style = "fade" },
+    { leaf = "workspacesOut", speed = 1.94, bezier = "almostLinear", style = "fade" },
+    { leaf = "zoomFactor",    speed = 7,    bezier = "quick" },
+}
+
+function GhostAnimations(factor)
+    for _, a in ipairs(animations) do
+        hl.animation({ leaf = a.leaf, enabled = true, speed = a.speed / factor,
+                       bezier = a.bezier, spring = a.spring, style = a.style })
+    end
+end
+
+GhostAnimations(1)
