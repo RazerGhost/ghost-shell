@@ -2,5 +2,3 @@
 # The shell's icon font, and its icon theme
 ttf-material-symbols-variable
 colloid-icon-theme-git
-# Ubuntu's community art contest wallpapers (illustrations and paintings), for the picker
-ubuntu-wallpapers

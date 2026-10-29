@@ -124,8 +124,8 @@ new setup step.
   settings or `qs ipc call wallpaper picker`) is its own strip across the top under the island
   (user's choice: a strip, not a menu; it stretched the island itself until 2026-10-28; the
   bottom edge is the dock's) with one row of
-  pictures: `~/Pictures/Wallpapers` first (local folder only: the user prefers real photos or
-  anime art and picks them themselves), then the built-in ones: Hyprland's `/usr/share/hypr/wall*.png` and
+  pictures: `~/Pictures/Wallpapers` first (local folder only: the user prefers anime art and
+  illustrations, not photos, and picks them themselves; corrected 2026-10-29), then the built-in ones: Hyprland's `/usr/share/hypr/wall*.png` and
   the `cachyos-wallpapers` package (in packages.txt). Those stay in their packages, not in this
   repo: their licensing is unclear (no artist credits) and they're ~200 MB. The row scrolls
   sideways (user's choice: one horizontal row, own and built-in together).
@@ -742,7 +742,9 @@ shell's cost, features and customization), checked before acting. Done so far:
   everything under /usr/share/wallpapers and /usr/share/backgrounds; JPEG XL/AVIF/HEIC only with
   kimageformats) grouped by `Wallpapers.js` (tested): a KDE Plasma picture is one entry at the
   screen's size, dark versions (`images_dark/`, `-dark`, `_dark`, `-d`) paired with their light
-  ones. Core gained the KDE Plasma, nwg-shell and Ubuntu art contest sets (user's picks).
+  ones (still useful for sets with dark versions). Core gained nwg-shell's digital art; KDE
+  Plasma's and Ubuntu's sets were tried and dropped: mostly photos, and the user wants art (anime
+  and illustrations), not photos.
   Settings -> Appearance -> Wallpaper: your folder, a slideshow (15 min to 4 h, from yours or
   all; each change recolors), and following light and dark for pictures with a dark version.
 - Live wallpapers (user's request, "anime cinematics"): video files (mp4, webm, mkv, mov) in your
