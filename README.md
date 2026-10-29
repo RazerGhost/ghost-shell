@@ -80,6 +80,7 @@ its setup (`setup.sh`).
 | `haunt` | the Haunt Git client, from its release package, and what building it needs |
 | `capture` | screen recording, color picker, text and QR codes from the screen |
 | `phone` | KDE Connect |
+| `proton` | Proton Mail, Pass and VPN |
 | `wave3` | the Elgato Wave:3 microphone with openxlr and a voice chain ([its README](modules/wave3/README.md)) |
 
 Every module except `wave3` is installed unless `~/.config/ghost/modules` lists the ones this

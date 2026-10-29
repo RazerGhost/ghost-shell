@@ -1,0 +1,5 @@
+# Proton's apps: VPN (its connections go through NetworkManager, so quick settings' VPN tile
+# switches them too).
+# pacman packages; # lines and blank lines are skipped.
+
+proton-vpn-gtk-app

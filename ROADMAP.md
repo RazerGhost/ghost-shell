@@ -524,6 +524,11 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   and a limiter. Opt-in modules (`opt_in` in `ghost`) only install where
   `~/.config/ghost/modules` lists them, never as part of "all".
 
+### Proton apps (built 2026-10-29)
+- The `proton` module (user's request): Proton VPN (`proton-vpn-gtk-app`, extra), Proton Mail
+  and Proton Pass (`proton-mail-bin`, `proton-pass-bin`, AUR; Proton's own builds). Proton
+  Drive has no Linux app. Proton VPN's connections are NetworkManager connections.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
