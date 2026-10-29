@@ -4,7 +4,8 @@ import qs.theme
 import qs.widgets
 
 // System page of quick settings: processor, memory, each graphics card and the disk, with a
-// bar for how busy or full each is. Updated every 2 s while the page is open (SystemStats).
+// bar for how busy or full each is, and the busiest apps with End task. Updated every 2 s while
+// the page is open (SystemStats).
 Column {
     id: root
 
@@ -119,5 +120,62 @@ Column {
         title: "Disk"
         detail: SystemStats.disk ? SystemStats.amount(SystemStats.disk.used, SystemStats.disk.total) : ""
         value: SystemStats.disk ? SystemStats.disk.used / SystemStats.disk.total : -1
+    }
+
+    // The busiest apps. End task asks for a second click within 4 s, like the power menu.
+    property var armed: null
+
+    Timer {
+        id: disarm
+        interval: 4000
+        onTriggered: root.armed = null
+    }
+
+    Text {
+        visible: SystemStats.apps.length > 0
+        x: Theme.spacing.m
+        text: "Apps"
+        color: Colors.m3onSurfaceVariant
+        font.family: Theme.font.sans
+        font.pixelSize: Theme.font.small
+    }
+
+    Column {
+        width: parent.width
+
+        Repeater {
+            model: SystemStats.apps
+
+            ListRow {
+                id: appRow
+
+                required property var modelData
+
+                width: parent.width
+                hoverEnabled: false
+                cursorShape: Qt.ArrowCursor
+                icon: "memory"
+                appIcon: modelData.icon
+                title: modelData.name
+                subtitle: "CPU " + root.percent(modelData.cpu) + " · " + SystemStats.size(modelData.memory)
+
+                TextButton {
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.spacing.s
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: !appRow.modelData.essential
+                    text: root.armed === appRow.modelData.name ? "Click to confirm" : "End task"
+                    onClicked: {
+                        if (root.armed === appRow.modelData.name) {
+                            root.armed = null;
+                            SystemStats.endTask(appRow.modelData);
+                        } else {
+                            root.armed = appRow.modelData.name;
+                            disarm.restart();
+                        }
+                    }
+                }
+            }
+        }
     }
 }

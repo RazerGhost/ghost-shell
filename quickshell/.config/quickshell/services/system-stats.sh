@@ -25,3 +25,13 @@ for card in /sys/class/drm/card[0-9]; do
         ;;
     esac
 done
+
+# This user's processes: "proc pid ppid ticks rss_bytes name". The name sits in parentheses in
+# the stat file and can hold spaces and parentheses itself, so it ends at the last ")".
+page=$(getconf PAGESIZE)
+ps -u "$(id -u)" -o pid= | awk '{ print "/proc/" $1 "/stat" }' | xargs awk -v page="$page" '{
+    first = index($0, "("); last = 0
+    while ((k = index(substr($0, last + 1), ")")) > 0) last += k
+    split(substr($0, last + 2), f, " ")
+    print "proc", $1, f[2], f[12] + f[13], f[22] * page, substr($0, first + 1, last - first - 1)
+}' 2>/dev/null

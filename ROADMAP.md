@@ -562,6 +562,13 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   `/dev/rfkill` through logind's ACL, no root). The lists are re-read on `nmcli monitor` and
   `rfkill event` output. The island shows a plane and a key while they're on.
 
+### End task on the System page (built 2026-10-29)
+- Under the stats: the six busiest apps (CPU over the last 2 s, then memory), like a task
+  manager: a window's app with every process under it (Electron and browser helpers), the rest
+  by process name (`/proc/<pid>/stat` read by `system-stats.sh`; grouping in `SystemStats.js`,
+  tested). "End task" sends SIGTERM to all of them after a second click; processes the session
+  needs (Hyprland, the shell, PipeWire, D-Bus, portals) have no button.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
