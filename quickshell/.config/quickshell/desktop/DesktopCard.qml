@@ -1,11 +1,13 @@
 import QtQuick
+import qs.customize
 import qs.services
 import qs.theme
 import qs.widgets
 import "DesktopWidgets.js" as DesktopWidgets
 
 // One desktop widget at its saved place (Settings' desktopWidgets, as fractions of the screen).
-// Resting the pointer on it shows a handle in its top-right corner; drag that to move it. Only
+// Resting the pointer on it (or the desktop editor being open) shows a handle in its top-right
+// corner; drag that to move it. Only
 // the handle: the media card's buttons keep their clicks.
 Item {
     id: root
@@ -45,7 +47,7 @@ Item {
         height: width
         radius: width / 2
         color: Colors.m3surfaceContainerHighest
-        opacity: hover.hovered || drag.active ? 1 : 0
+        opacity: hover.hovered || drag.active || Editing.desktop ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: Theme.anim.fast } }
 
         Accessible.role: Accessible.Button

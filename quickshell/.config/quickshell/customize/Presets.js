@@ -16,6 +16,13 @@ const lock = [
 const lockKeys = ["lockClockStyle", "lockLayout", "lockClockSize", "lockClockFont", "lockBlur", "lockDim",
                   "lockWallpaper", "lockClock", "lockDate"];
 
+// Every setting the desktop editor changes, for its Cancel (the wallpaper is put back apart:
+// it isn't a setting).
+const desktopKeys = ["colorScheme", "colorStyle", "colorContrast", "accentColor",
+                     "desktopClock", "desktopWeather", "desktopMedia", "desktopWidgets",
+                     "glass", "glassOpacity", "blurStyle", "uiScale", "textScale", "cornerScale",
+                     "fontSans", "fontMono", "iconTheme"];
+
 // The values of `keys` now, to put back with restore() when an editor is cancelled.
 function snapshot(values, keys) {
     const saved = {};

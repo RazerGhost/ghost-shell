@@ -19,7 +19,9 @@ Scope {
     // The shell's own entries, found like your commands: the on-screen editors (customize/).
     readonly property var shellCommands: [
         { name: "Customize the lock screen", command: "qs ipc call customize lock",
-          icon: "preferences-desktop-screensaver", subtitle: "Its clock, picture and look, on the screen itself" }
+          icon: "preferences-desktop-screensaver", subtitle: "Its clock, picture and look, on the screen itself" },
+        { name: "Customize the desktop", command: "qs ipc call customize desktop",
+          icon: "preferences-desktop-wallpaper", subtitle: "Wallpaper, colors, widgets and style, on the desktop itself" }
     ]
 
     property bool open: false

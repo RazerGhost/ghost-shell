@@ -910,7 +910,7 @@ changed the same day). The direction: Android's customization with iOS's and mac
 User's choices: four editors (lock screen, desktop, dock and island, windows look), opened
 from a Customize button on the matching Settings page and from the launcher (not a long-press
 or a key); their visual options leave Settings, which keeps only what isn't seen.
-- Lock screen editor (`customize/LockEditor.qml`, `qs ipc call customize lock|close`): the real
+- Lock screen editor (`customize/LockEditor.qml`, `qs ipc call customize lock`): the real
   lock screen, live, with Cancel and Done (Escape, Enter; Cancel writes the earlier values
   back), the clock outlined (click for its tab) and a sheet with Looks (presets as picture
   cards: your picture with each look's clock, `customize/Presets.js`, tested), Clock (style
@@ -920,6 +920,19 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   `widgets/ChoiceCards.qml` (picture cards, wrapping or one scrolling row),
   `widgets/Segmented.qml`, `lock/MiniClock.qml`. Settings -> Lock screen keeps the message,
   what shows under the clock, the grace period and the login screen's options.
+- Desktop editor (`customize/DesktopEditor.qml`, `qs ipc call customize desktop`), like
+  Android's "Wallpaper & style": opening it goes to an empty workspace (windows would cover the
+  desktop; Done or Cancel go back), the island and dock stay to show colors and sizes. Tabs:
+  Wallpaper (pictures and videos as cards), Colors (light, dark or at sunset; the accent as
+  swatches, the wallpaper's own in its picture; color style; contrast), Widgets (on or off;
+  their handles show while it's open, drag them), Style (glass, see-through, blur, corners),
+  Size and text (shell size, text size, font cards, icon theme). Its window takes input only
+  on its sheet and buttons, so the widgets underneath can be dragged. Cancel writes the earlier
+  settings back and sets the earlier wallpaper again. Settings -> Appearance keeps the wallpaper
+  folder and slideshow, the launcher's size, animation speed, workspace dots, status icons and
+  the windows' border and corners (the last ones move with their editors). The editors share
+  `customize/EditorChrome.qml` (Cancel, Done, the tabbed sheet); `customize/Customize.qml`
+  holds them and the IPC (`lock`, `desktop`, `close`).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
