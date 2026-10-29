@@ -530,6 +530,8 @@ windows).
 
 ## Decisions made
 
+### Hardware and boot
+
 - **External monitors:** keep the RTX in `AQ_DRM_DEVICES` (second, after the iGPU), so outputs wired
   to it work, accepting the battery cost.
 - **No global NVIDIA env vars:** the wiki's NVIDIA page sets `LIBVA_DRIVER_NAME=nvidia` and
@@ -540,12 +542,9 @@ windows).
   themed screen instead.
 - **Early KMS:** CachyOS's chwd removes the `kms` mkinitcpio hook on NVIDIA laptops, so
   `system/etc/mkinitcpio.conf.d/20-early-amdgpu.conf` adds `amdgpu` to MODULES.
-- **Color names in QML use an `m3` prefix** (`Colors.m3onSurface`). QML treats `on` + capital letter
-  as a change handler: next to a `surface` property, `onSurface` silently reads as `#000000`.
-  Reproduced in Qt 6.12. Follow this for every new color.
-- **matugen's Quickshell JSON lives outside the shell directory**
-  (`~/.local/state/quickshell/colors.json`). Quickshell reloads the whole shell when files in its config
-  directory change; `Colors.qml` watches the file instead.
+
+### Windows and keybinds
+
 - **Tiling with our own layout** (user's choice, 2026-10-28, replacing "everything floats"):
   snapping floating windows meant redoing what a tiling layout does (gaps, neighbours), and apps
   with a minimum size (Discord, 972 px against a 920 px half) only report their real size some
@@ -570,19 +569,6 @@ windows).
   `input.follow_mouse = 2` (hover still scrolls, a click focuses) and `hypr/windows.lua` raises
   every newly focused window (`hl.on("window.active", ...)` + `alter_zorder({ mode = "top" })`);
   Hyprland only raises on click by itself.
-- **Brightness OSD through IPC:** sysfs backlight files send no inotify events, so the brightness
-  binds run `qs ipc call brightness refresh` after `brightnessctl`. Volume and mic need nothing:
-  the OSD watches PipeWire.
-- **Island window:** fixed at the open menu's maximum size (resizing a layer surface every frame
-  would stutter); `mask: Region { item: island }` limits input to the shape and `exclusiveZone`
-  reserves only the closed height. The shape is one `ShapePath` (no seams between body and curves).
-- **Island keyboard focus: `OnDemand` while a menu is open, `None` while closed.** Always
-  `OnDemand` stole the keyboard: Hyprland gives the keyboard to a layer surface that accepts it as
-  soon as the pointer moves over it (`InputManager.cpp`, `rawSurfaceFocus`), and a click back into
-  the window didn't take it back because Hyprland still counted that window as focused, so only
-  Alt+Tab refocused. Switching between `None` and `Exclusive` instead made Hyprland clear the
-  `HyprlandFocusGrab` right after it started (the menu closed at once); `None`/`OnDemand` keeps
-  menus open. (The launcher maps a new surface with `Exclusive`, which works.)
 - **Keybinds: Windows-style** (user's choice, 2026-10-28): tap Super or Super+Space launcher,
   Super+Enter terminal, Super+E files, Super+B browser, Super+W / Alt+F4 close, Super+Up maximize,
   Super+Down minimize, Alt+Space or Super+Z window menu (with snap layouts), Alt+Tab switcher,
@@ -606,6 +592,40 @@ windows).
   it to the current workspace and focuses it (`services/Windows.qml`). Hovering the workspace dots shows the minimized windows
   under the workspace numbers (`MinimizedList`, also in the window menu); no separate indicator, to keep the island
   consistent (user's choice).
+- **Apps reopen where they were** (`hypr/positions.lua`): on `window.close` a floating window's
+  position and size are saved per class in `~/.local/state/hypr/window-positions`; on
+  `window.open` they're applied, unless another window of that class is open (dialogs, second
+  windows) or the spot is off-screen. Fullscreen and minimized windows aren't saved.
+- **Attention like a flashing taskbar button:** apps can't steal focus (`misc.focus_on_activate`
+  stays false); Hyprland marks them urgent and the island shows an `AttentionCard` (icon, title,
+  click to switch) for 5 s, after any notification pop-up. `services/Windows.qml` keeps its own
+  list from Hyprland's `urgent` raw events, dropping a window once it's focused or closed:
+  `HyprlandToplevel.urgent` didn't follow these events (false for a terminal bell). Opening a
+  window also sends `urgent` just before focusing it, which the list ignores.
+- **Apps may maximize themselves** (2026-10-28): the `suppress_event = "maximize"` rule from
+  Hyprland's example config (Phase 1) is gone. With everything floating it made the maximize
+  buttons in title bars (Ghostty, GTK apps, the settings window) do nothing. Apps that ask to
+  start maximized now do.
+- **App keybinds go through the shell** (Phase 7): Super+Enter/B/E and Super+Shift+E call
+  `qs ipc call apps ...`, which opens the default app chosen in settings. If the shell isn't
+  running the call fails and the bind falls back to Ghostty / Zen / Nautilus, so there's always a
+  terminal.
+
+### The island and panels
+
+- **Brightness OSD through IPC:** sysfs backlight files send no inotify events, so the brightness
+  binds run `qs ipc call brightness refresh` after `brightnessctl`. Volume and mic need nothing:
+  the OSD watches PipeWire.
+- **Island window:** fixed at the open menu's maximum size (resizing a layer surface every frame
+  would stutter); `mask: Region { item: island }` limits input to the shape and `exclusiveZone`
+  reserves only the closed height. The shape is one `ShapePath` (no seams between body and curves).
+- **Island keyboard focus: `OnDemand` while a menu is open, `None` while closed.** Always
+  `OnDemand` stole the keyboard: Hyprland gives the keyboard to a layer surface that accepts it as
+  soon as the pointer moves over it (`InputManager.cpp`, `rawSurfaceFocus`), and a click back into
+  the window didn't take it back because Hyprland still counted that window as focused, so only
+  Alt+Tab refocused. Switching between `None` and `Exclusive` instead made Hyprland clear the
+  `HyprlandFocusGrab` right after it started (the menu closed at once); `None`/`OnDemand` keeps
+  menus open. (The launcher maps a new surface with `Exclusive`, which works.)
 - **Media in the island:** while music plays, a "live activity" (`bar/MediaActivity.qml`: the
   album cover; level bars next to it were dropped, user's choice) replaces the clock, so the island stays centered (no
   alternating: user's choice). Hovering it opens a small player (`MediaCard`, no keyboard focus,
@@ -614,6 +634,39 @@ windows).
   seek bar, controls); clicking the middle opens whatever it shows. Player choice
   lives in `services/Media.qml`. Spotify (1.3.4) reports a frozen MPRIS position (equal to the
   track length) while playing, so its seek bar reads full; other players are untested.
+- **Notifications from the island** (user's choice over corner cards). Pop-ups wait while a menu
+  is open. Notifications carry no timestamp, so the service records arrival times; after a shell
+  restart (not a reload) the history is empty.
+- **Island window height** is 840 px (was 680) so the "today" menu with notifications fits.
+- **Island menu widths:** menus are `Theme.island.panelWidth` (380) wide, and the island's window
+  is just that wide (plus its curves and offset); the wallpaper picker is its own surface.
+- **The bottom edge belongs to the dock:** nothing else goes there.
+- **Settings window title bar** (user's request: like the other apps): drawn by the window
+  itself, GTK style: "Settings" over the sidebar, the page name, maximize and close (round
+  buttons); drag to move, double-click to maximize. Maximizing goes through Hyprland, not
+  `FloatingWindow.maximized` (see NOTES.md).
+
+### Colors and look
+
+- **Color names in QML use an `m3` prefix** (`Colors.m3onSurface`). QML treats `on` + capital letter
+  as a change handler: next to a `surface` property, `onSurface` silently reads as `#000000`.
+  Reproduced in Qt 6.12. Follow this for every new color.
+- **matugen's Quickshell JSON lives outside the shell directory**
+  (`~/.local/state/quickshell/colors.json`). Quickshell reloads the whole shell when files in its config
+  directory change; `Colors.qml` watches the file instead.
+- **Glass look** (user's request, 2026-10-28, like the Ghost Spotify theme: a strongly blurred
+  background, translucent panels, a faint light edge). Every shell panel is a `widgets/Surface.qml`
+  (the island draws the same with its shape's outline): `Colors.surfaceTranslucent` at the
+  setting's opacity (45 % by default, 20-85; it was 35-85 while the blur came from layer rules
+  with `ignore_alpha`, see "Native blur shapes") and a 1 px edge in the text color at 8 % (`Colors.glassEdge`). Settings ->
+  Appearance -> Shell panels -> Glass turns it off (85 % opaque, no edge). Hyprland's blur is stronger
+  (size 8, 3 passes, more vibrancy, a little darker; look.lua). Ghostty (`background-opacity
+  0.85`) and Zed (`background.appearance: blurred`, main backgrounds at 85 %) are see-through
+  too; those are fixed, not following the setting. GTK/libadwaita apps can't be.
+- **Icons: Colloid** (`Colloid-Dark`, `colloid-icon-theme-git` from the AUR; user's choice over
+  WhiteSur and Tela Circle after previews in the dock, 2026-10-28): set for Quickshell with
+  `QS_ICON_THEME` in `env.lua` and for GTK apps with gsettings in `install.sh`. It redraws
+  nearly every app in one style; Adwaita has few app icons, so apps showed their own.
 - **MangoHud follows the wallpaper** (user's request): matugen writes the whole
   `~/.config/MangoHud/MangoHud.conf` from `templates/mangohud.conf` (what it shows: fps, frame
   times, GPU and CPU load and temperature, RAM, VRAM, battery; a rounded card top left; fps and
@@ -652,25 +705,19 @@ windows).
   Hyprland draws none), enables the theme, and gives the plugin matugen and Hyprland's rounding as
   defaults on first run only. If Vesktop runs under XWayland, `~/.config/vesktop-flags.conf` with
   `--ozone-platform-hint=auto` (vesktop-bin's launcher reads it). Not yet tested on the laptop.
+- **No wallpaper yet:** `install.sh` with no argument generates colors from seed `#6750a4`, the same
+  scheme as the fallbacks in `Colors.qml`. `./install.sh "#rrggbb"` or `./install.sh <image>` overrides it.
+- **Calendar locale:** `Qt.locale(Qt.uiLanguage)` (en_GB): the user has English UI with Dutch
+  regional formats, and plain `Qt.locale()` gave Dutch day names next to English dates.
+
+### System and tooling
+
 - **Bluetooth pairing agent:** Quickshell can't register a BlueZ agent, and devices like the
   Keychron M6 ask the host to confirm pairing (journal: "No agent available for request type 2").
   `bt-agent` (`bluez-tools`, user-approved) runs from `autostart.lua` as
   `yes | bt-agent -c NoInputNoOutput`: without `--daemon` it reads answers from stdin, and in
   `--daemon` mode it rejects confirmations unless a PIN file matches. The Bluetooth page also sets
   the adapter `pairable` and the device `trusted` before `pair()`, and connects once paired.
-- **Apps reopen where they were** (`hypr/positions.lua`): on `window.close` a floating window's
-  position and size are saved per class in `~/.local/state/hypr/window-positions`; on
-  `window.open` they're applied, unless another window of that class is open (dialogs, second
-  windows) or the spot is off-screen. Fullscreen and minimized windows aren't saved.
-- **Attention like a flashing taskbar button:** apps can't steal focus (`misc.focus_on_activate`
-  stays false); Hyprland marks them urgent and the island shows an `AttentionCard` (icon, title,
-  click to switch) for 5 s, after any notification pop-up. `services/Windows.qml` keeps its own
-  list from Hyprland's `urgent` raw events, dropping a window once it's focused or closed:
-  `HyprlandToplevel.urgent` didn't follow these events (false for a terminal bell). Opening a
-  window also sends `urgent` just before focusing it, which the list ignores.
-- **Notifications from the island** (user's choice over corner cards). Pop-ups wait while a menu
-  is open. Notifications carry no timestamp, so the service records arrival times; after a shell
-  restart (not a reload) the history is empty.
 - **Night light is manual by default** (user's choice, after a fixed 20:00-07:00 schedule turned
   it on at every evening login); a schedule is a setting since Phase 7. Quickshell runs it, not
   hyprsunset: `hyprsunset.conf` has one all-day neutral profile, and `services/NightLight.qml`
@@ -681,48 +728,15 @@ windows).
   do that without regenerating its config and restarting; it now only locks before suspend.
   Wayland idle inhibitors (a playing video in the browser) hold the steps off; D-Bus inhibitors
   (`systemd-inhibit`, which hypridle also honoured) don't.
-- **Apps may maximize themselves** (2026-10-28): the `suppress_event = "maximize"` rule from
-  Hyprland's example config (Phase 1) is gone. With everything floating it made the maximize
-  buttons in title bars (Ghostty, GTK apps, the settings window) do nothing. Apps that ask to
-  start maximized now do.
-- **Settings window title bar** (user's request: like the other apps): drawn by the window
-  itself, GTK style: "Settings" over the sidebar, the page name, maximize and close (round
-  buttons); drag to move, double-click to maximize. Maximizing goes through Hyprland, not
-  `FloatingWindow.maximized` (see NOTES.md).
 - **The shell restarts after a crash** (`hypr/shell.sh`, started by `autostart.lua`): the lock
   screen, idle, notifications and password prompts live in it. A normal exit or `pkill -x qs`
   (exit 143) ends the loop; a crash (exit 255) restarts qs after a second. Locking falls back to
   hyprlock when the shell isn't running (Super+L, hypridle's `lock_cmd`), and the idle lock goes
   straight to the shell instead of through hypridle.
-- **App keybinds go through the shell** (Phase 7): Super+Enter/B/E and Super+Shift+E call
-  `qs ipc call apps ...`, which opens the default app chosen in settings. If the shell isn't
-  running the call fails and the bind falls back to Ghostty / Zen / Nautilus, so there's always a
-  terminal.
-- **Glass look** (user's request, 2026-10-28, like the Ghost Spotify theme: a strongly blurred
-  background, translucent panels, a faint light edge). Every shell panel is a `widgets/Surface.qml`
-  (the island draws the same with its shape's outline): `Colors.surfaceTranslucent` at the
-  setting's opacity (45 % by default, 20-85; it was 35-85 while the blur came from layer rules
-  with `ignore_alpha`, see "Native blur shapes") and a 1 px edge in the text color at 8 % (`Colors.glassEdge`). Settings ->
-  Windows -> Shell panels turns it off (85 % opaque, no edge). Hyprland's blur is stronger
-  (size 8, 3 passes, more vibrancy, a little darker; look.lua). Ghostty (`background-opacity
-  0.85`) and Zed (`background.appearance: blurred`, main backgrounds at 85 %) are see-through
-  too; those are fixed, not following the setting. GTK/libadwaita apps can't be.
 - **JavaScript runtime: bun** (user's choice, 2026-10-28): the setup's scripts (`json_edit`,
   `wallpaper.sh`, `ghost keybinds`, the Haunt lookup) and the discord-ghost build (`bun install`
   reads its package-lock.json; tested) run on bun. npm is gone. Node and pnpm stay only for
   Vencord, which pins pnpm (`packageManager`) and builds with `node`; Haunt also wants Node 22.18+.
-- **Island window height** is 840 px (was 680) so the "today" menu with notifications fits.
-- **Island menu widths:** menus are `Theme.island.panelWidth` (380) wide, and the island's window
-  is just that wide (plus its curves and offset); the wallpaper picker is its own surface.
-- **The bottom edge belongs to the dock:** nothing else goes there.
-- **Icons: Colloid** (`Colloid-Dark`, `colloid-icon-theme-git` from the AUR; user's choice over
-  WhiteSur and Tela Circle after previews in the dock, 2026-10-28): set for Quickshell with
-  `QS_ICON_THEME` in `env.lua` and for GTK apps with gsettings in `install.sh`. It redraws
-  nearly every app in one style; Adwaita has few app icons, so apps showed their own.
-- **Calendar locale:** `Qt.locale(Qt.uiLanguage)` (en_GB): the user has English UI with Dutch
-  regional formats, and plain `Qt.locale()` gave Dutch day names next to English dates.
-- **No wallpaper yet:** `install.sh` with no argument generates colors from seed `#6750a4`, the same
-  scheme as the fallbacks in `Colors.qml`. `./install.sh "#rrggbb"` or `./install.sh <image>` overrides it.
 
 ## Open issues
 

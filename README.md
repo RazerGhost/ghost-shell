@@ -18,11 +18,15 @@ machine can take what it needs.
   sound, power mode, system stats, background apps), today (date, weather, notifications,
   calendar), media, clipboard, emoji.
 - **Windows**: a tiling layout of its own (halves, thirds, quarters from the window menu, or by
-  the number of windows), Snap Assist, Alt+Tab with live previews, an overview (Super+Tab, a
-  three-finger swipe or the top-left corner), minimize, a dock with window previews.
-- **The rest of a desktop**: notifications, launcher, on-screen volume and brightness, lock and
-  login screen, idle and night light, screenshots, a password prompt for apps (polkit), a
-  settings app, an update count, wallpapers.
+  the number of windows), Snap Assist, window tabs, Alt+Tab with live previews, an overview
+  (Super+Tab, a three-finger swipe or the top-left corner), minimize, a dock with window previews.
+- **The rest of a desktop**: notifications (with sounds), launcher with a calculator, on-screen
+  volume and brightness, lock and login screen, idle and night light, screenshots and screen
+  recording, a password prompt for apps (polkit), an equalizer, screen time, web apps
+  (`ghost webapp`), an update count, wallpapers, and a welcome tour on the first start.
+- **A settings app** for what would otherwise be config files: displays, sound, keyboard and
+  touchpad, power, default apps, keybinds, Btrfs snapshots and more.
+- **Glass**: see-through panels with Hyprland's blur behind exactly their shape.
 - **One color scheme** from the wallpaper (matugen) for the shell, Hyprland, Ghostty, GTK apps,
   Zed, Yazi, Zen, Discord, Spotify, Steam and MangoHud.
 
@@ -69,7 +73,7 @@ its setup (`setup.sh`).
 | `core` | Hyprland, the shell, fonts and themes, the login screen, the colors |
 | `system` | this laptop's GPU rule, boot options, greetd and services |
 | `snapshots` | Btrfs snapshots: the system's before and after every update (bootable), your home folder hourly |
-| `apps` | terminal, editor, files, pictures, video, music, browser |
+| `apps` | terminal, editor, files, pictures, video, music, browser, web apps |
 | `dev` | languages, package managers and Docker |
 | `gaming` | Steam, Proton, Lutris, Heroic, MangoHud; Steam's theme |
 | `discord`, `spotify`, `zen` | those apps in the wallpaper's colors |
