@@ -110,7 +110,22 @@ end
 
 -- Scratchpad
 hl.bind(mainMod .. " + grave",         hl.dsp.workspace.toggle_special("magic"), { description = "Workspaces: Show or hide the scratchpad (a terminal when empty)" })
-hl.bind(mainMod .. " + SHIFT + grave", hl.dsp.window.move({ workspace = "special:magic" }), { description = "Workspaces: Move window to the scratchpad" })
+-- Both ways (user's request): a window on the scratchpad comes back to the workspace under it,
+-- any other window goes onto the scratchpad.
+local function toggle_scratchpad_window()
+    local window = hl.get_active_window()
+    if not window then
+        return
+    end
+    local target = "address:" .. window.address
+    if window.workspace.name == "special:magic" then
+        local ws = hl.get_active_workspace() -- the normal workspace, also while the scratchpad shows
+        hl.dispatch(hl.dsp.window.move({ window = target, workspace = tostring(ws and ws.id or 1) }))
+    else
+        hl.dispatch(hl.dsp.window.move({ window = target, workspace = "special:magic" }))
+    end
+end
+hl.bind(mainMod .. " + SHIFT + grave", toggle_scratchpad_window, { description = "Workspaces: Move window to or from the scratchpad" })
 
 -- Scroll through workspaces
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }), { description = "Workspaces: Next or previous workspace" })
