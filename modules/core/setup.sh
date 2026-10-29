@@ -12,9 +12,7 @@ step "Linking configs with stow"
 # tests/, modules/ and docs/.
 # -R re-links, so files added to an already-stowed package get linked too.
 # If stow reports a conflict, move the existing file aside and re-run.
-for pkg in */; do
-    pkg=${pkg%/}
-    [[ $pkg == system || $pkg == tests || $pkg == modules || $pkg == docs ]] && continue
+for pkg in $(stow_packages); do
     echo "$pkg"
     stow -R -t "$HOME" "$pkg"
 done

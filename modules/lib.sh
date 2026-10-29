@@ -35,3 +35,13 @@ json_edit() {
         fs.writeFileSync(path, JSON.stringify(data, null, 4) + "\n");
     '
 }
+
+# The repo's Stow packages, one per line: every top-level folder but the ones that aren't
+# (system/ mirrors /, the rest are the setup, tests and docs). Run from the repo's root.
+stow_packages() {
+    local pkg
+    for pkg in */; do
+        pkg=${pkg%/}
+        [[ $pkg == system || $pkg == tests || $pkg == modules || $pkg == docs ]] || echo "$pkg"
+    done
+}

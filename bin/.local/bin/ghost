@@ -172,9 +172,7 @@ cmd_doctor() {
     bad() { printf '  \033[1;31m✗\033[0m %s\n' "$1"; failed=1; }
 
     step "Configs linked into your home folder"
-    for pkg in */; do
-        pkg=${pkg%/}
-        [[ $pkg == system || $pkg == tests || $pkg == modules || $pkg == docs ]] && continue
+    for pkg in $(stow_packages); do
         # In simulation, stow prints nothing but its notice when everything is linked already.
         if stow -n -v -t "$HOME" "$pkg" 2>&1 | grep -qv "in simulation mode"; then
             bad "$pkg: not linked or in conflict (ghost install core links it)"
