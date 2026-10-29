@@ -25,13 +25,16 @@ function kill(line, uid) {
         const match = message.match(/^Killed (\/\S+)/);
         if (!match)
             return null;
-        if (match[1].includes("/user-" + uid + ".slice/session-"))
-            return { app: "", session: true, time: time };
-        // Another user's session isn't ours to report.
-        if (/\/session-[^/]*\.scope/.test(match[1]))
+        // Another user's session or apps aren't ours to report.
+        if (match[1].startsWith("/user.slice/") && !match[1].includes("/user-" + uid + ".slice/"))
             return null;
-        const unit = match[1].split("/").pop();
-        return { app: unit.replace(/\.(service|scope|slice)$/, ""), session: false, time: time };
+        if (match[1].includes("/session-"))
+            return { app: "", session: true, time: time };
+        const unit = match[1].split("/").pop().replace(/\.(service|scope|slice)$/, "");
+        // An app in its own scope: app-ghost-<desktop id>-<random> (services/Apps.qml) or
+        // Chromium's app-<id>-<pid>; the id names the app.
+        const scope = unit.match(/^app-(?:ghost-)?(.+)-[0-9a-f]+$/);
+        return { app: scope ? scope[1] : unit, session: false, time: time };
     }
     return null;
 }

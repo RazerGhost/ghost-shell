@@ -44,7 +44,7 @@ Scope {
 
     Timer {
         id: hide
-        // Settings' osdSeconds (0.5-10 s).
+        // Settings' osdSeconds (1-5 s in Settings; a hand-edited file is kept within 0.5-10).
         interval: Math.min(10, Math.max(0.5, Number(Settings.values.osdSeconds) || 1.5)) * 1000
         onTriggered: root.shown = false
     }

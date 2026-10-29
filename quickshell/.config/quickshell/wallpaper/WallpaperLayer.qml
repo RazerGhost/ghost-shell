@@ -44,8 +44,10 @@ Variants {
             id: current
 
             anchors.fill: parent
-            source: Wallpaper.stillPath ? "file://" + Wallpaper.stillPath : ""
-            // The frame changes under the same name for each video: don't keep an old one.
+            // Every video's frame has the same name: the video's path after the # makes each a new
+            // address, so the next video's frame loads (and isn't kept from the last one).
+            source: !Wallpaper.stillPath ? ""
+                  : "file://" + Wallpaper.stillPath + (Wallpaper.isVideo ? "#" + encodeURIComponent(Wallpaper.path) : "")
             cache: !Wallpaper.isVideo
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
@@ -81,6 +83,11 @@ Variants {
                 loops: MediaPlayer.Infinite
                 muted: true
                 Component.onCompleted: {
+                    if (window.playing)
+                        play();
+                }
+                // Another video: a new source stops playing.
+                onSourceChanged: {
                     if (window.playing)
                         play();
                 }

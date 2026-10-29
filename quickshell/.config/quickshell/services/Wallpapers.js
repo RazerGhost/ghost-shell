@@ -75,8 +75,23 @@ function entries(text, screenW, screenH, ownFolder) {
         (isDark ? g.dark : g.light).push({ path: path, w: 0, h: 0 });
     }
     const result = [];
+    const add = (light, dark, fileName) => result.push({
+        filePath: light,
+        fileName: fileName,
+        darkPath: dark,
+        own: ownFolder !== "" && light.startsWith(ownFolder + "/"),
+        video: isVideo(light),
+        thumb: thumbs[light] ?? ""
+    });
     for (const key of order) {
         const g = groups[key];
+        // Not one light and one dark picture (art.png and art.jpg, or sky.png and
+        // sky-light.png): each is a picture of its own.
+        if (!key.startsWith("plasma:") && (g.light.length > 1 || g.dark.length > 1)) {
+            for (const s of g.light.concat(g.dark))
+                add(s.path, "", s.path.slice(s.path.lastIndexOf("/") + 1));
+            continue;
+        }
         const pick = list => list.length === 0 ? "" : list.some(s => s.w > 0) ? bestSize(list, screenW, screenH) : list[0].path;
         let light = pick(g.light);
         let dark = pick(g.dark);
@@ -86,15 +101,7 @@ function entries(text, screenW, screenH, ownFolder) {
             dark = "";
         }
         // Two names with -d / -l but no partner: a picture each, not a pair.
-        const fileName = key.startsWith("plasma:") ? g.name : light.slice(light.lastIndexOf("/") + 1);
-        result.push({
-            filePath: light,
-            fileName: fileName,
-            darkPath: dark,
-            own: ownFolder !== "" && light.startsWith(ownFolder + "/"),
-            video: isVideo(light),
-            thumb: thumbs[light] ?? ""
-        });
+        add(light, dark, key.startsWith("plasma:") ? g.name : light.slice(light.lastIndexOf("/") + 1));
     }
     return result;
 }

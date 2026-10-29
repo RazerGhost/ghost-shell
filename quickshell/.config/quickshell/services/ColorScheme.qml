@@ -56,6 +56,10 @@ Singleton {
     // twice (logged 2026-10-29).
     property string applied: ""
     property bool appliedRead: false
+    // The mode the colors were last made in. The wallpaper follows this one, not `mode`: its
+    // switch to a picture's dark or light version then runs after these colors are made, not
+    // alongside (both run wallpaper.sh), and only once "At sunset" knows the sunset.
+    property string appliedMode: ""
 
     // Clicking through the choices quickly makes the colors once.
     Timer {
@@ -69,8 +73,10 @@ Singleton {
                 root.applied = current.text();
                 root.appliedRead = true;
             }
-            if (root.applied === root.wanted)
+            if (root.applied === root.wanted) {
+                root.appliedMode = ColorSchemeJs.modeOf(root.applied);
                 return;
+            }
             root.applied = root.wanted;
             apply.command = ["sh", "-c", `printf '%s' "$1" > "$2" && sh "$3"`, "sh", root.wanted, root.file,
                              Quickshell.env("HOME") + "/.config/matugen/wallpaper.sh"];
@@ -91,6 +97,8 @@ Singleton {
             // A failed run isn't retried here (it would loop); the next change runs it again.
             if (code !== 0)
                 console.warn("ColorScheme: wallpaper.sh exited with code " + code);
+            else
+                root.appliedMode = ColorSchemeJs.modeOf(root.applied);
             applyLater.restart(); // the choice may have changed while it ran
         }
     }

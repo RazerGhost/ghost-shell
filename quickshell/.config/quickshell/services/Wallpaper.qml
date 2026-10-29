@@ -61,9 +61,10 @@ Singleton {
         }
     }
 
-    // Light and dark: a picture with a dark version follows the mode (Settings'
-    // wallpaperFollowsMode). Each change also remakes the colors from the picture.
-    readonly property string modeWanted: Settings.values.wallpaperFollowsMode ? ColorScheme.mode : ""
+    // Light and dark: a picture with a dark version follows the mode the colors were last made
+    // in (Settings' wallpaperFollowsMode; ColorScheme.appliedMode). Each change also remakes the
+    // colors from the picture.
+    readonly property string modeWanted: Settings.values.wallpaperFollowsMode ? ColorScheme.appliedMode : ""
     onModeWantedChanged: followMode()
     onPicturesChanged: followMode()
 

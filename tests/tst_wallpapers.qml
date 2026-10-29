@@ -40,6 +40,15 @@ TestCase {
         compare(list[5].darkPath, "");
     }
 
+    function test_same_names() {
+        // The same name twice, or two light versions: no pair, every picture listed.
+        const list = Wallpapers.entries("/w/art.png\n/w/art.jpg\n/w/sky.png\n/w/sky-light.png\n/w/moon.png\n/w/moon-dark.png\n",
+                                        1920, 1080, "/w");
+        compare(list.map(p => p.filePath), ["/w/art.png", "/w/art.jpg", "/w/sky.png", "/w/sky-light.png", "/w/moon.png"]);
+        compare(list.map(p => p.darkPath), ["", "", "", "", "/w/moon-dark.png"]);
+        compare(list[1].fileName, "art.jpg");
+    }
+
     function test_bestSize() {
         const sizes = [{ path: "a", w: 1600, h: 900 }, { path: "b", w: 1280, h: 800 }];
         compare(Wallpapers.bestSize(sizes, 1920, 1080), "a"); // none covers: the biggest

@@ -9,11 +9,9 @@
 #                               notification; the picture is removed
 #   capture.sh color            the color picker (hyprpicker), #rrggbb copied
 
-# An app in its own scope, like the ones the shell starts (Apps.run in services/Apps.qml): when
-# memory runs out, oomd closes it rather than the session. Without the shell's Mesa-only EGL.
+# An app in its own scope, like the ones the shell starts (hypr/run-app.sh).
 app() {
-    systemd-run --user --scope --quiet --collect --slice=app.slice \
-        env -u __EGL_VENDOR_LIBRARY_FILENAMES "$@"
+    "$HOME/.config/hypr/run-app.sh" "$1" "$@"
 }
 
 case "${1-}" in

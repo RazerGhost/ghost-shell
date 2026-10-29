@@ -34,8 +34,8 @@ hl.on("workspace.created", function(workspace)
     end
     hl.timer(function()
         if scratchpad_empty() then
-            -- In its own scope, like the apps the shell starts (services/Apps.qml).
-            hl.exec_cmd("systemd-run --user --scope --quiet --collect --slice=app.slice ghostty")
+            -- In its own scope, like the apps the shell starts (run-app.sh).
+            hl.exec_cmd("~/.config/hypr/run-app.sh com.mitchellh.ghostty ghostty")
         end
     end, { timeout = 150, type = "oneshot" })
 end)

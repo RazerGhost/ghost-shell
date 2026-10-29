@@ -64,13 +64,13 @@ Singleton {
             property int nightLightEnd: 7 * 60
             property int nightLightTemperature: 4000 // Kelvin; lower is warmer
 
-            // Pop-ups (Settings -> Notifications): how long a notification stays (seconds; critical
-            // ones stay until dismissed), and the OSD's place ("bottom" or "top") and time.
             // The island's status icons you've hidden, by key (bar/StatusIcons.qml); the privacy
             // ones (recording, microphone, camera, screen sharing) always show.
             property var hiddenStatusIcons: []
             // The dock: "hide" (shows at the bottom edge), "always" (reserves its space) or "off".
             property string dockMode: "hide"
+            // Pop-ups (Settings -> Notifications): how long a notification stays (seconds; critical
+            // ones stay until dismissed), and the OSD's place ("bottom" or "top") and time.
             property real notificationSeconds: 5
             property string osdPosition: "bottom"
             property real osdSeconds: 1.5
@@ -105,7 +105,6 @@ Singleton {
             property bool batterySaver: true // power saver from the low battery warning until plugged in
             property bool clock24Hour: true // the island's and the lock screen's clock ("9:41 PM" off)
 
-            // The town for the weather in the today menu (services/Weather.qml); "" = no weather.
             // Screenshots and recordings: folders ("" = ~/Pictures/Screenshots, ~/Videos/Recordings),
             // the recording's frame rate, quality (gpu-screen-recorder's presets) and whether the
             // microphone is mixed in with the desktop's sound.
@@ -119,10 +118,10 @@ Singleton {
             property bool clockDate: false
             property bool clockSeconds: false
             property bool islandMedia: true
+            // The town for the weather in the today menu (services/Weather.qml); "" = no weather.
             property string weatherLocation: ""
             property string temperatureUnit: "celsius" // or "fahrenheit"
 
-            // "dark", "light" or "auto" (dark from sunset to sunrise; services/ColorScheme.qml).
             // Wallpapers (Settings -> Appearance): your folder ("" = ~/Pictures/Wallpapers), a
             // slideshow every so many minutes (0 = off) from yours or from all, and switching a
             // picture with a dark version along with light and dark.
@@ -130,6 +129,7 @@ Singleton {
             property int wallpaperMinutes: 0
             property bool wallpaperSlideshowAll: false
             property bool wallpaperFollowsMode: true
+            // "dark", "light" or "auto" (dark from sunset to sunrise; services/ColorScheme.qml).
             property string colorScheme: "dark"
             // matugen's color style (a scheme type, ColorScheme.js), contrast (-1 to 1) and a
             // fixed accent color ("#rrggbb"; "" = the wallpaper's).

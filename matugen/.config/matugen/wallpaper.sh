@@ -79,12 +79,14 @@ case "${1-}" in
         ;;
     *)
         [ -f "$1" ] || { echo "wallpaper not found: $1" >&2; exit 1; }
-        # The shell's wallpaper service watches this file and draws the picture it names.
         mkdir -p "$state"
+        # A video's frame first: the shell shows it as soon as the file below names the video.
+        picture=$(picture_of "$(realpath "$1")")
+        # The shell's wallpaper service watches this file and draws the picture it names.
         WALLPAPER=$(realpath "$1") bun -e '
             require("fs").writeFileSync(process.argv[1], JSON.stringify({ path: process.env.WALLPAPER }, null, 4) + "\n");
         ' "$state/wallpaper.json"
-        from_image "$(picture_of "$(realpath "$1")")"
+        from_image "$picture"
         ;;
 esac
 

@@ -74,6 +74,10 @@ Singleton {
         running: true
         stdout: StdioCollector {
             onStreamFinished: {
+                // A failed read (NetworkManager restarting) prints nothing: keep the last list,
+                // or every VPN would seem to disconnect and connect again.
+                if (text.trim() === "")
+                    return;
                 const before = root.activeVpn?.name ?? "";
                 root.connections = NetworkExtrasJs.connections(text);
                 const after = root.activeVpn?.name ?? "";

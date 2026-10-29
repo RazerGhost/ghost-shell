@@ -15,8 +15,10 @@ Singleton {
 
     readonly property string uid: (Quickshell.env("XDG_RUNTIME_DIR") ?? "").split("/").pop()
     // The newest kill already reported (journal time, microseconds), kept in a file so a shell
-    // restart doesn't report it again. Without the file, only kills from now on count.
-    property real seen: Number(seenFile.text()) || Date.now() * 1000
+    // restart doesn't report it again. Without the file, every kill of this boot counts (the
+    // journal is read from the boot on): a session oomd closed before any kill was reported
+    // left no file behind.
+    property real seen: Number(seenFile.text()) || 0
 
     // shell.qml reads this to start the service.
     readonly property bool watching: journal.running

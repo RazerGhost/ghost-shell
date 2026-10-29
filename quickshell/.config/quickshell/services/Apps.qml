@@ -53,15 +53,13 @@ Singleton {
         run(["xdg-open", target], "xdg-open", "");
     }
 
-    // Start a command in its own scope in the user's app.slice, named like the XDG spec's
-    // app-<launcher>-<app id>-<random>.scope. Without one, an app runs in Hyprland's session
-    // scope with everything else, and oomd would close the whole session for it. `env -u`: the
-    // shell's own Mesa-only EGL (hypr/shell.sh) isn't for the apps; prime-run needs NVIDIA's.
+    // Start a command in its own systemd scope (hypr/run-app.sh: when memory runs out, oomd
+    // closes that app rather than the whole session; and without the shell's Mesa-only EGL).
+    readonly property string runApp: Quickshell.env("HOME") + "/.config/hypr/run-app.sh"
+
     function run(command: list<string>, id: string, workingDirectory: string): void {
-        const unit = "app-ghost-" + id.replace(/[^A-Za-z0-9:_.]/g, "_") + "-" + Math.random().toString(16).slice(2, 10);
         Quickshell.execDetached({
-            command: ["systemd-run", "--user", "--scope", "--quiet", "--collect", "--slice=app.slice", "--unit=" + unit,
-                      "env", "-u", "__EGL_VENDOR_LIBRARY_FILENAMES", ...command],
+            command: [runApp, id, ...command],
             workingDirectory: workingDirectory || Quickshell.env("HOME")
         });
     }

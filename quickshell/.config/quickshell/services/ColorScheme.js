@@ -24,12 +24,19 @@ function mode(setting, now, sunrise, sunset) {
 const styles = ["scheme-tonal-spot", "scheme-vibrant", "scheme-expressive", "scheme-content", "scheme-fidelity",
                 "scheme-fruit-salad", "scheme-rainbow", "scheme-neutral", "scheme-monochrome"];
 
+// The mode in a scheme file's text (file() below): "light", "dark", or "" if there's none.
+function modeOf(text) {
+    const match = /^mode=(light|dark)$/m.exec(text ?? "");
+    return match ? match[1] : "";
+}
+
 // What wallpaper.sh reads from ~/.local/state/quickshell/scheme, one "key=value" line each.
 // Anything unexpected becomes the default, so a hand-edited settings file can't put anything
-// else there: mode light or dark, a known style, contrast -1 to 1, accent #rrggbb or "" (the
+// else there: mode light or dark, a known style, contrast -1 to 1 in steps of 0.5 (the ones
+// wallpaper.sh takes; Settings offers those), accent #rrggbb or "" (the
 // wallpaper's own), and an icon theme's name (letters, digits, - and _; Colloid by default).
 function file(mode, style, contrast, accent, icons) {
-    const c = typeof contrast === "number" && isFinite(contrast) ? Math.min(1, Math.max(-1, contrast)) : 0;
+    const c = typeof contrast === "number" && isFinite(contrast) ? Math.round(Math.min(1, Math.max(-1, contrast)) * 2) / 2 : 0;
     return [
         "mode=" + (mode === "light" ? "light" : "dark"),
         "type=" + (styles.includes(style) ? style : styles[0]),

@@ -33,7 +33,9 @@ Singleton {
     // the today menu's date; see the calendar locale decision). All-day ones without a time.
     function when(event: var): string {
         const day = new Date(event.start + "T00:00");
-        const tomorrow = new Date(Date.now() + 86400000);
+        // A calendar day after today: adding 24 hours misses on the nights the clocks change.
+        const tomorrow = new Date(today + "T00:00");
+        tomorrow.setDate(tomorrow.getDate() + 1);
         const label = event.start <= today ? "Today"
                     : event.start === Qt.formatDate(tomorrow, "yyyy-MM-dd") ? "Tomorrow"
                     : day.toLocaleDateString(Qt.locale(Qt.uiLanguage), "ddd d MMM");

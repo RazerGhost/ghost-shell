@@ -364,6 +364,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `systemd-run --user --scope -p MemoryMax=50M -p MemorySwapMax=0 python3 -c "x=b'a'*(200*1024*1024)"`
   (`bytearray(n)` isn't enough: its zero pages are never touched).
 
+- An `Image` loads its file again when only a `#fragment` of its `file://` source changes
+  (checked offscreen, 2026-10-29): the video wallpaper's still frame, always at the same path,
+  gets the video's path after a `#`.
+
 ## Testing on the laptop
 
 - README screenshots: an empty workspace up to 5 (higher ones add workspace dots), `grim -s 0.75`

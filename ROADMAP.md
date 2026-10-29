@@ -784,8 +784,9 @@ shell's cost, features and customization), checked before acting. Done so far:
   apps, `xdg-open`, the terminal) with `systemd-run --user --scope` in `app.slice` (`Apps.run`),
   as does the scratchpad's terminal, so oomd closes the app that ran out of memory instead of
   the session it used to share with Hyprland. Apps also no longer inherit the shell's Mesa-only
-  EGL. The screenshot tool's satty and picture viewer too (`capture.sh`'s `app`). Not scoped:
-  what Hyprland's fallback binds start while the shell is down. Read from this boot's
+  EGL. The screenshot tool's satty and picture viewer and the recording's Play too, all
+  through `hypr/run-app.sh`. Not scoped: what Hyprland's fallback binds start while the shell
+  is down. Read from this boot's
   journal and followed (`OomAlerts.js`, tested); the last one reported is in
   `~/.local/state/quickshell/oom-seen`, so a restart doesn't repeat it. Verified with a
   memory-limited test process; the session case is untested.
@@ -806,6 +807,29 @@ shell's cost, features and customization), checked before acting. Done so far:
   field goes into the list) and in the today and media menus (the date that folds the calendar
   out, the weather town, notification cards, the small player, the cover). Not the media
   menu's seek bar: Spotify reports a frozen position, so stepping from it would jump wrong.
+
+### Review of the day's additions (2026-10-29)
+Two read-only reviews of everything since the optimization review, findings checked, then fixed:
+- The lock and login screens' password field keeps Tab (Tab reached the power buttons: Tab
+  then Enter at the login screen would suspend), and the island's top row is out of the Tab
+  order again (Tab wrapped to the clock, and Enter there closed the menu).
+- Out-of-memory alerts: without `oom-seen` they count from the boot, so a session closed
+  before any other kill is still reported at the next login; apps' scopes
+  (`app-ghost-<id>-<random>`, Chromium's `app-<id>-<pid>`) are named by their app; other
+  users' units are left out (tested).
+- One `hypr/run-app.sh` starts apps in their own scope for the shell, Recorder's Play (it
+  wasn't scoped), the screenshot tool and the scratchpad (the systemd-run flags were written
+  out three times and had drifted).
+- Wallpapers: pictures with the same name (art.png and art.jpg) or two light versions are each
+  listed (only the first showed; tested); a video's still frame is made before the shell reads
+  the choice and reloads for each video; a new video plays; following light and dark waits
+  for the colors made in the new mode (`ColorScheme.appliedMode`), instead of racing them.
+- Smaller: a failed `nmcli` read no longer shows a VPN disconnecting and reconnecting; pins
+  made in a row are all kept, and the pins file loads before one is written; contrast snaps to
+  wallpaper.sh's steps (tested); "Tomorrow" is a calendar day, right on the nights the clocks
+  change; comments moved back to their settings.
+- Not done: with the dock set to "always" on several screens the OSD's height follows one of
+  them (only matters with an external monitor, none to test with).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

@@ -36,8 +36,7 @@ Singleton {
     function pin(entry: var): void {
         if (entry.image || entry.pinned)
             return;
-        decodePin.command = ["cliphist", "decode", entry.id];
-        decodePin.running = true;
+        decodePin.start(["cliphist", "decode", entry.id]);
     }
 
     function unpin(text: string): void {
@@ -45,7 +44,8 @@ Singleton {
         pinFile.writeAdapter();
     }
 
-    Process {
+    // A pin made while the last one is still being decoded runs after it.
+    LatestProcess {
         id: decodePin
         stdout: StdioCollector {
             onStreamFinished: {
@@ -59,6 +59,7 @@ Singleton {
         id: pinFile
         path: Quickshell.env("HOME") + "/.local/state/quickshell/clipboard-pins.json"
         printErrors: false // missing until the first pin
+        blockLoading: true // loaded before a pin is written over it
 
         adapter: JsonAdapter {
             id: pinState

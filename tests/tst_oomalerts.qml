@@ -23,8 +23,16 @@ TestCase {
                 { app: "", session: true, time: 1761750000000000 });
         compare(OomAlerts.kill(entry("systemd-oomd", "Killed /user.slice/user-1000.slice/user@1000.service/session.slice/pipewire.service due to swap used being more than 90.00%"), 1000).app,
                 "pipewire");
-        // The greeter's or another user's session.
+        // An app the shell started in its own scope, and Chromium's own scope.
+        compare(OomAlerts.kill(entry("systemd-oomd", "Killed /user.slice/user-1000.slice/user@1000.service/app.slice/app-ghost-zen-1a2b3c4d.scope due to swap"), 1000).app,
+                "zen");
+        compare(OomAlerts.kill(entry("systemd-oomd", "Killed /user.slice/user-1000.slice/user@1000.service/app.slice/app-org.chromium.Chromium-21041.scope due to swap"), 1000).app,
+                "org.chromium.Chromium");
+        // The greeter's or another user's session or apps.
         compare(OomAlerts.kill(entry("systemd-oomd", "Killed /user.slice/user-969.slice/session-1.scope due to swap"), 1000), null);
+        compare(OomAlerts.kill(entry("systemd-oomd", "Killed /user.slice/user-969.slice/user@969.service/app.slice/x.service due to swap"), 1000), null);
+        // A system service.
+        compare(OomAlerts.kill(entry("systemd-oomd", "Killed /system.slice/packagekit.service due to swap"), 1000).app, "packagekit");
         compare(OomAlerts.kill(entry("systemd-oomd", "Started"), 1000), null);
     }
 

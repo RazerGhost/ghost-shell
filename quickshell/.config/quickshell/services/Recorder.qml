@@ -57,8 +57,8 @@ Singleton {
             if (code === 0) {
                 Quickshell.execDetached(["sh", "-c", `
                     action=$(notify-send -a Recorder -i video-x-generic -A default=Play "Recording saved" "In $2")
-                    [ "$action" = default ] && xdg-open "$1"
-                `, "sh", root.file, CaptureFolders.short(root.folder, Quickshell.env("HOME"))]);
+                    [ "$action" = default ] && "$3" xdg-open xdg-open "$1"
+                `, "sh", root.file, CaptureFolders.short(root.folder, Quickshell.env("HOME")), Apps.runApp]);
             } else {
                 Quickshell.execDetached(["notify-send", "-a", "Recorder", "-u", "critical", "Recording failed",
                     "gpu-screen-recorder exited with code " + code]);

@@ -173,6 +173,11 @@ Item {
                 }
                 // Escape clears what was typed, like most lock screens.
                 Keys.onEscapePressed: text = ""
+                // Tab stays here: the buttons below take the keyboard elsewhere (the media
+                // card, the login screen's power buttons), and Enter there would suspend or
+                // restart, while the password typed after it went nowhere.
+                Keys.onTabPressed: event => event.accepted = true
+                Keys.onBacktabPressed: event => event.accepted = true
 
                 Text {
                     visible: password.text === ""
