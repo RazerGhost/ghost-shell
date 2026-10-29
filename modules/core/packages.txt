@@ -40,6 +40,10 @@ xdg-utils
 matugen
 unicode-emoji
 cachyos-wallpapers
+# More wallpapers for the picker (user's picks, 2026-10-29): KDE Plasma's set (several sizes and
+# some dark versions per picture) and nwg-shell's digital art; Ubuntu's art contest is in aur.txt
+plasma-workspace-wallpapers
+nwg-shell-wallpapers
 # USB sticks and SD cards (the shell's drives menu; its tray menu uses libappindicator, since
 # autostart.lua runs it with --appindicator)
 udiskie
