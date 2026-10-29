@@ -540,7 +540,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   a critical one under 5 %, each once until there's room again above 15 % (`DiskAlerts.js`,
   tested); it points at old snapshots. `df` a minute after login and every 10 minutes.
 
-### Media and notifications on the lock screen (built 2026-10-29; waiting on the user's test results)
+### Media and notifications on the lock screen (done, verified on the laptop 2026-10-29)
 - `lock/LockStatus.qml` under the date on the lock screen (not the login screen: `LockContent`
   only has a slot for it, so the greeter never starts the notification server): the island's
   `MediaCard` (play, pause, skip without unlocking) and the number of notifications, never
@@ -612,7 +612,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   start). The shell remembers the mode it applied rather than re-reading the file after a run:
   that read came back stale and made every switch run twice (~2 s; now one run after 300 ms).
 
-### To-do, note and timer in the today menu (built 2026-10-29)
+### To-do, note and timer in the today menu (built 2026-10-29; the timer verified on the laptop)
 - Three buttons under the weather, each opening its part (one at a time, folded when the menu
   opens): a to-do list (Enter adds, click ticks off, × removes, "Clear done"), one note saved
   while typing (both in `~/.local/state/quickshell/today.json`, `services/Planner.qml`), and a
