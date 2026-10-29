@@ -40,11 +40,12 @@ ShellRoot {
     HyprlandSettings {}
 
     // Background services that are singletons, so they only run once something uses them: low
-    // battery and disk space warnings, the touchpad's mouse rule, the equalizer's gains, screen
+    // battery, disk space and out-of-memory warnings, the touchpad's mouse rule, the equalizer's gains, screen
     // time, sound events (the charger and USB devices) and light or dark at sunset.
     Component.onCompleted: {
         BatteryAlerts.check();
         DiskAlerts.given;
+        OomAlerts.watching;
         Touchpad.enabled;
         Equalizer.gains;
         ScreenTime.loaded;

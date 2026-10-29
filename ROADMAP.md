@@ -755,7 +755,7 @@ shell's cost, features and customization), checked before acting. Done so far:
   colors from a frame (`video-frame.jpg`, which the lock and login screens show). Wallpaper
   Engine scenes (linux-wallpaperengine) aren't built: it isn't installed here.
 
-### Quiet while fullscreen, and more from the research (2026-10-29, in progress)
+### Quiet while fullscreen, and more from the research (done 2026-10-29)
 - Pop-ups wait while a window is fullscreen on the focused screen (a game, a film; Settings ->
   Notifications, on by default), like Do Not Disturb and game mode. When the quiet ends, one
   notification says how many came in meanwhile (apps set to Silent don't count). Verified:
@@ -777,6 +777,12 @@ shell's cost, features and customization), checked before acting. Done so far:
   picked) instead of its volume, and a VPN connecting or disconnecting from anywhere (the Wi-Fi
   page, Proton VPN's app, nmcli; `NetworkExtras.vpnSwitched`). Neither for what's already
   there when the shell starts. Verified with a null sink and a WireGuard test connection.
+- Out of memory (`services/OomAlerts.qml`): "Memory ran out: <app> was closed" when the kernel's
+  OOM killer or systemd-oomd ends an app or service, and at the next login when oomd closed the
+  whole session (every app runs in Hyprland's session scope, see NOTES). Read from this boot's
+  journal and followed (`OomAlerts.js`, tested); the last one reported is in
+  `~/.local/state/quickshell/oom-seen`, so a restart doesn't repeat it. Verified with a
+  memory-limited test process; the session case is untested.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

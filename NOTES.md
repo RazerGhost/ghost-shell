@@ -350,6 +350,15 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `qs -p` reached PlayingState and 1.37 s after 1.5 s. `HyprlandWorkspace.toplevels.values` is a
   workspace's windows (empty workspace: length 0).
 
+- Out of memory (checked 2026-10-29): systemd-oomd runs (CachyOS) and watches
+  `user-1000.slice` for swap above 90 % and memory pressure. Every app runs in Hyprland's
+  `session-N.scope` (no per-app scopes: Hyprland's `exec` doesn't make them), so an oomd kill
+  there closes the whole session. The kernel's OOM killer ends one process and logs
+  "Out of memory: Killed process N (name)" ("Memory cgroup out of memory: ..." in a limited
+  cgroup); the user reads both through `journalctl` without root. A safe test kill:
+  `systemd-run --user --scope -p MemoryMax=50M -p MemorySwapMax=0 python3 -c "x=b'a'*(200*1024*1024)"`
+  (`bytearray(n)` isn't enough: its zero pages are never touched).
+
 ## Testing on the laptop
 
 - README screenshots: an empty workspace up to 5 (higher ones add workspace dots), `grim -s 0.75`
