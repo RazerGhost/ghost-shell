@@ -11,11 +11,11 @@ Rectangle {
 
     signal toggled()
 
-    implicitWidth: 52
-    implicitHeight: 32
+    implicitWidth: Theme.toggle.width
+    implicitHeight: Theme.toggle.height
     radius: Theme.radius.full
     color: checked ? Colors.m3primary : Colors.m3surfaceContainerHighest
-    border.width: checked ? 0 : 2
+    border.width: checked ? 0 : Theme.toggle.border
     border.color: Colors.m3outlineVariant
 
     Accessible.role: Accessible.CheckBox

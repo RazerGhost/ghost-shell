@@ -83,7 +83,7 @@ Singleton {
         title: "Settings"
         implicitWidth: Theme.settings.width
         implicitHeight: Theme.settings.height
-        minimumSize: Qt.size(Theme.settings.sidebar + 400, 400)
+        minimumSize: Qt.size(Theme.settings.sidebar + Theme.settings.minContent, Theme.settings.minContent)
         color: Colors.m3surface
 
         // Closing the window (Super+W, Alt+F4) hides it.

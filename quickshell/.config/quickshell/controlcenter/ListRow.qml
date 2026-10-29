@@ -26,7 +26,7 @@ MouseArea {
     cursorShape: Qt.PointingHandCursor
 
     Accessible.role: Accessible.ListItem
-    Accessible.name: title + ", " + subtitle
+    Accessible.name: subtitle !== "" ? title + ", " + subtitle : title
     signal activated()
 
     Accessible.onPressAction: root.activated()

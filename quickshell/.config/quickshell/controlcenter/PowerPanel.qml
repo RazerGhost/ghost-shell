@@ -41,7 +41,7 @@ Column {
 
     Timer {
         id: disarm
-        interval: 4000
+        interval: Theme.confirmTimeout
         onTriggered: root.armed = ""
     }
 

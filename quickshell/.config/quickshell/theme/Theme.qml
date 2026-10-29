@@ -37,7 +37,6 @@ Singleton {
     readonly property QtObject icon: QtObject {
         readonly property int small:    16 // status icons in the closed island
         readonly property int normal:   20 // buttons, tiles, sliders
-        readonly property int tray:     18 // tray item images
         readonly property int launcher: 32 // app icons in the launcher list
         readonly property int osd:      18 // the OSD's icon
     }
@@ -51,6 +50,17 @@ Singleton {
         // starts fast and settles gently. Used with easing.type: Easing.BezierSpline.
         readonly property int morph: 450
         readonly property list<real> emphasized: [0.05, 0.7, 0.1, 1, 1, 1]
+    }
+
+    // How long a "click again to confirm" button waits for the second click (ms): the power
+    // menu's restart and shut down, End task.
+    readonly property int confirmTimeout: 4000
+
+    // The on/off switch (widgets/Switch.qml), Material 3's size.
+    readonly property QtObject toggle: QtObject {
+        readonly property int width:  52
+        readonly property int height: 32
+        readonly property int border: 2 // the outline while off
     }
 
     // Material "state layers": the content color laid over a control at this opacity.
@@ -204,6 +214,7 @@ Singleton {
         readonly property int titleBar:  52  // the bar at the top: drag to move, maximize, close
         readonly property int sidebar:   230 // the category list
         readonly property int content:   600 // the pages' maximum width
+        readonly property int minContent: 400 // the smallest the page area (and window height) gets
         readonly property int rowHeight: 64
         readonly property int stepper:   96  // the value between a stepper's - and +
         readonly property int stepperWide: 170 // a stepper showing a screen mode ("1920 × 1080, 165 Hz")

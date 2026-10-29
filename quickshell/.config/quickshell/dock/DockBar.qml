@@ -234,6 +234,7 @@ PanelWindow {
                 cursorShape: Qt.PointingHandCursor
                 Accessible.role: Accessible.MenuItem
                 Accessible.name: text
+                Accessible.onPressAction: entryRow.clicked(null)
 
                 Rectangle {
                     anchors.fill: parent
