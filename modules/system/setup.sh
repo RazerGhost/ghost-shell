@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# System setup for this laptop (needs sudo): the GPU udev rule, early KMS and no Plymouth,
-# greetd, and the services the shell reads.
+# System setup for this laptop (needs sudo): the GPU udev rule and the RTX's power saving, early
+# KMS and no Plymouth, greetd, one mDNS service, and the services the shell reads.
 # Run by `ghost install`; alone: `ghost install system`. Safe to re-run.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
@@ -33,6 +33,14 @@ echo "Compare with the PCI addresses below (1002 = AMD, 10de = NVIDIA):"
 lspci -nn -d ::03xx
 ls -l /dev/dri/by-path/ | grep -- '-card'
 
+step "RTX power saving (takes effect after a reboot)"
+# The driver reads modprobe.d when it loads (it isn't in the initramfs), so no rebuild.
+power=system/etc/modprobe.d/50-nvidia-power.conf
+if ! cmp -s "$power" "/etc/modprobe.d/$(basename "$power")"; then
+    sudo install -Dm644 "$power" "/etc/modprobe.d/$(basename "$power")"
+    echo "Reboot, then check: grep 'Runtime D3' /proc/driver/nvidia/gpus/*/power"
+fi
+
 step "Boot: early KMS, no Plymouth splash"
 rebuild_boot=false
 
@@ -53,6 +61,19 @@ if ! grep -qxF "$no_splash" /etc/default/limine; then
     rebuild_boot=true
 fi
 
+# Plymouth is off, so its packages and initramfs hook go too.
+noplymouth=system/etc/mkinitcpio.conf.d/30-no-plymouth.conf
+if ! cmp -s "$noplymouth" "/etc/mkinitcpio.conf.d/$(basename "$noplymouth")"; then
+    sudo install -Dm644 "$noplymouth" "/etc/mkinitcpio.conf.d/$(basename "$noplymouth")"
+    rebuild_boot=true
+fi
+plymouth=$(pacman -Qq plymouth cachyos-plymouth-bootanimation cachyos-plymouth-theme 2>/dev/null || true)
+if [[ -n $plymouth ]]; then
+    # shellcheck disable=SC2086 # one package name per word
+    sudo pacman -Rns --noconfirm $plymouth
+    rebuild_boot=true
+fi
+
 if $rebuild_boot; then
     # limine-mkinitcpio (CachyOS) rebuilds the initramfs and rewrites the Limine boot entries.
     sudo limine-mkinitcpio
@@ -69,6 +90,13 @@ sudo systemctl daemon-reload
 # Enable only, don't start: starting it now would take over tty1 under the running session.
 # It takes effect on the next boot.
 sudo systemctl enable greetd.service
+
+step "Name lookup: one mDNS service (Avahi)"
+mdns=system/etc/systemd/resolved.conf.d/50-no-mdns.conf
+if ! cmp -s "$mdns" "/etc/systemd/resolved.conf.d/$(basename "$mdns")"; then
+    sudo install -Dm644 "$mdns" "/etc/systemd/resolved.conf.d/$(basename "$mdns")"
+    sudo systemctl try-restart systemd-resolved.service
+fi
 
 step "Services the Quickshell bar reads"
 # Network, Bluetooth and power profile modules talk to these over D-Bus.

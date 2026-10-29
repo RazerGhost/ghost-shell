@@ -1,14 +1,9 @@
-# Haunt, the user's Git client: the app comes from its release's pacman package (setup.sh); these
-# are what building it from source needs (Tauri: `pnpm app`).
-# pacman packages; # lines and blank lines are skipped.
-
-webkit2gtk-4.1
-base-devel
-curl
-wget
-file
-openssl
-appmenu-gtk-module
-libappindicator
-librsvg
-xdotool
+# Haunt, the user's Git client: the app comes from its release's pacman package (setup.sh), which
+# brings what it needs to run, so nothing is listed here.
+#
+# Building Haunt from source (Tauri: `pnpm app`) needs more. Install it only for that, marked
+# as dependencies so it can go again afterwards:
+#   sudo pacman -S --needed --asdeps webkit2gtk-4.1 librsvg openssl appmenu-gtk-module xdotool
+#   ...build...
+#   sudo pacman -Rns $(pacman -Qdtq)    # removes whatever nothing needs any more, those included
+# (libappindicator is in core: udiskie's tray menu uses it.)

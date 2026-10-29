@@ -40,8 +40,10 @@ xdg-utils
 matugen
 unicode-emoji
 cachyos-wallpapers
-# USB sticks and SD cards (the shell's drives menu)
+# USB sticks and SD cards (the shell's drives menu; its tray menu uses libappindicator, since
+# autostart.lua runs it with --appindicator)
 udiskie
+libappindicator
 # The launcher's calculator (units, currencies) and file search ("/ name")
 libqalculate
 fd
@@ -66,6 +68,8 @@ fish
 # Tools the setup uses (paru, stow, git, bun for JSON edits and scripts, lspci) and the shell's update count
 # (checkupdates from pacman-contrib)
 paru
+# paru builds AUR packages with it
+base-devel
 pacman-contrib
 stow
 git

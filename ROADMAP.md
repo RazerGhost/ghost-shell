@@ -654,7 +654,15 @@ shell's cost, features and customization), checked before acting. Done so far:
 - The camera indicator reads the camera's power state in-process (it started a script every 3 s).
 - Package lists: core gained what the repo used without listing (pipewire-audio, -pulse, -alsa,
   dnsmasq, fd, breeze-icons, gnome-keyring, fish). The login screen's Hyprland turns off its
-  update-news pop-up (`ecosystem`), whose helper crashed at every boot.
+  update-news pop-up (`ecosystem`), whose helper crashed at every boot. Also listed now:
+  base-devel (paru's AUR builds) and libappindicator (udiskie runs with `--appindicator`). The
+  haunt module lists nothing: haunt-bin brings its own; building from source is a note there
+  (install as dependencies, then `pacman -Rns $(pacman -Qdtq)`).
+- System (user's picks, `ghost install system`): the RTX's runtime power management forced on
+  (`modprobe.d/50-nvidia-power.conf`; it was "Disabled by default" and never slept), Plymouth's
+  initramfs hook and packages removed, systemd-resolved's mDNS and LLMNR off (Avahi does mDNS).
+  Removed by hand: unused icon themes (Papirus, WhiteSur, Tela), AUR build leftovers (cmake, go,
+  zip), iwd, xf86-video-amdgpu, profile-sync-daemon, nss-mdns and Haunt's build tools.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
