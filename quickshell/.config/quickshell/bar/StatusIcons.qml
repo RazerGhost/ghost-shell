@@ -4,8 +4,8 @@ import qs.theme
 import qs.widgets
 
 // Small status glyphs on the right of the closed island, like Android's status bar.
-// Airplane mode, a VPN, Bluetooth, the microphone, camera or screen in use, waiting updates and
-// mute only show up when they have something to say.
+// Airplane mode, a VPN, Bluetooth, a timer, the microphone, camera or screen in use, waiting
+// updates and mute only show up when they have something to say.
 Row {
     anchors.verticalCenter: parent.verticalCenter
     spacing: Theme.spacing.xs
@@ -64,6 +64,31 @@ Row {
 
         Accessible.role: Accessible.StaticText
         Accessible.name: "Recording the screen, " + Recorder.time
+    }
+
+    // The today menu's timer is running: the time left.
+    Row {
+        anchors.verticalCenter: parent.verticalCenter
+        visible: Countdown.active
+        spacing: Theme.spacing.xs
+
+        MaterialIcon {
+            anchors.verticalCenter: parent.verticalCenter
+            icon: "timer"
+            font.pixelSize: Theme.icon.small
+        }
+
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            text: Countdown.label
+            color: Colors.m3onSurface
+            font.family: Theme.font.sans
+            font.pixelSize: Theme.font.small
+            font.features: { "tnum": 1 } // digits of equal width, so the time doesn't jitter
+        }
+
+        Accessible.role: Accessible.StaticText
+        Accessible.name: "Timer, " + Countdown.label + " left"
     }
 
     // An app is recording from the microphone.

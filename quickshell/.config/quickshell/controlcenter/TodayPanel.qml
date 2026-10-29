@@ -6,8 +6,9 @@ import qs.theme
 import qs.widgets
 import "NotificationGroups.js" as NotificationGroups
 
-// The "today" menu, opened by clicking the time: the date, the weather, the notification
-// history, and a month calendar that stays folded away until you click the date.
+// The "today" menu, opened by clicking the time: the date, the weather, the to-do list, note
+// and timer, the notification history, and a month calendar that stays folded away until you
+// click the date.
 Column {
     id: root
 
@@ -34,6 +35,7 @@ Column {
     onVisibleChanged: {
         if (visible) {
             calendarOpen = false;
+            tools.open = "";
             expandedApps = [];
             month = clock.date.getMonth();
             year = clock.date.getFullYear();
@@ -81,6 +83,11 @@ Column {
 
     // The weather where you are.
     WeatherRow {
+        width: parent.width - root.leftPadding - root.rightPadding
+    }
+
+    TodayTools {
+        id: tools
         width: parent.width - root.leftPadding - root.rightPadding
     }
 

@@ -15,7 +15,7 @@ machine can take what it needs.
 
 - **The island**: the bar, a shape growing out of the top edge with workspaces, the time (or the
   playing song's cover) and status icons. It opens into menus: quick settings (Wi-Fi, Bluetooth,
-  sound, power mode, game mode, system stats, background apps), today (date, weather, notifications,
+  sound, power mode, game mode, system stats, background apps), today (date, weather, to-do, note, timer, notifications,
   calendar), media, clipboard, emoji.
 - **Windows**: a tiling layout of its own (halves, thirds, quarters from the window menu, or by
   the number of windows), Snap Assist, window tabs, Alt+Tab with live previews, an overview

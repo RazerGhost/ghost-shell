@@ -600,6 +600,14 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   darkened on a light menu. Not switched: the shell's own icon theme (`QS_ICON_THEME`, read at
   start).
 
+### To-do, note and timer in the today menu (built 2026-10-29)
+- Three buttons under the weather, each opening its part (one at a time, folded when the menu
+  opens): a to-do list (Enter adds, click ticks off, × removes, "Clear done"), one note saved
+  while typing (both in `~/.local/state/quickshell/today.json`, `services/Planner.qml`), and a
+  timer (1, 5, 15 or 25 minutes, pause, cancel; `services/Countdown.qml`, kept across reloads)
+  whose time left shows in the island and which ends with a critical notification and the alarm
+  sound. List and time logic in `Planner.js`, tested.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
