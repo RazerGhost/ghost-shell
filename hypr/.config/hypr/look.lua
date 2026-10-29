@@ -102,8 +102,10 @@ hl.curve("quick",          { type = "bezier", points = { {0.15, 0},    {0.1, 1} 
 hl.curve("easy",           { type = "spring", mass = 1, stiffness = 238.1191, damping = 24.21279333 })
 
 -- Animations. `speed` is how long each takes, in tenths of a second, at normal speed.
--- GhostAnimations(factor) sets them all; shell-settings.lua calls it again with Settings'
--- animation speed (2 = twice as fast), so the windows keep pace with the shell.
+-- GhostAnimations(factor, styles) sets them all; shell-settings.lua calls it again with
+-- Settings' animation speed (2 = twice as fast), so the windows keep pace with the shell, and
+-- the chosen styles: `styles.windows` for windows opening and closing, `styles.workspaces` for
+-- switching workspaces (settings/HyprlandConfig.js checks them).
 local animations = {
     { leaf = "global",        speed = 10,   bezier = "default" },
     { leaf = "border",        speed = 5.39, bezier = "easeOutQuint" },
@@ -124,10 +126,18 @@ local animations = {
     { leaf = "zoomFactor",    speed = 7,    bezier = "quick" },
 }
 
-function GhostAnimations(factor)
+-- Which leaves take which chosen style.
+local styled = { windowsIn = "windows", windowsOut = "windows",
+                 workspaces = "workspaces", workspacesIn = "workspaces", workspacesOut = "workspaces" }
+
+function GhostAnimations(factor, styles)
     for _, a in ipairs(animations) do
+        local style = a.style
+        if styles and styled[a.leaf] and styles[styled[a.leaf]] then
+            style = styles[styled[a.leaf]]
+        end
         hl.animation({ leaf = a.leaf, enabled = true, speed = a.speed / factor,
-                       bezier = a.bezier, spring = a.spring, style = a.style })
+                       bezier = a.bezier, spring = a.spring, style = style })
     end
 end
 

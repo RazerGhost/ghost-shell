@@ -43,7 +43,7 @@ Singleton {
     // search matches a page's title and these words, so it finds the page for any setting on it.
     readonly property var pages: [
         { id: "appearance", section: "Personalize", icon: "palette", title: "Appearance",
-          words: "wallpaper slideshow folder rotate change every colors theme light dark mode sunset night accent style contrast vibrant monochrome matugen fonts font typeface icon theme colloid folder color status icons island wifi bluetooth battery glass blur style frost acrylic transparent see-through border corners rounding" },
+          words: "wallpaper slideshow folder rotate change every colors theme light dark mode sunset night accent style contrast vibrant monochrome matugen fonts font typeface icon theme colloid folder color status icons island wifi bluetooth battery glass blur style frost acrylic transparent see-through border corners rounding glow turning spinning animation opening closing slide workspaces floating pinned" },
         { id: "display", section: "Personalize", icon: "brightness_6", title: "Display",
           words: "night light warm blue light schedule screen monitor resolution refresh rate hz scale rotation rotate vrr adaptive sync" },
         { id: "lock", section: "Personalize", icon: "lock", title: "Lock screen",
@@ -57,7 +57,7 @@ Singleton {
         { id: "power", section: "System", icon: "battery_charging_full", title: "Power",
           words: "idle dim lock screen off suspend sleep battery plugged low power saver warning" },
         { id: "input", section: "System", icon: "touchpad_mouse", title: "Keyboard and mouse",
-          words: "keyboard layout language touchpad natural scrolling tap click pointer speed mouse off" },
+          words: "keyboard layout language touchpad natural scrolling tap click pointer speed mouse off cursor theme size" },
         { id: "snapshots", section: "System", icon: "history", title: "Snapshots",
           words: "backup restore btrfs snapper undo files home" },
         { id: "apps", section: "Apps", icon: "apps", title: "Default apps",

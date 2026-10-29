@@ -6,6 +6,7 @@ import qs.services
 import qs.theme
 import qs.widgets
 import "XkbLayouts.js" as XkbLayouts
+import "HyprlandConfig.js" as HyprlandConfig
 
 // Keyboard and touchpad: the keyboard layout (also the login screen's), touchpad scrolling and
 // tapping, pointer speed. Applied through Hyprland (HyprlandSettings.qml).
@@ -124,6 +125,50 @@ Column {
                 value: Settings.values.pointerSpeed
                 format: v => v === 0 ? "Normal" : (v > 0 ? "+" : "") + Math.round(v * 100) + " %"
                 onPicked: v => Settings.values.pointerSpeed = v
+            }
+        }
+    }
+
+    SettingGroup {
+        title: "Pointer"
+
+        SettingRow {
+            title: "Look"
+            subtitle: "The installed cursor themes"
+
+            Stepper {
+                label: "Cursor theme"
+                values: root.cursorThemes
+                valueWidth: Theme.settings.stepperWide
+                value: HyprlandConfig.cursorTheme(Settings.values.cursorTheme)
+                onPicked: v => Settings.values.cursorTheme = v === "Adwaita" ? "" : v
+            }
+        }
+
+        SettingRow {
+            title: "Size"
+
+            Stepper {
+                label: "Cursor size"
+                values: HyprlandConfig.cursorSizes
+                value: HyprlandConfig.cursorSize(Settings.values.cursorSize)
+                format: v => v + " px"
+                onPicked: v => Settings.values.cursorSize = v
+            }
+        }
+    }
+
+    // Cursor themes: icon theme folders with a cursors folder, system-wide or your own.
+    property var cursorThemes: ["Adwaita"]
+
+    Process {
+        command: ["sh", "-c", `for d in /usr/share/icons/*/cursors "$HOME"/.local/share/icons/*/cursors "$HOME"/.icons/*/cursors; do
+            [ -d "$d" ] && basename "$(dirname "$d")"; done | sort -u`]
+        running: true
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const found = text.split("\n").filter(n => n !== "" && HyprlandConfig.cursorTheme(n) === n);
+                root.cursorThemes = found.length ? found : ["Adwaita"];
             }
         }
     }

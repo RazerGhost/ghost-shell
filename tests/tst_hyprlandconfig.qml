@@ -67,12 +67,42 @@ TestCase {
         // Normal (or not set): nothing extra, look.lua's own speeds stand.
         verify(!HyprlandConfig.lua(defaults, false).includes("GhostAnimations"));
         const fast = HyprlandConfig.lua(Object.assign({}, defaults, { animationSpeed: 2 }), false);
-        verify(fast.includes("if GhostAnimations then GhostAnimations(2) end"));
+        verify(fast.includes('if GhostAnimations then GhostAnimations(2, { windows = "popin 87%", workspaces = "fade" }) end'));
         const off = HyprlandConfig.lua(Object.assign({}, defaults, { animationSpeed: 0 }), false);
         verify(off.includes("hl.config({ animations = { enabled = false } })"));
         // Hand-edited nonsense is normal speed.
         compare(HyprlandConfig.animationSpeed(7), 1);
         compare(HyprlandConfig.animationSpeed("2"), 1);
         compare(HyprlandConfig.animationSpeed(0.5), 0.5);
+    }
+
+    function test_animationStyles() {
+        const lua = HyprlandConfig.lua(Object.assign({}, defaults, { windowAnimation: "slide", workspaceAnimation: "slidefade" }), false);
+        verify(lua.includes('GhostAnimations(1, { windows = "slide", workspaces = "slidefade 20%" })'));
+        // Unknown styles are the defaults, which at normal speed need nothing.
+        const odd = HyprlandConfig.lua(Object.assign({}, defaults, { windowAnimation: 'x" }) os.exit() --', workspaceAnimation: "spin" }), false);
+        verify(!odd.includes("GhostAnimations"));
+        verify(!odd.includes("os.exit"));
+        // Off stays off whatever the styles.
+        verify(HyprlandConfig.lua(Object.assign({}, defaults, { animationSpeed: 0, windowAnimation: "slide" }), false).includes("enabled = false"));
+    }
+
+    function test_borderExtras() {
+        verify(!HyprlandConfig.lua(defaults, false).includes("borderangle"));
+        const lua = HyprlandConfig.lua(Object.assign({}, defaults, { borderSpin: true, windowGlow: true, windowKindBorders: true }), false);
+        verify(lua.includes('leaf = "borderangle"'));
+        verify(lua.includes("glow = { enabled = true"));
+        verify(lua.includes("match = { float = true, focus = true }, border_color = GhostColors.tertiary"));
+        verify(lua.includes("if GhostColors then"));
+    }
+
+    function test_cursor() {
+        const lua = HyprlandConfig.lua(Object.assign({}, defaults, { cursorTheme: "Bibata-Modern-Classic", cursorSize: 32 }), false);
+        verify(lua.includes('hl.env("XCURSOR_THEME", "Bibata-Modern-Classic")'));
+        verify(lua.includes('hl.env("HYPRCURSOR_SIZE", "32")'));
+        // Not set, or hand-edited: Adwaita at 24, nothing that breaks the string.
+        verify(HyprlandConfig.lua(defaults, false).includes('hl.env("XCURSOR_THEME", "Adwaita")'));
+        compare(HyprlandConfig.cursorTheme('a"); os.exit() --'), "Adwaita");
+        compare(HyprlandConfig.cursorSize(33), 24);
     }
 }

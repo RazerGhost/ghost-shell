@@ -29,14 +29,67 @@ function animationSpeed(value) {
     return animationSpeeds.includes(value) ? value : 1;
 }
 
-// Hyprland's side: look.lua's GhostAnimations at the factor, or animations off.
-function animationLua(value) {
+// How windows open and close, and how workspaces switch (Settings -> Appearance -> Windows):
+// Hyprland's styles, the first of each the default (look.lua's own).
+const windowStyles = { popin: "popin 87%", slide: "slide", gnomed: "gnomed" };
+const workspaceStyles = { fade: "fade", slide: "slide", slidevert: "slidevert", slidefade: "slidefade 20%" };
+
+function style(name, styles) {
+    return Object.keys(styles).includes(name) ? name : Object.keys(styles)[0];
+}
+
+// Hyprland's side: look.lua's GhostAnimations at the factor and styles, or animations off.
+function animationLua(value, windows, workspaces) {
     const speed = animationSpeed(value);
-    if (speed === 1)
-        return [];
+    const win = style(windows, windowStyles);
+    const ws = style(workspaces, workspaceStyles);
     if (speed === 0)
         return ["-- Animations off (Settings -> Appearance).", "hl.config({ animations = { enabled = false } })", ""];
-    return ["-- Animation speed (Settings -> Appearance).", `if GhostAnimations then GhostAnimations(${speed}) end`, ""];
+    if (speed === 1 && win === "popin" && ws === "fade")
+        return [];
+    return ["-- Animation speed and styles (Settings -> Appearance).",
+            `if GhostAnimations then GhostAnimations(${speed}, { windows = "${windowStyles[win]}", workspaces = "${workspaceStyles[ws]}" }) end`, ""];
+}
+
+// The window border's extras (Settings -> Appearance -> Windows). Colors come from matugen's
+// colors.lua (loaded before this file): the glow's own, and GhostColors for the rules.
+function borderLua(v) {
+    const lines = [];
+    if (v.borderSpin === true)
+        // Turns the border's gradient all the time: Hyprland redraws every frame (battery).
+        lines.push("-- The border's colors turn.",
+                   'hl.animation({ leaf = "borderangle", enabled = true, speed = 60, bezier = "linear", style = "loop" })');
+    if (v.windowGlow === true)
+        lines.push("-- A glow inside the focused window's edge.",
+                   "hl.config({ decoration = { glow = { enabled = true, range = 12 } } })");
+    if (v.windowKindBorders === true)
+        lines.push("-- Floating windows' border in the third color, pinned ones' (picture-in-picture) in the second.",
+                   "if GhostColors then",
+                   '    hl.window_rule({ name = "ghost-border-floating", match = { float = true, focus = true }, border_color = GhostColors.tertiary })',
+                   '    hl.window_rule({ name = "ghost-border-pinned", match = { pin = true }, border_color = GhostColors.secondary })',
+                   "end");
+    return lines.length ? [...lines, ""] : [];
+}
+
+// The pointer (Settings -> Keyboard and mouse): for apps started from now on. The shell also
+// runs `hyprctl setcursor` (HyprlandSettings.qml), which changes it at once.
+const cursorSizes = [16, 24, 32, 40, 48];
+
+function cursorSize(value) {
+    return cursorSizes.includes(value) ? value : 24;
+}
+
+// A theme folder's name: letters, digits, space, dot, dash, underscore; else the default.
+function cursorTheme(name) {
+    return typeof name === "string" && /^[A-Za-z0-9 ._-]+$/.test(name) ? name : "Adwaita";
+}
+
+function cursorLua(v) {
+    const theme = cursorTheme(v.cursorTheme);
+    const size = cursorSize(v.cursorSize);
+    return ["-- The pointer (Settings -> Keyboard and mouse).",
+            `hl.env("XCURSOR_THEME", "${theme}")`, `hl.env("XCURSOR_SIZE", "${size}")`,
+            `hl.env("HYPRCURSOR_THEME", "${theme}")`, `hl.env("HYPRCURSOR_SIZE", "${size}")`, ""];
 }
 
 // Game mode (services/GameMode.qml): what it switches off, after the settings so it wins.
@@ -76,7 +129,9 @@ function lua(v, gameMode) {
         "    },",
         "})",
         "",
-        ...animationLua(v.animationSpeed),
+        ...animationLua(v.animationSpeed, v.windowAnimation, v.workspaceAnimation),
+        ...borderLua(v),
+        ...cursorLua(v),
         ...(gameMode === true ? gameModeLua : []),
         // Screens set up in the Display page, by output name (the rest keep monitors.lua's
         // "preferred"); one that isn't safe to write is left out.

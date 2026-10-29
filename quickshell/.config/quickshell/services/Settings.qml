@@ -174,6 +174,14 @@ Singleton {
             property int gapsOut: 20             // between windows and the screen's edges
             property int borderSize: 2
             property int rounding: 10            // window corners
+            // The windows' extras (settings/HyprlandConfig.js lists the styles).
+            property string windowAnimation: "popin"   // popin, slide, gnomed
+            property string workspaceAnimation: "fade" // fade, slide, slidevert, slidefade
+            property bool borderSpin: false        // the border's colors turn (redraws all the time)
+            property bool windowGlow: false        // a glow inside the focused window's edge
+            property bool windowKindBorders: false // floating and pinned windows' own border colors
+            property string cursorTheme: ""        // "" = Adwaita
+            property int cursorSize: 24
             // Settings -> Appearance -> Size (theme/ThemeScale.js lists the steps).
             property real uiScale: 1
             property real textScale: 1

@@ -883,6 +883,18 @@ audit of our own UI): all sixteen, built in batches.
   each of `Colors`' properties, `Theme.anim.recolor`, so it follows the animation speed; not on
   the first load, which would fade from the fallback colors). Hyprland's borders and the apps
   still switch at once. Checked live by swapping colors.json.
+- Hyprland extras (Settings -> Appearance -> Windows): how windows open and close (pop in,
+  slide, grow: Hyprland's popin, slide, gnomed) and how workspaces switch (fade, slide, slide
+  up, slide and fade), through look.lua's `GhostAnimations(factor, styles)`; a turning border
+  (`borderangle` with the `loop` style: Hyprland redraws every frame, so off by default and the
+  row says it costs battery); a glow inside the focused window's edge (0.57's
+  `decoration.glow`, in the accent at 40 % from matugen's colors.lua); floating windows' border
+  in the tertiary color and pinned ones' in the secondary (`border_color` window rules using
+  `GhostColors`, which colors.lua defines and shell-settings.lua, loaded after it, reads).
+  Settings -> Keyboard and mouse -> Pointer: the cursor theme (the installed ones; only Adwaita
+  here) and size, as environment variables for apps started later and `hyprctl setcursor` at
+  once. `HyprlandConfig.js` tested. Checked live: every option applied (`hyprctl animations`,
+  `getoption`), no config errors.
 
 ### Visual Settings (planned, after the UI research round)
 User's request (2026-10-29): settings like the lock screen's clock should be picked by sight,
