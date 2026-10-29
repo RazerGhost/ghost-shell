@@ -721,6 +721,12 @@ shell's cost, features and customization), checked before acting. Done so far:
   colors are then made from it, the picture still shows). `~/.local/state/quickshell/scheme` is
   now `key=value` lines (mode, type, contrast, accent; `ColorScheme.file`, tested), and
   wallpaper.sh checks each value again before passing it to matugen.
+- Settings -> Appearance -> Fonts (text and monospaced, the installed ones of a short list; Theme
+  reads them live) and Icons: the icon theme (Colloid in its folder colors, Breeze, Adwaita;
+  `iconTheme`). wallpaper.sh picks its dark or light version for the mode (`-Dark`, `-Light`,
+  `-dark`), sets it for GTK and writes it to `icon-theme`, which `hypr/shell.sh` exports as
+  `QS_ICON_THEME` at every start, so "Restart the shell" applies it to the shell's own icons
+  too (env.lua's Colloid-Dark stays the fallback). Moved out of wallpaper.sh's fixed Colloid.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

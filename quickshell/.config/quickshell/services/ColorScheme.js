@@ -27,13 +27,14 @@ const styles = ["scheme-tonal-spot", "scheme-vibrant", "scheme-expressive", "sch
 // What wallpaper.sh reads from ~/.local/state/quickshell/scheme, one "key=value" line each.
 // Anything unexpected becomes the default, so a hand-edited settings file can't put anything
 // else there: mode light or dark, a known style, contrast -1 to 1, accent #rrggbb or "" (the
-// wallpaper's own).
-function file(mode, style, contrast, accent) {
+// wallpaper's own), and an icon theme's name (letters, digits, - and _; Colloid by default).
+function file(mode, style, contrast, accent, icons) {
     const c = typeof contrast === "number" && isFinite(contrast) ? Math.min(1, Math.max(-1, contrast)) : 0;
     return [
         "mode=" + (mode === "light" ? "light" : "dark"),
         "type=" + (styles.includes(style) ? style : styles[0]),
         "contrast=" + c,
-        "accent=" + (/^#[0-9a-fA-F]{6}$/.test(accent ?? "") ? accent.toLowerCase() : "")
+        "accent=" + (/^#[0-9a-fA-F]{6}$/.test(accent ?? "") ? accent.toLowerCase() : ""),
+        "icons=" + (/^[A-Za-z0-9_-]+$/.test(icons ?? "") ? icons : "Colloid")
     ].join("\n") + "\n";
 }

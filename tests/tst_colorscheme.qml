@@ -23,12 +23,12 @@ TestCase {
     }
 
     function test_file() {
-        compare(ColorScheme.file("light", "scheme-vibrant", 0.5, "#1E66F5"),
-                "mode=light\ntype=scheme-vibrant\ncontrast=0.5\naccent=#1e66f5\n");
+        compare(ColorScheme.file("light", "scheme-vibrant", 0.5, "#1E66F5", "Colloid-Teal"),
+                "mode=light\ntype=scheme-vibrant\ncontrast=0.5\naccent=#1e66f5\nicons=Colloid-Teal\n");
         // Hand-edited nonsense falls back to the defaults.
-        compare(ColorScheme.file("purple", "$(rm -rf ~)", 7, "red; reboot"),
-                "mode=dark\ntype=scheme-tonal-spot\ncontrast=1\naccent=\n");
-        compare(ColorScheme.file("dark", undefined, undefined, undefined),
-                "mode=dark\ntype=scheme-tonal-spot\ncontrast=0\naccent=\n");
+        compare(ColorScheme.file("purple", "$(rm -rf ~)", 7, "red; reboot", "../../etc"),
+                "mode=dark\ntype=scheme-tonal-spot\ncontrast=1\naccent=\nicons=Colloid\n");
+        compare(ColorScheme.file("dark", undefined, undefined, undefined, undefined),
+                "mode=dark\ntype=scheme-tonal-spot\ncontrast=0\naccent=\nicons=Colloid\n");
     }
 }

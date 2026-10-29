@@ -9,6 +9,13 @@
 export __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/50_mesa.json
 
 while :; do
+    # The icon theme chosen in Settings (matugen's wallpaper.sh writes its dark or light version);
+    # env.lua's Colloid-Dark otherwise. Read at every start, so a restart picks a new one up.
+    icons=$(cat "$HOME/.local/state/quickshell/icon-theme" 2>/dev/null)
+    case "$icons" in
+        "" | *[!A-Za-z0-9_-]*) ;;
+        *) export QS_ICON_THEME="$icons" ;;
+    esac
     qs
     code=$?
     [ "$code" -eq 0 ] || [ "$code" -eq 143 ] && exit 0

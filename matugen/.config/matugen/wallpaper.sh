@@ -19,13 +19,15 @@ default_seed="#6750a4"
 # lines; services/ColorScheme.js writes it): light or dark, matugen's color style and contrast,
 # and a fixed accent color ("" = the wallpaper's). Each value is checked again here, so the file
 # can't make this run anything else; an older file with just "light" or "dark" still works.
-mode=dark type=scheme-tonal-spot contrast=0 accent=
+mode=dark type=scheme-tonal-spot contrast=0 accent= icons=Colloid
 if [ -f "$state/scheme" ]; then
     while IFS='=' read -r key value; do
         case "$key=$value" in
             mode=light | light=) mode=light ;;
             type=scheme-[a-z-]*) type=$value ;;
             accent=\#[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]) accent=$value ;;
+            icons=*[!A-Za-z0-9_-]*) ;;
+            icons=?*) icons=$value ;;
         esac
         case "$key" in
             contrast) case "$value" in -1 | -0.5 | 0 | 0.5 | 1) contrast=$value ;; esac ;;
@@ -75,14 +77,31 @@ case "${1-}" in
         ;;
 esac
 
-# GTK 4 apps follow color-scheme; adw-gtk3 makes GTK 3 ones match. Colloid's -Dark and -Light
-# icons are drawn for dark and light backgrounds.
+# The icon theme's version for this mode: Colloid-Teal-Dark / -Light, breeze-dark, or the theme
+# itself when it has no such version.
+icon_theme() {
+    for name in "$@"; do
+        for dir in "$HOME/.local/share/icons" /usr/share/icons; do
+            [ -f "$dir/$name/index.theme" ] && { echo "$name"; return; }
+        done
+    done
+    echo Colloid-Dark
+}
+if [ "$mode" = light ]; then
+    icon_name=$(icon_theme "$icons-Light" "$icons")
+else
+    icon_name=$(icon_theme "$icons-Dark" "$icons-dark" "$icons")
+fi
+# The shell reads it when it starts (hypr/shell.sh sets QS_ICON_THEME from it).
+mkdir -p "$state"
+printf '%s\n' "$icon_name" > "$state/icon-theme"
+
+# GTK 4 apps follow color-scheme; adw-gtk3 makes GTK 3 ones match.
 if [ "$mode" = light ]; then
     gsettings set org.gnome.desktop.interface color-scheme prefer-light
     gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3
-    gsettings set org.gnome.desktop.interface icon-theme Colloid-Light
 else
     gsettings set org.gnome.desktop.interface color-scheme prefer-dark
     gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark
-    gsettings set org.gnome.desktop.interface icon-theme Colloid-Dark
 fi
+gsettings set org.gnome.desktop.interface icon-theme "$icon_name"

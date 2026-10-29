@@ -21,7 +21,8 @@ Singleton {
     // Everything wallpaper.sh makes the colors from: the mode, matugen's color style and contrast,
     // and a fixed accent (ColorScheme.js, tested). A change to any of them makes the colors again.
     readonly property string wanted: ColorSchemeJs.file(mode, Settings.values.colorStyle,
-                                                        Settings.values.colorContrast, Settings.values.accentColor)
+                                                        Settings.values.colorContrast, Settings.values.accentColor,
+                                                        Settings.values.iconTheme)
     // "At sunset" with a weather town waits for the town's sunset (or the weather failing), so a
     // start between the real sunset and the 19:00 fallback doesn't recolor everything twice.
     readonly property bool known: Settings.values.colorScheme !== "auto" || Settings.values.weatherLocation === ""

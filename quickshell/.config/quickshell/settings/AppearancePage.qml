@@ -1,4 +1,6 @@
 import QtQuick
+import Quickshell
+import Quickshell.Io
 import qs.services
 import qs.theme
 import qs.widgets
@@ -182,6 +184,51 @@ Column {
                 valueWidth: Theme.settings.stepperWide
                 value: Theme.font.mono
                 onPicked: v => Settings.values.fontMono = v === "MesloLGS Nerd Font" ? "" : v
+            }
+        }
+    }
+
+    // Icon themes: the installed ones, their dark and light versions as one (matugen's
+    // wallpaper.sh picks the version for the mode).
+    property var iconThemes: ["Colloid"]
+
+    Process {
+        command: ["sh", "-c", `for d in /usr/share/icons/*/index.theme "$HOME"/.local/share/icons/*/index.theme; do
+            [ -f "$d" ] || continue
+            n=$(basename "$(dirname "$d")")
+            case "$n" in *-Dark|*-Light|*-dark|hicolor|locolor|default|AdwaitaLegacy) continue ;; esac
+            grep -q "^Directories=" "$d" && echo "$n"
+        done`]
+        running: true
+        stdout: StdioCollector {
+            onStreamFinished: page.iconThemes = text.split("\n").filter(n => n !== "").sort((a, b) => a.localeCompare(b))
+        }
+    }
+
+    SettingGroup {
+        title: "Icons"
+
+        SettingRow {
+            title: "Icon theme"
+            subtitle: "Apps' icons, in Colloid's folder color or another theme; its dark or light version follows the mode"
+
+            Stepper {
+                label: "Icon theme"
+                values: page.iconThemes
+                valueWidth: Theme.settings.stepperWide
+                value: Settings.values.iconTheme
+                format: v => v.replace(/^Colloid-?/, "Colloid ").trim()
+                onPicked: v => Settings.values.iconTheme = v
+            }
+        }
+
+        SettingRow {
+            title: "The shell's own icons change after it restarts"
+            subtitle: "The dock, launcher and island read the icon theme when the shell starts. Restarting clears the notification list."
+
+            TextButton {
+                text: "Restart the shell"
+                onClicked: Quickshell.execDetached(["sh", "-c", "pkill -x qs; sleep 1; exec \"$HOME\"/.config/hypr/shell.sh"])
             }
         }
     }

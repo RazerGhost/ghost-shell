@@ -115,6 +115,9 @@ Singleton {
             property real colorContrast: 0
             property string accentColor: ""
             // The shell's fonts: UI text and the monospaced one ("" = Inter and MesloLGS Nerd Font).
+            // The icon theme ("Colloid", "Colloid-Teal", "breeze", ...); its dark or light version
+            // follows the mode (matugen's wallpaper.sh).
+            property string iconTheme: "Colloid"
             property string fontSans: ""
             property string fontMono: ""
             // The shell's panels (island, menus, dock, launcher...): glass, see-through over
