@@ -315,6 +315,13 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   instead `hl.on("workspace.created", function(workspace) ... end)`. A Lua workspace object
   (`hl.get_workspaces()`) has `name`, `id`, `is_empty`, `special` and `windows`.
 
+- QML's JavaScript engine lacks some ES2019+ functions: `String.prototype.trimStart` and
+  `Object.fromEntries` threw (verified); use a regex or a loop. Plain-JS tests in qmltestrunner
+  don't catch it when the call sits in a .qml handler, so check the shell's log after a change.
+- In an `onTextChanged` handler, a property bound to that text (`readonly property var query:
+  Fuzzy.mode(text)`) may still hold the old value: compute from `text` itself there (the
+  launcher's file search ran for the text before the last key).
+
 ## Testing on the laptop
 
 - README screenshots: an empty workspace up to 5 (higher ones add workspace dots), `grim -s 0.75`

@@ -130,9 +130,12 @@ Scope {
                     // New results: select the best match again (the answer, while there is one).
                     onTextChanged: {
                         list.currentIndex = 0;
-                        calc.ask(query.mode === "apps" ? text : "");
-                        if (query.mode === "files")
-                            fileSearch.ask(query.text);
+                        // From the text itself: `query` may not have caught up with it yet here,
+                        // and a search for the text before the last key was thrown away as stale.
+                        const now = Fuzzy.mode(text);
+                        calc.ask(now.mode === "apps" ? text : "");
+                        if (now.mode === "files")
+                            fileSearch.ask(now.text);
                     }
                     onKeyPressed: event => {
                         switch (event.key) {

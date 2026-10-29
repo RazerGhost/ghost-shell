@@ -78,7 +78,11 @@ Singleton {
                     root.cpuLoad = load;
                 if (root.previousCpu && r.cpu)
                     root.apps = Stats.apps(r.procs, root.previousTicks, r.cpu.total - root.previousCpu.total, root.windowApps(), 6);
-                root.previousTicks = Object.fromEntries(r.procs.map(p => [p.pid, p.ticks]));
+                // A loop: Object.fromEntries doesn't exist in QML's JavaScript engine.
+                const ticks = {};
+                for (const p of r.procs)
+                    ticks[p.pid] = p.ticks;
+                root.previousTicks = ticks;
                 root.previousCpu = r.cpu;
                 root.cpuTemp = r.cpuTemp;
                 root.memory = r.memory;
