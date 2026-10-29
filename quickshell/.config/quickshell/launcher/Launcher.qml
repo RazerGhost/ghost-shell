@@ -10,20 +10,39 @@ import qs.widgets
 import "Fuzzy.js" as Fuzzy
 import "Calc.js" as Calc
 
-// App launcher: type to fuzzy-search installed apps, arrow keys to pick, Enter to launch,
-// Escape or a click outside to close. Toggled with `qs ipc call launcher toggle` (tap Super or Super+Space).
+// App launcher: type to fuzzy-search installed apps and open windows, arrow keys to pick, Enter
+// to launch or switch, Escape or a click outside to close. "/ name" searches files in the home
+// folder (fd) and "> command" runs a command in the terminal (Fuzzy.mode, tested). Toggled with
+// `qs ipc call launcher toggle` (tap Super or Super+Space).
 Scope {
     id: root
 
     property bool open: false
 
-    // A result: an app, or one of its shortcuts ({ entry, action }; action null for the app).
+    // A result: an app or one of its shortcuts ({ entry, action }; action null for the app), a
+    // window ({ window }), a file ({ file }) or a command to run ({ command }).
     function launch(result: var): void {
-        if (result.action)
+        if (result.window)
+            Windows.show(result.window);
+        else if (result.file)
+            Quickshell.execDetached(["xdg-open", result.file.path]);
+        else if (result.command)
+            // The terminal stays open in your shell after the command, to read what it printed.
+            Apps.runInTerminal(["sh", "-c", 'eval "$1"; exec "${SHELL:-sh}"', "sh", result.command]);
+        else if (result.action)
             result.action.execute();
         else
             Apps.launch(result.entry);
         open = false;
+    }
+
+    // Open windows to search, with their app's name.
+    function windowList(): var {
+        return Hyprland.toplevels.values.map(t => ({
+            window: t,
+            title: t.title,
+            app: DesktopEntries.heuristicLookup(t.wayland?.appId ?? "")?.name ?? t.wayland?.appId ?? ""
+        }));
     }
 
     IpcHandler {
@@ -102,14 +121,18 @@ Scope {
                 SearchField {
                     id: search
 
+                    readonly property var query: Fuzzy.mode(text)
+
                     width: parent.width
-                    placeholder: "Search apps"
+                    placeholder: "Search apps and windows,  / files,  > run"
                     fontSize: Theme.font.large
 
                     // New results: select the best match again (the answer, while there is one).
                     onTextChanged: {
                         list.currentIndex = 0;
-                        calc.ask(text);
+                        calc.ask(query.mode === "apps" ? text : "");
+                        if (query.mode === "files")
+                            fileSearch.ask(query.text);
                     }
                     onKeyPressed: event => {
                         switch (event.key) {
@@ -237,6 +260,41 @@ Scope {
                     }
                 }
 
+                // Files in the home folder for "/ name": fd (hidden and git-ignored files are left
+                // out), once typing pauses. Parsed and sorted by Fuzzy.files (tested).
+                Item {
+                    id: fileSearch
+
+                    property var found: []
+                    property string asked: ""
+
+                    function ask(text: string): void {
+                        asked = text;
+                        found = [];
+                        if (text !== "")
+                            waitFiles.restart();
+                    }
+
+                    Timer {
+                        id: waitFiles
+                        interval: 200
+                        onTriggered: fd.running = true
+                    }
+
+                    Process {
+                        id: fd
+                        command: ["fd", "--absolute-path", "--ignore-case", "--fixed-strings", "--max-results", "50",
+                                  "--", fileSearch.asked, Quickshell.env("HOME")]
+                        stdout: StdioCollector {
+                            onStreamFinished: {
+                                // Results for an older search: the text changed since.
+                                if (search.query.mode === "files" && search.query.text === fileSearch.asked)
+                                    fileSearch.found = Fuzzy.files(text, Quickshell.env("HOME"));
+                            }
+                        }
+                    }
+                }
+
                 ListView {
                     id: list
 
@@ -247,7 +305,11 @@ Scope {
                     // by itself when apps are installed or removed. Includes the apps' own
                     // shortcuts ("New Private Window").
                     // ScriptModel: results that stay while typing keep their row.
-                    model: ScriptModel { values: Fuzzy.results(DesktopEntries.applications.values, search.text) }
+                    model: ScriptModel {
+                        values: search.query.mode === "files" ? fileSearch.found.map(f => ({ file: f }))
+                              : search.query.mode === "command" ? (search.query.text === "" ? [] : [{ command: search.query.text }])
+                              : Fuzzy.results(DesktopEntries.applications.values, search.text, root.windowList())
+                    }
                     highlightMoveDuration: Theme.anim.fast
                     boundsBehavior: Flickable.StopAtBounds
 
@@ -262,9 +324,22 @@ Scope {
                     delegate: MouseArea {
                         id: row
 
-                        required property var modelData // { entry, action }
+                        required property var modelData // see root.launch()
                         required property int index
-                        readonly property DesktopEntry entry: modelData.entry
+                        readonly property DesktopEntry entry: modelData.entry ?? null
+                        readonly property string title: modelData.window ? modelData.window.title
+                            : modelData.file ? modelData.file.name
+                            : modelData.command ? modelData.command
+                            : modelData.action?.name ?? entry?.name ?? ""
+                        // For a shortcut, the app it belongs to.
+                        readonly property string subtitle: modelData.window ? "Open window"
+                            : modelData.file ? modelData.file.folder
+                            : modelData.command ? "Run in the terminal"
+                            : modelData.action ? entry.name : entry?.genericName || entry?.comment || ""
+                        readonly property string icon: modelData.window ? Windows.iconFor(modelData.window)
+                            : modelData.file ? Fuzzy.fileIcon(modelData.file.name)
+                            : modelData.command ? "utilities-terminal"
+                            : entry?.icon ?? ""
 
                         width: ListView.view.width
                         height: Theme.launcher.rowHeight
@@ -274,7 +349,7 @@ Scope {
                         onClicked: root.launch(modelData)
 
                         Accessible.role: Accessible.ListItem
-                        Accessible.name: modelData.action ? modelData.action.name + ", " + entry.name : entry.name
+                        Accessible.name: subtitle !== "" ? title + ", " + subtitle : title
                         Accessible.onPressAction: root.launch(modelData)
 
                         IconImage {
@@ -284,7 +359,7 @@ Scope {
                             anchors.verticalCenter: parent.verticalCenter
                             implicitSize: Theme.icon.launcher
                             // Falls back to a generic icon when the theme has no match.
-                            source: Quickshell.iconPath(row.entry.icon, "application-x-executable")
+                            source: Quickshell.iconPath(row.icon, "application-x-executable")
                         }
 
                         Column {
@@ -296,7 +371,7 @@ Scope {
 
                             Text {
                                 width: parent.width
-                                text: row.modelData.action?.name ?? row.entry.name
+                                text: row.title
                                 color: Colors.m3onSurface
                                 font.family: Theme.font.sans
                                 font.pixelSize: Theme.font.normal
@@ -307,8 +382,7 @@ Scope {
                             Text {
                                 width: parent.width
                                 visible: text !== ""
-                                // For a shortcut, the app it belongs to.
-                                text: row.modelData.action ? row.entry.name : row.entry.genericName || row.entry.comment
+                                text: row.subtitle
                                 color: Colors.m3onSurfaceVariant
                                 font.family: Theme.font.sans
                                 font.pixelSize: Theme.font.small
@@ -324,7 +398,9 @@ Scope {
                     horizontalAlignment: Text.AlignHCenter
                     topPadding: Theme.spacing.s
                     bottomPadding: Theme.spacing.s
-                    text: "No apps found"
+                    text: search.query.mode === "files" ? (search.query.text === "" ? "Type a file or folder name" : fd.running || waitFiles.running ? "Searching…" : "No files found")
+                        : search.query.mode === "command" ? "Type a command to run in the terminal"
+                        : "No apps found"
                     color: Colors.m3onSurfaceVariant
                     font.family: Theme.font.sans
                     font.pixelSize: Theme.font.normal

@@ -20,7 +20,7 @@ machine can take what it needs.
 - **Windows**: a tiling layout of its own (halves, thirds, quarters from the window menu, or by
   the number of windows), Snap Assist, window tabs, Alt+Tab with live previews, an overview
   (Super+Tab, a three-finger swipe or the top-left corner), minimize, a dock with window previews.
-- **The rest of a desktop**: notifications (with sounds), launcher with a calculator, on-screen
+- **The rest of a desktop**: notifications (with sounds), launcher (apps, windows, files with `/`, commands with `>`, a calculator), on-screen
   volume and brightness, lock and login screen, idle and night light, screenshots and screen
   recording, a password prompt for apps (polkit), an equalizer, screen time, web apps
   (`ghost webapp`), an update count, wallpapers, and a welcome tour on the first start.

@@ -97,4 +97,40 @@ TestCase {
     function test_bestMatchFirst() {
         compare(names(Fuzzy.filter(apps, "fi"))[0], "Files");
     }
+
+    function test_resultsWithWindows() {
+        const windows = [{ window: "w1", title: "Invoice.pdf - Papers", app: "Papers" },
+                         { window: "w2", title: "~/dotfiles", app: "Ghostty" }];
+        const results = Fuzzy.results(withActions, "invoice", windows);
+        compare(results.length, 1);
+        compare(results[0].window, "w1");
+        compare(results[0].entry, null);
+        // An app and its window match equally: the app first.
+        const steamWindow = [{ window: "w3", title: "Steam", app: "Steam" }];
+        const steam = Fuzzy.results(withActions, "steam", steamWindow);
+        compare(steam[0].entry.name, "Steam");
+        verify(steam.some(r => r.window === "w3"));
+        // Loose matches don't list windows.
+        compare(Fuzzy.scoredWindows(windows, "ivc").length, 0);
+        compare(Fuzzy.results(withActions, "", windows).filter(r => r.window).length, 0);
+    }
+
+    function test_mode() {
+        compare(Fuzzy.mode("/ report"), { mode: "files", text: "report" });
+        compare(Fuzzy.mode("  >htop -d 5"), { mode: "command", text: "htop -d 5" });
+        compare(Fuzzy.mode("zen"), { mode: "apps", text: "zen" });
+    }
+
+    function test_files() {
+        const found = Fuzzy.files("/home/me/Documents/work/old/report.pdf\n/home/me/report.txt\n/home/me/Reports/\n/mnt/x/report\n", "/home/me");
+        compare(found.map(f => f.name), ["report.txt", "Reports", "report", "report.pdf"]);
+        compare(found[0].folder, "~/");
+        compare(found[2].folder, "/mnt/x/");
+        compare(found[3].folder, "~/Documents/work/old/");
+        compare(Fuzzy.fileIcon("report.pdf"), "application-pdf");
+        compare(Fuzzy.fileIcon("Photo.JPG"), "image-x-generic");
+        compare(Fuzzy.fileIcon("Reports"), "folder");
+        compare(Fuzzy.fileIcon("notes.md"), "text-x-generic");
+        compare(Fuzzy.fileIcon(".bashrc"), "folder"); // hidden files aren't searched
+    }
 }
