@@ -895,6 +895,13 @@ audit of our own UI): all sixteen, built in batches.
   here) and size, as environment variables for apps started later and `hyprctl setcursor` at
   once. `HyprlandConfig.js` tested. Checked live: every option applied (`hyprctl animations`,
   `getoption`), no config errors.
+- Desktop widgets (Settings -> Appearance -> Desktop widgets, all off by default): a clock, the
+  weather and the media player (while something plays) as glass cards on the wallpaper
+  (`desktop/DesktopWidgets.qml`, a `Bottom`-layer surface on the first screen, so windows
+  cover them; input and blur only on the cards). Resting on one shows a handle in its corner;
+  dragging that moves it, saved as fractions of the screen in `desktopWidgets` and kept on
+  screen (`DesktopWidgets.js`, tested). Checked live on an empty workspace; dragging is for the
+  user's checklist.
 
 ### Visual Settings (planned, after the UI research round)
 User's request (2026-10-29): settings like the lock screen's clock should be picked by sight,

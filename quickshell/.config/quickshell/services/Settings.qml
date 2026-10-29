@@ -180,6 +180,12 @@ Singleton {
             property bool borderSpin: false        // the border's colors turn (redraws all the time)
             property bool windowGlow: false        // a glow inside the focused window's edge
             property bool windowKindBorders: false // floating and pinned windows' own border colors
+            // Desktop widgets (desktop/DesktopWidgets.qml) and where each was dragged:
+            // { clock: { x, y }, ... } as fractions of the screen.
+            property bool desktopClock: false
+            property bool desktopWeather: false
+            property bool desktopMedia: false
+            property var desktopWidgets: ({})
             property string cursorTheme: ""        // "" = Adwaita
             property int cursorSize: 24
             // Settings -> Appearance -> Size (theme/ThemeScale.js lists the steps).

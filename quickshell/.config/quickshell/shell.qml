@@ -17,11 +17,13 @@ import qs.services
 import qs.settings
 import qs.snap
 import qs.switcher
+import qs.desktop
 import qs.wallpaper
 import qs.welcome
 
 ShellRoot {
     WallpaperLayer {}
+    DesktopWidgets {}
     WallpaperPicker {}
     Island {}
     Dock {}

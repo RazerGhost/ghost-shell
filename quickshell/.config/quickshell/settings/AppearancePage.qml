@@ -368,6 +368,33 @@ Column {
     }
 
     SettingGroup {
+        title: "Desktop widgets"
+
+        Repeater {
+            model: [
+                { key: "desktopClock", title: "Clock", subtitle: "The time and date" },
+                { key: "desktopWeather", title: "Weather", subtitle: "From the town in Weather and clock" },
+                { key: "desktopMedia", title: "Media", subtitle: "While something plays" }
+            ]
+
+            SettingRow {
+                id: widgetRow
+
+                required property var modelData
+
+                title: modelData.title
+                subtitle: modelData.subtitle + "; drag its handle to move it"
+
+                Switch {
+                    label: widgetRow.modelData.title + " on the desktop"
+                    checked: Settings.values[widgetRow.modelData.key]
+                    onToggled: Settings.values[widgetRow.modelData.key] = !checked
+                }
+            }
+        }
+    }
+
+    SettingGroup {
         title: "Workspaces"
 
         SettingRow {

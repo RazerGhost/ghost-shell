@@ -177,6 +177,13 @@ Singleton {
         readonly property int menuArt:     root.px(160)  // cover in the media menu
     }
 
+    // Desktop widgets (desktop/DesktopWidgets.qml), on the wallpaper.
+    readonly property QtObject desktop: QtObject {
+        readonly property int clock:   root.text(72) // the time
+        readonly property int weather: root.text(40) // the temperature
+        readonly property int width:   root.px(300)  // the weather and media cards
+    }
+
     readonly property QtObject dock: QtObject {
         // App icons at rest (Settings -> Windows -> Dock), and the bar around them.
         readonly property int icon:      root.px(ThemeScale.pick(Settings.values.dockIconSize, ThemeScale.dockIcons, 44))
