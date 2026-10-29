@@ -868,6 +868,14 @@ audit of our own UI): all sixteen, built in batches.
   before, in the middle with the field, or the bottom-left corner). `lock/LockClock.qml`, the
   choices, digits and hands in `LockClock.js` (tested). Checked in the preview.
 
+### Visual Settings (planned, after the UI research round)
+User's request (2026-10-29): settings like the lock screen's clock should be picked by sight,
+not through − / + steppers. User's choices: on the Lock screen, Appearance, Dock and island, and
+Windows pages, a live scaled-down copy of what the page changes at the top (the lock screen; the
+island, a menu and the dock; a desktop with two tiled windows), cards with a small picture for
+visual choices, and a row of built-in presets per page that set several settings at once (each
+still changeable after; no saving your own).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
