@@ -54,6 +54,24 @@ TestCase {
         compare(Fuzzy.results(entries, "").map(r => r.entry.name), ["Shelly", "Steam", "Zen Browser"]);
     }
 
+    function test_favoritesHiddenAndCommands() {
+        const entries = [{ id: "zen", name: "Zen Browser", keywords: [], noDisplay: false, actions: [] },
+                         { id: "steam", name: "Steam", keywords: [], noDisplay: false, actions: [] },
+                         { id: "avahi", name: "Avahi Browser", keywords: [], noDisplay: false, actions: [] }];
+        const options = { favorites: ["zen"], hidden: ["avahi"],
+                          commands: [{ name: "Wallpaper random", command: "ghost theme" }, { name: 3 }] };
+        // No query: favorites first, hidden apps gone.
+        compare(Fuzzy.results(entries, "", [], options).map(r => r.entry.name), ["Zen Browser", "Steam"]);
+        // A hidden app isn't found by name either.
+        compare(Fuzzy.results(entries, "avahi", [], options).length, 0);
+        // Your commands are found by name; a broken one (no command) is left out.
+        const found = Fuzzy.results(entries, "wallp", [], options);
+        compare(found.length, 1);
+        compare(found[0].custom.command, "ghost theme");
+        // Without options, as before.
+        compare(Fuzzy.results(entries, "").length, 3);
+    }
+
     function test_actionsNeedTheQueryAsIs() {
         compare(Fuzzy.actions(withActions, "").length, 0);
         compare(Fuzzy.actions(withActions, "pvt").length, 0); // no loose subsequence matches

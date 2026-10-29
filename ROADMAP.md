@@ -859,6 +859,10 @@ audit of our own UI): all sixteen, built in batches.
 - Settings -> Notifications -> Pop-ups for: each OSD pop-up on or off (volume, brightness,
   microphone, muted while recording, a new output, VPN, power mode, keyboard layout, caps lock;
   `hiddenOsdKinds`).
+- Launcher favorites, hidden apps and your own commands: resting on an app shows a star (first
+  in the list while the search is empty) and a hide button; Settings -> Default apps lists the
+  hidden ones (Show) and your commands (a name to find it by and a shell command, run in its
+  own scope; add and remove there). `Fuzzy.results` options, tested.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

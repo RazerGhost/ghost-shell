@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Widgets
 import qs.services
 import qs.theme
+import qs.widgets
 import "Fuzzy.js" as Fuzzy
 
 // A launcher result: an app or one of its shortcuts, a window, a file or a command (see
@@ -19,6 +20,7 @@ MouseArea {
         : modelData.window ? modelData.window.title
         : modelData.file ? modelData.file.name
         : modelData.command ? modelData.command
+        : modelData.custom ? modelData.custom.name
         : modelData.action?.name ?? entry?.name ?? ""
     // For a shortcut, the app it belongs to.
     readonly property string subtitle: modelData.web !== undefined ? "DuckDuckGo, in your browser"
@@ -27,12 +29,14 @@ MouseArea {
         : modelData.window ? "Open window"
         : modelData.file ? modelData.file.folder
         : modelData.command ? "Run in the terminal"
+        : modelData.custom ? "Your command: " + modelData.custom.command
         : modelData.action ? entry.name : entry?.genericName || entry?.comment || ""
     readonly property string icon: modelData.web !== undefined ? "system-search"
         : modelData.keybind ? "input-keyboard"
         : modelData.window ? Windows.iconFor(modelData.window)
         : modelData.file ? Fuzzy.fileIcon(modelData.file.name)
         : modelData.command ? "utilities-terminal"
+        : modelData.custom ? (modelData.custom.icon || "system-run")
         : entry?.icon ?? ""
 
     signal activated()
@@ -69,9 +73,42 @@ MouseArea {
         source: Quickshell.iconPath(root.icon, "application-x-executable")
     }
 
+    // An app: star it (first in the list) or hide it from the launcher (Settings -> Default apps
+    // shows it again). The star stays while it's a favorite.
+    readonly property bool isApp: entry !== null && !modelData.action
+    readonly property var favorites: Array.from(Settings.values.launcherFavorites ?? [])
+    readonly property bool favorite: isApp && favorites.includes(entry.id)
+
+    Row {
+        id: appButtons
+        anchors.right: parent.right
+        anchors.rightMargin: Theme.spacing.s
+        anchors.verticalCenter: parent.verticalCenter
+        visible: root.isApp && (root.containsMouse || root.favorite)
+
+        IconButton {
+            icon: "star"
+            color: root.favorite ? Colors.m3primary : Colors.m3onSurfaceVariant
+            iconSize: Theme.icon.small
+            label: root.favorite ? "Remove from favorites" : "Add to favorites"
+            onClicked: Settings.values.launcherFavorites = root.favorite
+                ? root.favorites.filter(id => id !== root.entry.id)
+                : [...root.favorites, root.entry.id]
+        }
+
+        IconButton {
+            visible: root.containsMouse
+            icon: "visibility_off"
+            color: Colors.m3onSurfaceVariant
+            iconSize: Theme.icon.small
+            label: "Hide from the launcher"
+            onClicked: Settings.values.launcherHidden = [...Array.from(Settings.values.launcherHidden ?? []), root.entry.id]
+        }
+    }
+
     Column {
         anchors.left: appIcon.right
-        anchors.right: parent.right
+        anchors.right: appButtons.visible ? appButtons.left : parent.right
         anchors.leftMargin: Theme.spacing.m
         anchors.rightMargin: Theme.spacing.s
         anchors.verticalCenter: parent.verticalCenter

@@ -127,22 +127,33 @@ function scoredActions(entries, query) {
     return results;
 }
 
-// Everything the launcher lists for `query`: apps, their shortcuts and open windows as
-// [{ entry, action, window }] (action null for an app; entry null for a window), together by how
-// well they match. An action's whole name matching ranks it above an app that only matches
-// loosely. With an empty query, just the apps. `windows` as for scoredWindows().
-function results(entries, query, windows) {
+// Everything the launcher lists for `query`: apps, their shortcuts, open windows and your own
+// commands as [{ entry, action, window, custom }] (action null for an app; entry null for a
+// window or command), together by how well they match. An action's whole name matching ranks it
+// above an app that only matches loosely. With an empty query, just the apps: your favorites
+// first, in the order you starred them, then the rest by name. `windows` as for scoredWindows();
+// `options` { favorites, hidden: desktop entry ids, commands: [{ name, command }] } from Settings
+// (Settings -> Default apps), each optional.
+function results(entries, query, windows, options) {
     const q = query.trim();
-    const shown = entries.filter(e => !e.noDisplay);
-    if (q === "")
-        return shown.sort(byName).map(e => ({ entry: e, action: null, window: null }));
-    // On equal scores: apps, then their shortcuts, then windows.
-    const rank = r => r.window ? 2 : r.action ? 1 : 0;
-    return scoredApps(shown, q).map(r => ({ entry: r.entry, action: null, window: null, score: r.score }))
-        .concat(scoredActions(shown, q).map(r => ({ entry: r.entry, action: r.action, window: null, score: r.score })))
-        .concat(scoredWindows(windows ?? [], q).map(r => ({ entry: null, action: null, window: r.window, score: r.score })))
+    const favorites = options?.favorites ?? [];
+    const hidden = options?.hidden ?? [];
+    const shown = entries.filter(e => !e.noDisplay && !hidden.includes(e.id));
+    if (q === "") {
+        const starred = favorites.map(id => shown.find(e => e.id === id)).filter(e => e);
+        const rest = shown.filter(e => !favorites.includes(e.id)).sort(byName);
+        return starred.concat(rest).map(e => ({ entry: e, action: null, window: null, custom: null }));
+    }
+    // On equal scores: apps, then your commands, their shortcuts, then windows.
+    const rank = r => r.window ? 3 : r.action ? 2 : r.custom ? 1 : 0;
+    const commands = (options?.commands ?? []).filter(c => typeof c?.name === "string" && typeof c?.command === "string");
+    return scoredApps(shown, q).map(r => ({ entry: r.entry, action: null, window: null, custom: null, score: r.score }))
+        .concat(commands.map(c => ({ entry: null, action: null, window: null, custom: c, score: score(q, c.name) }))
+            .filter(r => r.score > 0))
+        .concat(scoredActions(shown, q).map(r => ({ entry: r.entry, action: r.action, window: null, custom: null, score: r.score })))
+        .concat(scoredWindows(windows ?? [], q).map(r => ({ entry: null, action: null, window: r.window, custom: null, score: r.score })))
         .sort((a, b) => b.score - a.score || rank(a) - rank(b))
-        .map(r => ({ entry: r.entry, action: r.action, window: r.window }));
+        .map(r => ({ entry: r.entry, action: r.action, window: r.window, custom: r.custom }));
 }
 
 // What a query asks for: "/ report" searches files, "> htop" runs a command, "? close" searches

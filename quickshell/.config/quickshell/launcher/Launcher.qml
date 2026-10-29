@@ -33,6 +33,9 @@ Scope {
             Windows.show(result.window);
         else if (result.file)
             Apps.openPath(result.file.path);
+        else if (result.custom)
+            // Your own command (Settings -> Default apps), in its own scope like an app.
+            Apps.run(["sh", "-c", result.custom.command], "command", "");
         else if (result.command)
             // The terminal stays open in your shell after the command, to read what it printed.
             Apps.runInTerminal(["sh", "-c", 'eval "$1"; exec "${SHELL:-sh}"', "sh", result.command]);
@@ -46,7 +49,9 @@ Scope {
     function appResults(text: string): var {
         const color = Fuzzy.color(text);
         const found = Fuzzy.results(DesktopEntries.applications.values, text,
-                                    open && text.trim() !== "" ? windowList() : []);
+                                    open && text.trim() !== "" ? windowList() : [],
+                                    { favorites: Settings.values.launcherFavorites, hidden: Settings.values.launcherHidden,
+                                      commands: Settings.values.launcherCommands });
         return (color ? [{ color: color }] : []).concat(found, text.trim() !== "" ? [{ web: text.trim() }] : []);
     }
 

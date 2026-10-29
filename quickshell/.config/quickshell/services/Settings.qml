@@ -72,6 +72,11 @@ Singleton {
             property int dockIconSize: 44  // px at 100 % (theme/ThemeScale.js lists the sizes)
             property int launcherWidth: 560
             property int launcherRows: 8
+            // The launcher (Settings -> Default apps): starred and hidden apps by desktop entry id,
+            // and your own commands, [{ name, command }].
+            property var launcherFavorites: []
+            property var launcherHidden: []
+            property var launcherCommands: []
             property int workspaceDots: 5  // always shown; 0 = only the ones in use
             // Pop-ups (Settings -> Notifications): how long a notification stays (seconds; critical
             // ones stay until dismissed), and the OSD's place ("bottom" or "top") and time.
