@@ -620,13 +620,14 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   whose time left shows in the island and which ends with a critical notification and the alarm
   sound. List and time logic in `Planner.js`, tested.
 
-### Launcher: windows, files and commands (built 2026-10-29)
+### Launcher: windows, files and commands (done, verified on the laptop 2026-10-29)
 - Open windows are listed with the apps when the query appears in their title or app name
   (Enter switches, restoring a minimized one). "/ name" searches the home folder with `fd`
   (hidden and git-ignored files left out, the shortest paths first; Enter opens with xdg-open),
   "> command" runs it in the default terminal, which stays open in your shell afterwards.
   `Fuzzy.mode`, `scoredWindows`, `files` and `fileIcon`, tested. fd over plocate: no database
-  to keep up to date, and it's fast enough for the home folder (~10 ms).
+  to keep up to date, and it's fast enough for the home folder (~10 ms). The last results stay
+  up while a new search runs (emptying them on every key made the list flicker).
 
 ### Calendar events (built 2026-10-29; waiting on the user's share link to test)
 - User's choice: no Google; Proton Calendar through its read-only share link ("Share with
