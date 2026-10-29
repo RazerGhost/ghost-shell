@@ -599,7 +599,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   (`xdph-streaming-<n>`): Hyprland's `screencast` event also fires for grim and the shell's own
   previews.
 
-### Light mode (done, switching verified on the laptop 2026-10-29)
+### Light mode (done, verified on the laptop 2026-10-29)
 - Settings -> Appearance -> Light or dark: Dark (default), Light or At sunset (dark from sunset
   to sunrise at the weather town, open-meteo's `sunrise`/`sunset`; 19:00-07:00 without a town;
   `ColorScheme.js`, tested). `services/ColorScheme.qml` writes the result to
