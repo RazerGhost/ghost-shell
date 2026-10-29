@@ -677,6 +677,8 @@ shell's cost, features and customization), checked before acting. Done so far:
   on real changes only); the OSD only shows them (262 -> 202 lines).
   The screenshot tool's shell (save and "Draw on it", text, QR code, color picker) moved from
   template strings in Screenshot.qml into `screenshot/capture.sh`.
+  `stow_packages` in `modules/lib.sh` (ghost doctor and the core module each listed them). The
+  11 layer rules in `rules.lua` are a table and a loop (same rules, checked).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

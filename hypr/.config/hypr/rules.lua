@@ -86,81 +86,28 @@ hl.window_rule({
 -- (check with: hyprctl layers). Their blur isn't set here: each panel asks Hyprland for blur
 -- behind exactly its cards (BackgroundEffect.blurRegion, ext-background-effect; NOTES.md).
 
--- Island (the bar): slides in. It asks for blur behind its exact shape itself
--- (BackgroundEffect in bar/IslandWindow.qml), so no blur rule.
-hl.layer_rule({
-    name  = "qs-island",
-    match = { namespace = "^qs-island$" },
-    animation    = "slide top",
-})
+-- How each one opens: an animation, or none (`false`) for the ones that animate themselves.
+local panels = {
+    { "qs-island",           "slide top" },    -- the bar
+    { "qs-wallpaper",        false },          -- Quickshell fades it in; sliding in at login looked off
+    { "qs-snap",             "popin 90%" },    -- window menu (Alt+Space, Super+Z), over its window
+    { "qs-snap-assist",      "fade" },         -- Snap Assist: the windows offered for an empty spot
+    { "qs-switcher",         "popin 90%" },    -- Alt+Tab
+    { "qs-dock",             false },          -- slides itself
+    { "qs-launcher",         "popin 90%" },    -- from its center
+    { "qs-osd",              "slide bottom" }, -- volume / brightness pop-up
+    { "qs-polkit",           "fade" },         -- apps' password prompt
+    { "qs-overview",         "fade" },         -- Super+Tab
+    { "qs-wallpaper-picker", "slide top" },    -- the strip under the island
+}
 
--- Wallpaper: no open animation (it would slide in at login); Quickshell fades it itself.
-hl.layer_rule({
-    name  = "qs-wallpaper",
-    match = { namespace = "^qs-wallpaper$" },
-    no_anim = true,
-})
-
--- Window menu (Alt+Space, Super+Z): pops in over its window.
-hl.layer_rule({
-    name  = "qs-snap",
-    match = { namespace = "^qs-snap$" },
-    animation    = "popin 90%",
-})
-
--- Snap Assist (the other windows, offered for the space next to a snapped one): fades in.
-hl.layer_rule({
-    name  = "qs-snap-assist",
-    match = { namespace = "^qs-snap-assist$" },
-    animation    = "fade",
-})
-
--- Alt+Tab switcher: pops in.
-hl.layer_rule({
-    name  = "qs-switcher",
-    match = { namespace = "^qs-switcher$" },
-    animation    = "popin 90%",
-})
-
--- Dock: no open animation, it slides itself. It asks for blur behind the bar and its cards
--- itself (BackgroundEffect in dock/DockBar.qml), so no blur rule.
-hl.layer_rule({
-    name  = "qs-dock",
-    match = { namespace = "^qs-dock$" },
-    no_anim      = true,
-})
-
--- Launcher: pops in from its center.
-hl.layer_rule({
-    name  = "qs-launcher",
-    match = { namespace = "^qs-launcher$" },
-    animation    = "popin 90%",
-})
-
--- OSD (volume / brightness popup): slides up from the bottom edge.
-hl.layer_rule({
-    name  = "qs-osd",
-    match = { namespace = "^qs-osd$" },
-    animation    = "slide bottom",
-})
-
--- Password prompt for apps (polkit): fades in.
-hl.layer_rule({
-    name  = "qs-polkit",
-    match = { namespace = "^qs-polkit$" },
-    animation    = "fade",
-})
-
--- Overview (Super+Tab): fades in.
-hl.layer_rule({
-    name  = "qs-overview",
-    match = { namespace = "^qs-overview$" },
-    animation    = "fade",
-})
-
--- Wallpaper picker strip (quick settings' wallpaper button): slides down from the top.
-hl.layer_rule({
-    name  = "qs-wallpaper-picker",
-    match = { namespace = "^qs-wallpaper-picker$" },
-    animation    = "slide top",
-})
+for _, panel in ipairs(panels) do
+    local namespace, animation = panel[1], panel[2]
+    local rule = { name = namespace, match = { namespace = "^" .. namespace .. "$" } }
+    if animation then
+        rule.animation = animation
+    else
+        rule.no_anim = true
+    end
+    hl.layer_rule(rule)
+end
