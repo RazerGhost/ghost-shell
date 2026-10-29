@@ -690,6 +690,9 @@ shell's cost, features and customization), checked before acting. Done so far:
   each track's cover was fetched twice). Kept: the wallpaper picker's thumbnails stay decoded
   after the first open (~18 MB for 44 pictures; freeing them would decode up to 5K pictures again
   on every open).
+  The shell loads Mesa's EGL only (`__EGL_VENDOR_LIBRARY_FILENAMES` in `hypr/shell.sh`): it
+  draws on the iGPU, and NVIDIA's EGL libraries cost it ~57 MB. Fresh shell after all of this:
+  393 MB resident, 289 MB proportional (was 464 / 332).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

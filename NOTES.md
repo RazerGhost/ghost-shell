@@ -340,6 +340,11 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `/proc/driver/nvidia/gpus/*/power` says "Runtime D3 status: Not supported" (the default 3 says
   "Disabled by default"); `/sys/devices/platform/hp-wmi/gpu_mux_mode` is 0. It idles in P8 (~1.6 W).
 
+- The shell's memory is mostly the graphics stack. Measured on a fresh qs (2026-10-29): 464 MB
+  resident; menus built on demand -> 450; `__EGL_VENDOR_LIBRARY_FILENAMES=.../50_mesa.json` (no
+  NVIDIA EGL in the shell) -> 393; `QSG_RENDER_LOOP=basic` (one render thread for every window)
+  -> 361. `MALLOC_ARENA_MAX=2` made no difference.
+
 ## Testing on the laptop
 
 - README screenshots: an empty workspace up to 5 (higher ones add workspace dots), `grim -s 0.75`
