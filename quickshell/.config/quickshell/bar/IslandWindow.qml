@@ -238,7 +238,7 @@ PanelWindow {
             Row {
                 id: topRow
 
-                // The right side: the background apps' arrow (when there are some) and the status icons.
+                // The right side: the status icons and the background apps' arrow (when there are some).
                 readonly property real sideWidth: Math.max(workspaces.implicitWidth,
                     statusIcons.implicitWidth + (trayButton.visible ? trayButton.implicitWidth : 0))
 
@@ -307,10 +307,11 @@ PanelWindow {
                     width: topRow.sideWidth + Theme.spacing.m * 2
                     height: parent.height
 
-                    // Apps running in the background (the system tray): an arrow that opens their menu.
+                    // Apps running in the background (the system tray): an arrow at the outer right
+                    // (user's choice) that opens their menu.
                     IslandButton {
                         id: trayButton
-                        anchors.right: status.left
+                        anchors.right: parent.right
                         visible: SystemTray.items.values.length > 0
                         label: "Background apps"
                         active: root.panel === "tray"
@@ -330,7 +331,7 @@ PanelWindow {
 
                     IslandButton {
                         id: status
-                        anchors.right: parent.right
+                        anchors.right: trayButton.visible ? trayButton.left : parent.right
                         anchors.verticalCenter: parent.verticalCenter
                         label: "Quick settings"
                         active: root.panel === "settings"
