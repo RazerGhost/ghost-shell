@@ -514,7 +514,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   switcher, window menu, Snap Assist, wallpaper strip, polkit prompt and welcome tour their card;
   the overview its whole dimmed screen. No `blur` layer rules are left. Not the screenshot bar
   (over the frozen, opaque picture) or the lock preview (its own blurred wallpaper). The glass
-  opacity could now go below 35 %.
+  opacity now goes down to 20 % (was 35, for the rules' `ignore_alpha`; user's choice).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
@@ -693,8 +693,8 @@ windows).
 - **Glass look** (user's request, 2026-10-28, like the Ghost Spotify theme: a strongly blurred
   background, translucent panels, a faint light edge). Every shell panel is a `widgets/Surface.qml`
   (the island draws the same with its shape's outline): `Colors.surfaceTranslucent` at the
-  setting's opacity (45 % by default, 35-85; below ~30 % the layer rules' `ignore_alpha` would
-  stop the blur) and a 1 px edge in the text color at 8 % (`Colors.glassEdge`). Settings ->
+  setting's opacity (45 % by default, 20-85; it was 35-85 while the blur came from layer rules
+  with `ignore_alpha`, see "Native blur shapes") and a 1 px edge in the text color at 8 % (`Colors.glassEdge`). Settings ->
   Windows -> Shell panels turns it off (85 % opaque, no edge). Hyprland's blur is stronger
   (size 8, 3 passes, more vibrancy, a little darker; look.lua). Ghostty (`background-opacity
   0.85`) and Zed (`background.appearance: blurred`, main backgrounds at 85 %) are see-through

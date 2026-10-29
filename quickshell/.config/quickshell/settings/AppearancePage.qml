@@ -62,8 +62,9 @@ Column {
 
             Stepper {
                 label: "Glass opacity"
-                // Not below 35 %: the blur rules skip pixels under 30 % (ignore_alpha in rules.lua).
-                values: Array.from({ length: 11 }, (_, i) => 35 + i * 5)
+                // 20-85 % (user's choice). The blur doesn't depend on it: each panel asks for blur
+                // behind its cards (BackgroundEffect), whatever their opacity.
+                values: Array.from({ length: 14 }, (_, i) => 20 + i * 5)
                 value: Settings.values.glassOpacity
                 format: v => v + " %"
                 onPicked: v => Settings.values.glassOpacity = v
