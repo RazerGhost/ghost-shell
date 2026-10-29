@@ -322,6 +322,11 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   Fuzzy.mode(text)`) may still hold the old value: compute from `text` itself there (the
   launcher's file search ran for the text before the last key).
 
+- A `FileView` with a `JsonAdapter` on a file that exists but isn't valid JSON (or is empty)
+  fires `loaded`, not `loadFailed`, and the adapter keeps its defaults (verified with a throwaway
+  `qs -p`). Only a missing file fails (`FileViewError.FileNotFound`). So check `JSON.parse(text())`
+  in `onLoaded` before letting `onAdapterUpdated` write (services/Settings.qml).
+
 ## Testing on the laptop
 
 - README screenshots: an empty workspace up to 5 (higher ones add workspace dots), `grim -s 0.75`

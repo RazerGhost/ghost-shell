@@ -6,7 +6,6 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import Quickshell.Services.UPower
 import qs.theme
 import "BatteryAlerts.js" as BatteryAlertsJs
@@ -44,10 +43,9 @@ Singleton {
         }
         // Its own sound (the low battery switch), not the notification chime.
         Sounds.play("battery", "dialog-warning");
-        notify.command = ["notify-send", "--app-name=Battery", "--icon=battery-caution", "--hint=boolean:suppress-sound:true",
-            "--urgency=" + (warning === "critical" ? "critical" : "normal"),
-            (warning === "critical" ? "Battery very low: " : "Battery low: ") + percent + time, body];
-        notify.running = true;
+        Notifications.send("Battery", "battery-caution",
+                           (warning === "critical" ? "Battery very low: " : "Battery low: ") + percent + time, body,
+                           warning === "critical", ["boolean:suppress-sound:true"]);
     }
 
     Connections {
@@ -63,8 +61,4 @@ Singleton {
     }
 
     Component.onCompleted: check()
-
-    Process {
-        id: notify
-    }
 }

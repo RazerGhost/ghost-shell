@@ -51,7 +51,9 @@ Singleton {
             try {
                 root.data = JSON.parse(text());
             } catch (e) {
-                console.warn("screentime.json isn't valid JSON, starting over:", e);
+                // Starting over would overwrite it at the next save: keep it for the user.
+                console.warn("screentime.json isn't valid JSON, starting over (kept as screentime.json.bad):", e);
+                Quickshell.execDetached(["cp", "-f", path, path + ".bad"]);
             }
             root.loaded = true;
         }

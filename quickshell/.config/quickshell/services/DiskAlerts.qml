@@ -38,17 +38,12 @@ Singleton {
                 if (result.warning === "")
                     return;
                 const critical = result.warning === "critical";
-                notify.command = ["notify-send", "--app-name=Disk", "--icon=drive-harddisk",
-                    "--urgency=" + (critical ? "critical" : "normal"),
-                    (critical ? "Disk almost full: " : "Disk space low: ") + DiskAlertsJs.size(disk.avail) + " free",
-                    "Old snapshots take space too: Settings -> Snapshots, or Btrfs Assistant to remove them."];
-                notify.running = true;
+                Notifications.send("Disk", "drive-harddisk",
+                                   (critical ? "Disk almost full: " : "Disk space low: ") + DiskAlertsJs.size(disk.avail) + " free",
+                                   "Old snapshots take space too: Settings -> Snapshots, or Btrfs Assistant to remove them.",
+                                   critical, []);
             }
         }
-    }
-
-    Process {
-        id: notify
     }
 
     Timer {

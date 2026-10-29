@@ -54,8 +54,8 @@ Singleton {
             root.now = Date.now();
             if (root.now >= saved.endsAt) {
                 root.cancel();
-                Quickshell.execDetached(["notify-send", "--app-name=Timer", "--icon=appointment-soon", "--urgency=critical",
-                                         "--hint=string:sound-name:alarm-clock-elapsed", "Time's up", "The timer has finished"]);
+                Notifications.send("Timer", "appointment-soon", "Time's up", "The timer has finished", true,
+                                   ["string:sound-name:alarm-clock-elapsed"]);
             }
         }
     }

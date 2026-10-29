@@ -50,6 +50,15 @@ Singleton {
             done.expire();
     }
 
+    // Sends a notification from the shell itself, through notify-send, so it arrives like any
+    // app's (pop-up, history, per-app rules, sound). Each call runs on its own: two alerts in a row
+    // both arrive. `hints`: extra notify-send hints, e.g. ["boolean:suppress-sound:true"].
+    function send(app: string, icon: string, summary: string, body: string, critical: bool, hints: var): void {
+        Quickshell.execDetached(["notify-send", "--app-name=" + app, "--icon=" + icon,
+                                 "--urgency=" + (critical ? "critical" : "normal"),
+                                 ...(hints ?? []).map(h => "--hint=" + h), summary, body]);
+    }
+
     function clearAll(): void {
         for (const n of server.trackedNotifications.values.slice())
             n.dismiss();

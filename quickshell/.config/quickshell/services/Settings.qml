@@ -13,17 +13,47 @@ Singleton {
     readonly property JsonAdapter values: adapter
     // The file has been read (or found missing, so the defaults below apply).
     property bool loaded: false
+    // Changes are saved. Not when the file is there but isn't valid JSON: Quickshell then loads
+    // the defaults without an error (verified), and saving would write them over the user's file.
+    // That file is kept as settings.json.bad and the user is told; changes last until a restart.
+    property bool writable: false
 
     FileView {
+        id: file
         path: Quickshell.env("HOME") + "/.local/state/quickshell/settings.json"
         // The file loads a moment after the shell starts: until then the values below are the
         // defaults, so read them in bindings, which update once it's loaded.
         printErrors: false // missing until the first change
         watchChanges: true
         onFileChanged: reload()
-        onAdapterUpdated: writeAdapter()
-        onLoaded: root.loaded = true
-        onLoadFailed: root.loaded = true
+        onAdapterUpdated: {
+            if (root.writable)
+                writeAdapter();
+        }
+        onLoaded: {
+            const text = file.text();
+            let valid = true;
+            try {
+                if (text.trim() !== "")
+                    JSON.parse(text);
+            } catch (e) {
+                valid = false;
+            }
+            // Warn once: at start, or when a good file turns bad (a hand edit), not again after.
+            if (!valid && (root.writable || !root.loaded)) {
+                Quickshell.execDetached(["cp", "-f", path, path + ".bad"]);
+                Notifications.send("Settings", "dialog-warning", "Your settings file couldn't be read",
+                                   "It's kept as settings.json.bad. Settings use their defaults and aren't saved until it's fixed or removed.",
+                                   true, []);
+            }
+            root.writable = valid;
+            root.loaded = true;
+        }
+        onLoadFailed: error => {
+            // Missing: the defaults apply and the first change creates it. Anything else: leave it.
+            root.writable = error === FileViewError.FileNotFound;
+            root.loaded = true;
+        }
 
         adapter: JsonAdapter {
             id: adapter
