@@ -61,7 +61,7 @@ Singleton {
         }
     }
 
-    Process {
+    LatestProcess {
         id: readConnections
         command: ["nmcli", "-t", "-f", "NAME,UUID,TYPE,ACTIVE", "connection", "show"]
         running: true
@@ -70,7 +70,7 @@ Singleton {
         }
     }
 
-    Process {
+    LatestProcess {
         id: readRadios
         command: ["rfkill", "-n", "-o", "SOFT"]
         running: true
@@ -85,8 +85,8 @@ Singleton {
         id: readSoon
         interval: 300
         onTriggered: {
-            readConnections.running = true;
-            readRadios.running = true;
+            readConnections.start();
+            readRadios.start();
         }
     }
 

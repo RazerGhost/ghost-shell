@@ -17,7 +17,7 @@ Singleton {
     readonly property string thumbnailDir: Quickshell.env("XDG_RUNTIME_DIR") + "/qs-clipboard"
 
     function refresh(): void {
-        list.running = true;
+        list.start();
     }
 
     // Copies `entry` and pastes it. Call after closing the menu.
@@ -36,7 +36,7 @@ Singleton {
         Quickshell.execDetached(["cliphist", "wipe"]);
     }
 
-    Process {
+    LatestProcess {
         id: list
         command: ["cliphist", "list"]
         stdout: StdioCollector {

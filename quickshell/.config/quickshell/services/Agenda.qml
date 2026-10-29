@@ -29,17 +29,9 @@ Singleton {
     // minute clock is a new object every minute, which counted as a change and ran khal each time.
     readonly property var range: CalendarEventsJs.range(new Date(today + "T00:00"), year, month)
 
-    // khal asked again while it runs (the month flipped, a sync finished) runs once more after,
-    // so the shown month never keeps the last range's events.
-    property bool listAgain: false
-
     function refresh(): void {
-        if (!enabled)
-            return;
-        if (list.running)
-            listAgain = true;
-        else
-            list.running = true;
+        if (enabled)
+            list.start();
     }
 
     onRangeChanged: refresh()
@@ -81,17 +73,13 @@ Singleton {
         }
     }
 
-    Process {
+    // Asked again while it runs (the month flipped, a sync finished), khal runs once more after,
+    // so the shown month never keeps the last range's events.
+    LatestProcess {
         id: list
         command: ["khal", "list", "--format", CalendarEventsJs.format, "--day-format", "", root.range.from, root.range.to]
         stdout: StdioCollector {
             onStreamFinished: root.events = CalendarEventsJs.parse(text)
-        }
-        onExited: {
-            if (root.listAgain) {
-                root.listAgain = false;
-                Qt.callLater(() => list.running = true);
-            }
         }
     }
 }

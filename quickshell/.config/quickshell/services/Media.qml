@@ -31,21 +31,21 @@ Singleton {
         } else if (artUrl.startsWith("http")) {
             artFile = "";
             // A new name per track, so the quantizer sees a new file; the previous one goes.
-            download.target = Quickshell.env("XDG_RUNTIME_DIR") + "/qs-cover-" + Date.now();
-            download.command = ["sh", "-c", `rm -f "\${XDG_RUNTIME_DIR}"/qs-cover-*; exec curl -sfL --max-time 10 -o "$1" "$2"`,
-                                "sh", download.target, artUrl];
-            download.running = true;
+            const target = Quickshell.env("XDG_RUNTIME_DIR") + "/qs-cover-" + Date.now();
+            download.start(["sh", "-c", `rm -f "\${XDG_RUNTIME_DIR}"/qs-cover-*; exec curl -sfL --max-time 10 -o "$1" "$2"`,
+                            "sh", target, artUrl]);
         } else {
             artFile = "";
         }
     }
 
-    Process {
+    // Skipping tracks while one downloads: the newest track's cover downloads after it.
+    LatestProcess {
         id: download
-        property string target
         onExited: code => {
+            // command[4] is the file this run wrote ("sh", "-c", script, "sh", target, url).
             if (code === 0)
-                root.artFile = target;
+                root.artFile = command[4];
         }
     }
 

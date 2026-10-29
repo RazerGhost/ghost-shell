@@ -43,8 +43,7 @@ Singleton {
     // matugen's wallpaper.sh saves the choice (the file below, which updates `path`) and runs
     // matugen; `ghost theme` uses the same script.
     function set(path: string): void {
-        apply.command = ["sh", Quickshell.env("HOME") + "/.config/matugen/wallpaper.sh", path];
-        apply.running = true;
+        apply.start(["sh", Quickshell.env("HOME") + "/.config/matugen/wallpaper.sh", path]);
     }
 
     FolderListModel {
@@ -100,7 +99,8 @@ Singleton {
         }
     }
 
-    Process {
+    // A second pick while the first is still being colored is applied after it, not dropped.
+    LatestProcess {
         id: apply
         onExited: (code, status) => {
             if (code !== 0)

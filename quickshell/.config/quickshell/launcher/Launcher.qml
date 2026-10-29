@@ -209,10 +209,12 @@ Scope {
                     Timer {
                         id: wait
                         interval: 150
-                        onTriggered: qalc.running = true
+                        onTriggered: qalc.start()
                     }
 
-                    Process {
+                    // A currency question can take a moment (qalc fetches rates); asked again
+                    // meanwhile, it answers the newest question after.
+                    LatestProcess {
                         id: qalc
                         // Dots for decimals whatever the regional format.
                         command: ["qalc", "-s", "decimal comma off", "-t", Calc.prepare(calc.asked)]
@@ -270,8 +272,6 @@ Scope {
 
                     property var found: []
                     property string asked: ""
-                    // Asked while fd still ran for older text: search once more when it's done.
-                    property bool again: false
 
                     // The last results stay up until the new ones are in: clearing them on every
                     // key made the list empty and refill (and the launcher shrink and grow) as
@@ -287,15 +287,11 @@ Scope {
                     Timer {
                         id: waitFiles
                         interval: 200
-                        onTriggered: {
-                            if (fd.running)
-                                fileSearch.again = true;
-                            else
-                                fd.running = true;
-                        }
+                        onTriggered: fd.start()
                     }
 
-                    Process {
+                    // Asked while fd still runs for older text, it searches once more when done.
+                    LatestProcess {
                         id: fd
                         command: ["fd", "--absolute-path", "--ignore-case", "--fixed-strings", "--max-results", "50",
                                   "--", fileSearch.asked, Quickshell.env("HOME")]
@@ -304,12 +300,6 @@ Scope {
                                 // Results for an older search: the text changed since.
                                 if (search.query.mode === "files" && search.query.text === fileSearch.asked)
                                     fileSearch.found = Fuzzy.files(text, Quickshell.env("HOME"));
-                            }
-                        }
-                        onExited: {
-                            if (fileSearch.again) {
-                                fileSearch.again = false;
-                                Qt.callLater(() => fd.running = true);
                             }
                         }
                     }

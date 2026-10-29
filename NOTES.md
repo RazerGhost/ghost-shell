@@ -327,6 +327,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `qs -p`). Only a missing file fails (`FileViewError.FileNotFound`). So check `JSON.parse(text())`
   in `onLoaded` before letting `onAdapterUpdated` write (services/Settings.qml).
 
+- `Process.running = true` inside `Component.onCompleted` reads back false until the event loop
+  runs (from a Timer it's true at once). `services/LatestProcess.qml` (run once more with the
+  newest command when asked while running) relies on it reading true; verified with `qs -p`.
+
 ## Testing on the laptop
 
 - README screenshots: an empty workspace up to 5 (higher ones add workspace dots), `grim -s 0.75`

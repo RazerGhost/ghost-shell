@@ -17,10 +17,10 @@ Scope {
         id: debounce
         interval: 1000
         running: true // the first sync, at startup
-        onTriggered: sync.running = true
+        onTriggered: sync.start()
     }
 
-    Process {
+    LatestProcess {
         id: sync
         // The picture is passed in: Wallpaper.lockPath knows which one the lock screen shows.
         command: ["sh", Quickshell.shellDir + "/greeter/sync.sh", Wallpaper.lockPath]
