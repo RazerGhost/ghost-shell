@@ -73,6 +73,8 @@ Singleton {
         // The island's open/close morph: Material 3's "emphasized decelerate" curve, which
         // starts fast and settles gently. Used with easing.type: Easing.BezierSpline.
         readonly property int morph: speed > 0 ? Math.round(450 / speed) : 0
+        // The shell's colors fading to a new wallpaper's (Colors.qml).
+        readonly property int recolor: speed > 0 ? Math.round(800 / speed) : 0
         readonly property list<real> emphasized: [0.05, 0.7, 0.1, 1, 1, 1]
     }
 

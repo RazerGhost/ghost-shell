@@ -8,23 +8,27 @@ import Quickshell.Io
 import qs.services
 
 Singleton {
+    id: root
+
     // Every name has an "m3" prefix because QML treats "on" + capital letter as a change
     // handler: with a `surface` property next to it, `onSurface` silently reads as #000000.
-    readonly property color m3primary:                 json.primary
-    readonly property color m3onPrimary:               json.on_primary
-    readonly property color m3primaryContainer:        json.primary_container
-    readonly property color m3onPrimaryContainer:      json.on_primary_container
-    readonly property color m3surface:                 json.surface
-    readonly property color m3surfaceContainer:        json.surface_container
-    readonly property color m3surfaceContainerHigh:    json.surface_container_high
-    readonly property color m3surfaceContainerHighest: json.surface_container_highest
-    readonly property color m3onSurface:               json.on_surface
-    readonly property color m3onSurfaceVariant:        json.on_surface_variant
-    readonly property color m3outlineVariant:          json.outline_variant
-    readonly property color m3error:                   json.error
-    readonly property color m3onError:                 json.on_error
-    readonly property color m3errorContainer:          json.error_container
-    readonly property color m3onErrorContainer:        json.on_error_container
+    // Not readonly only because a Behavior can't sit on a readonly property: set them through
+    // matugen's colors.json, never from QML.
+    property color m3primary:                          json.primary
+    property color m3onPrimary:                        json.on_primary
+    property color m3primaryContainer:                 json.primary_container
+    property color m3onPrimaryContainer:               json.on_primary_container
+    property color m3surface:                          json.surface
+    property color m3surfaceContainer:                 json.surface_container
+    property color m3surfaceContainerHigh:             json.surface_container_high
+    property color m3surfaceContainerHighest:          json.surface_container_highest
+    property color m3onSurface:                        json.on_surface
+    property color m3onSurfaceVariant:                 json.on_surface_variant
+    property color m3outlineVariant:                   json.outline_variant
+    property color m3error:                            json.error
+    property color m3onError:                          json.on_error
+    property color m3errorContainer:                   json.error_container
+    property color m3onErrorContainer:                 json.on_error_container
 
     // Background of the shell's panels (widgets/Surface.qml): translucent so Hyprland's blur shows
     // through; more so with the glass setting, which also gives them a thin light edge.
@@ -35,8 +39,30 @@ Singleton {
                                              : "transparent"
 
     // Dims the screen behind the overview, the screenshot overlay and password prompts.
-    readonly property color m3scrim:                   json.scrim
+    property color m3scrim:                            json.scrim
     readonly property color scrim: Qt.rgba(m3scrim.r, m3scrim.g, m3scrim.b, 0.45)
+
+    // A new wallpaper's colors fade in rather than snapping (Theme.anim.recolor). Not the first
+    // load: the shell would start in the fallback colors and fade from them.
+    property bool loaded: false
+    readonly property int fade: loaded ? Theme.anim.recolor : 0
+
+    Behavior on m3primary { ColorAnimation { duration: root.fade } }
+    Behavior on m3onPrimary { ColorAnimation { duration: root.fade } }
+    Behavior on m3primaryContainer { ColorAnimation { duration: root.fade } }
+    Behavior on m3onPrimaryContainer { ColorAnimation { duration: root.fade } }
+    Behavior on m3surface { ColorAnimation { duration: root.fade } }
+    Behavior on m3surfaceContainer { ColorAnimation { duration: root.fade } }
+    Behavior on m3surfaceContainerHigh { ColorAnimation { duration: root.fade } }
+    Behavior on m3surfaceContainerHighest { ColorAnimation { duration: root.fade } }
+    Behavior on m3onSurface { ColorAnimation { duration: root.fade } }
+    Behavior on m3onSurfaceVariant { ColorAnimation { duration: root.fade } }
+    Behavior on m3outlineVariant { ColorAnimation { duration: root.fade } }
+    Behavior on m3error { ColorAnimation { duration: root.fade } }
+    Behavior on m3onError { ColorAnimation { duration: root.fade } }
+    Behavior on m3errorContainer { ColorAnimation { duration: root.fade } }
+    Behavior on m3onErrorContainer { ColorAnimation { duration: root.fade } }
+    Behavior on m3scrim { ColorAnimation { duration: root.fade } }
 
     // Written by matugen (templates/quickshell-colors.json). watchChanges + reload() picks up
     // a new wallpaper's colors live, without restarting the shell.
@@ -44,6 +70,7 @@ Singleton {
         path: Quickshell.env("HOME") + "/.local/state/quickshell/colors.json"
         watchChanges: true
         onFileChanged: reload()
+        onLoaded: Qt.callLater(() => root.loaded = true)
         onLoadFailed: console.warn("Colors: can't read " + path + ", using fallback colors. Run matugen once to generate it.")
 
         // JsonAdapter maps JSON keys to these properties. The defaults are the Material

@@ -879,6 +879,10 @@ audit of our own UI): all sixteen, built in batches.
   opens a Settings page. Checked: the message, the clock's size and font, the fade, the login
   screen run from the repo; the shake, hints, grace period, picture and screen off are for
   the user's checklist (they need a real lock, a picture or the caps lock key).
+- Smooth recoloring: the shell's colors fade to a new wallpaper's over 0.8 s (a `Behavior` on
+  each of `Colors`' properties, `Theme.anim.recolor`, so it follows the animation speed; not on
+  the first load, which would fade from the fallback colors). Hyprland's borders and the apps
+  still switch at once. Checked live by swapping colors.json.
 
 ### Visual Settings (planned, after the UI research round)
 User's request (2026-10-29): settings like the lock screen's clock should be picked by sight,
