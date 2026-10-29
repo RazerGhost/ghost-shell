@@ -16,11 +16,27 @@ hl.window_rule({
 
 -- The scratchpad (Super+`) doubles as a drop-down terminal: opened empty, it starts one. It
 -- tiles over the dimmed workspace below (decoration.dim_special, look.lua). A handler, since
--- Hyprland 0.57 deprecated the on_created_empty workspace rule.
-hl.on("workspace.created", function(workspace)
-    if workspace.name == "special:magic" and workspace.is_empty then
-        hl.exec_cmd("ghostty")
+-- Hyprland 0.57 deprecated the on_created_empty workspace rule. Moving a window into a
+-- scratchpad that doesn't exist yet also creates it empty, with the window arriving just after,
+-- so the handler looks again a moment later and only starts a terminal if it's still empty.
+local function scratchpad_empty()
+    for _, workspace in ipairs(hl.get_workspaces()) do
+        if workspace.name == "special:magic" then
+            return workspace.windows == 0
+        end
     end
+    return false -- gone again (closed before the check)
+end
+
+hl.on("workspace.created", function(workspace)
+    if workspace.name ~= "special:magic" then
+        return
+    end
+    hl.timer(function()
+        if scratchpad_empty() then
+            hl.exec_cmd("ghostty")
+        end
+    end, { timeout = 150, type = "oneshot" })
 end)
 
 -- Games: Proton games (Steam names their windows steam_app_<id>) and gamescope may tear for
