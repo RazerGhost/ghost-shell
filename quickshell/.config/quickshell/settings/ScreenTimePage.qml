@@ -34,6 +34,8 @@ Column {
         if (visible)
             chosen = today;
     }
+    // Settings builds the page when it's chosen, already visible.
+    Component.onCompleted: chosen = today
 
     SettingGroup {
         // The headline: the hovered day's total, else the chosen day's.

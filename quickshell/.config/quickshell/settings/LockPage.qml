@@ -20,17 +20,17 @@ Column {
     readonly property list<int> percents: Array.from({ length: 11 }, (_, i) => i * 10)
 
     spacing: Theme.spacing.l
-    Component.onCompleted: {
+    function shown(): void {
+        opened = true;
+        Wallpaper.rescan();
         check.running = true;
-        opened = visible;
     }
     onVisibleChanged: {
-        if (visible) {
-            opened = true;
-            Wallpaper.rescan();
-            check.running = true;
-        }
+        if (visible)
+            shown();
     }
+    // Settings builds the page when it's chosen, already visible.
+    Component.onCompleted: shown()
 
     Process {
         id: check

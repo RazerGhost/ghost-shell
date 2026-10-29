@@ -174,20 +174,32 @@ PanelWindow {
         onCleared: root.island.panel = ""
     }
 
-    // One view below the top row: a menu, a pop-up or a hover view. All of them exist all the
-    // time; the shown one fades in while the island grows around it. `extraHeight` is room the
-    // content's margins take below it.
+    // One view below the top row: a menu, a pop-up or a hover view. The shown one fades in while
+    // the island grows around it. `extraHeight` is room the content's margins take below it.
+    // Light views are written inside the slot and always exist. The menus are a `content`
+    // Component instead, built only while shown or fading out and freed after: built all the
+    // time (on every screen), they held their memory and work for nothing (review 2026-10-29).
     component MenuSlot: Item {
+        id: slot
+
         property bool shown
         property real extraHeight: 0
+        property Component content: null
 
         width: parent.width
-        implicitHeight: (children[0]?.implicitHeight ?? 0) + extraHeight
+        // The last child: the content written inside, or the Loader when there's none.
+        implicitHeight: (children[children.length - 1]?.implicitHeight ?? 0) + extraHeight
         opacity: shown ? 1 : 0
         visible: opacity > 0
 
         Behavior on opacity {
             NumberAnimation { duration: Theme.anim.normal }
+        }
+
+        Loader {
+            width: parent.width
+            active: slot.content !== null && (slot.shown || slot.visible)
+            sourceComponent: slot.content
         }
     }
 
@@ -457,43 +469,47 @@ PanelWindow {
 
                 MenuSlot {
                     shown: root.shown === "emoji"
-
-                    EmojiPanel {
-                        width: parent.width
-                        onPicked: emoji => {
-                            root.island.panel = "";
-                            Emoji.type(emoji);
+                    content: Component {
+                        EmojiPanel {
+                            width: parent.width
+                            onPicked: emoji => {
+                                root.island.panel = "";
+                                Emoji.type(emoji);
+                            }
                         }
                     }
                 }
 
                 MenuSlot {
                     shown: root.shown === "clipboard"
-
-                    ClipboardPanel {
-                        width: parent.width
-                        onPicked: entry => {
-                            root.island.panel = "";
-                            Clipboard.paste(entry);
+                    content: Component {
+                        ClipboardPanel {
+                            width: parent.width
+                            onPicked: entry => {
+                                root.island.panel = "";
+                                Clipboard.paste(entry);
+                            }
                         }
                     }
                 }
 
                 MenuSlot {
                     shown: root.shown === "tray"
-
-                    Tray {
-                        width: parent.width
-                        onDone: root.island.panel = ""
+                    content: Component {
+                        Tray {
+                            width: parent.width
+                            onDone: root.island.panel = ""
+                        }
                     }
                 }
 
                 MenuSlot {
                     shown: root.shown === "power"
-
-                    PowerPanel {
-                        width: parent.width
-                        onDone: root.island.panel = ""
+                    content: Component {
+                        PowerPanel {
+                            width: parent.width
+                            onDone: root.island.panel = ""
+                        }
                     }
                 }
 
@@ -523,26 +539,29 @@ PanelWindow {
 
                 MenuSlot {
                     shown: root.shown === "media"
-
-                    MediaPanel {
-                        width: parent.width
+                    content: Component {
+                        MediaPanel {
+                            width: parent.width
+                        }
                     }
                 }
 
                 MenuSlot {
                     shown: root.shown === "today"
-
-                    TodayPanel {
-                        width: parent.width
+                    content: Component {
+                        TodayPanel {
+                            width: parent.width
+                        }
                     }
                 }
 
                 MenuSlot {
                     shown: root.shown === "settings"
-
-                    QuickSettings {
-                        width: parent.width
-                        onOpenMenu: menu => root.island.panel = menu
+                    content: Component {
+                        QuickSettings {
+                            width: parent.width
+                            onOpenMenu: menu => root.island.panel = menu
+                        }
                     }
                 }
             }

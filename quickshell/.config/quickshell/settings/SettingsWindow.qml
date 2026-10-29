@@ -286,79 +286,29 @@ Singleton {
             clip: true
             boundsBehavior: Flickable.StopAtBounds
 
-            Column {
+            // Only the chosen page is built (it was all 13, kept up to date while hidden; review
+            // 2026-10-29). A page is built anew each time it's chosen.
+            Loader {
                 id: pages
 
                 // Centered when the window is wider than a page (maximized).
                 x: Math.max(Theme.spacing.l, (content.width - width) / 2)
                 width: Math.min(Theme.settings.content, content.width - Theme.spacing.l * 2)
-                spacing: Theme.spacing.l
+                sourceComponent: ({ appearance: appearancePage, display: displayPage, lock: lockPage, sound: soundPage, windows: windowsPage, notifications: notificationsPage, power: powerPage, input: inputPage, snapshots: snapshotsPage, apps: appsPage, screentime: screentimePage, keybinds: keybindsPage, clock: clockPage })[root.page] ?? null
 
-                // Only the chosen page is visible; a Column skips the others.
-                AppearancePage {
-                    width: parent.width
-                    visible: root.page === "appearance"
-                }
-
-                DisplayPage {
-                    width: parent.width
-                    visible: root.page === "display"
-                }
-
-                LockPage {
-                    width: parent.width
-                    visible: root.page === "lock"
-                }
-
-                SoundSettingsPage {
-                    width: parent.width
-                    visible: root.page === "sound"
-                }
-
-                WindowsPage {
-                    width: parent.width
-                    visible: root.page === "windows"
-                }
-
-                NotificationsPage {
-                    width: parent.width
-                    visible: root.page === "notifications"
-                }
-
-                PowerPage {
-                    width: parent.width
-                    visible: root.page === "power"
-                }
-
-                InputPage {
-                    width: parent.width
-                    visible: root.page === "input"
-                }
-
-                SnapshotsPage {
-                    width: parent.width
-                    visible: root.page === "snapshots"
-                }
-
-                AppsPage {
-                    width: parent.width
-                    visible: root.page === "apps"
-                }
-
-                ScreenTimePage {
-                    width: parent.width
-                    visible: root.page === "screentime"
-                }
-
-                KeybindsPage {
-                    width: parent.width
-                    visible: root.page === "keybinds"
-                }
-
-                ClockWeatherPage {
-                    width: parent.width
-                    visible: root.page === "clock"
-                }
+                Component { id: appearancePage; AppearancePage {} }
+                Component { id: displayPage; DisplayPage {} }
+                Component { id: lockPage; LockPage {} }
+                Component { id: soundPage; SoundSettingsPage {} }
+                Component { id: windowsPage; WindowsPage {} }
+                Component { id: notificationsPage; NotificationsPage {} }
+                Component { id: powerPage; PowerPage {} }
+                Component { id: inputPage; InputPage {} }
+                Component { id: snapshotsPage; SnapshotsPage {} }
+                Component { id: appsPage; AppsPage {} }
+                Component { id: screentimePage; ScreenTimePage {} }
+                Component { id: keybindsPage; KeybindsPage {} }
+                Component { id: clockPage; ClockWeatherPage {} }
             }
         }
     }

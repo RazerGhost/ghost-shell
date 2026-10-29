@@ -119,35 +119,38 @@ Scope {
         // Shows the lock screen in a normal window, without locking, to check how it looks.
         // Closes after a few seconds, on Enter, or when called again.
         function preview(): void {
-            preview.visible = !preview.visible;
+            preview.active = !preview.active;
         }
     }
 
-    PanelWindow {
+    // Built only while shown: a whole lock screen (picture, blur, media card) that's rarely
+    // looked at, and was held in memory from login on (review 2026-10-29).
+    LazyLoader {
         id: preview
 
-        visible: false
-        screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? null
-        anchors { top: true; bottom: true; left: true; right: true }
-        exclusionMode: ExclusionMode.Ignore
-        WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.namespace: "qs-lock-preview"
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+        PanelWindow {
+            screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? null
+            anchors { top: true; bottom: true; left: true; right: true }
+            exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.namespace: "qs-lock-preview"
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
-        Timer {
-            running: preview.visible
-            interval: 8000
-            onTriggered: preview.visible = false
-        }
+            Timer {
+                running: true
+                interval: 8000
+                onTriggered: preview.active = false
+            }
 
-        LockContent {
-            anchors.fill: parent
-            wallpaper: root.wallpaper
-            message: "Preview: nothing is locked"
-            onSubmitted: preview.visible = false
+            LockContent {
+                anchors.fill: parent
+                wallpaper: root.wallpaper
+                message: "Preview: nothing is locked"
+                onSubmitted: preview.active = false
 
-            LockStatus {
-                width: parent.width
+                LockStatus {
+                    width: parent.width
+                }
             }
         }
     }

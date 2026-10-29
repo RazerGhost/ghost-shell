@@ -27,6 +27,8 @@ Column {
         if (visible)
             refresh();
     }
+    // Settings builds the page when it's chosen, already visible.
+    Component.onCompleted: refresh()
 
     // Both lists in one go, as JSON objects one after the other on separate lines.
     Process {

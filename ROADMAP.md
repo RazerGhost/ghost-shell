@@ -681,6 +681,11 @@ shell's cost, features and customization), checked before acting. Done so far:
   11 layer rules in `rules.lua` are a table and a loop (same rules, checked).
   `widgets/StateLayer.qml`, the hover/active highlight, in eight controls (it was written out in
   each; three didn't fade); the overview opens through one `show()`.
+- Memory (a fresh shell: 464 MB resident, 332 MB proportional; most of it graphics, a GL context
+  per surface, fonts and libraries): the island's menus (quick settings, today, media,
+  clipboard, emoji, background apps, power) are built only while shown and freed after (on
+  every screen), the lock preview is a `LazyLoader`, and Settings builds only the chosen page
+  (it kept all 13 up to date while hidden). `MALLOC_ARENA_MAX=2` was tried: no difference.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
