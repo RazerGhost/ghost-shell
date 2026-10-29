@@ -14,6 +14,12 @@ hl.config({
         disable_hyprland_logo   = true,
         force_default_wallpaper = 0,
     },
+    -- No update-news or donation pop-up on the login screen: hyprland-update-screen crashed
+    -- (SIGSEGV) as the greeter user at every boot (coredumpctl, 2026-10-29).
+    ecosystem = {
+        no_update_news  = true,
+        no_donation_nag = true,
+    },
 })
 
 hl.on("hyprland.start", function()

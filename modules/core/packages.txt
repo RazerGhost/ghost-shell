@@ -15,10 +15,17 @@ nvidia-prime
 # The Quickshell shell, and what it runs or reads
 quickshell
 qt6-imageformats
+# Sound: PipeWire with its PulseAudio and ALSA sides (apps like Spotify, Vesktop and Zen talk
+# PulseAudio) and pw-play (the shell's sound events)
+pipewire-audio
+pipewire-pulse
+pipewire-alsa
 wireplumber
 upower
 power-profiles-daemon
 networkmanager
+# NetworkManager's shared mode, for the Wi-Fi page's hotspot
+dnsmasq
 bluez
 bluez-tools
 brightnessctl
@@ -35,18 +42,26 @@ unicode-emoji
 cachyos-wallpapers
 # USB sticks and SD cards (the shell's drives menu)
 udiskie
-# The launcher's calculator (units, currencies)
+# The launcher's calculator (units, currencies) and file search ("/ name")
 libqalculate
+fd
 
 # Fonts and themes
 inter-font
 ttf-meslo-nerd
 noto-fonts-emoji
 adw-gtk-theme
+# Colloid (aur.txt) inherits its missing icons from Breeze
+breeze-icons
+# The keyring apps keep logins in (Chromium web apps, Vesktop, Proton Pass)
+gnome-keyring
 
 # Login screen (greetd; tuigreet is the fallback)
 greetd
 greetd-tuigreet
+
+# The login shell (the fish/ Stow package)
+fish
 
 # Tools the setup uses (paru, stow, git, bun for JSON edits and scripts, lspci) and the shell's update count
 # (checkupdates from pacman-contrib)

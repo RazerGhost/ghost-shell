@@ -642,6 +642,20 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   (`CalendarEvents.js`, tested). Read-only: events are made in Proton's app or site. khal gives
   an all-day event's last day as its end date (its `AllDayEvent.end` is DTEND minus a day).
 
+### Optimization review (2026-10-29, in progress)
+Four read-only reviews (code against ENGINEERING_PRINCIPLES.md, packages and system, the running
+shell's cost, features and customization), checked before acting. Done so far:
+- Bugs: settings never saved over an unreadable settings.json (Quickshell loads defaults without
+  an error, see NOTES); screen time keeps a bad file as `.bad`; the calendar's range no longer
+  changes every minute (khal would have run each minute); `LatestProcess` runs a request made
+  while the same job runs after it instead of dropping it (calculator, file search, covers,
+  wallpaper, calendar, network state, login screen sync, clipboard); `Notifications.send` sends
+  each of the shell's own alerts on its own; a failed wallpaper change notifies.
+- The camera indicator reads the camera's power state in-process (it started a script every 3 s).
+- Package lists: core gained what the repo used without listing (pipewire-audio, -pulse, -alsa,
+  dnsmasq, fd, breeze-icons, gnome-keyring, fish). The login screen's Hyprland turns off its
+  update-news pop-up (`ecosystem`), whose helper crashed at every boot.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
