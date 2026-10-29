@@ -483,8 +483,9 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   `PersistentProperties` as JSON text (a write during a reload is cancelled).
 
 ### Welcome tour (done, verified on the laptop 2026-10-29)
-- `welcome/Welcome.qml` (user's choice: cards): six cards over the dimmed screen (welcome, the
-  launcher, the island, tiling and switching, the dock and tools, Settings), each with its keys
+- `welcome/Welcome.qml` (user's choice: cards): seven cards over the dimmed screen (welcome, the
+  launcher with files and commands, the island, tiling and switching, the dock and tools, the
+  drop-down terminal, Settings; updated 2026-10-29 for that day's features), each with its keys
   as key caps, progress dots, Skip / Back / Next. Right or Enter, Left, Escape. Shown on the
   first start (`welcomeSeen` in settings.json) and again from Settings -> Keybinds ("Show the
   welcome tour") or `qs ipc call welcome show`.
