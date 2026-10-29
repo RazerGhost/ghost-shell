@@ -1,6 +1,7 @@
 // Starting apps from their .desktop entries, shared by the launcher, the dock and the keybinds
 // (through the "apps" IPC target in launcher/Launcher.qml). The default terminal, browser and
-// file manager are chosen in the settings window.
+// file manager are chosen in the settings window. Every app runs in its own systemd scope
+// (`run`), so when memory runs out systemd-oomd closes that app, not the whole session.
 pragma Singleton
 
 import QtQuick
@@ -39,7 +40,30 @@ Singleton {
         if (entry.runInTerminal)
             runInTerminal(entry.command);
         else
-            entry.execute();
+            run(entry.command, entry.id, entry.workingDirectory);
+    }
+
+    // A .desktop action (a shortcut like "New private window") of `entry`.
+    function launchAction(action: DesktopAction, entry: DesktopEntry): void {
+        run(action.command, entry.id, entry.workingDirectory);
+    }
+
+    // Open a file, folder or link in its default app.
+    function openPath(target: string): void {
+        run(["xdg-open", target], "xdg-open", "");
+    }
+
+    // Start a command in its own scope in the user's app.slice, named like the XDG spec's
+    // app-<launcher>-<app id>-<random>.scope. Without one, an app runs in Hyprland's session
+    // scope with everything else, and oomd would close the whole session for it. `env -u`: the
+    // shell's own Mesa-only EGL (hypr/shell.sh) isn't for the apps; prime-run needs NVIDIA's.
+    function run(command: list<string>, id: string, workingDirectory: string): void {
+        const unit = "app-ghost-" + id.replace(/[^A-Za-z0-9:_.]/g, "_") + "-" + Math.random().toString(16).slice(2, 10);
+        Quickshell.execDetached({
+            command: ["systemd-run", "--user", "--scope", "--quiet", "--collect", "--slice=app.slice", "--unit=" + unit,
+                      "env", "-u", "__EGL_VENDOR_LIBRARY_FILENAMES", ...command],
+            workingDirectory: workingDirectory || Quickshell.env("HOME")
+        });
     }
 
     // The chosen app of a kind ("terminal", "browser", "editor", ...); null if it's not installed.
@@ -59,7 +83,7 @@ Singleton {
     function runInTerminal(command: list<string>): void {
         const terminal = defaultApp("terminal");
         if (terminal)
-            Quickshell.execDetached([...terminal.command, "-e", ...command]);
+            run([...terminal.command, "-e", ...command], terminal.id, "");
         else
             console.warn(`Apps: no terminal installed with id "${Settings.values.terminal}"`);
     }

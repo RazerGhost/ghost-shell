@@ -7,8 +7,9 @@ import "OomAlerts.js" as OomAlertsJs
 
 // A notification when memory ran out and something was closed for it: an app or service the
 // kernel's OOM killer or systemd-oomd ended, right away; or, at the next login, the whole
-// session, which oomd closes as one (every app runs in Hyprland's session scope, so nothing
-// can show anything while it happens). Read from this boot's journal (no root), then followed.
+// session, which oomd closes as one (Hyprland, the shell and anything not started through
+// Apps.run share its scope; nothing can show anything while it happens). Read from this boot's
+// journal (no root), then followed.
 Singleton {
     id: root
 

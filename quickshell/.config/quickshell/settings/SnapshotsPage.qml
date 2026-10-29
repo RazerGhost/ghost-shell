@@ -119,7 +119,7 @@ Column {
                 // The files as they were, to copy something back.
                 TextButton {
                     text: "Open"
-                    onClicked: Quickshell.execDetached(["xdg-open", "/home/.snapshots/" + modelData.number + "/snapshot/" + Quickshell.env("USER")])
+                    onClicked: Apps.openPath("/home/.snapshots/" + modelData.number + "/snapshot/" + Quickshell.env("USER"))
                 }
             }
         }
@@ -141,7 +141,7 @@ Column {
 
             TextButton {
                 text: "Open"
-                onClicked: Quickshell.execDetached(["btrfs-assistant"])
+                onClicked: Apps.run(["btrfs-assistant"], "btrfs-assistant", "")
             }
         }
     }

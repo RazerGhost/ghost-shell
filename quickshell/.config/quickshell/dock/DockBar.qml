@@ -283,7 +283,7 @@ PanelWindow {
                     required property DesktopAction modelData
                     icon: "open_in_new"
                     text: modelData.name
-                    onClicked: menu.run(() => modelData.execute())
+                    onClicked: menu.run(() => Apps.launchAction(modelData, menu.entry))
                 }
             }
 

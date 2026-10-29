@@ -351,9 +351,14 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   workspace's windows (empty workspace: length 0).
 
 - Out of memory (checked 2026-10-29): systemd-oomd runs (CachyOS) and watches
-  `user-1000.slice` for swap above 90 % and memory pressure. Every app runs in Hyprland's
-  `session-N.scope` (no per-app scopes: Hyprland's `exec` doesn't make them), so an oomd kill
-  there closes the whole session. The kernel's OOM killer ends one process and logs
+  `user-1000.slice` for swap above 90 % and memory pressure, and kills a descendant cgroup.
+  Hyprland's `exec` makes no per-app scopes, so everything it or the shell starts shares
+  `session-N.scope`, and an oomd kill there closes the whole session; hence `Apps.run`
+  (`systemd-run --user --scope --slice=app.slice`, verified: Loupe ran in
+  `app.slice/app-ghost-org.gnome.Loupe-<random>.scope`). Chromium and Electron apps move
+  themselves into an `app-org.chromium.Chromium-<pid>.scope`. Children of qs inherit its
+  environment (Spotify had the shell's `__EGL_VENDOR_LIBRARY_FILENAMES`), so `Apps.run`
+  drops that with `env -u`. The kernel's OOM killer ends one process and logs
   "Out of memory: Killed process N (name)" ("Memory cgroup out of memory: ..." in a limited
   cgroup); the user reads both through `journalctl` without root. A safe test kill:
   `systemd-run --user --scope -p MemoryMax=50M -p MemorySwapMax=0 python3 -c "x=b'a'*(200*1024*1024)"`

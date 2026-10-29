@@ -24,7 +24,7 @@ Scope {
     // ({ keybind }: just shown).
     function launch(result: var): void {
         if (result.web !== undefined)
-            Qt.openUrlExternally("https://duckduckgo.com/?q=" + encodeURIComponent(result.web));
+            Apps.openPath("https://duckduckgo.com/?q=" + encodeURIComponent(result.web));
         else if (result.color)
             Quickshell.execDetached(["wl-copy", result.color]);
         else if (result.keybind)
@@ -32,12 +32,12 @@ Scope {
         else if (result.window)
             Windows.show(result.window);
         else if (result.file)
-            Quickshell.execDetached(["xdg-open", result.file.path]);
+            Apps.openPath(result.file.path);
         else if (result.command)
             // The terminal stays open in your shell after the command, to read what it printed.
             Apps.runInTerminal(["sh", "-c", 'eval "$1"; exec "${SHELL:-sh}"', "sh", result.command]);
         else if (result.action)
-            result.action.execute();
+            Apps.launchAction(result.action, result.entry);
         else
             Apps.launch(result.entry);
         open = false;

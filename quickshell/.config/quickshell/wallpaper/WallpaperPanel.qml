@@ -132,7 +132,7 @@ Column {
             id: openFolder
             anchors.right: parent.right
             text: "Open folder"
-            onClicked: Quickshell.execDetached(["sh", "-c", 'mkdir -p "$1" && xdg-open "$1"', "sh", Wallpaper.folder])
+            onClicked: Apps.run(["sh", "-c", 'mkdir -p "$1" && exec xdg-open "$1"', "sh", Wallpaper.folder], "xdg-open", "")
         }
     }
 

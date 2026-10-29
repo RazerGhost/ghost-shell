@@ -5,7 +5,8 @@
 # (run this script again after such a stop). A crash makes qs exit with 255.
 
 # The shell draws on the AMD iGPU: give it Mesa's EGL only, so it doesn't also load NVIDIA's
-# (about 57 MB less resident, measured 2026-10-29). Apps keep both; prime-run picks NVIDIA.
+# (about 57 MB less resident, measured 2026-10-29). Apps the shell starts would inherit it, so
+# services/Apps.qml removes it for them: they keep both, and prime-run picks NVIDIA.
 export __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/50_mesa.json
 
 while :; do

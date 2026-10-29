@@ -779,7 +779,13 @@ shell's cost, features and customization), checked before acting. Done so far:
   there when the shell starts. Verified with a null sink and a WireGuard test connection.
 - Out of memory (`services/OomAlerts.qml`): "Memory ran out: <app> was closed" when the kernel's
   OOM killer or systemd-oomd ends an app or service, and at the next login when oomd closed the
-  whole session (every app runs in Hyprland's session scope, see NOTES). Read from this boot's
+  whole session (see NOTES).
+- Apps in their own scopes (user's choice): the shell starts every app (launcher, dock, default
+  apps, `xdg-open`, the terminal) with `systemd-run --user --scope` in `app.slice` (`Apps.run`),
+  as does the scratchpad's terminal, so oomd closes the app that ran out of memory instead of
+  the session it used to share with Hyprland. Apps also no longer inherit the shell's Mesa-only
+  EGL. Not scoped: what Hyprland's fallback binds start while the shell is down, and the
+  screenshot tool's satty and picture viewer (`capture.sh`). Read from this boot's
   journal and followed (`OomAlerts.js`, tested); the last one reported is in
   `~/.local/state/quickshell/oom-seen`, so a restart doesn't repeat it. Verified with a
   memory-limited test process; the session case is untested.

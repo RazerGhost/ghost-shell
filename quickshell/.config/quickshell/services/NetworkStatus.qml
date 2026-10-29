@@ -22,7 +22,7 @@ Singleton {
     // Opens the sign-in page: a plain http page made for this, which the network redirects to its
     // login (https pages can't be redirected).
     function signIn(): void {
-        Quickshell.execDetached(["xdg-open", "http://neverssl.com"]);
+        Apps.openPath("http://neverssl.com");
     }
 
     // While signing in, check again every 10 s, so the hint goes away soon after.
