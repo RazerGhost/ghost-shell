@@ -19,4 +19,13 @@ TestCase {
         compare(DesktopWidgets.dropped(1900, 1070, 192, 108, 1920, 1080), { x: 0.9, y: 0.9 });
         compare(DesktopWidgets.dropped(-50, -10, 100, 100, 1000, 1000), { x: 0, y: 0 });
     }
+
+    function test_withPlace() {
+        const saved = { clock: { x: 0.5, y: 0.5 } };
+        const places = DesktopWidgets.withPlace(saved, "weather", { x: 0.1, y: 0.2 });
+        // The others stay, the original isn't changed.
+        compare(places, { clock: { x: 0.5, y: 0.5 }, weather: { x: 0.1, y: 0.2 } });
+        compare(saved, { clock: { x: 0.5, y: 0.5 } });
+        compare(DesktopWidgets.withPlace(undefined, "media", { x: 0, y: 1 }), { media: { x: 0, y: 1 } });
+    }
 }

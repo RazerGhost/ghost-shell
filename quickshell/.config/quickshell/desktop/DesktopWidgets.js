@@ -28,3 +28,11 @@ function dropped(x, y, w, h, sw, sh) {
     const clamp = (v, max) => Math.min(Math.max(v, 0), Math.max(max, 0));
     return { x: clamp(x, sw - w) / sw, y: clamp(y, sh - h) / sh };
 }
+
+// The saved places with `name` at `place`, as a new object (so the setting's change is seen
+// and saved); the others' places stay.
+function withPlace(saved, name, place) {
+    const places = JSON.parse(JSON.stringify(saved ?? {}));
+    places[name] = { x: place.x, y: place.y };
+    return places;
+}

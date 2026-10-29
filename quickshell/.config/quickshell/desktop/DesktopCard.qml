@@ -16,9 +16,14 @@ Item {
 
     readonly property var spot: DesktopWidgets.place(Settings.values.desktopWidgets, name)
 
-    // Follows the drag while it lasts; the place is saved on release.
-    x: spot.x * parent.width + (drag.active ? drag.translation.x : 0)
-    y: spot.y * parent.height + (drag.active ? drag.translation.y : 0)
+    // How far the handle has been dragged; follows the drag while it lasts, and the place is
+    // saved when it ends. Kept here, not read from the handler at the end: a cancelled drag
+    // (the pointer reaching another surface at the screen's edge) leaves its translation empty.
+    property point dragged: Qt.point(0, 0)
+    property bool moving: false
+
+    x: spot.x * parent.width + (moving ? dragged.x : 0)
+    y: spot.y * parent.height + (moving ? dragged.y : 0)
     width: body.childrenRect.width
     height: body.childrenRect.height
 
@@ -60,17 +65,24 @@ Item {
         DragHandler {
             id: drag
             target: null
-            onActiveChanged: {
+            onActiveTranslationChanged: {
                 if (active)
-                    return;
-                // From the saved place plus the drag: x itself no longer follows it here.
-                const area = root.parent;
-                const place = DesktopWidgets.dropped(root.spot.x * area.width + translation.x,
-                                                     root.spot.y * area.height + translation.y,
-                                                     root.width, root.height, area.width, area.height);
-                // A new object, so the setting's change is seen and saved.
-                Settings.values.desktopWidgets = Object.assign({}, Settings.values.desktopWidgets, { [root.name]: place });
+                    root.dragged = Qt.point(activeTranslation.x, activeTranslation.y);
             }
+            onActiveChanged: {
+                if (active) {
+                    root.dragged = Qt.point(0, 0);
+                    root.moving = true;
+                    return;
+                }
+                const area = root.parent;
+                const place = DesktopWidgets.dropped(root.spot.x * area.width + root.dragged.x,
+                                                     root.spot.y * area.height + root.dragged.y,
+                                                     root.width, root.height, area.width, area.height);
+                Settings.values.desktopWidgets = DesktopWidgets.withPlace(Settings.values.desktopWidgets, root.name, place);
+                root.moving = false;
+            }
+            onCanceled: console.info("DesktopCard: the " + root.name + " drag was cancelled at", root.dragged)
         }
     }
 }
