@@ -113,6 +113,11 @@ Singleton {
             property int recordingFps: 60
             property string recordingQuality: "very_high"
             property bool recordingMic: false
+            // The island's clock: the day ("Thu 29") and seconds too; and whether playing music
+            // takes the clock's place (its cover).
+            property bool clockDate: false
+            property bool clockSeconds: false
+            property bool islandMedia: true
             property string weatherLocation: ""
             property string temperatureUnit: "celsius" // or "fahrenheit"
 

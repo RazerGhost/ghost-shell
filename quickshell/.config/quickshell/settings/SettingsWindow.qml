@@ -69,7 +69,7 @@ Singleton {
         { id: "capture", section: "Apps", icon: "screenshot_monitor", title: "Screenshots and recordings",
           words: "screenshot capture record recording video folder quality fps frame rate microphone" },
         { id: "clock", section: "Apps", icon: "partly_cloudy_day", title: "Weather and clock",
-          words: "fahrenheit celsius temperature unit weather town location 24-hour 12-hour time" }
+          words: "seconds day date music cover island fahrenheit celsius temperature unit weather town location 24-hour 12-hour time" }
     ]
     property string search: ""
     // The pages the search finds (all of them without one).

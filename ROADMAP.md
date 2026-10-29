@@ -732,6 +732,9 @@ shell's cost, features and customization), checked before acting. Done so far:
   `~/` works; `CaptureFolders.js`, tested), the recording's frame rate (30/60), quality
   (gpu-screen-recorder's medium to ultra) and the microphone mixed in. The notifications name
   the folder.
+- Settings -> Weather and clock -> Clock: the day in the island ("Thu 29  14:32", English day
+  names), seconds (the clock then ticks every second), and whether playing music takes the
+  clock's place (on by default, as before).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

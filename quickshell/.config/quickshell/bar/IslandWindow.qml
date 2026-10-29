@@ -49,7 +49,7 @@ PanelWindow {
     // While music plays the middle of the island shows the music instead of the time.
     // Once the island opens (hover player or a menu) the time comes back, since the
     // music is then shown below it.
-    readonly property bool showMedia: Media.playing && !expanded
+    readonly property bool showMedia: Settings.values.islandMedia && Media.playing && !expanded
 
     onOpenChanged: peek = ""
 
