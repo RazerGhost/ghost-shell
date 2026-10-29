@@ -87,9 +87,11 @@ Scope {
         }
     }
 
-    // Hyprland sends activelayout for every keyboard (and again for the same layout), so only a
-    // new layout name shows.
+    // Hyprland sends activelayout for every keyboard (virtual ones too, like wtype's for the emoji
+    // picker), and again for the same layout: only the main keyboard's, and only a new name, shows.
+    // Both are read from Hyprland at start (it sends no event then), so the first switch shows.
     property string layout: ""
+    property string mainKeyboard: ""
 
     Connections {
         target: Hyprland
@@ -97,13 +99,11 @@ Scope {
         function onRawEvent(event): void {
             if (event.name !== "activelayout")
                 return;
-            const name = Keyboard.layoutName(event.data);
-            if (name === "" || name === root.layout)
+            const active = Keyboard.activeLayout(event.data);
+            if (!active || active.keyboard !== root.mainKeyboard || active.layout === root.layout)
                 return;
-            const first = root.layout === "";
-            root.layout = name;
-            if (!first)
-                root.show("keyboard", name, -1);
+            root.layout = active.layout;
+            root.show("keyboard", active.layout, -1);
         }
     }
 
@@ -117,14 +117,24 @@ Scope {
         }
     }
 
+    // The main keyboard: at start for its name and layout, after the caps lock key for its state.
     Process {
         id: devices
+        property bool started: false
         command: ["hyprctl", "devices", "-j"]
+        running: true
         stdout: StdioCollector {
             onStreamFinished: {
-                const on = Keyboard.capsLock(text);
-                if (on !== null)
-                    root.show("keyboard_capslock", on ? "Caps lock on" : "Caps lock off", -1);
+                const main = Keyboard.mainKeyboard(text);
+                if (!main)
+                    return;
+                root.mainKeyboard = main.name;
+                if (!devices.started) {
+                    devices.started = true;
+                    root.layout = main.layout;
+                } else {
+                    root.show("keyboard_capslock", main.capsLock ? "Caps lock on" : "Caps lock off", -1);
+                }
             }
         }
     }
@@ -212,6 +222,9 @@ Scope {
                 Text {
                     visible: root.level < 0
                     anchors.verticalCenter: parent.verticalCenter
+                    // Long layout names ("English (US, intl., with dead keys)") end in "…".
+                    width: parent.width - glyph.width - parent.spacing
+                    elide: Text.ElideRight
                     text: root.label
                     color: Colors.m3onSurface
                     font.family: Theme.font.sans

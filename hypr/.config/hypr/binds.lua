@@ -13,7 +13,7 @@ local function app(kind, fallback)
     return hl.dsp.exec_cmd("qs ipc call apps open " .. kind .. " || " .. fallback)
 end
 
--- Every bind except the media keys has a description, "Category: what it does": the settings
+-- Every bind except the media keys and the caps lock pop-up's hook has a description, "Category: what it does": the settings
 -- window lists them by category (hyprctl binds -j), and binds with the same description show as
 -- one row ("Super + W / Alt + F4").
 

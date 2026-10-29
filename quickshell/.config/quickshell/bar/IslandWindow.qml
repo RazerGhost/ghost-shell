@@ -106,9 +106,11 @@ PanelWindow {
     // layer surface every animation frame would stutter. Only the island itself takes
     // input (mask); the rest is transparent and clicks go to the windows below.
     anchors.top: true
-    // As wide as the widest the island gets (a menu), plus its curves into the screen edge and
-    // its offset (Theme.island.offset), so the island stays centered under the webcam.
-    implicitWidth: Theme.island.panelWidth + (Theme.island.fillet + Math.abs(Theme.island.offset)) * 2
+    // As wide as the widest the island gets (a menu, or the closed island with many status
+    // icons), plus its curves into the screen edge and its offset (Theme.island.offset), so the
+    // island stays centered under the webcam. The closed width only changes when an icon comes
+    // or goes, not every frame.
+    implicitWidth: Math.max(Theme.island.panelWidth, closedWidth) + (Theme.island.fillet + Math.abs(Theme.island.offset)) * 2
     implicitHeight: Theme.island.maxHeight
     color: "transparent"
     mask: Region { item: shape }
@@ -314,6 +316,11 @@ PanelWindow {
                         anchors.right: parent.right
                         visible: SystemTray.items.values.length > 0
                         label: "Background apps"
+                        // The last app quit while its menu was open: close the empty menu.
+                        onVisibleChanged: {
+                            if (!visible && root.panel === "tray")
+                                root.island.panel = "";
+                        }
                         active: root.panel === "tray"
                         onActivated: root.island.toggle("tray", root.modelData.name)
 

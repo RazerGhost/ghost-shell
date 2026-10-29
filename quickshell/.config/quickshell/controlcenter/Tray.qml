@@ -2,11 +2,12 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.SystemTray
 import qs.theme
+import qs.widgets
 
 // The "Background apps" menu (system tray, StatusNotifierItem), opened by the arrow next to the
 // island's status icons (user's choice 2026-10-29, after chips in quick settings looked
 // cluttered): a row per app with its icon and name. Click activates the app (and closes the
-// menu), middle click is its secondary action, right click opens its own menu.
+// menu), middle click is its secondary action, right click or ⋮ opens its own menu.
 Column {
     id: root
 
@@ -54,8 +55,8 @@ Column {
             width: root.width - root.leftPadding - root.rightPadding
             appIcon: trayIcon
             title: name
-            subtitle: modelData.tooltipDescription || (modelData.hasMenu ? "Right-click for its menu" : "")
-            trailingIcon: modelData.hasMenu ? "more_vert" : ""
+            subtitle: modelData.tooltipDescription || ""
+            trailingSpace: menuButton.visible ? menuButton.width : 0
             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
             onPressed: event => button = event.button
 
@@ -72,6 +73,19 @@ Column {
                     modelData.activate();
                     root.done();
                 }
+            }
+
+            // The app's own menu, also by right-click.
+            IconButton {
+                id: menuButton
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacing.xs
+                anchors.verticalCenter: parent.verticalCenter
+                visible: item.modelData.hasMenu
+                icon: "more_vert"
+                label: item.name + " menu"
+                iconSize: Theme.icon.small
+                onClicked: menu.open()
             }
 
             // Opens the item's menu (exported over D-Bus by the app) just below the row.

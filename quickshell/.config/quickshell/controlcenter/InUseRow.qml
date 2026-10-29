@@ -14,6 +14,7 @@ Row {
     spacing: Theme.spacing.s
 
     MaterialIcon {
+        id: glyph
         anchors.verticalCenter: parent.verticalCenter
         icon: root.icon
         color: Colors.m3primary
@@ -21,6 +22,9 @@ Row {
 
     Text {
         anchors.verticalCenter: parent.verticalCenter
+        // Several apps' names end in "…" rather than running past the menu.
+        width: root.width - root.leftPadding - glyph.width - root.spacing
+        elide: Text.ElideRight
         text: root.text
         color: Colors.m3onSurfaceVariant
         font.family: Theme.font.sans

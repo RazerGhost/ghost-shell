@@ -5,20 +5,20 @@ import "../quickshell/.config/quickshell/osd/Keyboard.js" as Keyboard
 TestCase {
     name: "OsdKeyboard"
 
-    function test_layoutName() {
-        compare(Keyboard.layoutName("at-translated-set-2-keyboard,English (US)"), "English (US)");
-        compare(Keyboard.layoutName("kb,English (US, intl., with dead keys)"), "English (US, intl., with dead keys)");
-        compare(Keyboard.layoutName("nonsense"), "");
+    function test_activeLayout() {
+        compare(Keyboard.activeLayout("at-translated-set-2-keyboard,English (US)"), { keyboard: "at-translated-set-2-keyboard", layout: "English (US)" });
+        compare(Keyboard.activeLayout("kb,English (US, intl., with dead keys)").layout, "English (US, intl., with dead keys)");
+        compare(Keyboard.activeLayout("nonsense"), null);
     }
 
-    function test_capsLock() {
+    function test_mainKeyboard() {
         const devices = on => JSON.stringify({ keyboards: [
-            { name: "power-button", capsLock: false, main: false },
-            { name: "at-translated-set-2-keyboard", capsLock: on, main: true }
+            { name: "power-button", capsLock: false, main: false, active_keymap: "English (US)" },
+            { name: "at-translated-set-2-keyboard", capsLock: on, main: true, active_keymap: "Dutch" }
         ] });
-        compare(Keyboard.capsLock(devices(true)), true);
-        compare(Keyboard.capsLock(devices(false)), false);
-        compare(Keyboard.capsLock(JSON.stringify({ keyboards: [] })), null);
-        compare(Keyboard.capsLock("not json"), null);
+        compare(Keyboard.mainKeyboard(devices(true)), { name: "at-translated-set-2-keyboard", layout: "Dutch", capsLock: true });
+        compare(Keyboard.mainKeyboard(devices(false)).capsLock, false);
+        compare(Keyboard.mainKeyboard(JSON.stringify({ keyboards: [] })), null);
+        compare(Keyboard.mainKeyboard("not json"), null);
     }
 }

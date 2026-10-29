@@ -103,10 +103,11 @@ Column {
     }
 
     // The name and password of the connection active on the Wi-Fi card, a line each (the
-    // password "" for an open network).
+    // password "" for an open network). `-e no`: without it nmcli escapes ":" and "\" as "\:" and
+    // "\\", which would end up in the QR code.
     Process {
         id: readPassword
-        command: ["sh", "-c", `nmcli -s -g 802-11-wireless.ssid,802-11-wireless-security.psk connection show "$(nmcli -g GENERAL.CONNECTION device show "$1")"`,
+        command: ["sh", "-c", `nmcli -e no -s -g 802-11-wireless.ssid,802-11-wireless-security.psk connection show "$(nmcli -e no -g GENERAL.CONNECTION device show "$1")"`,
                   "sh", NetworkStatus.wifiDevice?.name ?? ""]
         stdout: StdioCollector {
             onStreamFinished: {

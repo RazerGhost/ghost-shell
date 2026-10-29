@@ -26,9 +26,12 @@ for file in settings.json colors.json; do
 done
 
 # The keyboard layout and touchpad settings (written by the shell's settings window); the login
-# screen's Hyprland loads this copy (system/etc/greetd/hypr/hyprland.lua).
+# screen's Hyprland loads this copy (system/etc/greetd/hypr/hyprland.lua). Without game mode's
+# block (settings/HyprlandConfig.js): logging out with game mode on mustn't leave the login
+# screen without animations.
 if [ -f "$HOME/.config/hypr/shell-settings.lua" ]; then
-    copy "$HOME/.config/hypr/shell-settings.lua" "$shared/shell-settings.lua"
+    sed '/^-- Game mode is on/,/^})$/d' "$HOME/.config/hypr/shell-settings.lua" >"$shared/shell-settings.lua.tmp"
+    mv -f "$shared/shell-settings.lua.tmp" "$shared/shell-settings.lua"
 fi
 
 # The lock screen's picture, from the shell (lock/LoginScreenSync.qml passes Wallpaper.lockPath;

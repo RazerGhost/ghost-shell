@@ -23,18 +23,24 @@ Column {
         TextButton {
             text: Planner.open > 0 ? "To-do · " + Planner.open : "To-do"
             filled: root.open === "todo"
+            Accessible.checkable: true
+            Accessible.checked: root.open === "todo"
             onClicked: root.toggle("todo")
         }
 
         TextButton {
             text: "Note"
             filled: root.open === "note"
+            Accessible.checkable: true
+            Accessible.checked: root.open === "note"
             onClicked: root.toggle("note")
         }
 
         TextButton {
             text: Countdown.active ? "Timer · " + Countdown.label : "Timer"
             filled: root.open === "timer"
+            Accessible.checkable: true
+            Accessible.checked: root.open === "timer"
             onClicked: root.toggle("timer")
         }
     }
@@ -149,7 +155,8 @@ Column {
                     id: removeTask
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: task.containsMouse
+                    // Always there (screen readers only see what's visible), faint until hovered.
+                    opacity: task.containsMouse ? 1 : Theme.state.disabled
                     icon: "close"
                     label: "Remove " + task.modelData.text
                     iconSize: Theme.icon.small

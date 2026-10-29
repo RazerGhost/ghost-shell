@@ -246,18 +246,21 @@ Item {
         // Who's using the microphone, camera or screen right now, like Android's privacy
         // indicators.
         InUseRow {
+            width: parent.width
             visible: Audio.recordingApps.length > 0
             icon: "mic"
             text: "Microphone in use by " + Audio.recordingApps.join(", ")
         }
 
         InUseRow {
+            width: parent.width
             visible: Privacy.cameraInUse
             icon: "videocam"
             text: Privacy.cameraApps.length > 0 ? "Camera in use by " + Privacy.cameraApps.join(", ") : "Camera in use"
         }
 
         InUseRow {
+            width: parent.width
             visible: Privacy.screenShared
             icon: "screen_share"
             text: "Your screen is being shared"

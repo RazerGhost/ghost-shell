@@ -16,6 +16,8 @@ MouseArea {
     property string subtitle
     property string trailingIcon
     property bool highlighted
+    // Room kept free at the right for a control placed over the row (an "End task" button).
+    property real trailingSpace: 0
 
     readonly property color contentColor: highlighted ? Colors.m3primary : Colors.m3onSurface
 
@@ -72,7 +74,7 @@ MouseArea {
         anchors.left: leading.right
         anchors.right: trailing.visible ? trailing.left : parent.right
         anchors.leftMargin: Theme.spacing.m
-        anchors.rightMargin: Theme.spacing.m
+        anchors.rightMargin: Theme.spacing.m + root.trailingSpace
         anchors.verticalCenter: parent.verticalCenter
 
         Text {

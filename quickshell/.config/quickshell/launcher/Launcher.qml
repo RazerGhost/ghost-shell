@@ -267,6 +267,8 @@ Scope {
 
                     property var found: []
                     property string asked: ""
+                    // Asked while fd still ran for older text: search once more when it's done.
+                    property bool again: false
 
                     function ask(text: string): void {
                         asked = text;
@@ -278,7 +280,12 @@ Scope {
                     Timer {
                         id: waitFiles
                         interval: 200
-                        onTriggered: fd.running = true
+                        onTriggered: {
+                            if (fd.running)
+                                fileSearch.again = true;
+                            else
+                                fd.running = true;
+                        }
                     }
 
                     Process {
@@ -290,6 +297,12 @@ Scope {
                                 // Results for an older search: the text changed since.
                                 if (search.query.mode === "files" && search.query.text === fileSearch.asked)
                                     fileSearch.found = Fuzzy.files(text, Quickshell.env("HOME"));
+                            }
+                        }
+                        onExited: {
+                            if (fileSearch.again) {
+                                fileSearch.again = false;
+                                Qt.callLater(() => fd.running = true);
                             }
                         }
                     }
@@ -308,7 +321,9 @@ Scope {
                     model: ScriptModel {
                         values: search.query.mode === "files" ? fileSearch.found.map(f => ({ file: f }))
                               : search.query.mode === "command" ? (search.query.text === "" ? [] : [{ command: search.query.text }])
-                              : Fuzzy.results(DesktopEntries.applications.values, search.text, root.windowList())
+                              // Windows only while open with a query: their titles change all the time.
+                              : Fuzzy.results(DesktopEntries.applications.values, search.text,
+                                              root.open && search.query.text.trim() !== "" ? root.windowList() : [])
                     }
                     highlightMoveDuration: Theme.anim.fast
                     boundsBehavior: Flickable.StopAtBounds

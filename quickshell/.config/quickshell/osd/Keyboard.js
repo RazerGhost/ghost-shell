@@ -3,19 +3,19 @@
 // (tests/tst_osdkeyboard.qml).
 .pragma library
 
-// "at-translated-set-2-keyboard,English (US, intl., with dead keys)" -> the layout's name. Only
-// the first comma separates: layout names have their own.
-function layoutName(data) {
+// "at-translated-set-2-keyboard,English (US, intl., with dead keys)" -> { keyboard, layout }.
+// Only the first comma separates: layout names have their own. null for anything else.
+function activeLayout(data) {
     const comma = data.indexOf(",");
-    return comma === -1 ? "" : data.slice(comma + 1);
+    return comma === -1 ? null : { keyboard: data.slice(0, comma), layout: data.slice(comma + 1) };
 }
 
-// Whether caps lock is on for the main keyboard (the one Hyprland marks "main"), from
-// `hyprctl devices -j`; null when the output can't be read.
-function capsLock(json) {
+// The main keyboard (the one Hyprland marks "main") from `hyprctl devices -j`, as
+// { name, layout, capsLock }; null when the output can't be read.
+function mainKeyboard(json) {
     try {
         const main = JSON.parse(json).keyboards.find(k => k.main);
-        return main ? main.capsLock === true : null;
+        return main ? { name: main.name, layout: main.active_keymap, capsLock: main.capsLock === true } : null;
     } catch (e) {
         return null;
     }

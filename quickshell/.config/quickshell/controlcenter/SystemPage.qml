@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import qs.services
 import qs.theme
 import qs.widgets
@@ -143,34 +144,40 @@ Column {
     Column {
         width: parent.width
 
+        // Keyed by name (plain strings), so a row stays the same row while its app stays in the
+        // list and a click isn't lost when the numbers refresh every 2 s; it reads the app's
+        // current numbers itself.
         Repeater {
-            model: SystemStats.apps
+            model: ScriptModel { values: SystemStats.apps.map(a => a.name) }
 
             ListRow {
                 id: appRow
 
-                required property var modelData
+                required property string modelData
+                readonly property var app: SystemStats.apps.find(a => a.name === modelData) ?? null
 
                 width: parent.width
                 hoverEnabled: false
                 cursorShape: Qt.ArrowCursor
                 icon: "memory"
-                appIcon: modelData.icon
-                title: modelData.name
-                subtitle: "CPU " + root.percent(modelData.cpu) + " · " + SystemStats.size(modelData.memory)
+                appIcon: app?.icon ?? ""
+                title: modelData
+                subtitle: app ? "CPU " + root.percent(app.cpu) + " · " + SystemStats.size(app.memory) : ""
+                trailingSpace: endButton.visible ? endButton.width + Theme.spacing.s : 0
 
                 TextButton {
+                    id: endButton
                     anchors.right: parent.right
                     anchors.rightMargin: Theme.spacing.s
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: !appRow.modelData.essential
-                    text: root.armed === appRow.modelData.name ? "Click to confirm" : "End task"
+                    visible: appRow.app !== null && !appRow.app.essential
+                    text: root.armed === appRow.modelData ? "Click to confirm" : "End task"
                     onClicked: {
-                        if (root.armed === appRow.modelData.name) {
+                        if (root.armed === appRow.modelData) {
                             root.armed = null;
-                            SystemStats.endTask(appRow.modelData);
+                            SystemStats.endTask(appRow.app);
                         } else {
-                            root.armed = appRow.modelData.name;
+                            root.armed = appRow.modelData;
                             disarm.restart();
                         }
                     }
