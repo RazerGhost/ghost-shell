@@ -540,6 +540,12 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   `MediaCard` (play, pause, skip without unlocking) and the number of notifications, never
   their content. Settings -> Lock screen: "Media controls" and "Notification count", both on.
 
+### Game mode (built 2026-10-29)
+- A round button in quick settings (`services/GameMode.qml`; not saved, like Keep awake): while
+  on, Hyprland's animations, blur and shadows are off (appended to `shell-settings.lua` after
+  the settings, `HyprlandConfig.js`, tested), pop-ups wait in the history like Do Not Disturb
+  (critical ones still show) and the power mode is Performance, back to the previous one after.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

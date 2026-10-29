@@ -52,4 +52,14 @@ TestCase {
         verify(lua.includes("gaps_in     = 5,"));
         verify(lua.includes("rounding = 10,"));
     }
+
+    function test_gameMode() {
+        const off = HyprlandConfig.lua(defaults, false);
+        verify(!off.includes("animations"));
+        const on = HyprlandConfig.lua(defaults, true);
+        verify(on.includes("animations = { enabled = false },"));
+        verify(on.includes("shadow = { enabled = false }"));
+        // After the settings' own hl.config, so it overrides them.
+        verify(on.indexOf("animations") > on.indexOf("wobble"));
+    }
 }

@@ -112,7 +112,7 @@ Item {
             z: 1
             width: parent.width
             // Spread evenly: the gaps share what the buttons leave.
-            spacing: (width - Theme.tile.round * 4) / 3
+            spacing: (width - Theme.tile.round * 5) / 4
 
             RoundToggle {
                 icon: Audio.micMuted ? "mic_off" : "mic"
@@ -140,6 +140,13 @@ Item {
                 title: "Keep awake"
                 active: KeepAwake.on
                 onClicked: KeepAwake.on = !KeepAwake.on
+            }
+
+            RoundToggle {
+                icon: "sports_esports"
+                title: "Game mode"
+                active: GameMode.on
+                onClicked: GameMode.on = !GameMode.on
             }
         }
 

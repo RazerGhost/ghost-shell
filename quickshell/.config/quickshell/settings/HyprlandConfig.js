@@ -21,8 +21,19 @@ function number(value, fallback) {
     return typeof value === "number" && isFinite(value) ? value : fallback;
 }
 
-// The Lua file Hyprland loads last (hyprland.lua), from the settings' values.
-function lua(v) {
+// Game mode (services/GameMode.qml): what it switches off, after the settings so it wins.
+const gameModeLua = [
+    "-- Game mode is on (quick settings).",
+    "hl.config({",
+    "    animations = { enabled = false },",
+    "    decoration = { blur = { enabled = false }, shadow = { enabled = false } },",
+    "})",
+    ""
+];
+
+// The Lua file Hyprland loads last (hyprland.lua), from the settings' values and whether game
+// mode is on.
+function lua(v, gameMode) {
     return [
         "-- Written by Quickshell's settings window (settings/HyprlandSettings.qml); don't edit:",
         "-- it's overwritten. Loaded last by hyprland.lua, so it overrides input.lua and look.lua.",
@@ -47,6 +58,7 @@ function lua(v) {
         "    },",
         "})",
         "",
+        ...(gameMode === true ? gameModeLua : []),
         // Screens set up in the Display page, by output name (the rest keep monitors.lua's
         // "preferred"); one that isn't safe to write is left out.
         ...Object.entries(v.monitors || {}).map(([output, setup]) => DisplayModes.lua(output, setup)).filter(l => l !== ""),
