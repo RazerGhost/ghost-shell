@@ -594,8 +594,9 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
 ### Camera and screen sharing indicators (built 2026-10-29; untested with a real call)
 - Like the microphone: a camera and a screen icon in the island, and "Camera in use by ..." /
   "Your screen is being shared" in quick settings (`services/Privacy.qml`, `InUseRow`). The
-  camera's USB power state is read every 3 s (`services/camera.sh`; `fuser` names the apps only
-  while it's on; `Privacy.js`, tested). Screen sharing is the portal's PipeWire stream
+  camera's USB power state is read in-process every 3 s (its folder found once by
+  `services/camera.sh devices`; before 2026-10-29's review it started a script every 3 s, ~6,000
+  an hour); `camera.sh apps` (`fuser`) names the apps only while it's on (`Privacy.js`, tested). Screen sharing is the portal's PipeWire stream
   (`xdph-streaming-<n>`): Hyprland's `screencast` event also fires for grim and the shell's own
   previews.
 

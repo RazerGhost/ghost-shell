@@ -25,7 +25,9 @@ Singleton {
     readonly property var days: CalendarEventsJs.days(events) // dates with an event
     readonly property string today: CalendarEventsJs.iso(clock.date)
     readonly property var upcoming: CalendarEventsJs.upcoming(events, today, 4)
-    readonly property var range: CalendarEventsJs.range(clock.date, year, month)
+    // From `today` (text, so it only changes once a day), not the clock: a range built from the
+    // minute clock is a new object every minute, which counted as a change and ran khal each time.
+    readonly property var range: CalendarEventsJs.range(new Date(today + "T00:00"), year, month)
 
     // khal asked again while it runs (the month flipped, a sync finished) runs once more after,
     // so the shown month never keeps the last range's events.
