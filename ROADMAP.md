@@ -831,7 +831,7 @@ Two read-only reviews of everything since the optimization review, findings chec
 - Not done: with the dock set to "always" on several screens the OSD's height follows one of
   them (only matters with an external monitor, none to test with).
 
-### UI research round (2026-10-29, in progress)
+### UI research round (done, verified on the laptop 2026-10-30)
 User's picks from two read-only researches (other Quickshell shells and Hyprland 0.56/0.57; an
 audit of our own UI): all sixteen, built in batches.
 - Audit fixes: hover on the cards that had none (notifications, attention, the small player,
