@@ -1,8 +1,9 @@
-// Light or dark for everything (Settings -> Appearance): "dark", "light" or "auto" (dark from
-// sunset to sunrise at the weather town; ColorScheme.js, tested). When the result changes it's
-// written to ~/.local/state/quickshell/scheme and matugen's wallpaper.sh makes the colors again
-// from the current wallpaper (and sets GTK's light or dark). Only on a change, so starting the
-// shell doesn't regenerate the colors.
+// How the colors are made (Settings -> Appearance): light or dark ("dark", "light" or "auto":
+// dark from sunset to sunrise at the weather town), matugen's color style and contrast, and an
+// optional fixed accent (ColorScheme.js, tested). When that changes it's written to
+// ~/.local/state/quickshell/scheme and matugen's wallpaper.sh makes the colors again from the
+// current wallpaper (and sets GTK's light or dark). Only on a change, so starting the shell
+// doesn't regenerate the colors.
 pragma Singleton
 
 import QtQuick
@@ -17,12 +18,16 @@ Singleton {
     readonly property string mode: ColorSchemeJs.mode(Settings.values.colorScheme, Schedule.minutesOf(clock.date),
                                                       Weather.current?.sunrise ?? null, Weather.current?.sunset ?? null)
     readonly property string file: Quickshell.env("HOME") + "/.local/state/quickshell/scheme"
+    // Everything wallpaper.sh makes the colors from: the mode, matugen's color style and contrast,
+    // and a fixed accent (ColorScheme.js, tested). A change to any of them makes the colors again.
+    readonly property string wanted: ColorSchemeJs.file(mode, Settings.values.colorStyle,
+                                                        Settings.values.colorContrast, Settings.values.accentColor)
     // "At sunset" with a weather town waits for the town's sunset (or the weather failing), so a
     // start between the real sunset and the 19:00 fallback doesn't recolor everything twice.
     readonly property bool known: Settings.values.colorScheme !== "auto" || Settings.values.weatherLocation === ""
                                   || Weather.current !== null || Weather.error !== ""
 
-    onModeChanged: {
+    onWantedChanged: {
         if (Settings.loaded)
             applyLater.restart();
     }
@@ -45,7 +50,7 @@ Singleton {
         precision: SystemClock.Minutes
     }
 
-    // The mode the colors were last made for: the file's at start (read once), then remembered
+    // What the colors were last made for: the file's at start (read once), then remembered
     // here. Not re-read after a run: the read right after came back stale, so every switch ran
     // twice (logged 2026-10-29).
     property string applied: ""
@@ -60,13 +65,13 @@ Singleton {
             if (!root.known || apply.running)
                 return;
             if (!root.appliedRead) {
-                root.applied = current.text().trim();
+                root.applied = current.text();
                 root.appliedRead = true;
             }
-            if (root.applied === root.mode)
+            if (root.applied === root.wanted)
                 return;
-            root.applied = root.mode;
-            apply.command = ["sh", "-c", `printf '%s\\n' "$1" > "$2" && sh "$3"`, "sh", root.mode, root.file,
+            root.applied = root.wanted;
+            apply.command = ["sh", "-c", `printf '%s' "$1" > "$2" && sh "$3"`, "sh", root.wanted, root.file,
                              Quickshell.env("HOME") + "/.config/matugen/wallpaper.sh"];
             apply.running = true;
         }

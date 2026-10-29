@@ -109,6 +109,11 @@ Singleton {
 
             // "dark", "light" or "auto" (dark from sunset to sunrise; services/ColorScheme.qml).
             property string colorScheme: "dark"
+            // matugen's color style (a scheme type, ColorScheme.js), contrast (-1 to 1) and a
+            // fixed accent color ("#rrggbb"; "" = the wallpaper's).
+            property string colorStyle: "scheme-tonal-spot"
+            property real colorContrast: 0
+            property string accentColor: ""
             // The shell's panels (island, menus, dock, launcher...): glass, see-through over
             // Hyprland's blur with a thin light edge (like the Ghost Spotify theme), or nearly solid.
             property bool glass: true

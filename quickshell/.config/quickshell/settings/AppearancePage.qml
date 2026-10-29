@@ -2,6 +2,7 @@ import QtQuick
 import qs.services
 import qs.theme
 import qs.widgets
+import "../services/ColorScheme.js" as ColorSchemeJs
 
 // Appearance: the wallpaper (the colors of everything come from it), light or dark, the shell's panels (glass
 // or nearly solid: Colors.surfaceTranslucent, widgets/Surface.qml), and the windows' border and
@@ -38,6 +39,69 @@ Column {
                 value: Settings.values.colorScheme
                 format: v => ({ dark: "Dark", light: "Light", auto: "At sunset" })[v]
                 onPicked: v => Settings.values.colorScheme = v
+            }
+        }
+
+        SettingRow {
+            title: "Color style"
+            subtitle: "How the colors are drawn from the wallpaper (matugen)"
+
+            Stepper {
+                label: "Color style"
+                values: ColorSchemeJs.styles
+                valueWidth: Theme.settings.stepperWide
+                value: Settings.values.colorStyle
+                format: v => ({
+                    "scheme-tonal-spot": "Tonal (default)", "scheme-vibrant": "Vibrant",
+                    "scheme-expressive": "Expressive", "scheme-content": "Content",
+                    "scheme-fidelity": "Faithful", "scheme-fruit-salad": "Fruit salad",
+                    "scheme-rainbow": "Rainbow", "scheme-neutral": "Neutral",
+                    "scheme-monochrome": "Monochrome"
+                })[v] ?? v
+                onPicked: v => Settings.values.colorStyle = v
+            }
+        }
+
+        SettingRow {
+            title: "Contrast"
+
+            Stepper {
+                label: "Contrast"
+                values: [-0.5, 0, 0.5, 1]
+                value: Settings.values.colorContrast
+                format: v => ({ "-0.5": "Lower", "0": "Standard", "0.5": "Higher", "1": "Highest" })[String(v)]
+                onPicked: v => Settings.values.colorContrast = v
+            }
+        }
+
+        SettingRow {
+            title: "Accent color"
+            subtitle: Settings.values.accentColor ? "Instead of the wallpaper's; the wallpaper still shows"
+                                                  : "Taken from the wallpaper"
+
+            Row {
+                spacing: Theme.spacing.s
+
+                // The chosen color.
+                Rectangle {
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: Settings.values.accentColor !== ""
+                    width: Theme.icon.normal
+                    height: width
+                    radius: width / 2
+                    color: Settings.values.accentColor || "transparent"
+                }
+
+                Stepper {
+                    label: "Accent color"
+                    values: ["", "#6750a4", "#1e66f5", "#00897b", "#43a047", "#fb8c00", "#e53935", "#d81b60"]
+                    value: Settings.values.accentColor
+                    format: v => ({
+                        "": "Wallpaper", "#6750a4": "Purple", "#1e66f5": "Blue", "#00897b": "Teal",
+                        "#43a047": "Green", "#fb8c00": "Orange", "#e53935": "Red", "#d81b60": "Pink"
+                    })[v] ?? v
+                    onPicked: v => Settings.values.accentColor = v
+                }
             }
         }
     }

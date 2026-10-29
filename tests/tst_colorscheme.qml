@@ -21,4 +21,14 @@ TestCase {
         compare(ColorScheme.mode("auto", 1100, null, null), "light");
         compare(ColorScheme.mode("auto", 1140, null, null), "dark");
     }
+
+    function test_file() {
+        compare(ColorScheme.file("light", "scheme-vibrant", 0.5, "#1E66F5"),
+                "mode=light\ntype=scheme-vibrant\ncontrast=0.5\naccent=#1e66f5\n");
+        // Hand-edited nonsense falls back to the defaults.
+        compare(ColorScheme.file("purple", "$(rm -rf ~)", 7, "red; reboot"),
+                "mode=dark\ntype=scheme-tonal-spot\ncontrast=1\naccent=\n");
+        compare(ColorScheme.file("dark", undefined, undefined, undefined),
+                "mode=dark\ntype=scheme-tonal-spot\ncontrast=0\naccent=\n");
+    }
 }

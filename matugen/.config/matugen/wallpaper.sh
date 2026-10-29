@@ -6,22 +6,46 @@
 #   wallpaper.sh             colors again from the current wallpaper (renders templates added
 #                            since, or after switching between light and dark); with no
 #                            wallpaper, from the last seed color (the default one at first)
-# Light or dark comes from the shell (Settings -> Appearance), which writes it to
-# ~/.local/state/quickshell/scheme; dark when that's missing. GTK apps get it through gsettings.
+# Light or dark, the color style, contrast and accent come from the shell (Settings ->
+# Appearance), which writes them to ~/.local/state/quickshell/scheme; dark when that's missing.
+# GTK apps get light or dark through gsettings.
 set -eu
 
 state="$HOME/.local/state/quickshell"
 # The Material baseline purple: the same scheme as the fallbacks in quickshell's Colors.qml.
 default_seed="#6750a4"
 
-mode=$(cat "$state/scheme" 2>/dev/null || true)
-[ "$mode" = light ] || mode=dark
+# How to make the colors, from the shell's Settings -> Appearance ($state/scheme, "key=value"
+# lines; services/ColorScheme.js writes it): light or dark, matugen's color style and contrast,
+# and a fixed accent color ("" = the wallpaper's). Each value is checked again here, so the file
+# can't make this run anything else; an older file with just "light" or "dark" still works.
+mode=dark type=scheme-tonal-spot contrast=0 accent=
+if [ -f "$state/scheme" ]; then
+    while IFS='=' read -r key value; do
+        case "$key=$value" in
+            mode=light | light=) mode=light ;;
+            type=scheme-[a-z-]*) type=$value ;;
+            accent=\#[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]) accent=$value ;;
+        esac
+        case "$key" in
+            contrast) case "$value" in -1 | -0.5 | 0 | 0.5 | 1) contrast=$value ;; esac ;;
+        esac
+    done < "$state/scheme"
+fi
 
-from_image() { matugen image "$1" -m "$mode" --source-color-index 0; }
+scheme() { matugen "$@" -m "$mode" -t "$type" --contrast "$contrast"; }
+# A fixed accent wins over the picture (the wallpaper itself still shows).
+from_image() {
+    if [ -n "$accent" ]; then
+        scheme color hex "$accent"
+    else
+        scheme image "$1" --source-color-index 0
+    fi
+}
 from_seed() {
     mkdir -p "$state"
     printf '%s\n' "$1" > "$state/seed"
-    matugen color hex "$1" -m "$mode"
+    scheme color hex "${accent:-$1}"
 }
 
 case "${1-}" in

@@ -715,6 +715,12 @@ shell's cost, features and customization), checked before acting. Done so far:
 - Settings -> Windows -> Dock: at the edge (as before), always (it reserves its space, so windows
   tile above it), or off. Pins move left or right from the dock's right-click menu
   (`DockApps.movePin`, tested).
+- Settings -> Appearance: Color style (matugen's scheme types: Tonal by default, Vibrant,
+  Expressive, Content, Faithful, Fruit salad, Rainbow, Neutral, Monochrome), Contrast (lower to
+  highest, matugen's `--contrast`) and Accent color (the wallpaper's, or one of seven; the
+  colors are then made from it, the picture still shows). `~/.local/state/quickshell/scheme` is
+  now `key=value` lines (mode, type, contrast, accent; `ColorScheme.file`, tested), and
+  wallpaper.sh checks each value again before passing it to matugen.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
