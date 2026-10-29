@@ -4,8 +4,8 @@ import qs.theme
 import qs.widgets
 
 // Small status glyphs on the right of the closed island, like Android's status bar.
-// Bluetooth, the microphone in use, waiting updates and mute only show up when they have
-// something to say.
+// Airplane mode, a VPN, Bluetooth, the microphone in use, waiting updates and mute only show up
+// when they have something to say.
 Row {
     anchors.verticalCenter: parent.verticalCenter
     spacing: Theme.spacing.xs
@@ -14,6 +14,22 @@ Row {
         anchors.verticalCenter: parent.verticalCenter
         icon: NetworkStatus.icon
         font.pixelSize: Theme.icon.small
+    }
+
+    MaterialIcon {
+        anchors.verticalCenter: parent.verticalCenter
+        visible: NetworkExtras.airplane
+        icon: "flight"
+        font.pixelSize: Theme.icon.small
+        Accessible.name: "Airplane mode"
+    }
+
+    MaterialIcon {
+        anchors.verticalCenter: parent.verticalCenter
+        visible: NetworkExtras.activeVpn !== null
+        icon: "vpn_key"
+        font.pixelSize: Theme.icon.small
+        Accessible.name: "VPN: " + (NetworkExtras.activeVpn?.name ?? "")
     }
 
     MaterialIcon {

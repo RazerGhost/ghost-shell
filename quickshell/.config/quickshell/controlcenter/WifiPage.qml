@@ -9,7 +9,8 @@ import "WifiQr.js" as WifiQr
 
 // Wi-Fi page of quick settings: on/off switch and the networks in range. Click a network to
 // connect (or disconnect from the connected one). Secured networks you haven't joined before
-// ask for the password first.
+// ask for the password first. Below them: the saved VPNs, the hotspot and airplane mode
+// (services/NetworkExtras.qml).
 Column {
     id: root
 
@@ -81,16 +82,16 @@ Column {
         }
     }
 
-    // Sharing the connected network as a QR code a phone can scan to join (WifiQr.js, tested):
-    // its password comes from NetworkManager, the picture from qrencode (the capture module).
+    // Sharing the connected network (or the hotspot) as a QR code a phone can scan to join
+    // (WifiQr.js, tested): its name and password come from NetworkManager, the picture from qrencode (the capture module).
     // The text reaches qrencode through its environment, not its command line, which other users
     // could see. The picture sits in the private runtime folder and goes when the QR closes.
     property string sharing: ""   // the network shown as a QR code
     property string qrFile: ""
     readonly property string qrPath: Quickshell.env("XDG_RUNTIME_DIR") + "/qs-wifi-qr.png"
 
-    function share(network: WifiNetwork): void {
-        sharing = network.name;
+    function share(name: string): void {
+        sharing = name;
         qrFile = "";
         readPassword.running = true;
     }
@@ -101,14 +102,17 @@ Column {
         Quickshell.execDetached(["rm", "-f", qrPath]);
     }
 
-    // The password of the connection active on the Wi-Fi card ("" for an open network).
+    // The name and password of the connection active on the Wi-Fi card, a line each (the
+    // password "" for an open network).
     Process {
         id: readPassword
-        command: ["sh", "-c", `nmcli -s -g 802-11-wireless-security.psk connection show "$(nmcli -g GENERAL.CONNECTION device show "$1")"`,
+        command: ["sh", "-c", `nmcli -s -g 802-11-wireless.ssid,802-11-wireless-security.psk connection show "$(nmcli -g GENERAL.CONNECTION device show "$1")"`,
                   "sh", NetworkStatus.wifiDevice?.name ?? ""]
         stdout: StdioCollector {
             onStreamFinished: {
-                drawQr.environment = { WIFI_QR: WifiQr.text(root.sharing, text.trim()) };
+                const lines = text.trim().split("\n");
+                root.sharing = lines[0] || root.sharing;
+                drawQr.environment = { WIFI_QR: WifiQr.text(root.sharing, lines.slice(1).join("\n")) };
                 drawQr.running = true;
             }
         }
@@ -134,10 +138,10 @@ Column {
     }
 
     Text {
-        visible: root.error !== ""
+        visible: text !== ""
         width: parent.width
         leftPadding: Theme.spacing.s
-        text: root.error
+        text: root.error || NetworkExtras.error
         color: Colors.m3error
         font.family: Theme.font.sans
         font.pixelSize: Theme.font.normal
@@ -303,7 +307,7 @@ Column {
                     icon: "qr_code"
                     label: "Share " + (networkRow.modelData?.name ?? "") + " as a QR code"
                     iconSize: Theme.icon.small
-                    onClicked: root.share(networkRow.modelData)
+                    onClicked: root.share(networkRow.modelData.name)
                 }
 
                 IconButton {
@@ -327,5 +331,56 @@ Column {
         color: Colors.m3onSurfaceVariant
         font.family: Theme.font.sans
         font.pixelSize: Theme.font.normal
+    }
+
+    // The saved VPNs (click to connect or disconnect), the hotspot and airplane mode.
+    Repeater {
+        model: NetworkExtras.vpns
+
+        ListRow {
+            required property var modelData
+
+            width: root.width
+            icon: "vpn_key"
+            title: modelData.name
+            subtitle: modelData.active ? "Connected" : "VPN"
+            highlighted: modelData.active
+            onActivated: NetworkExtras.toggleVpn(modelData)
+        }
+    }
+
+    ListRow {
+        width: parent.width
+        // Starting a hotspot takes the Wi-Fi card off its network, so it shares a cable
+        // connection only.
+        enabled: NetworkStatus.wired || NetworkExtras.hotspot
+        opacity: enabled ? 1 : Theme.state.disabled
+        icon: "wifi_tethering"
+        title: "Hotspot"
+        subtitle: NetworkExtras.hotspot ? "Sharing the cable connection"
+                : NetworkStatus.wired ? "Share the cable connection over Wi-Fi"
+                : "Needs a cable connection"
+        highlighted: NetworkExtras.hotspot
+        onActivated: NetworkExtras.setHotspot(!NetworkExtras.hotspot)
+
+        IconButton {
+            anchors.right: parent.right
+            anchors.rightMargin: Theme.spacing.s
+            anchors.verticalCenter: parent.verticalCenter
+            visible: NetworkExtras.hotspot
+            icon: "qr_code"
+            label: "Share the hotspot as a QR code"
+            iconSize: Theme.icon.small
+            onClicked: root.share("the hotspot")
+        }
+    }
+
+    ListRow {
+        width: parent.width
+        icon: "flight"
+        title: "Airplane mode"
+        subtitle: NetworkExtras.airplane ? "On: Wi-Fi and Bluetooth are off" : "Off"
+        highlighted: NetworkExtras.airplane
+        onActivated: NetworkExtras.setAirplane(!NetworkExtras.airplane)
     }
 }

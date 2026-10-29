@@ -553,6 +553,15 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   `qs ipc call osd capsLock`, which reads the main keyboard's state from `hyprctl devices -j`
   (`osd/Keyboard.js`, tested).
 
+### VPN, hotspot and airplane mode (built 2026-10-29; the hotspot and airplane mode untested)
+- Under the networks in quick settings' Wi-Fi page (`services/NetworkExtras.qml`, parsing in
+  `NetworkExtras.js`, tested): the saved VPNs (NetworkManager's VPN plugins and WireGuard, which
+  Proton VPN's app uses; click to connect or disconnect), the hotspot (`nmcli device wifi
+  hotspot`; only with a cable connection, since it takes the Wi-Fi card off its network; its QR
+  code shares it like a network) and airplane mode (`rfkill block all`; the user may write
+  `/dev/rfkill` through logind's ACL, no root). The lists are re-read on `nmcli monitor` and
+  `rfkill event` output. The island shows a plane and a key while they're on.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

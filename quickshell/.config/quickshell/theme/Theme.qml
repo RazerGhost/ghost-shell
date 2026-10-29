@@ -57,6 +57,7 @@ Singleton {
     readonly property QtObject state: QtObject {
         readonly property real hover:  0.08 // the pointer is over it
         readonly property real active: 0.14 // its menu is open (the island's buttons)
+        readonly property real disabled: 0.4 // can't be used right now
     }
 
     // Backgrounds of the island, menus, launcher, OSD...; Hyprland blurs what's behind them. This

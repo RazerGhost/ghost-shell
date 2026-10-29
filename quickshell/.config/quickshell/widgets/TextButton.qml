@@ -14,7 +14,7 @@ Rectangle {
     implicitHeight: Theme.island.height
     radius: Theme.radius.full
     color: filled ? Colors.m3primary : "transparent"
-    opacity: enabled ? 1 : 0.4
+    opacity: enabled ? 1 : Theme.state.disabled
 
     Accessible.role: Accessible.Button
     Accessible.name: text
