@@ -166,141 +166,63 @@ Item {
             onMoved: value => Brightness.set(value)
         }
 
-        // The network wants you to sign in (a hotel's or café's Wi-Fi).
-        Item {
+        // Things going on, each only while it is.
+        StatusRow {
             width: parent.width
-            implicitHeight: Theme.slider.height
-            visible: NetworkStatus.needsSignIn
-
-            Row {
-                anchors.left: parent.left
-                anchors.leftMargin: Theme.spacing.s
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacing.s
-
-                MaterialIcon {
-                    anchors.verticalCenter: parent.verticalCenter
-                    icon: "login"
-                    color: Colors.m3primary
-                }
-
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: "This network needs you to sign in"
-                    color: Colors.m3onSurfaceVariant
-                    font.family: Theme.font.sans
-                    font.pixelSize: Theme.font.normal
-                }
-            }
-
-            TextButton {
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.spacing.xs
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Sign in"
-                onClicked: {
-                    NetworkStatus.signIn();
-                    root.openMenu("");
-                }
+            visible: NetworkStatus.needsSignIn // a hotel's or café's Wi-Fi
+            icon: "login"
+            text: "This network needs you to sign in"
+            buttonText: "Sign in"
+            onClicked: {
+                NetworkStatus.signIn();
+                root.openMenu("");
             }
         }
 
-        // A screen recording: its time and a Stop button.
-        Item {
+        StatusRow {
             width: parent.width
-            implicitHeight: Theme.slider.height
             visible: Recorder.recording
-
-            Row {
-                anchors.left: parent.left
-                anchors.leftMargin: Theme.spacing.s
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacing.s
-
-                Rectangle {
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: Theme.spacing.s
-                    height: width
-                    radius: width / 2
-                    color: Colors.m3error
-                }
-
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: "Recording the screen · " + Recorder.time
-                    color: Colors.m3onSurfaceVariant
-                    font.family: Theme.font.sans
-                    font.pixelSize: Theme.font.normal
-                }
-            }
-
-            TextButton {
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.spacing.xs
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Stop"
-                onClicked: Recorder.stop()
-            }
+            icon: "fiber_manual_record" // the red dot, like the island's
+            iconColor: Colors.m3error
+            iconSize: Theme.icon.small
+            text: "Recording the screen · " + Recorder.time
+            buttonText: "Stop"
+            onClicked: Recorder.stop()
         }
 
         // Who's using the microphone, camera or screen right now, like Android's privacy
         // indicators.
-        InUseRow {
+        StatusRow {
             width: parent.width
             visible: Audio.recordingApps.length > 0
             icon: "mic"
             text: "Microphone in use by " + Audio.recordingApps.join(", ")
         }
 
-        InUseRow {
+        StatusRow {
             width: parent.width
             visible: Privacy.cameraInUse
             icon: "videocam"
             text: Privacy.cameraApps.length > 0 ? "Camera in use by " + Privacy.cameraApps.join(", ") : "Camera in use"
         }
 
-        InUseRow {
+        StatusRow {
             width: parent.width
             visible: Privacy.screenShared
             icon: "screen_share"
             text: "Your screen is being shared"
         }
 
-        // Waiting updates (services/Updates.qml), only when there are some.
-        Item {
+        StatusRow {
             width: parent.width
-            implicitHeight: Theme.slider.height
             visible: Updates.count > 0
-
-            Row {
-                anchors.left: parent.left
-                anchors.leftMargin: Theme.spacing.s
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacing.s
-
-                MaterialIcon {
-                    anchors.verticalCenter: parent.verticalCenter
-                    icon: "download"
-                }
-
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: Updates.summary
-                    color: Colors.m3onSurfaceVariant
-                    font.family: Theme.font.sans
-                    font.pixelSize: Theme.font.normal
-                }
-            }
-
-            TextButton {
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.spacing.xs
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Update"
-                onClicked: {
-                    Updates.update();
-                    root.openMenu("");
-                }
+            icon: "download"
+            iconColor: Colors.m3onSurface
+            text: Updates.summary
+            buttonText: "Update"
+            onClicked: {
+                Updates.update();
+                root.openMenu("");
             }
         }
 

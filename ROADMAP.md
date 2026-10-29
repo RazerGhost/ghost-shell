@@ -593,7 +593,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
 
 ### Camera and screen sharing indicators (built 2026-10-29; untested with a real call)
 - Like the microphone: a camera and a screen icon in the island, and "Camera in use by ..." /
-  "Your screen is being shared" in quick settings (`services/Privacy.qml`, `InUseRow`). The
+  "Your screen is being shared" in quick settings (`services/Privacy.qml`, `StatusRow`). The
   camera's USB power state is read in-process every 3 s (its folder found once by
   `services/camera.sh devices`; before 2026-10-29's review it started a script every 3 s, ~6,000
   an hour); `camera.sh apps` (`fuser`) names the apps only while it's on (`Privacy.js`, tested). Screen sharing is the portal's PipeWire stream
@@ -667,6 +667,8 @@ shell's cost, features and customization), checked before acting. Done so far:
   zip), iwd, xf86-video-amdgpu, profile-sync-daemon, nss-mdns and Haunt's build tools. Removing
   iwd renamed the Wi-Fi card (wlan0 -> wlo1, see NOTES), so the saved network had to be joined
   again; the name stays wlo1 (nothing in the repo uses it).
+- Cleanup: quick settings' status lines (sign-in, recording, microphone, camera, screen,
+  updates) are one `StatusRow` (icon, text, optional button); QuickSettings 429 -> 351 lines.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
