@@ -343,7 +343,8 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - The shell's memory is mostly the graphics stack. Measured on a fresh qs (2026-10-29): 464 MB
   resident; menus built on demand -> 450; `__EGL_VENDOR_LIBRARY_FILENAMES=.../50_mesa.json` (no
   NVIDIA EGL in the shell) -> 393; `QSG_RENDER_LOOP=basic` (one render thread for every window)
-  -> 361. `MALLOC_ARENA_MAX=2` made no difference.
+  -> 361, but rejected: Settings' window stuttered while Hyprland animated it to its tile size
+  (the basic loop draws on the main thread). `MALLOC_ARENA_MAX=2` made no difference.
 
 ## Testing on the laptop
 

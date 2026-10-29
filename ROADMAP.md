@@ -693,6 +693,8 @@ shell's cost, features and customization), checked before acting. Done so far:
   The shell loads Mesa's EGL only (`__EGL_VENDOR_LIBRARY_FILENAMES` in `hypr/shell.sh`): it
   draws on the iGPU, and NVIDIA's EGL libraries cost it ~57 MB. Fresh shell after all of this:
   393 MB resident, 289 MB proportional (was 464 / 332).
+  Tried and dropped: `QSG_RENDER_LOOP=basic` (another ~32 MB, but the Settings window stuttered
+  while Hyprland resized it into its tile).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
