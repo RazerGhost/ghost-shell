@@ -33,6 +33,12 @@ PanelWindow {
     }
 
     readonly property bool shown: revealed
+    onShownChanged: {
+        if (shown)
+            DockState.shownOn = screen.name;
+        else if (DockState.shownOn === screen.name)
+            DockState.shownOn = "";
+    }
 
     Timer {
         id: hideDelay

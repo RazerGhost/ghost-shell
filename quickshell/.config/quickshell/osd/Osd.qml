@@ -165,7 +165,8 @@ Scope {
         visible: root.shown
 
         anchors.bottom: true
-        margins.bottom: Theme.osd.gap
+        // Above the dock while it shows on this screen, closer to the edge while it's hidden.
+        margins.bottom: DockState.shownOn !== "" && DockState.shownOn === screen?.name ? Theme.osd.gap : Theme.osd.gapLow
         implicitWidth: Theme.osd.width
         implicitHeight: Theme.osd.height
 
@@ -191,10 +192,15 @@ Scope {
             Accessible.role: Accessible.Indicator
             Accessible.name: root.level < 0 ? root.label : root.label + " " + Math.round(root.level * 100) + "%"
 
+            // A level bar fills the card; a label alone (caps lock, layout, power mode) sits in
+            // the middle with its icon.
             Row {
-                anchors.fill: parent
-                anchors.leftMargin: Theme.spacing.l
-                anchors.rightMargin: Theme.spacing.l
+                readonly property real fullWidth: parent.width - Theme.spacing.l * 2
+
+                anchors.verticalCenter: parent.verticalCenter
+                x: root.level >= 0 ? Theme.spacing.l : (parent.width - width) / 2
+                width: root.level >= 0 ? fullWidth : implicitWidth
+                height: parent.height
                 spacing: Theme.spacing.m
 
                 MaterialIcon {
@@ -243,7 +249,7 @@ Scope {
                     visible: root.level < 0
                     anchors.verticalCenter: parent.verticalCenter
                     // Long layout names ("English (US, intl., with dead keys)") end in "…".
-                    width: parent.width - glyph.width - parent.spacing
+                    width: Math.min(implicitWidth, parent.fullWidth - glyph.width - parent.spacing)
                     elide: Text.ElideRight
                     text: root.label
                     color: Colors.m3onSurface

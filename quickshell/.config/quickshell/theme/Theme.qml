@@ -214,7 +214,8 @@ Singleton {
     readonly property QtObject osd: QtObject {
         readonly property int width:   280
         readonly property int height:  52
-        readonly property int gap:     64   // distance from the bottom screen edge
+        readonly property int gap:     64   // distance from the bottom screen edge, above the dock
+        readonly property int gapLow:  24   // the same while the dock is hidden
         readonly property int track:   6    // height of the level bar
         readonly property int timeout: 1500 // ms the popup stays up after the last change
     }
