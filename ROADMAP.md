@@ -699,6 +699,11 @@ shell's cost, features and customization), checked before acting. Done so far:
 - Splits: the Wi-Fi page's QR sharing is `WifiShare.qml` (387 -> 289 lines); the launcher's
   calculator, file search and result row are `CalcRow`, `FileSearch` and `LauncherRow`
   (433 -> 232). The touchpad rule watches udev's input events instead of polling every 3 s.
+  The island's view order (menu, reload notice, notification, attention, hover view) is
+  `IslandViews.shown` (tested) and the reload note `ReloadNotice.qml` (IslandWindow 551 -> 528).
+  The top row stays in IslandWindow: it reads the island's state in a dozen places (dots,
+  media, peeks, the tray arrow, the symmetric widths), so a separate file would only pass all
+  of that through properties.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

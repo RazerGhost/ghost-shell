@@ -392,48 +392,8 @@ PanelWindow {
                     shown: root.shown === "reload"
                     extraHeight: Theme.spacing.m * 2
 
-                    // Centered when it's just "Shell reloaded"; an error takes the full width.
-                    Row {
-                        id: reloadRow
-
-                        readonly property bool failed: root.island.reloadError !== ""
-
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        y: Theme.spacing.m
-                        width: failed ? parent.width - Theme.spacing.l * 2 : implicitWidth
-                        spacing: Theme.spacing.m
-
-                        MaterialIcon {
-                            id: reloadIcon
-                            anchors.verticalCenter: reloadRow.failed ? undefined : parent.verticalCenter
-                            icon: reloadRow.failed ? "error" : "check_circle"
-                            color: reloadRow.failed ? Colors.m3error : Colors.m3primary
-                        }
-
-                        Column {
-                            width: reloadRow.failed ? parent.width - reloadIcon.width - parent.spacing : implicitWidth
-                            spacing: Theme.spacing.xs
-
-                            Text {
-                                text: root.island.reloadError ? "Shell reload failed" : "Shell reloaded"
-                                color: Colors.m3onSurface
-                                font.family: Theme.font.sans
-                                font.pixelSize: Theme.font.normal
-                                font.weight: Font.DemiBold
-                            }
-
-                            Text {
-                                width: parent.width
-                                visible: text !== ""
-                                text: root.island.reloadError
-                                color: Colors.m3onSurfaceVariant
-                                font.family: Theme.font.mono
-                                font.pixelSize: Theme.font.small
-                                wrapMode: Text.Wrap
-                                maximumLineCount: 6
-                                elide: Text.ElideRight
-                            }
-                        }
+                    ReloadNotice {
+                        error: root.island.reloadError
                     }
                 }
 
