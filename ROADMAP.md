@@ -790,6 +790,19 @@ shell's cost, features and customization), checked before acting. Done so far:
   `~/.local/state/quickshell/oom-seen`, so a restart doesn't repeat it. Verified with a
   memory-limited test process; the session case is untested.
 
+### Keyboard in the island's menus (done, verified on the laptop 2026-10-29)
+- User's request: arrow keys like a native app. In an open menu, the arrow keys move to the
+  nearest control that way (`widgets/ArrowNavigation.qml`, the direction logic in
+  `ArrowNavigation.js`, tested: controls in line first, others within 45 degrees); with nothing
+  chosen yet, the first arrow or Tab picks the first control. Enter or Space use it. Tiles,
+  round buttons, icon and text buttons, list rows, switches, sliders (Left and Right set them,
+  Up and Down move on), steppers, the to-do rows and text fields take the keyboard; a ring
+  inside the control's edge in the accent color (`widgets/FocusRing.qml`) shows which, and a
+  click never shows it. Only the menu's own controls: the top row's clock and status icons
+  are left out (Enter on one closed the menu and gave the keyboard back to the window, so the
+  next keys went there). Quick settings' pages are hidden once they've slid out, so the keys
+  skip them.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

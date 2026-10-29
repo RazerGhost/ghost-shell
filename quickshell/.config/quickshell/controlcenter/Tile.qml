@@ -25,6 +25,12 @@ Rectangle {
     Accessible.name: title + ", " + subtitle
     Accessible.onPressAction: root.clicked()
 
+    // The keyboard (arrow keys or Tab, then Enter or Space), like a click.
+    activeFocusOnTab: true
+    Keys.onReturnPressed: root.clicked()
+    Keys.onEnterPressed: root.clicked()
+    Keys.onSpacePressed: root.clicked()
+
     Behavior on color {
         ColorAnimation { duration: Theme.anim.fast }
     }
@@ -34,6 +40,10 @@ Rectangle {
         radius: parent.radius
         color: root.contentColor
         hovered: mouse.containsMouse
+    }
+
+    FocusRing {
+        radius: root.radius
     }
 
     // WifiIcon: a weak Wi-Fi signal keeps its unlit arcs visible (dimmed); other symbols

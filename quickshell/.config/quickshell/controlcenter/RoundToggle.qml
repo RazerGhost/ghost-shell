@@ -26,6 +26,12 @@ Rectangle {
     Accessible.checked: active
     Accessible.onPressAction: root.clicked()
 
+    // The keyboard (arrow keys or Tab, then Enter or Space), like a click.
+    activeFocusOnTab: true
+    Keys.onReturnPressed: root.clicked()
+    Keys.onEnterPressed: root.clicked()
+    Keys.onSpacePressed: root.clicked()
+
     Behavior on color {
         ColorAnimation { duration: Theme.anim.fast }
     }
@@ -37,13 +43,17 @@ Rectangle {
         hovered: mouse.containsMouse
     }
 
+    FocusRing {
+        radius: root.radius
+    }
+
     MaterialIcon {
         anchors.centerIn: parent
         icon: root.icon
         color: root.contentColor
     }
 
-    // The name, under the button while hovered.
+    // The name, under the button while hovered or chosen with the keyboard.
     Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.bottom
@@ -52,7 +62,7 @@ Rectangle {
         height: name.implicitHeight + Theme.spacing.xs * 2
         radius: Theme.radius.full
         color: Colors.m3surfaceContainerHighest
-        opacity: mouse.containsMouse ? 1 : 0
+        opacity: mouse.containsMouse || root.activeFocus ? 1 : 0
         visible: opacity > 0
 
         Behavior on opacity {

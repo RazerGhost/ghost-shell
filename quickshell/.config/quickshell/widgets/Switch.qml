@@ -25,8 +25,18 @@ Rectangle {
     Accessible.onToggleAction: root.toggled()
     Accessible.onPressAction: root.toggled()
 
+    // The keyboard (arrow keys or Tab, then Enter or Space), like a click.
+    activeFocusOnTab: true
+    Keys.onReturnPressed: root.toggled()
+    Keys.onEnterPressed: root.toggled()
+    Keys.onSpacePressed: root.toggled()
+
     Behavior on color {
         ColorAnimation { duration: Theme.anim.fast }
+    }
+
+    FocusRing {
+        radius: root.radius
     }
 
     // The thumb grows and slides to the right when on.

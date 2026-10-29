@@ -87,9 +87,19 @@ Column {
                 Accessible.checked: modelData.done
                 Accessible.onPressAction: Planner.toggle(index)
 
+                // The keyboard (arrow keys or Tab, then Enter or Space), like a click.
+                activeFocusOnTab: true
+                Keys.onReturnPressed: Planner.toggle(index)
+                Keys.onEnterPressed: Planner.toggle(index)
+                Keys.onSpacePressed: Planner.toggle(index)
+
                 StateLayer {
                     radius: Theme.radius.m
                     hovered: task.containsMouse
+                }
+
+                FocusRing {
+                    radius: Theme.radius.m
                 }
 
                 MaterialIcon {

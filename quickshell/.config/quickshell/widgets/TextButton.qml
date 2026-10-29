@@ -20,11 +20,21 @@ Rectangle {
     Accessible.name: text
     Accessible.onPressAction: root.clicked()
 
+    // The keyboard (arrow keys or Tab, then Enter or Space), like a click.
+    activeFocusOnTab: true
+    Keys.onReturnPressed: if (enabled) root.clicked()
+    Keys.onEnterPressed: if (enabled) root.clicked()
+    Keys.onSpacePressed: if (enabled) root.clicked()
+
     // Hover highlight.
     StateLayer {
         radius: parent.radius
         color: label.color
         hovered: mouse.containsMouse
+    }
+
+    FocusRing {
+        radius: root.radius
     }
 
     Text {

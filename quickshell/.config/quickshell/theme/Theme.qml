@@ -65,6 +65,11 @@ Singleton {
         readonly property int border: 2 // the outline while off
     }
 
+    // The ring around the control that has the keyboard (widgets/FocusRing.qml).
+    readonly property QtObject focus: QtObject {
+        readonly property int width: 2
+    }
+
     // Material "state layers": the content color laid over a control at this opacity.
     readonly property QtObject state: QtObject {
         readonly property real hover:  0.08 // the pointer is over it

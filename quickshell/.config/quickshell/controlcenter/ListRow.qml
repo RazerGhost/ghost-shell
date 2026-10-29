@@ -32,9 +32,19 @@ MouseArea {
     Accessible.onPressAction: root.activated()
     onClicked: root.activated()
 
+    // The keyboard (arrow keys or Tab, then Enter or Space), like a click.
+    activeFocusOnTab: true
+    Keys.onReturnPressed: root.activated()
+    Keys.onEnterPressed: root.activated()
+    Keys.onSpacePressed: root.activated()
+
     StateLayer {
         radius: Theme.radius.m
         hovered: root.containsMouse
+    }
+
+    FocusRing {
+        radius: Theme.radius.m
     }
 
     Item {

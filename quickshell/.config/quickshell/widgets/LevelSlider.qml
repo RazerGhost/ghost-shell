@@ -2,7 +2,8 @@ import QtQuick
 import qs.theme
 
 // Android-style slider: a thick rounded track whose filled part carries the icon.
-// Click or drag to set, scroll or use the arrow keys to nudge. Like Switch, it shows `value`
+// Click or drag to set, scroll or use Left and Right to nudge (Up and Down move on to the next
+// control in the island's menus). Like Switch, it shows `value`
 // and reports changes through onMoved instead of changing `value` itself.
 Rectangle {
     id: root
@@ -28,9 +29,11 @@ Rectangle {
     Accessible.onDecreaseAction: move(value - 0.05)
 
     Keys.onRightPressed: move(value + 0.05)
-    Keys.onUpPressed: move(value + 0.05)
     Keys.onLeftPressed: move(value - 0.05)
-    Keys.onDownPressed: move(value - 0.05)
+
+    FocusRing {
+        radius: root.radius
+    }
 
     // Filled part. Never narrower than the track is high, so the icon always fits inside.
     Rectangle {

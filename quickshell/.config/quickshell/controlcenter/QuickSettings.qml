@@ -33,6 +33,8 @@ Item {
 
         x: root.page === "main" ? root.padding : -root.width
         width: root.width - root.padding * 2
+        // Hidden once it has slid out, so Tab and the arrow keys skip its controls.
+        visible: x > -width
         spacing: Theme.spacing.s
 
         Behavior on x {
@@ -300,6 +302,7 @@ Item {
         id: wifiPage
         x: root.page === "wifi" ? root.padding : root.width
         width: root.width - root.padding * 2
+        visible: x < root.width
         active: root.visible && root.page === "wifi"
         onBack: root.page = "main"
 
@@ -312,6 +315,7 @@ Item {
         id: bluetoothPage
         x: root.page === "bluetooth" ? root.padding : root.width
         width: root.width - root.padding * 2
+        visible: x < root.width
         active: root.visible && root.page === "bluetooth"
         onBack: root.page = "main"
 
@@ -324,6 +328,7 @@ Item {
         id: soundPage
         x: root.page === "sound" ? root.padding : root.width
         width: root.width - root.padding * 2
+        visible: x < root.width
         onBack: root.page = "main"
 
         Behavior on x {
@@ -335,6 +340,7 @@ Item {
         id: systemPage
         x: root.page === "system" ? root.padding : root.width
         width: root.width - root.padding * 2
+        visible: x < root.width
         onBack: root.page = "main"
 
         // Only read the system while the page shows.

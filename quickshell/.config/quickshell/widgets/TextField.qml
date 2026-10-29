@@ -36,6 +36,7 @@ Rectangle {
         font.family: Theme.font.sans
         font.pixelSize: Theme.font.normal
         clip: true
+        activeFocusOnTab: true
 
         Accessible.role: Accessible.EditableText
         Accessible.name: root.placeholder

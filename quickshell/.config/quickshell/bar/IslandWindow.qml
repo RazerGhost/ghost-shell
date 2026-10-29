@@ -242,6 +242,20 @@ PanelWindow {
             hoverEnabled: true
             acceptedButtons: Qt.NoButton
             Keys.onEscapePressed: root.island.panel = ""
+            // In a menu, the arrow keys move between its controls (to the nearest one that
+            // way) and Tab, with nothing chosen yet, picks the first; Enter or Space use it.
+            // Only the menu's own controls: Enter on the top row's clock or status icons would
+            // close the menu and hand the keyboard back to the window.
+            Keys.onPressed: event => {
+                const keys = [Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down, Qt.Key_Tab];
+                if (root.island.panel !== "" && keys.includes(event.key) && !(event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier)))
+                    event.accepted = navigation.move(event.key);
+            }
+
+            ArrowNavigation {
+                id: navigation
+                area: menus
+            }
 
             // Workspaces | time | status icons, symmetric (user's choice): both sides are as wide
             // as the wider group, so the time sits exactly in the screen's middle, under the

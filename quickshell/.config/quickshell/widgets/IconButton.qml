@@ -21,11 +21,21 @@ Item {
     Accessible.name: label
     Accessible.onPressAction: root.clicked(Qt.LeftButton)
 
+    // The keyboard (arrow keys or Tab, then Enter or Space), like a click.
+    activeFocusOnTab: true
+    Keys.onReturnPressed: root.clicked(Qt.LeftButton)
+    Keys.onEnterPressed: root.clicked(Qt.LeftButton)
+    Keys.onSpacePressed: root.clicked(Qt.LeftButton)
+
     // Hover highlight (a Material "state layer").
     StateLayer {
         radius: Theme.radius.full
         color: glyph.color
         hovered: mouse.containsMouse
+    }
+
+    FocusRing {
+        radius: Theme.radius.full
     }
 
     MaterialIcon {
