@@ -317,6 +317,11 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 
 ## Testing on the laptop
 
+- README screenshots: an empty workspace up to 5 (higher ones add workspace dots), `grim -s 0.75`
+  (1440 x 810) while the menus are opened with `qs ipc call ...`. Hyprland draws the pointer into
+  grim's shots: hide it for the run with `hyprctl eval 'hl.config({ cursor = { invisible = true } })'`
+  and set it back to false after.
+
 - Quickshell reloads on file changes, but a reload after adding a property to a singleton
   (e.g. `Theme`) can leave parts blank; restart it then:
   `hyprctl dispatch 'hl.dsp.exec_cmd("pkill -x qs; sleep 0.5; ~/.config/hypr/shell.sh")'` (the
