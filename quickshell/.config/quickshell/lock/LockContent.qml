@@ -4,11 +4,12 @@ import Quickshell
 import qs.services
 import qs.theme
 import qs.widgets
+import "LockClock.js" as LockClockJs
 
 // What the lock screen shows on each monitor: the wallpaper blurred and darkened, a big clock
-// and the date, and the password field. Lock.qml checks the password. The login screen
-// (greeter/Greeter.qml) uses it too, with the user's name above the field and power buttons.
-// The look (blur, dimming, clock, date) follows the settings window's "Lock and login screen".
+// (LockClock.qml) and the date, and the password field. Lock.qml checks the password. The login
+// screen (greeter/Greeter.qml) uses it too, with the user's name above the field and power
+// buttons. The look (blur, dimming, clock style and place, date) follows Settings -> Lock screen.
 // Children go under the date (the lock screen's LockStatus: media and the notification count).
 Item {
     id: root
@@ -65,26 +66,64 @@ Item {
         precision: SystemClock.Minutes
     }
 
+    // Where the clock sits (Settings -> Lock screen -> Clock): at the top with the field low
+    // (the default), both together in the middle, or the clock in the bottom-left corner.
+    readonly property string layout: LockClockJs.pick(Settings.values.lockLayout, LockClockJs.layouts)
+
+    states: [
+        State {
+            when: root.layout === "center"
+            AnchorChanges {
+                target: clockColumn
+                anchors.top: undefined
+                anchors.bottom: fieldColumn.top
+            }
+            PropertyChanges {
+                clockColumn.anchors.bottomMargin: Theme.spacing.l * 3
+                fieldColumn.anchors.bottomMargin: root.height * 0.32
+            }
+        },
+        State {
+            when: root.layout === "left"
+            AnchorChanges {
+                target: clockColumn
+                anchors.top: undefined
+                anchors.horizontalCenter: undefined
+                anchors.left: root.left
+                anchors.bottom: root.bottom
+            }
+            PropertyChanges {
+                clockColumn.anchors.leftMargin: root.width * 0.06
+                clockColumn.anchors.bottomMargin: root.height * 0.08
+            }
+        }
+    ]
+
     Column {
+        id: clockColumn
+
+        // Left-aligned in the corner, centered otherwise.
+        function place(item: Item): real {
+            return root.layout === "left" ? 0 : (width - item.width) / 2;
+        }
+
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.topMargin: parent.height * 0.18
         spacing: Theme.spacing.xs
 
-        Text {
-            anchors.horizontalCenter: parent.horizontalCenter
+        LockClock {
+            id: bigClock
+            x: clockColumn.place(this)
             visible: Settings.values.lockClock
-            text: Qt.formatTime(clock.date, Settings.values.clock24Hour ? "HH:mm" : "h:mm AP")
-            color: Colors.m3onSurface
-            font.family: Theme.font.sans
-            font.pixelSize: Theme.lock.clock
-            font.weight: Font.Bold
-            font.features: { "tnum": 1 }
+            date: clock.date
         }
 
         Text {
-            anchors.horizontalCenter: parent.horizontalCenter
+            id: dateLine
+            x: clockColumn.place(this)
             visible: Settings.values.lockDate
+            topPadding: bigClock.style === "analog" ? Theme.spacing.m : 0
             // English names even with Dutch regional formats, like the calendar.
             text: Qt.locale(Qt.uiLanguage).toString(clock.date, "dddd, d MMMM")
             color: Colors.m3onSurfaceVariant
@@ -94,13 +133,14 @@ Item {
 
         Column {
             id: statusSlot
-            anchors.horizontalCenter: parent.horizontalCenter
+            x: clockColumn.place(this)
             width: Theme.lock.fieldWidth
             topPadding: Theme.spacing.l * 2
         }
     }
 
     Column {
+        id: fieldColumn
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: parent.height * 0.2

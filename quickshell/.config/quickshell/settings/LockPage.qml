@@ -5,6 +5,7 @@ import Quickshell.Widgets
 import qs.services
 import qs.theme
 import qs.widgets
+import "../lock/LockClock.js" as LockClock
 
 // The lock screen and the login screen share one look: picture, blur, dimming, clock and date.
 // The login screen also shows your name and power buttons. The login screen gets these through
@@ -176,6 +177,63 @@ Column {
                 label: "Show the time"
                 checked: Settings.values.lockClock
                 onToggled: Settings.values.lockClock = !checked
+            }
+        }
+
+        SettingRow {
+            title: "Style"
+            subtitle: "Stacked puts the hours over the minutes"
+
+            Stepper {
+                label: "Clock style"
+                values: LockClock.styles
+                valueWidth: Theme.settings.stepperWide
+                value: LockClock.pick(Settings.values.lockClockStyle, LockClock.styles)
+                format: v => ({ big: "Big", stacked: "Stacked", thin: "Thin", analog: "Analog" })[v]
+                onPicked: v => Settings.values.lockClockStyle = v
+            }
+        }
+
+        SettingRow {
+            title: "Size"
+
+            Stepper {
+                label: "Clock size"
+                values: LockClock.sizes
+                value: LockClock.pick(Settings.values.lockClockSize, LockClock.sizes)
+                format: v => v + " %"
+                onPicked: v => Settings.values.lockClockSize = v
+            }
+        }
+
+        SettingRow {
+            title: "Font"
+            subtitle: "The clock's own; the date keeps the shell's"
+
+            Stepper {
+                readonly property var installed: Qt.fontFamilies()
+                label: "Clock font"
+                // "" is the shell's text font (Settings -> Appearance -> Fonts).
+                values: ["", "Inter Display", "Noto Serif", "C059", "Nimbus Sans Narrow", "MesloLGS Nerd Font"]
+                        .filter(f => f === "" || installed.includes(f))
+                valueWidth: Theme.settings.stepperWide
+                value: Settings.values.lockClockFont
+                format: v => v === "" ? "Same as text" : v === "MesloLGS Nerd Font" ? "Monospaced" : v
+                onPicked: v => Settings.values.lockClockFont = v
+            }
+        }
+
+        SettingRow {
+            title: "Place"
+            subtitle: "Where the clock and date sit"
+
+            Stepper {
+                label: "Clock place"
+                values: LockClock.layouts
+                valueWidth: Theme.settings.stepperWide
+                value: LockClock.pick(Settings.values.lockLayout, LockClock.layouts)
+                format: v => ({ top: "Top", center: "Middle", left: "Bottom left" })[v]
+                onPicked: v => Settings.values.lockLayout = v
             }
         }
 

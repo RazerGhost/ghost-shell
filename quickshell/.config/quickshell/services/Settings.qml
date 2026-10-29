@@ -107,6 +107,11 @@ Singleton {
             property int lockDim: 25          // percent darker
             property bool lockClock: true
             property bool lockDate: true
+            // The clock's look and place (lock/LockClock.js has the choices).
+            property string lockClockStyle: "big" // big, stacked, thin, analog
+            property int lockClockSize: 100       // percent
+            property string lockClockFont: ""     // "" = the shell's text font
+            property string lockLayout: "top"     // top, center, left (the bottom-left corner)
             property bool greeterShowName: true     // your user name above the password field
             property bool greeterPowerButtons: true // suspend, restart and shut down
 

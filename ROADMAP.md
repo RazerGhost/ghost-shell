@@ -863,6 +863,10 @@ audit of our own UI): all sixteen, built in batches.
   in the list while the search is empty) and a hide button; Settings -> Default apps lists the
   hidden ones (Show) and your commands (a name to find it by and a shell command, run in its
   own scope; add and remove there). `Fuzzy.results` options, tested.
+- Lock screen clock (Settings -> Lock screen -> Clock; the login screen too): style (big, stacked
+  hours over minutes, thin, analog), size (75-150 %), its own font, and where it sits (top as
+  before, in the middle with the field, or the bottom-left corner). `lock/LockClock.qml`, the
+  choices, digits and hands in `LockClock.js` (tested). Checked in the preview.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
