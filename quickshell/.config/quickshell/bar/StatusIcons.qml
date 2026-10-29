@@ -102,14 +102,15 @@ Row {
         Accessible.name: "Timer, " + Countdown.label + " left"
     }
 
-    // An app is recording from the microphone.
+    // An app is recording from the microphone; red and crossed out while it's muted (talking
+    // into a call that can't hear you).
     MaterialIcon {
         anchors.verticalCenter: parent.verticalCenter
         visible: Audio.recordingApps.length > 0
-        icon: "mic"
-        color: Colors.m3primary
+        icon: Audio.micMuted ? "mic_off" : "mic"
+        color: Audio.micMuted ? Colors.m3error : Colors.m3primary
         font.pixelSize: Theme.icon.small
-        Accessible.name: "Microphone in use by " + Audio.recordingApps.join(", ")
+        Accessible.name: (Audio.micMuted ? "Microphone muted, but in use by " : "Microphone in use by ") + Audio.recordingApps.join(", ")
     }
 
     MaterialIcon {

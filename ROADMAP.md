@@ -760,6 +760,10 @@ shell's cost, features and customization), checked before acting. Done so far:
   Notifications, on by default), like Do Not Disturb and game mode. When the quiet ends, one
   notification says how many came in meanwhile (apps set to Silent don't count). Verified:
   nothing popped up during fullscreen, the summary came right after.
+- Talking while muted: when an app records from the microphone while it's muted (a call starting
+  muted), the OSD says "Microphone is muted" and the island's mic icon turns into a red crossed
+  out one for as long as it lasts (`Audio.mutedWhileRecording`). Not voice detection: that would
+  mean reading the microphone's level all the time. Verified with pw-record.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

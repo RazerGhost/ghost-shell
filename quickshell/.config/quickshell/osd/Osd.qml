@@ -63,6 +63,12 @@ Scope {
         function onMicMutedChanged(): void {
             root.show(Audio.micMuted ? "mic_off" : "mic", Audio.micMuted ? "Microphone muted" : "Microphone on", -1);
         }
+
+        // An app starts recording (a call) while the microphone is muted.
+        function onMutedWhileRecordingChanged(): void {
+            if (Audio.mutedWhileRecording)
+                root.show("mic_off", "Microphone is muted", -1);
+        }
     }
 
     Connections {

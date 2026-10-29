@@ -13,6 +13,9 @@ Singleton {
     readonly property real volume: sink?.audio?.volume ?? 0
     readonly property bool muted: sink?.audio?.muted ?? false
     readonly property bool micMuted: source?.audio?.muted ?? false
+    // An app records from the microphone while it's muted: talking into a call that can't hear
+    // you (the OSD warns, the island's mic icon turns red).
+    readonly property bool mutedWhileRecording: micMuted && recordingApps.length > 0
 
     // The apps recording from the microphone right now, by name (like the microphone indicator
     // on Android and macOS): the app streams linked to the default microphone. The shell itself
