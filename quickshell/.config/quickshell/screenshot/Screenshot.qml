@@ -33,66 +33,35 @@ Scope {
         open = true;
     }
 
+    // The follow-ups (copying, notifying, reading text or a QR code, the color picker) are shell
+    // in screenshot/capture.sh, run detached.
+    function follow(args: var): void {
+        Quickshell.execDetached(["sh", Quickshell.shellDir + "/screenshot/capture.sh", ...args]);
+    }
+
     // Saves the picture and tells the user; `path` is where grabToImage wrote it. The
-    // notification's "Draw on it" opens it in satty (the capture module): Enter saves the drawing
-    // over the picture and copies it.
+    // notification can open it, or draw on it in satty (the capture module).
     function done(path: string): void {
         open = false;
         Sounds.play("feedback", "screen-capture");
-        Quickshell.execDetached(["sh", "-c", `
-            file=$1
-            wl-copy --type image/png < "$file"
-            set -- -A default=Open
-            command -v satty >/dev/null && set -- "$@" -A "draw=Draw on it"
-            action=$(notify-send -a Screenshot -i "$file" "$@" "Screenshot saved" "Copied to the clipboard, and saved in Pictures/Screenshots")
-            case "$action" in
-                default) xdg-open "$file" ;;
-                draw) satty --filename "$file" --output-filename "$file" --copy-command wl-copy \\
-                          --actions-on-enter save-to-clipboard,save-to-file,exit --save-after-copy ;;
-            esac
-        `, "sh", path]);
+        follow(["save", path]);
     }
 
     function fileName(): string {
         return folder + "/Screenshot_" + Qt.formatDateTime(new Date(), "yyyy-MM-dd_HH-mm-ss") + ".png";
     }
 
-    // The text in a picture (tesseract), or the QR code in it (zbarimg), copied to the clipboard
-    // and shown in a notification; a link from a QR code can be opened from it. The picture was
-    // only for reading, so it's removed.
+    // The text in a picture, or the QR code in it, copied and shown in a notification. The
+    // picture was only for reading, so the script removes it.
     function read(path: string): void {
         open = false;
-        const script = action === "text" ? `
-            text=$(tesseract "$1" - -l eng 2>/dev/null); rm -f "$1"
-            if [ -n "$(printf %s "$text" | tr -d '[:space:]')" ]; then
-                printf %s "$text" | wl-copy
-                notify-send -a Screenshot -i edit-copy "Text copied" "$(printf %s "$text" | head -c 300)"
-            else
-                notify-send -a Screenshot "No text found" "Try a larger or sharper area"
-            fi` : `
-            code=$(zbarimg -q --raw "$1" 2>/dev/null); rm -f "$1"
-            if [ -n "$code" ]; then
-                printf %s "$code" | wl-copy
-                case $code in
-                    http://*|https://*)
-                        action=$(notify-send -a Screenshot -A default=Open "QR code copied" "$code")
-                        [ "$action" = default ] && xdg-open "$code" ;;
-                    *) notify-send -a Screenshot "QR code copied" "$code" ;;
-                esac
-            else
-                notify-send -a Screenshot "No QR code found" "Select the whole code"
-            fi`;
-        Quickshell.execDetached(["sh", "-c", script, "sh", path]);
+        follow([action === "text" ? "text" : "qr", path]);
     }
 
-    // The color picker (hyprpicker): the overlay closes first, since hyprpicker draws its own.
-    // The color is copied as #rrggbb.
+    // The color picker (hyprpicker), copied as #rrggbb.
     function pickColor(): void {
         open = false;
-        Quickshell.execDetached(["sh", "-c", `
-            sleep 0.3
-            color=$(hyprpicker -a -f hex) && [ -n "$color" ] && notify-send -a "Color picker" "Color copied" "$color"
-        `]);
+        follow(["color"]);
     }
 
     IpcHandler {

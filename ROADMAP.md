@@ -675,6 +675,8 @@ shell's cost, features and customization), checked before acting. Done so far:
   (Settings' groups and sidebar, the Sound page), all announced as headings now.
   The keyboard's layout and caps lock moved from the OSD into `services/Keyboard.qml` (signals
   on real changes only); the OSD only shows them (262 -> 202 lines).
+  The screenshot tool's shell (save and "Draw on it", text, QR code, color picker) moved from
+  template strings in Screenshot.qml into `screenshot/capture.sh`.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
