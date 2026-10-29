@@ -401,7 +401,8 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
 - The scratchpad (Super+`) starts a terminal when it's empty (a `workspace.created` handler since
   Hyprland 0.57 deprecated `on_created_empty`), over the
   dimmed workspace below (`decoration.dim_special`). Super+Shift+` moves a window onto it, or
-  back off it to the workspace underneath when it's already there (user's request).
+  back off it to the workspace underneath when it's already there (user's request; verified
+  2026-10-29).
 
 ### Network sign-in hint (built 2026-10-28; untested: needs a network with a login page)
 - When NetworkManager's connectivity check is redirected (`Networking.connectivity` is Portal: a
