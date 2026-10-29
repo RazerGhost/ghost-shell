@@ -571,7 +571,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   `/dev/rfkill` through logind's ACL, no root). The lists are re-read on `nmcli monitor` and
   `rfkill event` output. The island shows a plane and a key while they're on.
 
-### End task on the System page (built 2026-10-29)
+### End task on the System page (done, verified on the laptop 2026-10-29)
 - Under the stats: the six busiest apps (CPU over the last 2 s, then memory), like a task
   manager: a window's app with every process under it (Electron and browser helpers), the rest
   by process name (`/proc/<pid>/stat` read by `system-stats.sh`; grouping in `SystemStats.js`,
@@ -580,13 +580,13 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   it started (its nmcli, rfkill and udevadm watchers) are one "Ghost Shell" row without one, also
   when its Settings window is open (review 2026-10-29: that window made qs endable).
 
-### Per-app notification settings (built 2026-10-29)
+### Per-app notification settings (done, verified on the laptop 2026-10-29)
 - Settings -> Notifications -> Apps: every app that has sent a notification (remembered by name
   in `notificationApps`), each Silent (only into the list, no sound), Pop up (the default) or
   Always pop up (also during Do Not Disturb and game mode). Critical ones always pop up
   (`services/NotificationRules.js`, tested).
 
-### Drawing on screenshots (built 2026-10-29; needs `ghost install capture` for satty)
+### Drawing on screenshots (done, verified on the laptop 2026-10-29)
 - The screenshot notification's "Draw on it" opens the picture in satty (`extra`, MPL-2.0,
   GTK 4, so it follows the wallpaper's colors): arrows, boxes, text, blur. Enter saves the drawing
   over the screenshot and copies it. Without satty the button isn't offered.
@@ -612,7 +612,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   start). The shell remembers the mode it applied rather than re-reading the file after a run:
   that read came back stale and made every switch run twice (~2 s; now one run after 300 ms).
 
-### To-do, note and timer in the today menu (built 2026-10-29; the timer verified on the laptop)
+### To-do, note and timer in the today menu (done, verified on the laptop 2026-10-29)
 - Three buttons under the weather, each opening its part (one at a time, folded when the menu
   opens): a to-do list (Enter adds, click ticks off, × removes, "Clear done"), one note saved
   while typing (both in `~/.local/state/quickshell/today.json`, `services/Planner.qml`), and a
