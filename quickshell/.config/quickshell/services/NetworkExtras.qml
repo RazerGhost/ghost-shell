@@ -20,6 +20,10 @@ Singleton {
     // What went wrong with the last switch, for the page to show ("" when nothing did).
     property string error: ""
 
+    // A VPN connected or disconnected, from the shell or anywhere else (Proton VPN's app,
+    // nmcli); the OSD shows it. Not for the VPN already up when the shell starts.
+    signal vpnSwitched(name: string, connected: bool)
+
     function toggleVpn(vpn: var): void {
         run(["nmcli", "connection", vpn.active ? "down" : "up", "uuid", vpn.uuid],
             "Couldn't " + (vpn.active ? "disconnect " : "connect ") + vpn.name);
@@ -63,10 +67,20 @@ Singleton {
 
     LatestProcess {
         id: readConnections
+
+        property bool readBefore: false
+
         command: ["nmcli", "-t", "-f", "NAME,UUID,TYPE,ACTIVE", "connection", "show"]
         running: true
         stdout: StdioCollector {
-            onStreamFinished: root.connections = NetworkExtrasJs.connections(text)
+            onStreamFinished: {
+                const before = root.activeVpn?.name ?? "";
+                root.connections = NetworkExtrasJs.connections(text);
+                const after = root.activeVpn?.name ?? "";
+                if (readConnections.readBefore && after !== before)
+                    root.vpnSwitched(after || before, after !== "");
+                readConnections.readBefore = true;
+            }
         }
     }
 

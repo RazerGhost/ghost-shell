@@ -9,7 +9,7 @@ import qs.widgets
 
 // Popup for volume, mic mute and brightness changes: an icon and a level bar at the bottom
 // of the focused monitor, hidden again a moment after the last change. Caps lock, the keyboard
-// layout and the power mode show there too, as a label.
+// layout, the power mode, a new sound output and a VPN connecting show there too, as a label.
 Scope {
     id: root
 
@@ -21,6 +21,8 @@ Scope {
     // PipeWire reports the starting volume and mute state shortly after the shell starts,
     // which looks like a change; ignore changes until this has fired.
     property bool ready: false
+    // The output before the current one (PipeWire's default sink), to tell a switch from startup.
+    property var lastSink: null
 
     function show(icon: string, label: string, level: real): void {
         if (!ready)
@@ -38,6 +40,8 @@ Scope {
         onTriggered: root.ready = true
     }
 
+    Component.onCompleted: lastSink = Audio.sink
+
     Timer {
         id: hide
         // Settings' osdSeconds (0.5-10 s).
@@ -50,13 +54,18 @@ Scope {
     Connections {
         target: Audio
 
+        // A new output brings its own volume and mute state: the output's name shows instead.
         function onVolumeChanged(): void {
+            if (outputSwitched.running)
+                return;
             if (root.ready)
                 Sounds.play("feedback", "audio-volume-change");
             root.show(Audio.icon, "Volume", Audio.volume);
         }
 
         function onMutedChanged(): void {
+            if (outputSwitched.running)
+                return;
             root.show(Audio.icon, Audio.muted ? "Muted" : "Volume", Audio.volume);
         }
 
@@ -68,6 +77,34 @@ Scope {
         function onMutedWhileRecordingChanged(): void {
             if (Audio.mutedWhileRecording)
                 root.show("mic_off", "Microphone is muted", -1);
+        }
+
+        // Headphones plugged in, a Bluetooth headset connected, or an output picked in the
+        // Sound page. Not the first output PipeWire reports at startup.
+        function onSinkChanged(): void {
+            if (Audio.sink !== null && root.lastSink !== null && Audio.sink !== root.lastSink)
+                outputSwitched.restart();
+            if (Audio.sink !== null)
+                root.lastSink = Audio.sink;
+        }
+    }
+
+    // A new output's name fills in once PipeWire's tracker has its properties, and its volume
+    // arrives about then too.
+    Timer {
+        id: outputSwitched
+        interval: 500
+        onTriggered: {
+            if (Audio.sink)
+                root.show(Audio.deviceIcon(Audio.sink), Audio.deviceName(Audio.sink), -1);
+        }
+    }
+
+    Connections {
+        target: NetworkExtras
+
+        function onVpnSwitched(name: string, connected: bool): void {
+            root.show(connected ? "vpn_key" : "vpn_key_off", (connected ? "Connected to " : "Disconnected from ") + name, -1);
         }
     }
 

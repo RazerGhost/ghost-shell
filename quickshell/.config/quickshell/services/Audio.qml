@@ -54,6 +54,11 @@ Singleton {
         return node?.properties["device.profile.description"] || node?.description || node?.nickname || node?.name || "";
     }
 
+    // Headphones and headsets by name ("Headphones", "WH-1000XM4 Headset"), anything else a speaker.
+    function deviceIcon(node: PwNode): string {
+        return deviceName(node).toLowerCase().includes("head") ? "headphones" : "speaker";
+    }
+
     // Matches the cap in the volume keybinds (wpctl -l 1).
     function setVolume(value: real): void {
         if (sink?.audio)

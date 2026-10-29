@@ -773,6 +773,10 @@ shell's cost, features and customization), checked before acting. Done so far:
   typo in an app's name still finds it when nothing else does (`Fuzzy.oneTypo`); the last row
   searches the web for the text (DuckDuckGo in the browser; user's choice: no Google). `Fuzzy.color`,
   `keybinds`, typos tested. Verified live.
+- The OSD shows a new sound output ("Headphones", a Bluetooth headset's name; plugged in or
+  picked) instead of its volume, and a VPN connecting or disconnecting from anywhere (the Wi-Fi
+  page, Proton VPN's app, nmcli; `NetworkExtras.vpnSwitched`). Neither for what's already
+  there when the shell starts. Verified with a null sink and a WireGuard test connection.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

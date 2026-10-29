@@ -66,7 +66,7 @@ Column {
             readonly property bool chosen: modelData === Audio.sink
 
             width: root.width
-            icon: Audio.deviceName(modelData).toLowerCase().includes("head") ? "headphones" : "speaker"
+            icon: Audio.deviceIcon(modelData)
             title: Audio.deviceName(modelData)
             highlighted: chosen
             trailingIcon: chosen ? "check" : ""
