@@ -3,13 +3,15 @@
 // stay in the history (the "today" menu) until dismissed. Do Not Disturb skips the pop-ups,
 // except critical ones; the history still collects everything. With a schedule (settings
 // window) it turns on at the start time and off at the end time; toggling in between lasts
-// until the next of those, like night light. Game mode holds the pop-ups back the same way.
+// until the next of those, like night light. Game mode and a fullscreen window hold the pop-ups
+// back the same way; afterwards one notification says how many came in meanwhile.
 // Each app can be silent (never pops up) or always pop up, even then (Settings -> Notifications,
 // NotificationRules.js).
 pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Services.Notifications
 import "NotificationRules.js" as Rules
 import "Schedule.js" as Schedule
@@ -24,6 +26,24 @@ Singleton {
         && Schedule.active(Schedule.minutesOf(clock.date), Settings.values.dndStart, Settings.values.dndEnd)
     // Assigning doNotDisturb (the tile) breaks its binding, so follow the schedule from here on.
     onScheduledDndChanged: doNotDisturb = scheduledDnd
+
+    // A window fullscreen on the focused screen (a game, a film): pop-ups wait like Do Not
+    // Disturb (Settings' dndFullscreen, on by default; Hyprland's fullscreen 2, not maximized).
+    readonly property bool fullscreenNow: Settings.values.dndFullscreen
+        && (Hyprland.focusedMonitor?.activeWorkspace?.toplevels.values ?? []).some(t => t.lastIpcObject?.fullscreen === 2)
+    // Pop-ups held back: Do Not Disturb, game mode or a fullscreen window.
+    readonly property bool quiet: doNotDisturb || GameMode.on || fullscreenNow
+    // How many were held back (apps set to Silent don't count): when the quiet ends, one
+    // notification says so.
+    property int missed: 0
+    onQuietChanged: {
+        if (quiet || missed === 0)
+            return;
+        send("Notifications", "notifications", missed === 1 ? "1 notification came in while you were busy"
+                                                            : missed + " notifications came in while you were busy",
+             "They're in the today menu: click the time.", false, []);
+        missed = 0;
+    }
 
     SystemClock {
         id: clock
@@ -98,9 +118,11 @@ Singleton {
             if (apps !== null)
                 Settings.values.notificationApps = apps;
             const mode = Rules.mode(Settings.values.notificationApps, notification.appName);
-            if (Rules.popsUp(mode, root.doNotDisturb || GameMode.on, critical)) {
+            if (Rules.popsUp(mode, root.quiet, critical)) {
                 root.queue = [...root.queue, notification];
                 Sounds.playNotification(notification.hints, critical);
+            } else if (mode !== "silent") {
+                root.missed++;
             }
         }
     }

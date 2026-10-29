@@ -22,6 +22,17 @@ Column {
                 onToggled: Notifications.doNotDisturb = !checked
             }
         }
+
+        SettingRow {
+            title: "Also while a window is fullscreen"
+            subtitle: "Games and films aren't interrupted; afterwards you're told how many came in"
+
+            Switch {
+                label: "Do Not Disturb while a window is fullscreen"
+                checked: Settings.values.dndFullscreen
+                onToggled: Settings.values.dndFullscreen = !checked
+            }
+        }
     }
 
     SettingGroup {

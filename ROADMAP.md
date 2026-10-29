@@ -755,6 +755,12 @@ shell's cost, features and customization), checked before acting. Done so far:
   colors from a frame (`video-frame.jpg`, which the lock and login screens show). Wallpaper
   Engine scenes (linux-wallpaperengine) aren't built: it isn't installed here.
 
+### Quiet while fullscreen, and more from the research (2026-10-29, in progress)
+- Pop-ups wait while a window is fullscreen on the focused screen (a game, a film; Settings ->
+  Notifications, on by default), like Do Not Disturb and game mode. When the quiet ends, one
+  notification says how many came in meanwhile (apps set to Silent don't count). Verified:
+  nothing popped up during fullscreen, the summary came right after.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

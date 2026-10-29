@@ -75,6 +75,7 @@ Singleton {
             property string osdPosition: "bottom"
             property real osdSeconds: 1.5
 
+            property bool dndFullscreen: true // pop-ups wait while a window is fullscreen
             property bool dndScheduled: false
             property int dndStart: 23 * 60
             property int dndEnd: 7 * 60
