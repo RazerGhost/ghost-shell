@@ -38,8 +38,13 @@ Singleton {
         run(["rfkill", on ? "block" : "unblock", "all"], "Couldn't switch airplane mode");
     }
 
-    // One switch at a time; its error replaces the last one.
+    // One switch at a time (a second one while the first runs would be lost); its error
+    // replaces the last one.
     function run(command: var, failure: string): void {
+        if (action.running) {
+            error = "Still switching, try again in a moment";
+            return;
+        }
         error = "";
         action.failure = failure;
         action.command = command;

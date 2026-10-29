@@ -31,13 +31,14 @@ Singleton {
         apps = apps.filter(a => a !== app);
     }
 
-    // Windows' process ids -> their app, to group helper processes under it.
+    // Windows' process ids -> their app, to group helper processes under it. The shell's own
+    // windows (Settings) are left out: SystemStats.apps groups the shell by itself.
     function windowApps(): var {
         const result = {};
         for (const window of Hyprland.toplevels.values) {
             const pid = window.lastIpcObject?.pid;
             const appId = window.wayland?.appId ?? "";
-            if (pid)
+            if (pid && appId !== "org.quickshell")
                 result[pid] = { name: DesktopEntries.heuristicLookup(appId)?.name || appId, icon: Windows.iconFor(window) };
         }
         return result;

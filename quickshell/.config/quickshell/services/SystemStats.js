@@ -51,6 +51,16 @@ const essential = ["systemd", "(sd-pam)", "start-hyprland", "Hyprland", "Xwaylan
                    "pipewire", "pipewire-pulse", "wireplumber", "dbus-broker", "dbus-broker-lau",
                    "xdg-desktop-por", "xdg-permission-", "xdg-document-po", "gnome-keyring-d"];
 
+// Whether a process is the shell (qs) or one it started (its nmcli, rfkill and udevadm
+// watchers): those are one essential group, so End task can't take the shell down with them.
+function fromShell(p, byPid) {
+    for (let at = p, depth = 0; at && depth < 64; at = byPid[at.ppid], depth++) {
+        if (at.name === "qs")
+            return true;
+    }
+    return false;
+}
+
 // The busiest apps, like a task manager: a window's app with every process under it (Electron
 // and browser helpers, games under Steam), the rest by process name. `windows` maps a window's
 // process id to its app { name, icon }; `previous` maps process ids to their CPU ticks at the
@@ -63,14 +73,15 @@ function apps(procs, previous, cpuTicks, windows, limit) {
         byPid[p.pid] = p;
     const groups = {};
     for (const p of procs) {
+        const shell = fromShell(p, byPid);
         let owner = p;
         for (let depth = 0; owner && !windows[owner.pid] && depth < 64; depth++)
             owner = byPid[owner.ppid];
-        const app = owner ? windows[owner.pid] : null;
-        const key = app ? "app:" + app.name : "proc:" + p.name;
+        const app = shell || !owner ? null : windows[owner.pid];
+        const key = shell ? "shell" : app ? "app:" + app.name : "proc:" + p.name;
         const group = groups[key] ?? (groups[key] = {
-            name: app ? app.name : p.name, icon: app ? app.icon : "",
-            essential: !app && essential.includes(p.name), cpu: 0, memory: 0, pids: []
+            name: shell ? "Ghost Shell" : app ? app.name : p.name, icon: app ? app.icon : "",
+            essential: shell || (!app && essential.includes(p.name)), cpu: 0, memory: 0, pids: []
         });
         if (previous[p.pid] !== undefined && cpuTicks > 0)
             group.cpu += Math.max(0, p.ticks - previous[p.pid]) / cpuTicks;

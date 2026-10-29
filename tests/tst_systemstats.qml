@@ -80,4 +80,22 @@ TestCase {
         compare(SystemStats.size(340e6), "340 MB");
         compare(SystemStats.size(1.25e9), "1.3 GB");
     }
+
+    function test_shellIsOneEssentialGroup() {
+        const procs = [
+            { pid: 1, ppid: 0, ticks: 0, memory: 1e6, name: "systemd" },
+            { pid: 50, ppid: 1, ticks: 0, memory: 500e6, name: "qs" },
+            { pid: 51, ppid: 50, ticks: 0, memory: 5e6, name: "nmcli" },
+            { pid: 52, ppid: 50, ticks: 0, memory: 5e6, name: "rfkill" },
+            { pid: 60, ppid: 1, ticks: 0, memory: 5e6, name: "nmcli" }
+        ];
+        // Even when the shell's Settings window names it as an app.
+        const apps = SystemStats.apps(procs, {}, 1000, { 50: { name: "org.quickshell", icon: "" } }, 10);
+        const shell = apps.find(a => a.name === "Ghost Shell");
+        compare(shell.pids, [50, 51, 52]);
+        verify(shell.essential);
+        verify(!apps.some(a => a.name === "org.quickshell"));
+        // An nmcli the shell didn't start is its own row.
+        compare(apps.find(a => a.name === "nmcli").pids, [60]);
+    }
 }

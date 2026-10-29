@@ -6,4 +6,7 @@ cd "$(dirname "$0")/../.."
 . modules/lib.sh
 
 step "Calendars"
+# The shell watches khal's config to know a calendar was added; it can only watch for a file in
+# a folder that exists.
+mkdir -p "$HOME/.config/khal"
 modules/calendar/calendar.sh configure

@@ -83,7 +83,9 @@ Singleton {
                 return;
             root.received[notification.id] = Date.now();
             const critical = notification.urgency === NotificationUrgency.Critical;
-            const apps = Rules.remember(Settings.values.notificationApps, notification.appName);
+            // Only once settings.json is in: writing to the defaults before then would save
+            // them over the user's file.
+            const apps = Settings.loaded ? Rules.remember(Settings.values.notificationApps, notification.appName) : null;
             if (apps !== null)
                 Settings.values.notificationApps = apps;
             const mode = Rules.mode(Settings.values.notificationApps, notification.appName);

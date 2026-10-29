@@ -19,20 +19,35 @@ Singleton {
     property int month: clock.date.getMonth()
 
     property var events: [] // [{ start, startTime, end, endTime, title, allDay }]
+    // Why the calendars couldn't be updated ("" when they were). vdirsyncer's own message isn't
+    // shown or logged: it can contain the link.
+    property string error: ""
     readonly property var days: CalendarEventsJs.days(events) // dates with an event
     readonly property string today: CalendarEventsJs.iso(clock.date)
     readonly property var upcoming: CalendarEventsJs.upcoming(events, today, 4)
     readonly property var range: CalendarEventsJs.range(clock.date, year, month)
 
+    // khal asked again while it runs (the month flipped, a sync finished) runs once more after,
+    // so the shown month never keeps the last range's events.
+    property bool listAgain: false
+
     function refresh(): void {
-        if (enabled)
+        if (!enabled)
+            return;
+        if (list.running)
+            listAgain = true;
+        else
             list.running = true;
     }
 
     onRangeChanged: refresh()
     onEnabledChanged: {
-        if (enabled)
+        if (enabled) {
             sync.running = true;
+        } else {
+            events = [];
+            error = "";
+        }
     }
 
     SystemClock {
@@ -58,7 +73,10 @@ Singleton {
     Process {
         id: sync
         command: ["vdirsyncer", "sync"]
-        onExited: root.refresh()
+        onExited: code => {
+            root.error = code === 0 ? "" : "Couldn't update the calendar (offline, or the link no longer works)";
+            root.refresh();
+        }
     }
 
     Process {
@@ -66,6 +84,12 @@ Singleton {
         command: ["khal", "list", "--format", CalendarEventsJs.format, "--day-format", "", root.range.from, root.range.to]
         stdout: StdioCollector {
             onStreamFinished: root.events = CalendarEventsJs.parse(text)
+        }
+        onExited: {
+            if (root.listAgain) {
+                root.listAgain = false;
+                Qt.callLater(() => list.running = true);
+            }
         }
     }
 }

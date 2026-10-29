@@ -1,21 +1,35 @@
 // "Game mode" (the round button in quick settings): while on, Hyprland's animations, blur and
 // shadows are off (settings/HyprlandSettings.qml writes them into shell-settings.lua), pop-ups
 // wait in the history like Do Not Disturb (critical ones still show), and the power mode is
-// Performance, back to the previous mode when it's turned off. Not saved: it's off again after
-// a restart, like Keep awake.
+// Performance, back to the previous mode when it's turned off. Kept across shell reloads (else
+// a reload would leave Performance on with the button off); off again after a restart, like
+// Keep awake.
 pragma Singleton
 
+import QtQuick
 import Quickshell
 import Quickshell.Services.UPower
 
 Singleton {
     id: root
 
-    property bool on: false
+    property alias on: saved.on
     // The power mode before game mode switched to Performance; -1 if it didn't.
-    property int modeBefore: -1
+    property alias modeBefore: saved.modeBefore
 
+    PersistentProperties {
+        id: saved
+        reloadableId: "gameMode"
+        property bool on: false
+        property int modeBefore: -1
+        property bool applied: false // what the power mode was last set for
+    }
+
+    // Only a switch from the button: a reload restoring `on` (already applied) changes nothing.
     onOnChanged: {
+        if (on === saved.applied)
+            return;
+        saved.applied = on;
         if (on && PowerProfiles.hasPerformanceProfile && PowerProfiles.profile !== PowerProfile.Performance) {
             modeBefore = PowerProfiles.profile;
             PowerProfiles.profile = PowerProfile.Performance;

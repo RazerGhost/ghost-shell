@@ -65,6 +65,15 @@ Column {
     }
 
     Text {
+        visible: Agenda.error !== ""
+        leftPadding: Theme.spacing.xs
+        text: Agenda.error
+        color: Colors.m3error
+        font.family: Theme.font.sans
+        font.pixelSize: Theme.font.small
+    }
+
+    Text {
         visible: Agenda.upcoming.length === 0
         leftPadding: Theme.spacing.xs
         text: "Nothing on the calendar this week"

@@ -84,8 +84,9 @@ EOT
 
 cmd_sync() {
     [[ -s $list ]] || fail "no calendars yet (ghost calendar add)"
-    # discover sets the pairs up on the first run; `yes` answers its "create it?" questions.
-    yes | vdirsyncer discover >/dev/null
+    # discover sets the pairs up on the first run; `yes` answers its "create it?" questions. It
+    # dies of SIGPIPE when discover is done, which pipefail would count as a failure.
+    { yes || true; } | vdirsyncer discover >/dev/null
     vdirsyncer sync
 }
 
@@ -113,7 +114,9 @@ cmd_remove() {
     names | grep -qx "$name" || fail "no calendar called \"$1\" (ghost calendar list)"
     awk -F'\t' -v n="$name" '$1 != n' "$list" >"$list.new" && mv "$list.new" "$list"
     chmod 600 "$list"
-    rm -rf "${data:?}/$name" "$HOME/.local/state/vdirsyncer/status/$name"*
+    # vdirsyncer's status is "<pair>" plus files starting "<pair>."; not a bare prefix, which
+    # would also take "work-stuff" with "work".
+    rm -rf "${data:?}/$name" "$HOME/.local/state/vdirsyncer/status/$name" "$HOME/.local/state/vdirsyncer/status/$name".*
     if [[ -s $list ]]; then
         cmd_configure
     else

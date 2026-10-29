@@ -570,7 +570,9 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   manager: a window's app with every process under it (Electron and browser helpers), the rest
   by process name (`/proc/<pid>/stat` read by `system-stats.sh`; grouping in `SystemStats.js`,
   tested). "End task" sends SIGTERM to all of them after a second click; processes the session
-  needs (Hyprland, the shell, PipeWire, D-Bus, portals) have no button.
+  needs (Hyprland, the shell, PipeWire, D-Bus, portals) have no button. The shell and everything
+  it started (its nmcli, rfkill and udevadm watchers) are one "Ghost Shell" row without one, also
+  when its Settings window is open (review 2026-10-29: that window made qs endable).
 
 ### Per-app notification settings (built 2026-10-29)
 - Settings -> Notifications -> Apps: every app that has sent a notification (remembered by name
@@ -628,8 +630,8 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   `services/Agenda.qml` runs `vdirsyncer sync` at start and every 15 minutes once khal's config
   exists, and asks khal for the shown month and the coming week. The today menu lists the next
   four events under the weather and dots the days with events in the month calendar
-  (`CalendarEvents.js`, tested). Read-only: events are made in Proton's app or site. Unverified:
-  how khal writes an all-day event's end date (inclusive is assumed).
+  (`CalendarEvents.js`, tested). Read-only: events are made in Proton's app or site. khal gives
+  an all-day event's last day as its end date (its `AllDayEvent.end` is DTEND minus a day).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

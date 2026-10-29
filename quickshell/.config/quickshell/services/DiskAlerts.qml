@@ -12,7 +12,14 @@ import "DiskAlerts.js" as DiskAlertsJs
 Singleton {
     id: root
 
-    property string given: ""
+    // The warning already given; kept across shell reloads, so a reload doesn't warn again.
+    property alias given: saved.given
+
+    PersistentProperties {
+        id: saved
+        reloadableId: "diskAlerts"
+        property string given: ""
+    }
 
     function check(): void {
         df.running = true;
