@@ -24,8 +24,9 @@ Scope {
     // The output before the current one (PipeWire's default sink), to tell a switch from startup.
     property var lastSink: null
 
-    function show(icon: string, label: string, level: real): void {
-        if (!ready)
+    // `kind` is the pop-up's key in Settings' hiddenOsdKinds (Settings -> Notifications -> Pop-ups).
+    function show(kind: string, icon: string, label: string, level: real): void {
+        if (!ready || (Settings.values.hiddenOsdKinds ?? []).includes(kind))
             return;
         root.icon = icon;
         root.label = label;
@@ -60,23 +61,23 @@ Scope {
                 return;
             if (root.ready)
                 Sounds.play("feedback", "audio-volume-change");
-            root.show(Audio.icon, "Volume", Audio.volume);
+            root.show("volume", Audio.icon, "Volume", Audio.volume);
         }
 
         function onMutedChanged(): void {
             if (outputSwitched.running)
                 return;
-            root.show(Audio.icon, Audio.muted ? "Muted" : "Volume", Audio.volume);
+            root.show("volume", Audio.icon, Audio.muted ? "Muted" : "Volume", Audio.volume);
         }
 
         function onMicMutedChanged(): void {
-            root.show(Audio.micMuted ? "mic_off" : "mic", Audio.micMuted ? "Microphone muted" : "Microphone on", -1);
+            root.show("mic", Audio.micMuted ? "mic_off" : "mic", Audio.micMuted ? "Microphone muted" : "Microphone on", -1);
         }
 
         // An app starts recording (a call) while the microphone is muted.
         function onMutedWhileRecordingChanged(): void {
             if (Audio.mutedWhileRecording)
-                root.show("mic_off", "Microphone is muted", -1);
+                root.show("mutedMic", "mic_off", "Microphone is muted", -1);
         }
 
         // Headphones plugged in, a Bluetooth headset connected, or an output picked in the
@@ -96,7 +97,7 @@ Scope {
         interval: 500
         onTriggered: {
             if (Audio.sink)
-                root.show(Audio.deviceIcon(Audio.sink), Audio.deviceName(Audio.sink), -1);
+                root.show("output", Audio.deviceIcon(Audio.sink), Audio.deviceName(Audio.sink), -1);
         }
     }
 
@@ -104,7 +105,7 @@ Scope {
         target: NetworkExtras
 
         function onVpnSwitched(name: string, connected: bool): void {
-            root.show(connected ? "vpn_key" : "vpn_key_off", (connected ? "Connected to " : "Disconnected from ") + name, -1);
+            root.show("vpn", connected ? "vpn_key" : "vpn_key_off", (connected ? "Connected to " : "Disconnected from ") + name, -1);
         }
     }
 
@@ -113,7 +114,7 @@ Scope {
 
         function onChanged(): void {
             const level = Brightness.level;
-            root.show(level < 0.34 ? "brightness_low" : level < 0.67 ? "brightness_medium" : "brightness_high",
+            root.show("brightness", level < 0.34 ? "brightness_low" : level < 0.67 ? "brightness_medium" : "brightness_high",
                       "Brightness", level);
         }
     }
@@ -123,7 +124,7 @@ Scope {
 
         function onProfileChanged(): void {
             const profile = PowerProfiles.profile;
-            root.show(profile === PowerProfile.PowerSaver ? "eco" : profile === PowerProfile.Performance ? "speed" : "balance",
+            root.show("power", profile === PowerProfile.PowerSaver ? "eco" : profile === PowerProfile.Performance ? "speed" : "balance",
                       profile === PowerProfile.PowerSaver ? "Power saver" : profile === PowerProfile.Performance ? "Performance" : "Balanced",
                       -1);
         }
@@ -134,11 +135,11 @@ Scope {
         target: Keyboard
 
         function onLayoutSwitched(name: string): void {
-            root.show("keyboard", name, -1);
+            root.show("layout", "keyboard", name, -1);
         }
 
         function onCapsLockSwitched(on: bool): void {
-            root.show("keyboard_capslock", on ? "Caps lock on" : "Caps lock off", -1);
+            root.show("capsLock", "keyboard_capslock", on ? "Caps lock on" : "Caps lock off", -1);
         }
     }
 

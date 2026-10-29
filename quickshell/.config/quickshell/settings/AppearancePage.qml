@@ -367,8 +367,6 @@ Column {
         }
     }
 
-    // The island's status icons, each on or off (bar/StatusIcons.qml). The privacy ones
-    // (recording, microphone, camera, screen sharing) always show, so they aren't listed.
     SettingGroup {
         title: "Workspaces"
 
@@ -387,6 +385,8 @@ Column {
         }
     }
 
+    // The island's status icons, each on or off (bar/StatusIcons.qml). The privacy ones
+    // (recording, microphone, camera, screen sharing) always show, so they aren't listed.
     SettingGroup {
         title: "Status icons"
 

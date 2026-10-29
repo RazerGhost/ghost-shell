@@ -77,6 +77,42 @@ Column {
         }
     }
 
+    // Which pop-ups the OSD shows (osd/Osd.qml), each on or off.
+    SettingGroup {
+        title: "Pop-ups for"
+
+        Repeater {
+            model: [
+                { key: "volume", title: "Volume" },
+                { key: "brightness", title: "Brightness" },
+                { key: "mic", title: "Microphone on or off" },
+                { key: "mutedMic", title: "An app recording while the microphone is muted" },
+                { key: "output", title: "A new sound output (headphones)" },
+                { key: "vpn", title: "A VPN connecting or disconnecting" },
+                { key: "power", title: "Power mode" },
+                { key: "layout", title: "Keyboard layout" },
+                { key: "capsLock", title: "Caps lock" }
+            ]
+
+            SettingRow {
+                id: kindRow
+
+                required property var modelData
+                readonly property var hidden: Array.from(Settings.values.hiddenOsdKinds ?? [])
+
+                title: modelData.title
+
+                Switch {
+                    label: "Pop-up for " + kindRow.modelData.title
+                    checked: !kindRow.hidden.includes(kindRow.modelData.key)
+                    onToggled: Settings.values.hiddenOsdKinds = checked
+                        ? [...kindRow.hidden, kindRow.modelData.key]
+                        : kindRow.hidden.filter(k => k !== kindRow.modelData.key)
+                }
+            }
+        }
+    }
+
     SettingGroup {
         title: "Schedule"
 

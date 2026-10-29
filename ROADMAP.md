@@ -856,6 +856,9 @@ audit of our own UI): all sixteen, built in batches.
   (Appearance -> Size) and the workspace dots (Appearance -> Workspaces: 3-10 always, or only
   the ones in use, which scrolling then steps between: `WorkspaceSlots.stepIn`, tested). The
   window menu keeps five "move to" buttons. Checked live.
+- Settings -> Notifications -> Pop-ups for: each OSD pop-up on or off (volume, brightness,
+  microphone, muted while recording, a new output, VPN, power mode, keyboard layout, caps lock;
+  `hiddenOsdKinds`).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

@@ -77,6 +77,7 @@ Singleton {
             // ones stay until dismissed), and the OSD's place ("bottom" or "top") and time.
             property real notificationSeconds: 5
             property string osdPosition: "bottom"
+            property var hiddenOsdKinds: [] // pop-ups turned off, by key (osd/Osd.qml)
             property real osdSeconds: 1.5
 
             property bool dndFullscreen: true // pop-ups wait while a window is fullscreen
