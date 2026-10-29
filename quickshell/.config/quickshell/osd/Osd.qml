@@ -40,7 +40,8 @@ Scope {
 
     Timer {
         id: hide
-        interval: Theme.osd.timeout
+        // Settings' osdSeconds (0.5-10 s).
+        interval: Math.min(10, Math.max(0.5, Number(Settings.values.osdSeconds) || 1.5)) * 1000
         onTriggered: root.shown = false
     }
 
@@ -103,9 +104,13 @@ Scope {
         screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? null
         visible: root.shown
 
-        anchors.bottom: true
-        // Above the dock while it shows on this screen, closer to the edge while it's hidden.
+        // At the bottom (above the dock while it shows on this screen, closer to the edge while
+        // it's hidden), or at the top just under the island (Settings' osdPosition).
+        readonly property bool top: Settings.values.osdPosition === "top"
+        anchors.bottom: !top
+        anchors.top: top
         margins.bottom: DockState.shownOn !== "" && DockState.shownOn === screen?.name ? Theme.osd.gap : Theme.osd.gapLow
+        margins.top: Theme.island.height + Theme.osd.below
         implicitWidth: Theme.osd.width
         implicitHeight: Theme.osd.height
 

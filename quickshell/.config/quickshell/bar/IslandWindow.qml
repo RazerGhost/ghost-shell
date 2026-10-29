@@ -43,6 +43,8 @@ PanelWindow {
                                                       popup !== null, attentionWindow !== null, peek)
     readonly property bool expanded: shown !== ""
     readonly property real menuWidth: Theme.island.panelWidth
+    // How long a notification pop-up (and the attention card) stays, from Settings (1-60 s).
+    readonly property int popupTime: Math.min(60, Math.max(1, Number(Settings.values.notificationSeconds) || 5)) * 1000
 
     // While music plays the middle of the island shows the music instead of the time.
     // Once the island opens (hover player or a menu) the time comes back, since the
@@ -51,7 +53,7 @@ PanelWindow {
 
     onOpenChanged: peek = ""
 
-    // Each pop-up stays Theme.notifications.timeout ms, paused while hovered; critical
+    // Each pop-up stays Settings' notificationSeconds, paused while hovered; critical
     // ones stay until dismissed. popupReady dips for a moment when the pop-up changes,
     // which restarts the timer for the next one.
     property bool popupReady: true
@@ -61,7 +63,7 @@ PanelWindow {
     }
 
     Timer {
-        interval: Theme.notifications.timeout
+        interval: root.popupTime
         running: root.popupReady && root.popup !== null && !content.containsMouse
                  && root.popup.urgency !== NotificationUrgency.Critical
         onTriggered: Notifications.next()
@@ -75,7 +77,7 @@ PanelWindow {
     }
 
     Timer {
-        interval: Theme.notifications.timeout
+        interval: root.popupTime
         running: root.attentionReady && root.attentionWindow !== null && !content.containsMouse
         onTriggered: Windows.attentionSeen()
     }

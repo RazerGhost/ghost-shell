@@ -705,6 +705,11 @@ shell's cost, features and customization), checked before acting. Done so far:
   media, peeks, the tray arrow, the symmetric widths), so a separate file would only pass all
   of that through properties.
 
+### More settings (2026-10-29, in progress; user's picks from the research)
+- Settings -> Notifications -> Pop-ups: how long a notification stays (3-30 s, 5 by default;
+  the attention card too) and the volume and brightness pop-up's place (bottom, or top under the
+  island) and time (1-5 s).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

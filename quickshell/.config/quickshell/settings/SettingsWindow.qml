@@ -53,7 +53,7 @@ Singleton {
         { id: "windows", section: "System", icon: "select_window", title: "Windows",
           words: "gaps tiling hot corner overview reopen floating position wobble wobbly jelly" },
         { id: "notifications", section: "System", icon: "notifications", title: "Notifications",
-          words: "do not disturb dnd quiet schedule apps silent mute always priority" },
+          words: "do not disturb dnd quiet schedule apps silent mute always priority pop-up popup time seconds osd volume brightness position top bottom" },
         { id: "power", section: "System", icon: "battery_charging_full", title: "Power",
           words: "idle dim lock screen off suspend sleep battery plugged low power saver warning" },
         { id: "input", section: "System", icon: "touchpad_mouse", title: "Keyboard and mouse",

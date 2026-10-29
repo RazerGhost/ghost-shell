@@ -64,6 +64,12 @@ Singleton {
             property int nightLightEnd: 7 * 60
             property int nightLightTemperature: 4000 // Kelvin; lower is warmer
 
+            // Pop-ups (Settings -> Notifications): how long a notification stays (seconds; critical
+            // ones stay until dismissed), and the OSD's place ("bottom" or "top") and time.
+            property real notificationSeconds: 5
+            property string osdPosition: "bottom"
+            property real osdSeconds: 1.5
+
             property bool dndScheduled: false
             property int dndStart: 23 * 60
             property int dndEnd: 7 * 60

@@ -5,8 +5,9 @@ import qs.widgets
 import "../services/NotificationRules.js" as Rules
 import "../services/Schedule.js" as Schedule
 
-// Notifications: Do Not Disturb, on/off and an optional daily schedule (e.g. at night), and
-// each app that has sent one: silent, pop up, or always pop up.
+// Notifications: Do Not Disturb, how long pop-ups (and the volume and brightness one) stay and
+// where, an optional daily schedule (e.g. at night), and each app that has sent one: silent,
+// pop up, or always pop up.
 Column {
     spacing: Theme.spacing.l
 
@@ -19,6 +20,48 @@ Column {
                 label: "Do Not Disturb"
                 checked: Notifications.doNotDisturb
                 onToggled: Notifications.doNotDisturb = !checked
+            }
+        }
+    }
+
+    SettingGroup {
+        title: "Pop-ups"
+
+        SettingRow {
+            title: "Notifications stay for"
+            subtitle: "Hovering one keeps it; critical ones stay until you close them"
+
+            Stepper {
+                label: "Notifications stay for"
+                values: [3, 5, 8, 12, 20, 30]
+                value: Settings.values.notificationSeconds
+                format: v => v + " s"
+                onPicked: v => Settings.values.notificationSeconds = v
+            }
+        }
+
+        SettingRow {
+            title: "Volume and brightness pop-up"
+            subtitle: "Also caps lock, keyboard layout and power mode"
+
+            Stepper {
+                label: "Volume and brightness pop-up position"
+                values: ["bottom", "top"]
+                value: Settings.values.osdPosition
+                format: v => v === "top" ? "Top" : "Bottom"
+                onPicked: v => Settings.values.osdPosition = v
+            }
+        }
+
+        SettingRow {
+            title: "It stays for"
+
+            Stepper {
+                label: "Volume and brightness pop-up time"
+                values: [1, 1.5, 2, 3, 5]
+                value: Settings.values.osdSeconds
+                format: v => v + " s"
+                onPicked: v => Settings.values.osdSeconds = v
             }
         }
     }

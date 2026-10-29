@@ -187,7 +187,6 @@ Singleton {
     }
 
     readonly property QtObject notifications: QtObject {
-        readonly property int timeout:       5000 // ms a pop-up stays (critical ones stay until dismissed)
         readonly property int historyHeight: 300  // the history in the "today" menu scrolls past this
     }
 
@@ -229,6 +228,6 @@ Singleton {
         readonly property int gap:     64   // distance from the bottom screen edge, above the dock
         readonly property int gapLow:  24   // the same while the dock is hidden
         readonly property int track:   5    // height of the level bar
-        readonly property int timeout: 1500 // ms the popup stays up after the last change
+        readonly property int below:   12   // under the island, when it's at the top
     }
 }
