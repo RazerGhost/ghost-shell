@@ -527,7 +527,8 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
 ### Proton apps (built 2026-10-29)
 - The `proton` module (user's request): Proton VPN (`proton-vpn-gtk-app`, extra), Proton Mail
   and Proton Pass (`proton-mail-bin`, `proton-pass-bin`, AUR; Proton's own builds). Proton
-  Drive has no Linux app. Proton VPN's connections are NetworkManager connections.
+  Drive has no Linux app yet (October 2026: in development, no date; an official CLI since
+  June 2026, and rclone's `protondrive` backend can mount it). Proton VPN's connections are NetworkManager connections.
 
 ### Low disk space warning (built 2026-10-29)
 - `services/DiskAlerts.qml`: a notification under 10 % free on `/` (the same Btrfs as /home) and
@@ -615,6 +616,18 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   "> command" runs it in the default terminal, which stays open in your shell afterwards.
   `Fuzzy.mode`, `scoredWindows`, `files` and `fileIcon`, tested. fd over plocate: no database
   to keep up to date, and it's fast enough for the home folder (~10 ms).
+
+### Calendar events (built 2026-10-29; waiting on the user's share link to test)
+- User's choice: no Google; Proton Calendar through its read-only share link ("Share with
+  anyone"; Proton has no CalDAV). The `calendar` module (vdirsyncer and khal, `extra`) and
+  `ghost calendar add [name]`, which asks for the link without echoing it and keeps it only in
+  `~/.config/ghost/calendars` and vdirsyncer's config (both mode 600, outside the repo), then
+  writes vdirsyncer's config (http -> filesystem, `a wins`) and khal's (fixed ISO formats).
+  `services/Agenda.qml` runs `vdirsyncer sync` at start and every 15 minutes once khal's config
+  exists, and asks khal for the shown month and the coming week. The today menu lists the next
+  four events under the weather and dots the days with events in the month calendar
+  (`CalendarEvents.js`, tested). Read-only: events are made in Proton's app or site. Unverified:
+  how khal writes an all-day event's end date (inclusive is assumed).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

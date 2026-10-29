@@ -15,7 +15,7 @@ machine can take what it needs.
 
 - **The island**: the bar, a shape growing out of the top edge with workspaces, the time (or the
   playing song's cover) and status icons. It opens into menus: quick settings (Wi-Fi, Bluetooth,
-  sound, power mode, game mode, system stats, background apps), today (date, weather, to-do, note, timer, notifications,
+  sound, power mode, game mode, system stats, background apps), today (date, weather, calendar events, to-do, note, timer, notifications,
   calendar), media, clipboard, emoji.
 - **Windows**: a tiling layout of its own (halves, thirds, quarters from the window menu, or by
   the number of windows), Snap Assist, window tabs, Alt+Tab with live previews, an overview
@@ -58,6 +58,7 @@ After the first install, `ghost` (in `~/.local/bin`) does everything:
 | `ghost install [module...]` | packages and setup for some or all modules |
 | `ghost theme <wallpaper \| "#rrggbb">` | a new wallpaper and the colors from it |
 | `ghost greeter` | update the login screen's copy of the shell (after changing its code) |
+| `ghost calendar add [name]` | subscribe to a calendar (it asks for the link: a Proton Calendar share link or any .ics address; `remove <name>`, `list`, `sync`) |
 | `ghost webapp add <name> <url> [icon]` | a site in its own window, in the launcher and the dock (`remove <name>`, `list`) |
 | `ghost doctor` | check that everything is set up; each problem says what fixes it |
 | `ghost modules` | list the modules and which ones this machine uses |
@@ -81,6 +82,7 @@ its setup (`setup.sh`).
 | `capture` | screen recording, color picker, text and QR codes from the screen |
 | `phone` | KDE Connect |
 | `proton` | Proton Mail, Pass and VPN |
+| `calendar` | calendar events in the today menu, from a Proton Calendar share link (`ghost calendar add`) |
 | `wave3` | the Elgato Wave:3 microphone with openxlr and a voice chain ([its README](modules/wave3/README.md)) |
 
 Every module except `wave3` is installed unless `~/.config/ghost/modules` lists the ones this

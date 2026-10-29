@@ -10,6 +10,9 @@
 #   ghost greeter     copy the shell to the login screen (needed after changing the shell's code)
 #   ghost webapp add <name> <url> [icon] | remove <name> | list
 #                     a site in its own window, in the launcher and the dock (modules/apps/webapp.sh)
+#   ghost calendar add [name] | remove <name> | list | sync
+#                     a subscribed calendar (a Proton Calendar share link) in the today menu
+#                     (modules/calendar/calendar.sh)
 #   ghost doctor      check that everything is set up
 #   ghost modules     list the modules, and which this machine uses
 #   ghost keybinds    Hyprland's keybinds as a Markdown table (docs/keybinds.md is made with it)
@@ -25,7 +28,7 @@ cd "$repo"
 . modules/lib.sh
 
 # In the order they're set up: core first (configs, colors), the apps after it.
-all_modules=(core system snapshots apps dev gaming discord spotify zen haunt capture phone proton wave3)
+all_modules=(core system snapshots apps dev gaming discord spotify zen haunt capture phone proton calendar wave3)
 # Only for machines that list them in ~/.config/ghost/modules, never part of "all": hardware
 # that's plugged into one machine.
 opt_in=(wave3)
@@ -43,6 +46,7 @@ declare -A about=(
     [capture]="screen recording, color picker, text and QR codes from the screen"
     [phone]="KDE Connect: your phone's notifications, clipboard and files"
     [proton]="Proton Mail, Pass and VPN"
+    [calendar]="calendar events in the today menu, from a Proton Calendar share link"
     [wave3]="the Elgato Wave:3 with openxlr and a voice chain (only where it's plugged in)"
 )
 machine_modules="$HOME/.config/ghost/modules"
@@ -252,6 +256,7 @@ case ${1:-help} in
     theme) shift; cmd_theme "$@" ;;
     greeter) modules/core/greeter.sh ;;
     webapp) shift; modules/apps/webapp.sh "$@" ;;
+    calendar) shift; modules/calendar/calendar.sh "$@" ;;
     doctor) cmd_doctor ;;
     modules) cmd_modules ;;
     keybinds) cmd_keybinds ;;

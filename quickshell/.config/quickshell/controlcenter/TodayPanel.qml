@@ -6,8 +6,8 @@ import qs.theme
 import qs.widgets
 import "NotificationGroups.js" as NotificationGroups
 
-// The "today" menu, opened by clicking the time: the date, the weather, the to-do list, note
-// and timer, the notification history, and a month calendar that stays folded away until you
+// The "today" menu, opened by clicking the time: the date, the weather, the next calendar
+// events, the to-do list, note and timer, the notification history, and a month calendar that stays folded away until you
 // click the date.
 Column {
     id: root
@@ -86,6 +86,10 @@ Column {
         width: parent.width - root.leftPadding - root.rightPadding
     }
 
+    AgendaList {
+        width: parent.width - root.leftPadding - root.rightPadding
+    }
+
     TodayTools {
         id: tools
         width: parent.width - root.leftPadding - root.rightPadding
@@ -143,6 +147,19 @@ Column {
         }
     }
 
+    // The calendar's events for the month shown (dots under their days).
+    Binding {
+        target: Agenda
+        property: "year"
+        value: root.year
+    }
+
+    Binding {
+        target: Agenda
+        property: "month"
+        value: root.month
+    }
+
     MonthGrid {
         id: grid
 
@@ -159,7 +176,9 @@ Column {
 
             required property int day
             required property int month
+            required property int year
             required property bool today
+            readonly property bool hasEvent: Agenda.days[`${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`] === true
 
             implicitHeight: Theme.island.height
 
@@ -181,6 +200,19 @@ Column {
                 font.family: Theme.font.sans
                 font.pixelSize: Theme.font.normal
                 font.weight: cell.today ? Font.DemiBold : Font.Normal
+            }
+
+            // A day with a calendar event.
+            Rectangle {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: Theme.spacing.xs / 2
+                width: Theme.spacing.xs
+                height: width
+                radius: width / 2
+                visible: cell.hasEvent && !cell.today
+                color: Colors.m3primary
+                opacity: cell.month === grid.month ? 1 : 0.35
             }
         }
     }
