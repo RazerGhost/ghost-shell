@@ -76,9 +76,11 @@ its setup (`setup.sh`).
 | `haunt` | the Haunt Git client, from its release package, and what building it needs |
 | `capture` | screen recording, color picker, text and QR codes from the screen |
 | `phone` | KDE Connect |
+| `wave3` | the Elgato Wave:3 microphone with openxlr and a voice chain ([its README](modules/wave3/README.md)) |
 
-Every module is installed unless `~/.config/ghost/modules` lists the ones this machine wants, one
-per line. That file isn't in the repo, so each machine keeps its own:
+Every module except `wave3` is installed unless `~/.config/ghost/modules` lists the ones this
+machine wants, one per line (`wave3` only ever comes from that list: it's for the machine the
+microphone is plugged into). That file isn't in the repo, so each machine keeps its own:
 
 ```sh
 mkdir -p ~/.config/ghost

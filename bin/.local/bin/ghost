@@ -16,7 +16,8 @@
 #
 # Modules are the folders in modules/: their packages (packages.txt, aur.txt) and setup
 # (setup.sh). Which ones this machine gets: ~/.config/ghost/modules, one name per line (not in
-# the repo, so each machine has its own); without that file, all of them.
+# the repo, so each machine has its own); without that file, all of them but the opt-in ones
+# (hardware plugged into one machine, like wave3).
 set -euo pipefail
 
 repo=$(cd "$(dirname "$(readlink -f "$0")")/../../.." && pwd)
@@ -24,7 +25,10 @@ cd "$repo"
 . modules/lib.sh
 
 # In the order they're set up: core first (configs, colors), the apps after it.
-all_modules=(core system snapshots apps dev gaming discord spotify zen haunt capture phone)
+all_modules=(core system snapshots apps dev gaming discord spotify zen haunt capture phone wave3)
+# Only for machines that list them in ~/.config/ghost/modules, never part of "all": hardware
+# that's plugged into one machine.
+opt_in=(wave3)
 declare -A about=(
     [core]="Hyprland, the shell, fonts and themes, the login screen, the colors"
     [system]="this laptop's GPU rule, boot options, greetd and services (sudo)"
@@ -38,6 +42,7 @@ declare -A about=(
     [haunt]="the Haunt Git client (its release package) and what building it needs"
     [capture]="screen recording, color picker, text and QR codes from the screen"
     [phone]="KDE Connect: your phone's notifications, clipboard and files"
+    [wave3]="the Elgato Wave:3 with openxlr and a voice chain (only where it's plugged in)"
 )
 machine_modules="$HOME/.config/ghost/modules"
 
@@ -47,8 +52,10 @@ entries() {
     grep -v -e '^[[:space:]]*$' -e '^[[:space:]]*#' "$1" | sed 's/[[:space:]]*$//'
 }
 
-# This machine's modules, in setup order.
+# This machine's modules, in setup order: the ones ~/.config/ghost/modules lists, or without
+# that file every module but the opt-in ones.
 machine() {
+    local m
     if [[ -f $machine_modules ]]; then
         local chosen
         chosen=$(entries "$machine_modules")
@@ -56,7 +63,9 @@ machine() {
             grep -qx "$m" <<<"$chosen" && echo "$m"
         done
     else
-        printf '%s\n' "${all_modules[@]}"
+        for m in "${all_modules[@]}"; do
+            [[ " ${opt_in[*]} " == *" $m "* ]] || echo "$m"
+        done
     fi
 }
 
@@ -143,7 +152,7 @@ cmd_modules() {
     if [[ -f $machine_modules ]]; then
         echo "This machine's modules come from $machine_modules (* = used):"
     else
-        echo "No $machine_modules: this machine uses all of them (* = used):"
+        echo "No $machine_modules: this machine uses all but the opt-in ones (* = used):"
     fi
     for m in "${all_modules[@]}"; do
         mark=" "

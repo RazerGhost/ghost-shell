@@ -447,7 +447,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   overrides monitors.lua's "preferred". Positions stay "auto": arranging several screens isn't
   built (only the laptop's screen to test with).
 
-### Web apps (built 2026-10-29; waiting on the user's test results)
+### Web apps (done, verified on the laptop 2026-10-29)
 - `ghost webapp add <name> <url> [icon]` (`modules/apps/webapp.sh`; `remove`, `list`): a desktop
   entry `webapp-<name>.desktop` that opens the site with `chromium --app` (ungoogled-chromium-bin,
   user's choice: Zen has no window-without-tabs mode; Chromium runs only while a web app is
@@ -457,7 +457,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   `apple-touch-icon.png`, else its favicon from DuckDuckGo's icon service. All web apps share
   one Chromium profile (one login per site).
 
-### Equalizer (built 2026-10-29; waiting on the user's test results)
+### Equalizer (done, verified on the laptop 2026-10-29)
 - Five bands (bass 80 Hz, low mids 250 Hz, mids 1 kHz, presence 4 kHz, treble 10 kHz; ±12 dB)
   between the apps and the output, with presets (Off, Laptop speakers, Voice, More bass, More
   treble; `services/Equalizer.js`, tested). PipeWire's own filter-chain (user's choice over
@@ -468,7 +468,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   the filter restarts. The preset in quick settings' Sound page, the bands in Settings ->
   Sound. The equalizer's nodes are left out of the Sound page's outputs and apps.
 
-### Screen time (built 2026-10-29; waiting on the user's test results)
+### Screen time (done, verified on the laptop 2026-10-29)
 - Settings -> Screen time (user's choice: a Settings page, only showing the time; no limits or
   reminders): a day's total, the last 7 days as bars (hover for the time, click for that day)
   and the day's apps with their time. `services/ScreenTime.qml` gives the focused window's app
@@ -485,7 +485,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   first start (`welcomeSeen` in settings.json) and again from Settings -> Keybinds ("Show the
   welcome tour") or `qs ipc call welcome show`.
 
-### Sound events (built 2026-10-29; waiting on the user's test results)
+### Sound events (done, verified on the laptop 2026-10-29)
 - `services/Sounds.qml`: short sounds from the freedesktop sound theme (`sound-theme-freedesktop`,
   already installed), played with `pw-play` at 60 % through the default output, on by default
   (user's choice). Notifications (a chime, the warning for critical ones; apps' `sound-name` and
@@ -496,7 +496,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   stays quiet). `SoundEvents.js` tested. Settings -> Sound (was Equalizer): a switch for all and
   one per kind.
 
-### Window tabs (built 2026-10-29; waiting on the user's test results)
+### Window tabs (done, verified on the laptop 2026-10-29)
 - Hyprland groups (user's choice: keys and the window menu, no dragging into groups): Super+G
   makes the window a tab group (again: separate windows), Super+Ctrl+Shift+arrows moves a window
   into the group next to it, Super+Shift+G takes it out, Alt+` / Alt+Shift+` or a click on a
@@ -505,7 +505,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   the wallpaper's colors (matugen's `hyprland-colors.lua`: the active tab in the primary
   container color, the others like the shell's surfaces, blurred).
 
-### Native blur shapes (built 2026-10-29; waiting on the user's test results)
+### Native blur shapes (done, verified on the laptop 2026-10-29)
 - Every shell panel asks Hyprland for blur behind exactly its cards (`BackgroundEffect.blurRegion`,
   ext-background-effect-v1) instead of a layer rule blurring every pixel above 30 % opacity
   (the island and dock first, verified by the user; then the rest at their request): the
@@ -515,6 +515,14 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   the overview its whole dimmed screen. No `blur` layer rules are left. Not the screenshot bar
   (over the frozen, opaque picture) or the lock preview (its own blurred wallpaper). The glass
   opacity now goes down to 20 % (was 35, for the rules' `ignore_alpha`; user's choice).
+
+### Elgato Wave:3 (built 2026-10-29; reviewed by the user, untested: the microphone is on the desktop)
+- The opt-in `wave3` module (`modules/wave3/`, its README has the details): openxlr (AUR)
+  instead of Elgato Wave Link, `lsp-plugins-lv2`, and a "Voice" profile recalled whenever the
+  microphone connects: RNNoise noise removal, a high-pass and gentle EQ, a compressor, an
+  optional de-esser (LSP compressor with a side-chain high-pass; Calf's de-esser is stereo only)
+  and a limiter. Opt-in modules (`opt_in` in `ghost`) only install where
+  `~/.config/ghost/modules` lists them, never as part of "all".
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

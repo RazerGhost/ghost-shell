@@ -1,0 +1,9 @@
+# Elgato Wave:3 (USB 0fd9:0070) with openxlr: the LV2 plugins for its voice chain (LSP's
+# Parametric Equalizer, Compressor and Limiter). Noise removal (RNNoise, DeepFilterNet) is
+# built into openxlr.
+# pacman packages; # lines and blank lines are skipped.
+
+lsp-plugins-lv2
+
+# lsusb, which setup.sh uses to check the microphone is a Wave:3
+usbutils

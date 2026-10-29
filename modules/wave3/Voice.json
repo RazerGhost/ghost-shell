@@ -1,0 +1,47 @@
+{
+  "mixer": {
+    "noiseRemoval": {
+      "xlr1": { "enabled": true, "engine": "rnnoise", "strength": 100 }
+    },
+    "inserts": {
+      "xlr1": [
+        {
+          "id": "eq",
+          "kind": "lv2",
+          "plugin": "http://lsp-plug.in/plugins/lv2/para_equalizer_x8_mono",
+          "label": "EQ",
+          "bypass": false,
+          "params": {
+            "ft_0": 2, "f_0": 90, "s_0": 1,
+            "ft_1": 1, "f_1": 275, "g_1": 0.794, "q_1": 0.7,
+            "ft_2": 1, "f_2": 4000, "g_2": 1.334, "q_2": 0.8
+          }
+        },
+        {
+          "id": "compressor",
+          "kind": "lv2",
+          "plugin": "http://lsp-plug.in/plugins/lv2/compressor_mono",
+          "label": "Compressor",
+          "bypass": false,
+          "params": { "cr": 3, "at": 10, "rt": 100, "al": 0.126, "mk": 1.413 }
+        },
+        {
+          "id": "deesser",
+          "kind": "lv2",
+          "plugin": "http://lsp-plug.in/plugins/lv2/compressor_mono",
+          "label": "De-esser",
+          "bypass": true,
+          "params": { "cr": 4, "at": 1, "rt": 50, "al": 0.1, "mk": 1, "scm": 0, "shpm": 2, "shpf": 6000 }
+        },
+        {
+          "id": "limiter",
+          "kind": "lv2",
+          "plugin": "http://lsp-plug.in/plugins/lv2/limiter_mono",
+          "label": "Limiter",
+          "bypass": false,
+          "params": { "th": 0.891 }
+        }
+      ]
+    }
+  }
+}
