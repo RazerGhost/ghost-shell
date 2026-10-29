@@ -15,11 +15,13 @@ hl.window_rule({
 })
 
 -- The scratchpad (Super+`) doubles as a drop-down terminal: opened empty, it starts one. It
--- tiles over the dimmed workspace below (decoration.dim_special, look.lua).
-hl.workspace_rule({
-    workspace        = "special:magic",
-    on_created_empty = "ghostty",
-})
+-- tiles over the dimmed workspace below (decoration.dim_special, look.lua). A handler, since
+-- Hyprland 0.57 deprecated the on_created_empty workspace rule.
+hl.on("workspace.created", function(workspace)
+    if workspace.name == "special:magic" and workspace.is_empty then
+        hl.exec_cmd("ghostty")
+    end
+end)
 
 -- Games: Proton games (Steam names their windows steam_app_<id>) and gamescope may tear for
 -- lower latency (general.allow_tearing in look.lua).

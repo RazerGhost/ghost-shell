@@ -398,7 +398,8 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
 ### Magnifier and drop-down terminal (done, verified on the laptop 2026-10-29)
 - Super+Plus / Super+Minus zoom around the pointer in steps of 1.5x (up to 8x), Super+Escape back
   to normal (`cursor.zoom_factor`, set from Lua binds).
-- The scratchpad (Super+`) starts a terminal when it's empty (`on_created_empty`), over the
+- The scratchpad (Super+`) starts a terminal when it's empty (a `workspace.created` handler since
+  Hyprland 0.57 deprecated `on_created_empty`), over the
   dimmed workspace below (`decoration.dim_special`).
 
 ### Network sign-in hint (built 2026-10-28; untested: needs a network with a login page)

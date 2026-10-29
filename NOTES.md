@@ -311,6 +311,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   to load with "InUse is not a type" at its own declaration, while the same pattern loads in plain
   `qml` and in other files of the shell; cause unknown. A separate file works.
 
+- Hyprland 0.57 deprecates the `on_created_empty` workspace rule (`hyprctl deprecated-config`);
+  instead `hl.on("workspace.created", function(workspace) ... end)`. A Lua workspace object
+  (`hl.get_workspaces()`) has `name`, `id`, `is_empty`, `special` and `windows`.
+
 ## Testing on the laptop
 
 - Quickshell reloads on file changes, but a reload after adding a property to a singleton
