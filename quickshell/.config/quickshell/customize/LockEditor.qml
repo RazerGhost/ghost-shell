@@ -12,7 +12,7 @@ import "../lock/LockClock.js" as LockClockJs
 import "Presets.js" as Presets
 
 // The lock screen editor, like long-pressing the iOS lock screen: the real lock screen, live,
-// with Cancel and Done at the top and a sheet at the bottom with the looks (presets), the
+// as a card on the background color, with Cancel and Done at the top and a sheet at the bottom with the looks (presets), the
 // clock and the picture. Every change shows at once; Cancel puts the values from before back.
 // The clock is outlined: clicking it opens the clock's tab. Opened from Settings -> Lock screen
 // and the launcher (Customize.qml). The login screen follows (greeter/sync.sh).
@@ -48,52 +48,79 @@ Scope {
         id: editor
 
         PanelWindow {
+            id: window
+
             screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? null
             anchors { top: true; bottom: true; left: true; right: true }
             exclusionMode: ExclusionMode.Ignore
-            color: "black"
+            color: Colors.m3surface
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.namespace: "qs-customize"
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
-            // The lock screen itself, with input off: the editor's controls sit on top.
-            LockContent {
-                id: lock
-                anchors.fill: parent
-                wallpaper: Wallpaper.lockPath
-                enabled: false
+            // The lock screen as a card, like GNOME's workspaces and Android's widget editing:
+            // laid out at the screen's size and scaled to fit between the top buttons and the
+            // sheet, on the background color. It follows the sheet's height as tabs change.
+            readonly property real top: Theme.spacing.l * 3 + Theme.island.height + Theme.spacing.xs * 2
+            readonly property real bottom: chrome.sheet.y - Theme.spacing.l * 1.5
+            readonly property real cardScale: Math.min((width - Theme.spacing.l * 4) / width,
+                                                       Math.max(bottom - top, 1) / height)
 
-                LockStatus {
-                    width: parent.width
-                }
-            }
+            ClippingRectangle {
+                id: card
+                anchors.horizontalCenter: parent.horizontalCenter
+                y: window.top + (window.bottom - window.top - height) / 2
+                width: window.width * window.cardScale
+                height: window.height * window.cardScale
+                radius: Theme.radius.l * 1.5
+                color: "black"
 
-            // The clock, outlined like an iOS lock screen widget being edited; click it for the
-            // clock's options.
-            Rectangle {
-                readonly property Item clock: lock.clockItem
-                readonly property Item column: clock?.parent ?? null
+                Item {
+                    width: window.width
+                    height: window.height
+                    scale: window.cardScale
+                    transformOrigin: Item.TopLeft
 
-                visible: (clock?.visible ?? false) || chrome.tab === "clock"
-                x: (column?.x ?? 0) + (clock?.x ?? 0) - Theme.spacing.m
-                y: (column?.y ?? 0) + (clock?.y ?? 0) - Theme.spacing.m
-                width: (clock?.width ?? 0) + Theme.spacing.m * 2
-                height: (clock?.height ?? 0) + Theme.spacing.m * 2
-                radius: Theme.radius.l
-                color: clockMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.08) : "transparent"
-                border.width: Theme.outline.normal
-                border.color: chrome.tab === "clock" ? Colors.m3primary : Qt.rgba(1, 1, 1, 0.5)
+                    // The lock screen itself, with input off.
+                    LockContent {
+                        id: lock
+                        anchors.fill: parent
+                        wallpaper: Wallpaper.lockPath
+                        enabled: false
 
-                Accessible.role: Accessible.Button
-                Accessible.name: "The clock's options"
-                Accessible.onPressAction: chrome.tab = "clock"
+                        LockStatus {
+                            width: parent.width
+                        }
+                    }
 
-                MouseArea {
-                    id: clockMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: chrome.tab = "clock"
+                    // The clock, outlined like an iOS lock screen widget being edited; click it
+                    // for the clock's options. Its line is scaled back to the usual width.
+                    Rectangle {
+                        readonly property Item clock: lock.clockItem
+                        readonly property Item column: clock?.parent ?? null
+
+                        visible: (clock?.visible ?? false) || chrome.tab === "clock"
+                        x: (column?.x ?? 0) + (clock?.x ?? 0) - Theme.spacing.m
+                        y: (column?.y ?? 0) + (clock?.y ?? 0) - Theme.spacing.m
+                        width: (clock?.width ?? 0) + Theme.spacing.m * 2
+                        height: (clock?.height ?? 0) + Theme.spacing.m * 2
+                        radius: Theme.radius.l
+                        color: clockMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.08) : "transparent"
+                        border.width: Theme.outline.normal / window.cardScale
+                        border.color: chrome.tab === "clock" ? Colors.m3primary : Qt.rgba(1, 1, 1, 0.5)
+
+                        Accessible.role: Accessible.Button
+                        Accessible.name: "The clock's options"
+                        Accessible.onPressAction: chrome.tab = "clock"
+
+                        MouseArea {
+                            id: clockMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: chrome.tab = "clock"
+                        }
+                    }
                 }
             }
 
@@ -104,8 +131,6 @@ Scope {
                     { value: "clock", label: "Clock" },
                     { value: "picture", label: "Picture" }
                 ]
-                // Frosted over the lock screen, so the glass settings show on it too.
-                backdrop: lock
                 onCancelled: root.cancel()
                 onFinished: root.done()
 

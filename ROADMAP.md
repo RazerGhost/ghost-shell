@@ -968,6 +968,15 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   when it isn't one of its steps. Moved out of Settings: Appearance's animation speed and window
   border and corners, Windows' gaps and wobbly windows (now a Customize button). With this,
   Settings keeps only what isn't seen; every visual option is in an editor.
+- The screen as a card (user's request, like GNOME's workspaces and Android's widget editing):
+  each editor shows what it edits shrunk into a rounded card on the background color, the
+  sheet below it. A live shrunken copy of the whole screen isn't possible on Hyprland 0.57
+  (tested 2026-10-30: a full-screen layer ends up in its own screencopy, a mirror in a
+  mirror; the `no_screen_share` layer rule draws it black instead of leaving it out), so each
+  editor draws its own: the lock screen editor scales LockContent (laid out at the screen's
+  size) into the card, which follows the sheet's height as tabs change; the clock's outline
+  is inside the card. Next: the desktop (wallpaper and widgets drawn in the card), the windows
+  (the examples tiled into it with `hl.monitor`'s `reserved_area`), the dock and island.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

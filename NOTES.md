@@ -270,6 +270,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `active`, and use that at the end (desktop/DesktopCard.qml). Verified by the user's drags.
 - A new folder (a new `qs.<folder>` module) imported in the same change can fail the reload
   with 'module "qs.<folder>" is not installed'; the next reload (touch shell.qml) finds it.
+- `ScreencopyView { captureSource: <ShellScreen>; live: true }` under a full-screen layer of
+  the shell captures that layer too (a mirror in a mirror). The `no_screen_share` layer rule
+  (0.57) doesn't leave the layer out: it's drawn black in every capture (grim too), like the
+  window rule's black boxes. Tested 2026-10-30.
 - An IPC function named `show` can't be called with arguments: `qs ipc call settings show lock`
   fails with "The following argument was not expected: lock" (the CLI's own `show` subcommand
   takes it). Named `page` instead.
