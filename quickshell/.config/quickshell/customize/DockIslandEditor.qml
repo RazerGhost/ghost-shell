@@ -77,162 +77,266 @@ Scope {
                 onCancelled: root.cancel()
                 onFinished: root.close()
 
-                // Island: dots, clock, status icons.
-                SheetGrid {
+                // Island: the workspace dots (drawn at your count), the clock (as it will read) and
+                // which status icons show.
+                SheetTiles {
                     visible: chrome.tab === "island"
 
-                    SheetItem {
+                    SheetTile {
                         title: "Workspace dots"
-                        subtitle: Settings.values.workspaceDots === 0 ? "Only the ones in use; scrolling steps between them" : "Always this many, more when in use"
+                        subtitle: Settings.values.workspaceDots === 0 ? "Only the ones in use" : "Always this many, more when in use"
+                        weight: 1.3
+
+                        // The dots as the island draws them: the current one a wide pill.
+                        Row {
+                            readonly property int count: ThemeScale.pick(Settings.values.workspaceDots, ThemeScale.workspaceDots, 5) || 3
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.top: parent.top
+                            anchors.topMargin: Theme.spacing.m
+                            spacing: Theme.spacing.s
+
+                            Repeater {
+                                model: parent.count
+
+                                Rectangle {
+                                    required property int index
+                                    width: index === 1 ? Theme.spacing.l * 2 : Theme.spacing.m
+                                    height: Theme.spacing.m
+                                    radius: height / 2
+                                    color: index === 1 ? Colors.m3primary : Colors.m3onSurfaceVariant
+                                    opacity: index === 1 || Settings.values.workspaceDots === 0 ? 1 : 0.5
+                                    Behavior on width { NumberAnimation { duration: Theme.anim.fast } }
+                                }
+                            }
+                        }
+
 
                         Segmented {
+                            id: dotsChoice
+                            anchors.bottom: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
                             options: ThemeScale.workspaceDots.map(v => ({ value: v, label: v === 0 ? "In use" : String(v) }))
                             current: ThemeScale.pick(Settings.values.workspaceDots, ThemeScale.workspaceDots, 5)
                             onPicked: v => Settings.values.workspaceDots = v
                         }
                     }
 
-                    Repeater {
-                        model: [
-                            { key: "clockDate", title: "The day next to the time", subtitle: "Thu 29  14:32" },
-                            { key: "clockSeconds", title: "Seconds", subtitle: "" },
-                            { key: "islandMedia", title: "Music takes the clock's place", subtitle: "Its cover while playing" }
-                        ]
+                    SheetTile {
+                        title: "Clock"
+                        subtitle: "In the island's middle"
 
-                        SheetItem {
-                            id: clockRow
-                            required property var modelData
-                            title: modelData.title
-                            subtitle: modelData.subtitle
+                        Column {
+                            anchors.fill: parent
+                            spacing: Theme.spacing.s
 
-                            Switch {
-                                label: clockRow.modelData.title
-                                checked: Settings.values[clockRow.modelData.key]
-                                onToggled: Settings.values[clockRow.modelData.key] = !checked
+                            // The clock as it will read.
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: (Settings.values.clockDate ? "Thu 29  " : "") + "14:32" + (Settings.values.clockSeconds ? ":05" : "")
+                                color: Colors.m3onSurface
+                                font.family: Theme.font.sans
+                                font.pixelSize: Theme.font.large
+                                font.weight: Font.DemiBold
+                                font.features: { "tnum": 1 }
+                            }
+
+                            Repeater {
+                                model: [
+                                    { key: "clockDate", label: "The day too" },
+                                    { key: "clockSeconds", label: "Seconds" },
+                                    { key: "islandMedia", label: "Music's cover instead" }
+                                ]
+
+                                TileRow {
+                                    id: clockRow
+                                    required property var modelData
+                                    label: modelData.label
+
+                                    Switch {
+                                        label: clockRow.modelData.label
+                                        checked: Settings.values[clockRow.modelData.key]
+                                        onToggled: Settings.values[clockRow.modelData.key] = !checked
+                                    }
+                                }
                             }
                         }
                     }
 
                     // Status icons as chips, filled while shown (the privacy ones always show:
                     // recording, microphone, camera, screen sharing).
-                    SheetItem {
+                    SheetTile {
                         title: "Status icons"
+                        subtitle: "Microphone, camera and sharing always show"
+                        weight: 1.4
 
-                        Row {
+                        Flow {
+                            anchors.centerIn: parent
+                            width: parent.width
                             spacing: Theme.spacing.s
 
-                            Repeater {
-                                model: [
-                                    { key: "wifi", icon: "wifi", label: "Wi-Fi" },
-                                    { key: "bluetooth", icon: "bluetooth", label: "Bluetooth" },
-                                    { key: "vpn", icon: "vpn_key", label: "VPN" },
-                                    { key: "airplane", icon: "flight", label: "Airplane" },
-                                    { key: "timer", icon: "timer", label: "Timer" },
-                                    { key: "updates", icon: "download", label: "Updates" },
-                                    { key: "muted", icon: "volume_off", label: "Muted" },
-                                    { key: "battery", icon: "battery_full", label: "Battery" }
-                                ]
 
-                                Rectangle {
-                                    id: chip
+                                Repeater {
+                                    model: [
+                                        { key: "wifi", icon: "wifi", label: "Wi-Fi" },
+                                        { key: "bluetooth", icon: "bluetooth", label: "Bluetooth" },
+                                        { key: "vpn", icon: "vpn_key", label: "VPN" },
+                                        { key: "airplane", icon: "flight", label: "Airplane" },
+                                        { key: "timer", icon: "timer", label: "Timer" },
+                                        { key: "updates", icon: "download", label: "Updates" },
+                                        { key: "muted", icon: "volume_off", label: "Muted" },
+                                        { key: "battery", icon: "battery_full", label: "Battery" }
+                                    ]
 
-                                    required property var modelData
-                                    readonly property var hidden: Array.from(Settings.values.hiddenStatusIcons ?? [])
-                                    readonly property bool shown: !hidden.includes(modelData.key)
+                                    Rectangle {
+                                        id: chip
 
-                                    function toggle(): void {
-                                        Settings.values.hiddenStatusIcons = shown ? [...hidden, modelData.key]
-                                                                                  : hidden.filter(k => k !== modelData.key);
-                                    }
+                                        required property var modelData
+                                        readonly property var hidden: Array.from(Settings.values.hiddenStatusIcons ?? [])
+                                        readonly property bool shown: !hidden.includes(modelData.key)
 
-                                    width: chipRow.width + Theme.spacing.m * 2
-                                    height: Theme.island.height
-                                    radius: Theme.radius.full
-                                    color: shown ? Colors.m3primaryContainer : "transparent"
-                                    border.width: shown ? 0 : 1
-                                    border.color: Colors.m3outlineVariant
-
-                                    Accessible.role: Accessible.CheckBox
-                                    Accessible.name: modelData.label
-                                    Accessible.checked: shown
-                                    Accessible.onToggleAction: toggle()
-                                    activeFocusOnTab: true
-                                    Keys.onReturnPressed: toggle()
-                                    Keys.onSpacePressed: toggle()
-
-                                    Row {
-                                        id: chipRow
-                                        anchors.centerIn: parent
-                                        spacing: Theme.spacing.xs
-
-                                        MaterialIcon {
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            icon: chip.modelData.icon
-                                            color: chip.shown ? Colors.m3onPrimaryContainer : Colors.m3onSurfaceVariant
-                                            font.pixelSize: Theme.icon.small
+                                        function toggle(): void {
+                                            Settings.values.hiddenStatusIcons = shown ? [...hidden, modelData.key]
+                                                                                      : hidden.filter(k => k !== modelData.key);
                                         }
 
-                                        Text {
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            text: chip.modelData.label
-                                            color: chip.shown ? Colors.m3onPrimaryContainer : Colors.m3onSurfaceVariant
-                                            font.family: Theme.font.sans
-                                            font.pixelSize: Theme.font.small
+                                        width: chipRow.width + Theme.spacing.m * 2
+                                        height: Theme.island.height
+                                        radius: Theme.radius.full
+                                        color: shown ? Colors.m3primaryContainer : "transparent"
+                                        border.width: shown ? 0 : 1
+                                        border.color: Colors.m3outlineVariant
+
+                                        Accessible.role: Accessible.CheckBox
+                                        Accessible.name: modelData.label
+                                        Accessible.checked: shown
+                                        Accessible.onToggleAction: toggle()
+                                        activeFocusOnTab: true
+                                        Keys.onReturnPressed: toggle()
+                                        Keys.onSpacePressed: toggle()
+
+                                        Row {
+                                            id: chipRow
+                                            anchors.centerIn: parent
+                                            spacing: Theme.spacing.xs
+
+                                            MaterialIcon {
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                icon: chip.modelData.icon
+                                                color: chip.shown ? Colors.m3onPrimaryContainer : Colors.m3onSurfaceVariant
+                                                font.pixelSize: Theme.icon.small
+                                            }
+
+                                            Text {
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                text: chip.modelData.label
+                                                color: chip.shown ? Colors.m3onPrimaryContainer : Colors.m3onSurfaceVariant
+                                                font.family: Theme.font.sans
+                                                font.pixelSize: Theme.font.small
+                                            }
                                         }
-                                    }
 
-                                    StateLayer {
-                                        radius: chip.radius
-                                        color: Colors.m3onSurface
-                                        hovered: chipMouse.containsMouse
-                                    }
+                                        StateLayer {
+                                            radius: chip.radius
+                                            color: Colors.m3onSurface
+                                            hovered: chipMouse.containsMouse
+                                        }
 
-                                    FocusRing {
-                                        radius: chip.radius
-                                    }
+                                        FocusRing {
+                                            radius: chip.radius
+                                        }
 
-                                    MouseArea {
-                                        id: chipMouse
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: chip.toggle()
+                                        MouseArea {
+                                            id: chipMouse
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: chip.toggle()
+                                        }
                                     }
                                 }
-                            }
                         }
                     }
                 }
 
-                // Dock: when it shows, its icons' size.
-                SheetGrid {
+                // Dock: when it shows, its icons' size (drawn at it), and where pinning is.
+                SheetTiles {
                     visible: chrome.tab === "dock"
 
-                    SheetItem {
+                    SheetTile {
                         title: "Show the dock"
                         subtitle: ({ hide: "When the pointer touches the bottom edge", always: "All the time; windows tile above it",
                                      off: "Never" })[Settings.values.dockMode] ?? ""
 
                         Segmented {
+                            anchors.centerIn: parent
                             options: [{ value: "hide", label: "At the edge" }, { value: "always", label: "Always" }, { value: "off", label: "Off" }]
                             current: Settings.values.dockMode
                             onPicked: v => Settings.values.dockMode = v
                         }
                     }
 
-                    SheetItem {
+                    SheetTile {
                         title: "Icon size"
+                        weight: 1.3
+
+                        // Four icons at the chosen size, like the dock's.
+                        Row {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.bottom: sizeChoice.top
+                            anchors.bottomMargin: Theme.spacing.m
+                            spacing: Theme.spacing.s
+
+                            Repeater {
+                                model: [Colors.m3primaryContainer, Colors.m3surfaceContainerHighest, Colors.m3primary, Colors.m3surfaceContainerHighest]
+
+                                Rectangle {
+                                    required property color modelData
+                                    anchors.bottom: parent.bottom
+                                    width: Theme.dock.icon
+                                    height: width
+                                    radius: width * 0.28
+                                    color: modelData
+                                    Behavior on width { NumberAnimation { duration: Theme.anim.fast } }
+                                }
+                            }
+                        }
 
                         Segmented {
+                            id: sizeChoice
+                            anchors.bottom: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
                             options: ThemeScale.dockIcons.map(v => ({ value: v, label: ({ 36: "Small", 44: "Normal", 52: "Large", 60: "Larger" })[v] }))
                             current: ThemeScale.pick(Settings.values.dockIconSize, ThemeScale.dockIcons, 44)
                             onPicked: v => Settings.values.dockIconSize = v
                         }
                     }
 
-                    SheetItem {
+                    SheetTile {
                         title: "Pinned apps"
-                        subtitle: "Right-click an app in the dock to pin, unpin or move it"
+                        weight: 0.8
+
+                        Column {
+                            anchors.centerIn: parent
+                            width: parent.width
+                            spacing: Theme.spacing.s
+
+                            MaterialIcon {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                icon: "push_pin"
+                                color: Colors.m3onSurfaceVariant
+                                font.pixelSize: Theme.font.title * 1.4
+                            }
+
+                            Text {
+                                width: parent.width
+                                horizontalAlignment: Text.AlignHCenter
+                                text: "Right-click an app in the dock to pin, unpin or move it"
+                                color: Colors.m3onSurfaceVariant
+                                font.family: Theme.font.sans
+                                font.pixelSize: Theme.font.small
+                                wrapMode: Text.Wrap
+                            }
+                        }
                     }
                 }
             }

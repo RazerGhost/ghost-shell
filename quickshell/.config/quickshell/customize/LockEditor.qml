@@ -130,111 +130,134 @@ Scope {
 
                 // Looks: your picture with each preset's clock on it, and first your own look
                 // while it matches none of them ("" is yours).
-                SheetGrid {
+                SheetTiles {
                     visible: chrome.tab === "looks"
 
-                    ChoiceCards {
-                        options: (Presets.current(Settings.values, Presets.lock) === "" ? [{ value: "", label: "Yours" }] : [])
-                            .concat(Presets.lock.map(p => ({ value: p.name, label: p.name })))
-                        current: Presets.current(Settings.values, Presets.lock)
-                        onPicked: v => {
-                            if (v !== "")
-                                Presets.apply(Settings.values, Presets.lock, v);
-                        }
-                        art: Component {
-                            Item {
-                                id: look
-                                readonly property var values: parent.option.value === "" ? Settings.values
-                                    : Presets.lock.find(p => p.name === parent.option.value).values
+                    SheetTile {
+                        title: "Looks"
+                        subtitle: "Your picture with each look's clock"
 
-                                Image {
-                                    anchors.fill: parent
-                                    source: Wallpaper.lockPath ? "file://" + Wallpaper.lockPath : ""
-                                    fillMode: Image.PreserveAspectCrop
-                                    sourceSize.width: width * 2
-                                    asynchronous: true
-                                }
+                        ChoiceCards {
+                            anchors.centerIn: parent
+                            options: (Presets.current(Settings.values, Presets.lock) === "" ? [{ value: "", label: "Yours" }] : [])
+                                .concat(Presets.lock.map(p => ({ value: p.name, label: p.name })))
+                            current: Presets.current(Settings.values, Presets.lock)
+                            onPicked: v => {
+                                if (v !== "")
+                                    Presets.apply(Settings.values, Presets.lock, v);
+                            }
+                            art: Component {
+                                Item {
+                                    id: look
+                                    readonly property var values: parent.option.value === "" ? Settings.values
+                                        : Presets.lock.find(p => p.name === parent.option.value).values
 
-                                Rectangle {
-                                    anchors.fill: parent
-                                    color: "black"
-                                    opacity: look.values.lockDim / 100 + 0.1
-                                }
+                                    Image {
+                                        anchors.fill: parent
+                                        source: Wallpaper.lockPath ? "file://" + Wallpaper.lockPath : ""
+                                        fillMode: Image.PreserveAspectCrop
+                                        sourceSize.width: width * 2
+                                        asynchronous: true
+                                    }
 
-                                MiniClock {
-                                    box: look
-                                    style: look.values.lockClockStyle
-                                    family: look.values.lockClockFont || Theme.font.sans
-                                    fill: 0.5
-                                    // Placed by its shrunk size, like the look's place on the screen.
-                                    transformOrigin: Item.TopLeft
-                                    x: look.values.lockLayout === "left" ? look.width * 0.08 : (look.width - width * scale) / 2
-                                    y: look.values.lockLayout === "top" ? look.height * 0.12
-                                       : look.values.lockLayout === "center" ? (look.height - height * scale) / 2 : look.height * 0.88 - height * scale
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: "black"
+                                        opacity: look.values.lockDim / 100 + 0.1
+                                    }
+
+                                    MiniClock {
+                                        box: look
+                                        style: look.values.lockClockStyle
+                                        family: look.values.lockClockFont || Theme.font.sans
+                                        fill: 0.5
+                                        // Placed by its shrunk size, like the look's place on the screen.
+                                        transformOrigin: Item.TopLeft
+                                        x: look.values.lockLayout === "left" ? look.width * 0.08 : (look.width - width * scale) / 2
+                                        y: look.values.lockLayout === "top" ? look.height * 0.12
+                                           : look.values.lockLayout === "center" ? (look.height - height * scale) / 2 : look.height * 0.88 - height * scale
+                                    }
                                 }
                             }
                         }
                     }
                 }
 
-                // Clock: style and font as tall cards, then place, size and the time and date
-                // stacked beside them.
-                SheetGrid {
+                // Clock: style and font as tall cards, and the clock's place, size and what it
+                // shows, each a tile.
+                SheetTiles {
                     visible: chrome.tab === "clock"
+                    tileHeight: Math.round(Theme.editor.clockCard * 1.1) + Theme.editor.tileChrome
 
-                    // The same card size as the fonts beside it, so the two rows line up.
-                    ChoiceCards {
-                        cardWidth: Theme.editor.clockCard
-                        cardHeight: Math.round(Theme.editor.clockCard * 1.1)
+                    SheetTile {
                         title: "Style"
-                        options: LockClockJs.styles.map(v => ({ value: v, label: ({ big: "Big", stacked: "Stacked", thin: "Thin", analog: "Analog" })[v] }))
-                        current: LockClockJs.pick(Settings.values.lockClockStyle, LockClockJs.styles)
-                        onPicked: v => Settings.values.lockClockStyle = v
-                        art: Component {
-                            Rectangle {
-                                color: Colors.m3surfaceContainerHighest
+                        natural: styleCards.width
 
-                                MiniClock {
-                                    anchors.centerIn: parent
-                                    box: parent
-                                    style: parent.parent.option.value
+                        ChoiceCards {
+                            id: styleCards
+                            anchors.centerIn: parent
+                            cardWidth: Theme.editor.clockCard
+                            cardHeight: Math.round(Theme.editor.clockCard * 1.1)
+                            options: LockClockJs.styles.map(v => ({ value: v, label: ({ big: "Big", stacked: "Stacked", thin: "Thin", analog: "Analog" })[v] }))
+                            current: LockClockJs.pick(Settings.values.lockClockStyle, LockClockJs.styles)
+                            onPicked: v => Settings.values.lockClockStyle = v
+                            art: Component {
+                                Rectangle {
+                                    color: Colors.m3surfaceContainerHighest
+
+                                    MiniClock {
+                                        anchors.centerIn: parent
+                                        box: parent
+                                        style: parent.parent.option.value
+                                    }
                                 }
                             }
                         }
                     }
 
-                    ChoiceCards {
-                        cardWidth: Theme.editor.clockCard
-                        cardHeight: Math.round(Theme.editor.clockCard * 1.1)
-                        id: fontCards
+                    SheetTile {
                         title: "Font"
-                        options: ["", "Inter Display", "Noto Serif", "C059", "Nimbus Sans Narrow", "MesloLGS Nerd Font"]
-                            .filter(f => f === "" || Qt.fontFamilies().includes(f))
-                            .map(f => ({ value: f, label: f === "" ? "Same as text" : f === "MesloLGS Nerd Font" ? "Monospaced" : f }))
-                        current: Settings.values.lockClockFont
-                        onPicked: v => Settings.values.lockClockFont = v
-                        art: Component {
-                            Rectangle {
-                                color: Colors.m3surfaceContainerHighest
+                        subtitle: "The date keeps the shell's"
+                        natural: fontCards.width
 
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "10:09"
-                                    color: Colors.m3onSurface
-                                    font.family: parent.parent.option.value || Theme.font.sans
-                                    font.pixelSize: Math.min(parent.height * 0.36, parent.width * 0.24)
-                                    font.weight: Font.Bold
+                        ChoiceCards {
+                            id: fontCards
+                            anchors.centerIn: parent
+                            cardWidth: Theme.editor.clockCard
+                            cardHeight: Math.round(Theme.editor.clockCard * 1.1)
+                            options: ["", "Inter Display", "Noto Serif", "C059", "Nimbus Sans Narrow", "MesloLGS Nerd Font"]
+                                .filter(f => f === "" || Qt.fontFamilies().includes(f))
+                                .map(f => ({ value: f, label: f === "" ? "Same as text" : f === "MesloLGS Nerd Font" ? "Monospaced" : f }))
+                            current: Settings.values.lockClockFont
+                            onPicked: v => Settings.values.lockClockFont = v
+                            art: Component {
+                                Rectangle {
+                                    color: Colors.m3surfaceContainerHighest
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "10:09"
+                                        color: Colors.m3onSurface
+                                        font.family: parent.parent.option.value || Theme.font.sans
+                                        font.pixelSize: Math.min(parent.height * 0.36, parent.width * 0.24)
+                                        font.weight: Font.Bold
+                                    }
                                 }
                             }
                         }
                     }
 
-                    // Place, size and the time and date stacked beside the cards.
-                    Column {
-                        spacing: Theme.spacing.m
+                    SheetTile {
+                        title: "Place and size"
 
-                        SheetItem {
-                            title: "Place"
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width
+                            spacing: Theme.spacing.m
+
+
+                        TileRow {
+                            label: "Place"
 
                             Segmented {
                                 options: LockClockJs.layouts.map(v => ({ value: v, label: ({ top: "Top", center: "Middle", left: "Bottom left" })[v] }))
@@ -243,8 +266,8 @@ Scope {
                             }
                         }
 
-                        SheetItem {
-                            title: "Size"
+                        TileRow {
+                            label: "Size"
 
                             Segmented {
                                 options: LockClockJs.sizes.map(v => ({ value: v, label: v + " %" }))
@@ -253,8 +276,8 @@ Scope {
                             }
                         }
 
-                        SheetItem {
-                            title: "Show"
+                        TileRow {
+                            label: "Show"
 
                             Row {
                                 spacing: Theme.spacing.m
@@ -285,70 +308,80 @@ Scope {
                                 }
                             }
                         }
+                        }
                     }
                 }
 
-                // Picture: the desktop's or one of yours (the whole row), then blur and darkening.
-                SheetGrid {
+                // Picture: the desktop's or one of yours, and blur and darkening as sliders.
+                SheetTiles {
                     visible: chrome.tab === "picture"
+                    tileHeight: Theme.editor.tile + Theme.spacing.l
 
-                    ChoiceCards {
-                        // The row of pictures takes what the sliders beside it leave.
-                        width: parent.width - Theme.spacing.l * 2 - pictureDivider.width - pictureStack.width - parent.spacing * 2
+                    SheetTile {
                         title: "Picture"
-                        fadeColor: chrome.solid
-                        // Larger than other cards: about as tall as the sliders beside them.
-                        cardWidth: Theme.editor.pictureCard
-                        scrolls: true
-                        // Pictures only: the lock and login screens can't play a video.
-                        options: [{ value: "", label: "Desktop's" }].concat(
-                            Wallpaper.pictures.filter(p => !p.video).map(p => ({ value: p.filePath, label: p.fileName })))
-                        current: Settings.values.lockWallpaper
-                        onPicked: v => Settings.values.lockWallpaper = v
-                        art: Component {
-                            Image {
-                                readonly property string file: parent.option.value || Wallpaper.path
-                                source: file ? "file://" + file : ""
-                                fillMode: Image.PreserveAspectCrop
-                                sourceSize.width: width * 2
-                                asynchronous: true
+                        subtitle: "The lock and login screens'"
+
+                        ChoiceCards {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width
+                            // Fades into the tile, over the sheet.
+                            fadeColor: Qt.tint(chrome.solid, Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, 0.05))
+                            // Larger than other cards: about as tall as the sliders beside them.
+                            cardWidth: Theme.editor.pictureCard
+                            scrolls: true
+                            // Pictures only: the lock and login screens can't play a video.
+                            options: [{ value: "", label: "Desktop's" }].concat(
+                                Wallpaper.pictures.filter(p => !p.video).map(p => ({ value: p.filePath, label: p.fileName })))
+                            current: Settings.values.lockWallpaper
+                            onPicked: v => Settings.values.lockWallpaper = v
+                            art: Component {
+                                Image {
+                                    readonly property string file: parent.option.value || Wallpaper.path
+                                    source: file ? "file://" + file : ""
+                                    fillMode: Image.PreserveAspectCrop
+                                    sourceSize.width: width * 2
+                                    asynchronous: true
+                                }
                             }
                         }
                     }
 
-                    Rectangle {
-                        id: pictureDivider
-                        width: 1
-                        height: pictureStack.height
-                        color: Colors.m3outlineVariant
-                    }
+                    SheetTile {
+                        title: "Blur and darken"
+                        natural: Theme.editor.slider
 
-                    // Blur and darkening as sliders, stacked beside the pictures.
-                    Column {
-                        id: pictureStack
-                        spacing: Theme.spacing.m
+                        // Each slider with its value above it.
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.spacing.xs
 
-                        SheetItem {
-                            title: "Blur  ·  " + (Settings.values.lockBlur === 0 ? "Off" : Settings.values.lockBlur + " %")
+                            Repeater {
+                                model: [
+                                    { name: "Blur", key: "lockBlur", most: 100, step: 10, icon: "blur_on" },
+                                    { name: "Darken", key: "lockDim", most: 60, step: 5, icon: "contrast" }
+                                ]
 
-                            LevelSlider {
-                                width: Theme.editor.slider
-                                icon: "blur_on"
-                                label: "Blur"
-                                value: Settings.values.lockBlur / 100
-                                onMoved: v => Settings.values.lockBlur = Math.round(v * 10) * 10
-                            }
-                        }
+                                Column {
+                                    id: amount
+                                    required property var modelData
+                                    readonly property int value: Settings.values[modelData.key]
+                                    spacing: Theme.spacing.xs
 
-                        SheetItem {
-                            title: "Darken  ·  " + (Settings.values.lockDim === 0 ? "Off" : Settings.values.lockDim + " %")
+                                    Text {
+                                        text: amount.modelData.name + "  ·  " + (amount.value === 0 ? "Off" : amount.value + " %")
+                                        color: Colors.m3onSurfaceVariant
+                                        font.family: Theme.font.sans
+                                        font.pixelSize: Theme.font.small
+                                    }
 
-                            LevelSlider {
-                                width: Theme.editor.slider
-                                icon: "contrast"
-                                label: "Darken"
-                                value: Settings.values.lockDim / 60
-                                onMoved: v => Settings.values.lockDim = Math.round(v * 12) * 5
+                                    LevelSlider {
+                                        width: Theme.editor.slider
+                                        icon: amount.modelData.icon
+                                        label: amount.modelData.name
+                                        value: amount.value / amount.modelData.most
+                                        onMoved: v => Settings.values[amount.modelData.key] = Math.round(v * amount.modelData.most / amount.modelData.step) * amount.modelData.step
+                                    }
+                                }
                             }
                         }
                     }

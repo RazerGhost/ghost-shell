@@ -1020,7 +1020,16 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   panel at the glass setting over your wallpaper with its slider, the blur styles as chips
   (`OptionChip.qml`; the sheet itself shows the blur), a corner sample; Size and text: sample
   text with the two sizes, the fonts as "Aa" chips, the icon theme. Equal heights also keep
-  the card above from jumping between these tabs.
+  the card above from jumping between these tabs. Then every other tab too
+  (user's request): a tile can take its content's width (`natural`, the clock's cards) with
+  the rest sharing what's left, a row can be taller (`tileHeight`), and `TileRow` holds a label
+  and its control inside a tile with several settings. Lock screen: Looks, Style, Font, Place
+  and size, Picture, Blur and darken. Desktop: Wallpaper, Light or dark, Accent, Color style
+  (the nine as chips), Contrast. Dock and island: workspace dots drawn at your count, the
+  island's clock as it will read with its switches, status icons; when the dock shows, icon
+  size with sample icons at it, pinned apps. Windows: a sample window at your border width and
+  corners, the effects, two windows at your gap between and a window in the screen at your
+  edge gap, and the motion settings.
 - Lock screen fix (user's find): a wrong password's message, in the field's column (anchored
   at its bottom), pushed the field up into the lines under the clock. The hints and messages
   now hang below the field in their own column, and in the top layout the field keeps a gap

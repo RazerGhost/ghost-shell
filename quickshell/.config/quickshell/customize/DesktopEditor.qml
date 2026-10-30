@@ -131,49 +131,59 @@ Scope {
                 onFinished: root.close()
 
                 // Wallpaper: yours and the built-in ones, videos as their still frame.
-                SheetGrid {
+                SheetTiles {
                     visible: chrome.tab === "wallpaper"
 
-                    ChoiceCards {
+                    SheetTile {
                         title: "Wallpaper"
-                        scrolls: true
-                        cardWidth: Theme.editor.pictureCard
-                        fadeColor: Colors.surfaceTranslucent
-                        options: Wallpaper.pictures.map(p => ({ value: p.filePath, label: p.fileName, thumb: p.video ? p.thumb : p.filePath }))
-                        current: Wallpaper.path
-                        onPicked: v => Wallpaper.set(v)
-                        art: Component {
-                            Image {
-                                source: "file://" + parent.option.thumb
-                                fillMode: Image.PreserveAspectCrop
-                                sourceSize.width: width * 2
-                                asynchronous: true
+                        subtitle: "Yours and the built-in ones; the colors come from it"
+
+                        ChoiceCards {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width
+                            // Fades into the tile, over the glass sheet.
+                            fadeColor: Qt.tint(Colors.surfaceTranslucent, Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, 0.05))
+                            scrolls: true
+                            cardWidth: Theme.editor.pictureCard
+                            options: Wallpaper.pictures.map(p => ({ value: p.filePath, label: p.fileName, thumb: p.video ? p.thumb : p.filePath }))
+                            current: Wallpaper.path
+                            onPicked: v => Wallpaper.set(v)
+                            art: Component {
+                                Image {
+                                    source: "file://" + parent.option.thumb
+                                    fillMode: Image.PreserveAspectCrop
+                                    sourceSize.width: width * 2
+                                    asynchronous: true
+                                }
                             }
                         }
                     }
                 }
 
-                // Colors: light or dark, the accent as swatches, how they're drawn, contrast.
-                SheetGrid {
+                // Colors: light or dark, the accent as swatches, how the colors are drawn, contrast.
+                SheetTiles {
                     visible: chrome.tab === "colors"
 
-                    SheetItem {
+                    SheetTile {
                         title: "Light or dark"
                         subtitle: Settings.values.colorScheme === "auto" ? "Dark from sunset to sunrise" : ""
 
                         Segmented {
+                            anchors.centerIn: parent
                             options: [{ value: "dark", label: "Dark" }, { value: "light", label: "Light" }, { value: "auto", label: "At sunset" }]
                             current: Settings.values.colorScheme
                             onPicked: v => Settings.values.colorScheme = v
                         }
                     }
 
-                    SheetItem {
+                    SheetTile {
+                        weight: 1.3
                         title: "Accent"
                         subtitle: Settings.values.accentColor ? "Instead of the wallpaper's" : "From the wallpaper"
 
                         // The wallpaper's own (its picture in the circle), then fixed colors.
                         Row {
+                            anchors.centerIn: parent
                             spacing: Theme.spacing.s
 
                             Repeater {
@@ -227,27 +237,43 @@ Scope {
                         }
                     }
 
-                    SheetItem {
+                    SheetTile {
                         title: "Color style"
                         subtitle: "How the colors are drawn from the wallpaper"
+                        weight: 1.6
 
-                        Segmented {
-                            options: ColorSchemeJs.styles.map(v => ({ value: v, label: ({
-                                "scheme-tonal-spot": "Tonal", "scheme-vibrant": "Vibrant",
-                                "scheme-expressive": "Expressive", "scheme-content": "Content",
-                                "scheme-fidelity": "Faithful", "scheme-fruit-salad": "Fruit salad",
-                                "scheme-rainbow": "Rainbow", "scheme-neutral": "Neutral",
-                                "scheme-monochrome": "Mono"
-                            })[v] ?? v }))
-                            current: Settings.values.colorStyle
-                            onPicked: v => Settings.values.colorStyle = v
+                        Grid {
+                            id: styleGrid
+                            anchors.centerIn: parent
+                            width: parent.width
+                            columns: 3
+                            spacing: Theme.spacing.s
+
+                            Repeater {
+                                model: ColorSchemeJs.styles
+
+                                OptionChip {
+                                    required property string modelData
+                                    width: (styleGrid.width - styleGrid.spacing * 2) / 3
+                                    text: ({
+                                        "scheme-tonal-spot": "Tonal", "scheme-vibrant": "Vibrant",
+                                        "scheme-expressive": "Expressive", "scheme-content": "Content",
+                                        "scheme-fidelity": "Faithful", "scheme-fruit-salad": "Fruit salad",
+                                        "scheme-rainbow": "Rainbow", "scheme-neutral": "Neutral",
+                                        "scheme-monochrome": "Mono"
+                                    })[modelData] ?? modelData
+                                    chosen: Settings.values.colorStyle === modelData
+                                    onClicked: Settings.values.colorStyle = modelData
+                                }
+                            }
                         }
                     }
 
-                    SheetItem {
+                    SheetTile {
                         title: "Contrast"
 
                         Segmented {
+                            anchors.centerIn: parent
                             options: [{ value: -0.5, label: "Lower" }, { value: 0, label: "Standard" },
                                       { value: 0.5, label: "Higher" }, { value: 1, label: "Highest" }]
                             current: Settings.values.colorContrast

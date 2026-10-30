@@ -10,11 +10,13 @@ Rectangle {
     property string title
     property string subtitle
     property real weight: 1
+    // Its content's width (picture cards), instead of a share by weight; 0: by weight.
+    property real natural: 0
     default property alias content: body.data
     property alias action: actionSlot.data
 
-    width: (parent?.unit ?? 0) * weight
-    height: Theme.editor.tile
+    width: natural > 0 ? natural + Theme.spacing.m * 2 : (parent?.unit ?? 0) * weight
+    height: parent?.tileHeight ?? Theme.editor.tile
     radius: Theme.radius.l
     // A shade over the sheet, glass or solid alike.
     color: Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, 0.05)

@@ -215,71 +215,164 @@ Scope {
                 onCancelled: root.cancel()
                 onFinished: root.close()
 
-                // Borders: width, corners and the extras.
-                SheetGrid {
+                // Borders: a sample window for the width and the corners, and the extras.
+                SheetTiles {
                     visible: chrome.tab === "borders"
 
-                    SheetItem {
+                    SheetTile {
                         title: "Border"
                         subtitle: "In your wallpaper's colors"
 
+                        // A window, as Hyprland draws it at the setting.
+                        Rectangle {
+                            anchors.top: parent.top
+                            anchors.bottom: borderChoice.top
+                            anchors.bottomMargin: Theme.spacing.m
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            width: parent.width * 0.5
+                            color: Colors.m3surfaceContainerHighest
+                            radius: Settings.values.rounding
+                            border.width: Settings.values.borderSize
+                            border.color: Colors.m3primary
+                        }
+
                         Segmented {
+                            id: borderChoice
+                            anchors.bottom: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
                             options: root.withCurrent([0, 1, 2, 3, 4], Settings.values.borderSize).map(v => ({ value: v, label: v === 0 ? "None" : v + " px" }))
                             current: Settings.values.borderSize
                             onPicked: v => Settings.values.borderSize = v
                         }
                     }
 
-                    SheetItem {
+                    SheetTile {
                         title: "Corners"
 
+                        // A window, as Hyprland draws it at the setting.
+                        Rectangle {
+                            anchors.top: parent.top
+                            anchors.bottom: cornerChoice.top
+                            anchors.bottomMargin: Theme.spacing.m
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            width: parent.width * 0.5
+                            color: Colors.m3surfaceContainerHighest
+                            radius: Settings.values.rounding
+                            border.width: Theme.outline.normal
+                            border.color: Colors.m3outlineVariant
+                            Behavior on radius { NumberAnimation { duration: Theme.anim.fast } }
+                        }
+
                         Segmented {
+                            id: cornerChoice
+                            anchors.bottom: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
                             options: root.withCurrent([0, 6, 10, 14, 20], Settings.values.rounding).map(v => ({ value: v, label: ({ 0: "Square", 6: "Less", 10: "Round", 14: "More", 20: "Most" })[v] ?? v + " px" }))
                             current: Settings.values.rounding
                             onPicked: v => Settings.values.rounding = v
                         }
                     }
 
-                    Repeater {
-                        model: [
-                            { key: "borderSpin", title: "Turning border", subtitle: "Costs battery: redraws all the time" },
-                            { key: "windowGlow", title: "Glow", subtitle: "In your accent, on the focused window" },
-                            { key: "windowKindBorders", title: "Floating and pinned windows stand out", subtitle: "Their borders in other colors" }
-                        ]
+                    SheetTile {
+                        title: "Effects"
 
-                        SheetItem {
-                            id: extraRow
-                            required property var modelData
-                            title: modelData.title
-                            subtitle: modelData.subtitle
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width
+                            spacing: Theme.spacing.s
 
-                            Switch {
-                                label: extraRow.modelData.title
-                                checked: Settings.values[extraRow.modelData.key]
-                                onToggled: Settings.values[extraRow.modelData.key] = !checked
+                            Repeater {
+                                model: [
+                                    { key: "borderSpin", label: "Turning border (costs battery)" },
+                                    { key: "windowGlow", label: "Glow on the focused window" },
+                                    { key: "windowKindBorders", label: "Floating and pinned stand out" }
+                                ]
+
+                                TileRow {
+                                    id: extraRow
+                                    required property var modelData
+                                    label: modelData.label
+
+                                    Switch {
+                                        label: extraRow.modelData.label
+                                        checked: Settings.values[extraRow.modelData.key]
+                                        onToggled: Settings.values[extraRow.modelData.key] = !checked
+                                    }
+                                }
                             }
                         }
                     }
                 }
 
-                // Space: the gaps between tiled windows and at the screen's edges.
-                SheetGrid {
+                // Space: the gaps, each drawn: two windows apart, and a window inside the screen.
+                SheetTiles {
                     visible: chrome.tab === "space"
 
-                    SheetItem {
+                    SheetTile {
                         title: "Between windows"
 
+                        Row {
+                            anchors.top: parent.top
+                            anchors.bottom: betweenChoice.top
+                            anchors.bottomMargin: Theme.spacing.m
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            spacing: Settings.values.gapsIn
+                            Behavior on spacing { NumberAnimation { duration: Theme.anim.fast } }
+
+                            Repeater {
+                                model: 2
+
+                                Rectangle {
+                                    width: Theme.editor.slider * 0.4
+                                    height: parent.height
+                                    radius: Settings.values.rounding
+                                    color: Colors.m3surfaceContainerHighest
+                                    border.width: Settings.values.borderSize
+                                    border.color: Colors.m3primary
+                                }
+                            }
+                        }
+
                         Segmented {
+                            id: betweenChoice
+                            anchors.bottom: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
                             options: root.withCurrent([0, 3, 5, 8, 12], Settings.values.gapsIn).map(v => ({ value: v, label: v === 0 ? "None" : v + " px" }))
                             current: Settings.values.gapsIn
                             onPicked: v => Settings.values.gapsIn = v
                         }
                     }
 
-                    SheetItem {
+                    SheetTile {
                         title: "At the screen's edges"
 
+                        // The screen, and a window inside it at the gap.
+                        Rectangle {
+                            anchors.top: parent.top
+                            anchors.bottom: edgesChoice.top
+                            anchors.bottomMargin: Theme.spacing.m
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            width: height * 16 / 9
+                            radius: Theme.radius.s
+                            color: "transparent"
+                            border.width: Theme.outline.normal
+                            border.color: Colors.m3outlineVariant
+
+                            Rectangle {
+                                anchors.fill: parent
+                                anchors.margins: Settings.values.gapsOut
+                                Behavior on anchors.margins { NumberAnimation { duration: Theme.anim.fast } }
+                                radius: Settings.values.rounding
+                                color: Colors.m3surfaceContainerHighest
+                                border.width: Settings.values.borderSize
+                                border.color: Colors.m3primary
+                            }
+                        }
+
                         Segmented {
+                            id: edgesChoice
+                            anchors.bottom: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
                             options: root.withCurrent([0, 8, 14, 20, 30], Settings.values.gapsOut).map(v => ({ value: v, label: v === 0 ? "None" : v + " px" }))
                             current: Settings.values.gapsOut
                             onPicked: v => Settings.values.gapsOut = v
@@ -287,24 +380,28 @@ Scope {
                     }
                 }
 
-                // Motion: speed and styles, each with Play; wobbly windows.
-                SheetGrid {
+                // Motion: the speed, how windows and workspaces move (each with Play), wobbly windows.
+                SheetTiles {
                     visible: chrome.tab === "motion"
 
-                    SheetItem {
+                    SheetTile {
+                        weight: 1.3
                         title: "Speed"
 
                         Segmented {
+                            anchors.centerIn: parent
                             options: HyprlandConfig.animationSpeeds.map(v => ({ value: v, label: v === 0 ? "Off" : v === 1 ? "Normal" : v + "×" }))
                             current: HyprlandConfig.animationSpeed(Settings.values.animationSpeed)
                             onPicked: v => Settings.values.animationSpeed = v
                         }
                     }
 
-                    SheetItem {
+                    SheetTile {
+                        weight: 1.3
                         title: "Opening and closing"
 
                         Row {
+                            anchors.centerIn: parent
                             spacing: Theme.spacing.s
 
                             Segmented {
@@ -322,10 +419,12 @@ Scope {
                         }
                     }
 
-                    SheetItem {
+                    SheetTile {
+                        weight: 1.3
                         title: "Switching workspaces"
 
                         Row {
+                            anchors.centerIn: parent
                             spacing: Theme.spacing.s
 
                             Segmented {
@@ -343,11 +442,13 @@ Scope {
                         }
                     }
 
-                    SheetItem {
+                    SheetTile {
+                        weight: 0.7
                         title: "Wobbly windows"
                         subtitle: "While moving or resizing"
 
                         Switch {
+                            anchors.centerIn: parent
                             label: "Wobbly windows"
                             checked: Settings.values.wobble
                             onToggled: Settings.values.wobble = !checked
