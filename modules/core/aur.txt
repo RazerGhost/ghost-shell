@@ -2,3 +2,6 @@
 # The shell's icon font, and its icon theme
 ttf-material-symbols-variable
 colloid-icon-theme-git
+# The pointer: Bibata Modern (Ice, Classic, Amber; user's choice 2026-10-30), picked in
+# Settings -> Keyboard and mouse -> Pointer
+bibata-cursor-theme-bin
