@@ -28,7 +28,7 @@ machine can take what it needs.
   lock screen editing: the lock screen (clock styles, fonts, looks, picture, widgets), the desktop
   (saved themes, wallpaper, colors, desktop widgets, glass, sizes, fonts), the dock and island, and how
   windows look (borders, gaps, animations, on example windows). Each shows the screen as a card
-  with live previews and ready-made looks; Super + U picks one, and each works with the keyboard as well as the pointer.
+  with live previews and ready-made looks; Super + U picks one, and each works with the keyboard as well as the pointer. Your themes and looks travel to another machine with `ghost looks export` / `import` (a `looks.json` in the repo).
 - **Desktop widgets**: a clock, the weather, the media player, the calendar's next events, the
   battery, the to-do list and a timer on the wallpaper, picked from a gallery and dragged into place.
 - **A settings app** for what would otherwise be config files: displays, sound, keyboard and

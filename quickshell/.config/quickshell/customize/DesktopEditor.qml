@@ -416,6 +416,47 @@ Scope {
                                 visible: themesTab.current !== ""
                                 onClicked: Settings.values.themes = Themes.removed(themesTab.themes, themesTab.current)
                             }
+
+                            // Across machines (ghost looks): your themes and every editor's looks
+                            // into the repo's looks.json, or from it.
+                            Row {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                spacing: Theme.spacing.s
+
+                                TextButton {
+                                    text: "Export"
+                                    onClicked: looksShare.start([Quickshell.env("HOME") + "/.local/bin/ghost", "looks", "export"])
+                                }
+
+                                TextButton {
+                                    text: "Import"
+                                    onClicked: looksShare.start([Quickshell.env("HOME") + "/.local/bin/ghost", "looks", "import"])
+                                }
+                            }
+
+                            Process {
+                                id: looksShare
+                                stdout: StdioCollector {
+                                    id: shareOut
+                                }
+                                stderr: StdioCollector {
+                                    id: shareErr
+                                }
+                                function start(command: var): void {
+                                    looksShare.command = command;
+                                    looksShare.running = true;
+                                }
+                                // Export says where they went; import's own notice comes from the
+                                // shell when it merges (Customize.qml).
+                                onExited: code => {
+                                    if (code !== 0)
+                                        Notifications.send("Customize", "dialog-warning", "Couldn't share the looks",
+                                                           shareErr.text.trim() || "ghost looks exited with " + code, false, []);
+                                    else if (looksShare.command[2] === "export")
+                                        Notifications.send("Customize", "preferences-desktop-theme", "Looks exported",
+                                                           shareOut.text.trim(), false, []);
+                                }
+                            }
                         }
                     }
                 }

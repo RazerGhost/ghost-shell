@@ -1,6 +1,8 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.services
+import "LooksFile.js" as LooksFile
 
 // The on-screen editors (user's choice over pickers inside Settings: Android's customization
 // with iOS's and macOS's way of editing on the screen itself). Opened from the customize menu
@@ -55,8 +57,42 @@ Scope {
         editor.open();
     }
 
+    // Themes and looks from another machine (`ghost looks import`, the Themes tab's Import):
+    // merged into the settings here, which this shell owns while it runs.
+    Process {
+        id: looksRead
+        property string from
+        command: ["cat", from]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                let file;
+                try {
+                    file = JSON.parse(text);
+                } catch (e) {
+                    Notifications.send("Customize", "dialog-warning", "Couldn't import the looks",
+                                       looksRead.from + " isn't valid JSON.", false, []);
+                    return;
+                }
+                const here = {};
+                for (const key of LooksFile.keys)
+                    here[key] = Array.from(Settings.values[key] ?? []);
+                const merged = LooksFile.imported(here, file, Quickshell.env("HOME"));
+                for (const key of LooksFile.keys)
+                    Settings.values[key] = merged[key];
+                const count = LooksFile.keys.reduce((n, key) => n + (Array.isArray(file[key]) ? file[key].length : 0), 0);
+                Notifications.send("Customize", "preferences-desktop-theme", "Looks imported",
+                                   count + " themes and looks from your dotfiles, merged with this machine's.", false, []);
+            }
+        }
+    }
+
     IpcHandler {
         target: "customize"
+
+        function importLooks(path: string): void {
+            looksRead.from = path;
+            looksRead.running = true;
+        }
 
         // Super+U: open, or close again.
         function menu(): void {

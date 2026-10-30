@@ -1348,6 +1348,18 @@ while the grid is on (a step from a line lands on the next one), else 48 px, kep
 screen (`DesktopWidgets.nudged`, tested). The hint row says so on that tab
 (`EditorChrome.extraHints`).
 
+### Themes and looks across machines (built 2026-10-30)
+User's pick. `ghost looks export` writes this machine's themes and every editor's own looks
+(`themes`, `lockLooks`, `dockLooks`, `windowLooks`, `widgetLooks`) into the repo as
+`looks.json`, the home folder written as "~" (a theme's wallpaper, a lock look's picture), to
+commit and pull elsewhere; `ghost looks import` merges it in there: the same name replaces,
+new ones are added, the others stay (`customize/LooksFile.js`, tested; bun loads the same file
+in `modules/core/looks.sh`). While the shell runs, the import goes through it
+(`qs ipc call customize importLooks <file>`), since it owns settings.json then; otherwise into
+the file. The desktop editor's Themes tab has Export and Import buttons for the same, with a
+notification saying what happened. A look whose picture isn't on the other machine shows as
+"picture gone" until it is.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

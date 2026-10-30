@@ -13,6 +13,9 @@
 #   ghost calendar add [name] | remove <name> | list | sync
 #                     a subscribed calendar (a Proton Calendar share link) in the today menu
 #                     (modules/calendar/calendar.sh)
+#   ghost looks export | import
+#                     your themes and looks into the repo's looks.json, or from it into this
+#                     machine's (modules/core/looks.sh)
 #   ghost doctor      check that everything is set up
 #   ghost modules     list the modules, and which this machine uses
 #   ghost keybinds    Hyprland's keybinds as a Markdown table (docs/keybinds.md is made with it)
@@ -255,6 +258,7 @@ case ${1:-help} in
     greeter) modules/core/greeter.sh ;;
     webapp) shift; modules/apps/webapp.sh "$@" ;;
     calendar) shift; modules/calendar/calendar.sh "$@" ;;
+    looks) shift; modules/core/looks.sh "$@" ;;
     doctor) cmd_doctor ;;
     modules) cmd_modules ;;
     keybinds) cmd_keybinds ;;
