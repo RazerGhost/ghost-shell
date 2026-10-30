@@ -10,15 +10,12 @@ Row {
 
     property real tileHeight: Theme.editor.tile
 
-    readonly property var tiles: {
-        const list = [];
-        for (const child of children)
-            if (child.visible && child.weight !== undefined)
-                list.push(child);
-        return list;
-    }
+    // Every tile, shown or not: on a tab that isn't showing, every child reports `visible` false,
+    // and dividing the width among no tiles made each millions of px wide (a texture the size
+    // of that froze the shell; NOTES).
+    readonly property var tiles: Array.from(children).filter(child => child.weight !== undefined)
     readonly property real fixedWidth: tiles.reduce((sum, t) => sum + (t.natural > 0 ? t.natural + Theme.spacing.m * 2 : 0), 0)
-    readonly property real totalWeight: Math.max(tiles.reduce((sum, t) => sum + (t.natural > 0 ? 0 : t.weight), 0), 0.001)
+    readonly property real totalWeight: Math.max(tiles.reduce((sum, t) => sum + (t.natural > 0 ? 0 : t.weight), 0), 1)
     // One weight's width, of what the natural-width tiles leave.
     readonly property real unit: (width - spacing * Math.max(tiles.length - 1, 0) - fixedWidth) / totalWeight
 

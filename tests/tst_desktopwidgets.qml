@@ -28,4 +28,18 @@ TestCase {
         compare(saved, { clock: { x: 0.5, y: 0.5 } });
         compare(DesktopWidgets.withPlace(undefined, "media", { x: 0, y: 1 }), { media: { x: 0, y: 1 } });
     }
+
+    function test_snapped() {
+        // Near the top-left corner: onto the screen's margin.
+        compare(DesktopWidgets.snapped(40, 20, 100, 50, 1920, 1080, [], 32, 16, 24), { x: 32, y: 32 });
+        // Near the right and bottom edges.
+        compare(DesktopWidgets.snapped(1800, 1000, 100, 50, 1920, 1080, [], 32, 16, 24), { x: 1788, y: 998 });
+        // Far from everything: where it was dropped.
+        compare(DesktopWidgets.snapped(500, 400, 100, 50, 1920, 1080, [], 32, 16, 24), { x: 500, y: 400 });
+        // Under another widget: its left edge, and the gap below it.
+        const other = { x: 300, y: 200, w: 200, h: 100 };
+        compare(DesktopWidgets.snapped(310, 322, 100, 50, 1920, 1080, [other], 32, 16, 24), { x: 300, y: 316 });
+        // Beside it: the gap to its right, and its top.
+        compare(DesktopWidgets.snapped(520, 190, 100, 50, 1920, 1080, [other], 32, 16, 24), { x: 516, y: 200 });
+    }
 }

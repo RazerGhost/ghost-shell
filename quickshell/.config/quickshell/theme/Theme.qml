@@ -178,10 +178,19 @@ Singleton {
     }
 
     // Desktop widgets (desktop/DesktopWidgets.qml), on the wallpaper.
+    // Desktop widgets (desktop/), a family like iOS's and Android's: a small square and a medium
+    // one twice as wide, the same height, corners and padding.
     readonly property QtObject desktop: QtObject {
-        readonly property int clock:   root.text(72) // the time
-        readonly property int weather: root.text(40) // the temperature
-        readonly property int width:   root.px(300)  // the weather and media cards
+        readonly property int size:    root.px(168) // a small widget's side; every widget's height
+        readonly property int gap:     root.px(16)  // between widgets snapped side by side
+        readonly property int medium:  size * 2 + gap
+        readonly property int padding: root.px(20)
+        readonly property int radius:  root.round(28)
+        readonly property int margin:  root.px(32)  // from the screen's edges, when snapped
+        readonly property int reach:   root.px(24)  // how close a drop snaps
+        readonly property int clock:   root.text(64) // the time
+        readonly property int weather: root.text(44) // the temperature
+        readonly property int cover:   size - padding * 2 // the media widget's cover
     }
 
     readonly property QtObject dock: QtObject {

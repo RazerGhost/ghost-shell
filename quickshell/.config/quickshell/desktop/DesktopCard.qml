@@ -1,19 +1,21 @@
 import QtQuick
-import qs.customize
 import qs.services
 import qs.theme
 import qs.widgets
 import "DesktopWidgets.js" as DesktopWidgets
 
 // One desktop widget at its saved place (Settings' desktopWidgets, as fractions of the screen).
-// Resting the pointer on it (or the desktop editor being open) shows a handle in its top-right
-// corner; drag that to move it. Only
-// the handle: the media card's buttons keep their clicks.
+// It fades and grows in when shown, and lifts a little under the pointer. Resting the pointer
+// on it (or the desktop editor being open) shows a handle in its top-right corner; drag that to
+// move it, and a drop near the screen's edges or another widget lines up with them. Only the
+// handle: the media widget's buttons keep their clicks.
 Item {
     id: root
 
     // Its key in desktopWidgets ("clock", "weather", "media").
     required property string name
+    // On (its setting, and for media something to play); it stays visible while fading out.
+    property bool shown: true
     default property alias content: body.data
 
     readonly property var spot: DesktopWidgets.place(Settings.values.desktopWidgets, name)
@@ -29,6 +31,12 @@ Item {
     width: body.childrenRect.width
     height: body.childrenRect.height
 
+    visible: opacity > 0
+    opacity: shown ? 1 : 0
+    scale: !shown ? 0.92 : hover.hovered && !drag.active ? 1.02 : 1
+    Behavior on opacity { NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing } }
+    Behavior on scale { NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing } }
+
     Item {
         id: body
         anchors.fill: parent
@@ -42,7 +50,7 @@ Item {
         id: handle
         anchors.top: parent.top
         anchors.right: parent.right
-        anchors.margins: Theme.spacing.xs
+        anchors.margins: Theme.spacing.s
         width: Theme.icon.normal + Theme.spacing.s
         height: width
         radius: width / 2
@@ -84,9 +92,15 @@ Item {
                     return;
                 }
                 const area = root.parent;
-                const place = DesktopWidgets.dropped(root.spot.x * area.width + root.dragged.x,
-                                                     root.spot.y * area.height + root.dragged.y,
-                                                     root.width, root.height, area.width, area.height);
+                // The other widgets showing, to line up with.
+                const others = Array.from(area.children)
+                    .filter(c => c !== root && c.name !== undefined && c.visible)
+                    .map(c => ({ x: c.x, y: c.y, w: c.width, h: c.height }));
+                const at = DesktopWidgets.snapped(root.spot.x * area.width + root.dragged.x,
+                                                  root.spot.y * area.height + root.dragged.y,
+                                                  root.width, root.height, area.width, area.height, others,
+                                                  Theme.desktop.margin, Theme.desktop.gap, Theme.desktop.reach);
+                const place = DesktopWidgets.dropped(at.x, at.y, root.width, root.height, area.width, area.height);
                 Settings.values.desktopWidgets = DesktopWidgets.withPlace(Settings.values.desktopWidgets, root.name, place);
                 root.moving = false;
             }

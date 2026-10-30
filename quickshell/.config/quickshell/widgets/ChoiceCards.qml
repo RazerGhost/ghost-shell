@@ -5,7 +5,7 @@ import qs.widgets
 // A setting picked by sight, like macOS's Appearance thumbnails or the iOS lock screen
 // gallery: a row of small pictures with a name under each; the current one has an accent
 // outline. `art` draws a card's picture; it's given the option as `option` on its parent
-// (`parent.option`). The on-screen editors' (customize/) sheets line them up (SheetGrid).
+// (`parent.option`). The on-screen editors' (customize/) tiles hold them.
 Column {
     id: root
 
@@ -30,7 +30,7 @@ Column {
     property real cardHeight: Math.round(cardWidth * 10 / 16)
 
     // As wide as its cards in one row; a scrolling row takes the whole row of its sheet (the
-    // editor's SheetGrid, less its side margins).
+    // tile, less the side margins).
     width: scrolls ? (parent?.width ?? 0) - Theme.spacing.l * 2
                    : options.length * cardWidth + Math.max(options.length - 1, 0) * Theme.spacing.m
     spacing: Theme.spacing.s

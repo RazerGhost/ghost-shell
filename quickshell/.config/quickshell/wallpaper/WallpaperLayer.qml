@@ -5,7 +5,6 @@ import Quickshell.Hyprland
 import Quickshell.Services.UPower
 import Quickshell.Wayland
 import Quickshell.Widgets
-import qs.customize
 import qs.services
 import qs.theme
 

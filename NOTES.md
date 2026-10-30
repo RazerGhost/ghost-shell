@@ -282,6 +282,13 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - Anything set with `hyprctl eval` (a workspace rule, a monitor) is dropped by the next
   `hyprctl reload`, which the shell runs whenever a setting written to shell-settings.lua
   changes. What must last through those goes in that file (services/HyprlandRuntime.qml).
+- An item's `visible` is false whenever any parent is hidden, so code that counts "visible"
+  children gets none on a tab that isn't showing. `SheetTiles` divided its width among no
+  tiles (by 0.001): tiles 2,188,776 px wide, and a `ClippingRectangle` in one asked for a
+  texture that size every frame ("QSGRhiLayer: Unsupported size requested ... Maximum texture
+  size: 16384"). The shell's event loop stopped answering (`qs ipc` timed out) and reading its
+  `/proc` entries (`ps`, `pgrep`) hung until it was killed. Hit 2026-10-30; a frozen instance's
+  log stays in `/run/user/1000/quickshell/by-id/<id>/log.log`.
 - An IPC function named `show` can't be called with arguments: `qs ipc call settings show lock`
   fails with "The following argument was not expected: lock" (the CLI's own `show` subcommand
   takes it). Named `page` instead.

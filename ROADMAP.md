@@ -1033,6 +1033,17 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   size with sample icons at it, pinned apps. Windows: a sample window at your border width and
   corners, the effects, two windows at your gap between and a window in the screen at your
   edge gap, and the motion settings.
+- Desktop widgets polish: one family like iOS's and Android's (`Theme.desktop`): a small square
+  and a medium one twice as wide, the same height, corners and padding (`WidgetSurface.qml`).
+  Clock (medium): the weekday in the accent, the time, the date. Weather (small): the
+  temperature and sky icon at the top, the sky, high and low and the town below. Media
+  (medium): the cover, track and artist, and previous, play and next (play in a filled circle;
+  no progress bar: Spotify reports a frozen position). They fade and grow in when turned on
+  and lift a little under the pointer; a drop near the screen's edges or another widget lines
+  up with them (`DesktopWidgets.snapped`, tested). The desktop editor's Widgets tab shows the
+  real widgets, scaled. `Editing` moved to `services/` (the editors now import `qs.desktop`,
+  which imported `qs.customize` for it). A bug found on the way: on a hidden tab
+  `SheetTiles` made its tiles millions of px wide and froze the shell (NOTES).
 - Lock screen fix (user's find): a wrong password's message, in the field's column (anchored
   at its bottom), pushed the field up into the lines under the clock. The hints and messages
   now hang below the field in their own column, and in the top layout the field keeps a gap

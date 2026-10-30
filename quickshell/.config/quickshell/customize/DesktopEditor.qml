@@ -4,6 +4,7 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
+import qs.desktop
 import qs.services
 import qs.settings
 import qs.theme
@@ -307,93 +308,23 @@ Scope {
                                 onToggled: Settings.values[widgetTile.modelData.key] = !checked
                             }
 
-                            // A small copy of the widget, dimmed while it's off; clicking toggles.
-                            Surface {
-                                anchors.centerIn: parent
-                                width: Math.min(parent.width, Theme.desktop.width * 0.7)
-                                height: parent.height
-                                radius: Theme.radius.l
+                            // The widget itself, scaled to fit, dimmed while it's off; clicking toggles.
+                            Item {
+                                anchors.fill: parent
                                 opacity: widgetTile.on ? 1 : Theme.state.disabled
                                 Behavior on opacity { NumberAnimation { duration: Theme.anim.fast } }
 
-                                Column {
+                                Loader {
                                     anchors.centerIn: parent
-                                    visible: widgetTile.modelData.key === "desktopClock"
-
-                                    Text {
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        text: "10:09"
-                                        color: Colors.m3onSurface
-                                        font.family: Theme.font.sans
-                                        font.pixelSize: Theme.font.title * 1.6
-                                        font.weight: Font.Bold
-                                    }
-
-                                    Text {
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        text: "Thursday, 29 October"
-                                        color: Colors.m3onSurfaceVariant
-                                        font.family: Theme.font.sans
-                                        font.pixelSize: Theme.font.small
-                                    }
+                                    enabled: false
+                                    sourceComponent: ({ desktopClock: clockWidget, desktopWeather: weatherWidget,
+                                                        desktopMedia: mediaWidget })[widgetTile.modelData.key]
+                                    scale: item ? Math.min(parent.width / item.width, parent.height / item.height, 1) : 1
                                 }
 
-                                Row {
-                                    anchors.centerIn: parent
-                                    visible: widgetTile.modelData.key === "desktopWeather"
-                                    spacing: Theme.spacing.s
-
-                                    MaterialIcon {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        icon: Weather.current?.icon ?? "partly_cloudy_day"
-                                        color: Colors.m3primary
-                                        font.pixelSize: Theme.font.title * 1.6
-                                    }
-
-                                    Text {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        text: (Weather.current?.temperature ?? 18) + "°"
-                                        color: Colors.m3onSurface
-                                        font.family: Theme.font.sans
-                                        font.pixelSize: Theme.font.title * 1.4
-                                        font.weight: Font.DemiBold
-                                    }
-                                }
-
-                                Row {
-                                    anchors.centerIn: parent
-                                    visible: widgetTile.modelData.key === "desktopMedia"
-                                    spacing: Theme.spacing.m
-
-                                    Rectangle {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        width: Theme.icon.normal * 2
-                                        height: width
-                                        radius: Theme.radius.s
-                                        color: Colors.m3primaryContainer
-
-                                        MaterialIcon {
-                                            anchors.centerIn: parent
-                                            icon: "music_note"
-                                            color: Colors.m3onPrimaryContainer
-                                        }
-                                    }
-
-                                    Row {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        spacing: Theme.spacing.xs
-
-                                        Repeater {
-                                            model: ["skip_previous", "play_arrow", "skip_next"]
-
-                                            MaterialIcon {
-                                                required property string modelData
-                                                icon: modelData
-                                                color: Colors.m3onSurfaceVariant
-                                            }
-                                        }
-                                    }
-                                }
+                                Component { id: clockWidget; ClockWidget {} }
+                                Component { id: weatherWidget; WeatherWidget {} }
+                                Component { id: mediaWidget; MediaWidget {} }
 
                                 MouseArea {
                                     anchors.fill: parent
