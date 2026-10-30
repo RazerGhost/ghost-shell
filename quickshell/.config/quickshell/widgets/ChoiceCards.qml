@@ -30,8 +30,8 @@ Column {
     property real cardHeight: Math.round(cardWidth * 10 / 16)
 
     // As wide as its cards in one row; a scrolling row takes the whole row of its sheet (the
-    // editor's SheetGrid, less its padding).
-    width: scrolls ? (parent ? parent.width - (parent.leftPadding ?? 0) - (parent.rightPadding ?? 0) : 0)
+    // editor's SheetGrid, less its side margins).
+    width: scrolls ? (parent?.width ?? 0) - Theme.spacing.l * 2
                    : options.length * cardWidth + Math.max(options.length - 1, 0) * Theme.spacing.m
     spacing: Theme.spacing.s
 
@@ -51,12 +51,13 @@ Column {
 
         Text {
             width: parent.width
-            visible: text !== ""
-            text: root.subtitle
+            // A line kept even without a subtitle, so cards and settings beside them line up.
+            text: root.subtitle || " "
+            maximumLineCount: 1
+            elide: Text.ElideRight
             color: Colors.m3onSurfaceVariant
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.small
-            wrapMode: Text.Wrap
         }
     }
 

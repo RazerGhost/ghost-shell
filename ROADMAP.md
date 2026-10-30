@@ -1007,7 +1007,10 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   review): a titled row of larger wallpapers fading at the end; color styles as segments, all
   colors in one row; the widgets as on/off cards with a small look at each, like the iOS widget
   gallery (`ChoiceCards.chosenValues` for several at once); glass's solidity as a slider and
-  the blur styles as segments; shell and text size stacked, then fonts, then icons.
+  the blur styles as segments; shell and text size stacked, then fonts, then icons. Then (user's
+  review of all tabs): every setting's header keeps a line for its subtitle (one line, cut
+  short), so the controls in a row start at the same height; a row that fits is centered in
+  the sheet; glass's switch and solidity are one setting; the widget cards are larger.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

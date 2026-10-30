@@ -264,6 +264,7 @@ Scope {
                     ChoiceCards {
                         title: "Widgets"
                         subtitle: "Click to show or hide; drag one on the desktop by its handle"
+                        cardWidth: Theme.editor.pictureCard
                         options: [
                             { value: "desktopClock", label: "Clock" },
                             { value: "desktopWeather", label: "Weather" },
@@ -335,27 +336,31 @@ Scope {
                 SheetGrid {
                     visible: chrome.tab === "style"
 
+                    // Glass on or off, and how solid it is, as one.
                     SheetItem {
-                        title: "Glass"
+                        title: "Glass  ·  " + (Settings.values.glass ? Settings.values.glassOpacity + " % solid" : "Off")
                         subtitle: "See-through panels with a thin light edge"
 
-                        Switch {
-                            label: "Glass panels"
-                            checked: Settings.values.glass
-                            onToggled: Settings.values.glass = !checked
-                        }
-                    }
+                        Row {
+                            spacing: Theme.spacing.m
 
-                    SheetItem {
-                        visible: Settings.values.glass
-                        title: "Solid  ·  " + Settings.values.glassOpacity + " %"
+                            Switch {
+                                anchors.verticalCenter: parent.verticalCenter
+                                label: "Glass panels"
+                                checked: Settings.values.glass
+                                onToggled: Settings.values.glass = !checked
+                            }
 
-                        LevelSlider {
-                            width: Theme.editor.slider
-                            icon: "opacity"
-                            label: "How solid the glass is"
-                            value: (Settings.values.glassOpacity - 20) / 65
-                            onMoved: v => Settings.values.glassOpacity = 20 + Math.round(v * 13) * 5
+                            LevelSlider {
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: Theme.editor.slider
+                                enabled: Settings.values.glass
+                                opacity: enabled ? 1 : Theme.state.disabled
+                                icon: "opacity"
+                                label: "How solid the glass is"
+                                value: (Settings.values.glassOpacity - 20) / 65
+                                onMoved: v => Settings.values.glassOpacity = 20 + Math.round(v * 13) * 5
+                            }
                         }
                     }
 

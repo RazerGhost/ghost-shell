@@ -294,7 +294,7 @@ Scope {
 
                     ChoiceCards {
                         // The row of pictures takes what the sliders beside it leave.
-                        width: parent.width - parent.leftPadding - parent.rightPadding - pictureDivider.width - pictureStack.width - parent.spacing * 2
+                        width: parent.width - Theme.spacing.l * 2 - pictureDivider.width - pictureStack.width - parent.spacing * 2
                         title: "Picture"
                         fadeColor: chrome.solid
                         // Larger than other cards: about as tall as the sliders beside them.
