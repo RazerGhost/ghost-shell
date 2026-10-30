@@ -58,27 +58,21 @@ Scope {
             WlrLayershell.namespace: "qs-customize"
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
-            // The lock screen as a card, like GNOME's workspaces and Android's widget editing:
-            // laid out at the screen's size and scaled to fit between the top buttons and the
-            // sheet, on the background color. It follows the sheet's height as tabs change.
-            readonly property real top: Theme.spacing.l * 2
-            readonly property real bottom: chrome.sheet.y - Theme.spacing.l * 1.5
-            readonly property real cardScale: Math.min((width - Theme.spacing.l * 4) / width,
-                                                       Math.max(bottom - top, 1) / height)
-
+            // The lock screen as a card (EditorChrome.card), laid out at the screen's size and
+            // scaled into it, on the background color.
             ClippingRectangle {
                 id: card
-                anchors.horizontalCenter: parent.horizontalCenter
-                y: window.top + (window.bottom - window.top - height) / 2
-                width: window.width * window.cardScale
-                height: window.height * window.cardScale
+                x: chrome.card.x
+                y: chrome.card.y
+                width: chrome.card.width
+                height: chrome.card.height
                 radius: Theme.radius.l * 1.5
                 color: "black"
 
                 Item {
                     width: window.width
                     height: window.height
-                    scale: window.cardScale
+                    scale: chrome.cardScale
                     transformOrigin: Item.TopLeft
 
                     // The lock screen itself, with input off.
@@ -106,7 +100,7 @@ Scope {
                         height: (clock?.height ?? 0) + Theme.spacing.m * 2
                         radius: Theme.radius.l
                         color: clockMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.08) : "transparent"
-                        border.width: Theme.outline.normal / window.cardScale
+                        border.width: Theme.outline.normal / chrome.cardScale
                         border.color: chrome.tab === "clock" ? Colors.m3primary : Qt.rgba(1, 1, 1, 0.5)
 
                         Accessible.role: Accessible.Button

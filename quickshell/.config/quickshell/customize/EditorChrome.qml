@@ -33,6 +33,17 @@ Item {
     signal cancelled()
     signal finished()
 
+    // The card the edited screen is shown as (GNOME's workspaces, Android's widget editing):
+    // between `cardTop` and the sheet, at the screen's shape, following the sheet's height as
+    // tabs change. The lock screen editor scales its lock screen into it; the desktop and
+    // windows editors publish it for the wallpaper and widgets (Editing.card).
+    property real cardTop: Theme.spacing.l * 2
+    readonly property real cardScale: Math.min((width - Theme.spacing.l * 4) / Math.max(width, 1),
+                                               Math.max(sheet.y - Theme.spacing.l * 1.5 - cardTop, 1) / Math.max(height, 1))
+    readonly property rect card: Qt.rect((width - width * cardScale) / 2,
+                                         cardTop + (sheet.y - Theme.spacing.l * 1.5 - cardTop - height * cardScale) / 2,
+                                         width * cardScale, height * cardScale)
+
     readonly property color solid: Qt.rgba(Colors.m3surfaceContainer.r, Colors.m3surfaceContainer.g,
                                            Colors.m3surfaceContainer.b, 0.94)
 

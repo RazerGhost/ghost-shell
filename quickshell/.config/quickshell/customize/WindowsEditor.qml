@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Io
 import Quickshell.Wayland
 import qs.services
 import qs.settings
@@ -30,6 +31,8 @@ Scope {
             return;
         saved = Presets.snapshot(Settings.values, Presets.windowsKeys);
         Editing.toEmptyWorkspace();
+        Editing.hideDock = true;
+        reservedRead.running = true;
         examples.active = true;
         editorLater.restart();
     }
@@ -51,12 +54,48 @@ Scope {
         editor.active = false;
         sample.active = false;
         examples.active = false;
+        Editing.hideDock = false;
         Editing.back();
+        // Drops the examples' workspace rule (made with hyprctl eval, not in any file).
+        Quickshell.execDetached(["hyprctl", "reload"]);
     }
 
     function cancel(): void {
         Presets.restore(Settings.values, saved);
         close();
+    }
+
+    // The space bars already reserve on the screen ([left, top, right, bottom]: the island, an
+    // always-shown dock), which the workspace's gaps stack on.
+    property var reserved: [0, Theme.island.height, 0, 0]
+
+    Process {
+        id: reservedRead
+        command: ["hyprctl", "monitors", "-j"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    const monitor = JSON.parse(text).find(m => m.focused);
+                    if (monitor?.reserved?.length === 4)
+                        root.reserved = monitor.reserved;
+                } catch (e) {
+                    console.warn("WindowsEditor: can't read hyprctl monitors: " + e);
+                }
+            }
+        }
+    }
+
+    // The examples tile inside the card: their workspace's gaps at the screen's edges are the
+    // space around the card plus your own gaps (a workspace rule, applied live; reload drops it).
+    function tileInto(card: rect, width: real, height: real): void {
+        const id = Editing.emptyWorkspace;
+        if (id <= 0 || card.width <= 0)
+            return;
+        const own = Number(Settings.values.gapsOut) || 0;
+        const side = (space, bar) => Math.max(0, Math.round(space - bar + own));
+        const gaps = `{ top = ${side(card.y, reserved[1])}, right = ${side(width - card.x - card.width, reserved[2])}, `
+                   + `bottom = ${side(height - card.y - card.height, reserved[3])}, left = ${side(card.x, reserved[0])} }`;
+        Quickshell.execDetached(["hyprctl", "eval", `hl.workspace_rule({ workspace = "${id}", gaps_out = ${gaps} })`]);
     }
 
     // Long enough for the slowest animation to finish (at half speed).
@@ -119,6 +158,8 @@ Scope {
         id: editor
 
         PanelWindow {
+            id: window
+
             screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? null
             anchors { top: true; bottom: true; left: true; right: true }
             exclusionMode: ExclusionMode.Ignore
@@ -126,6 +167,36 @@ Scope {
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.namespace: "qs-customize"
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+
+            // The desktop as a card (EditorChrome.card), the examples tiled inside it.
+            Component.onCompleted: {
+                Editing.card = chrome.card;
+                Editing.cardScreen = screen?.name ?? "";
+                tiling.restart();
+            }
+            Component.onDestruction: Editing.cardScreen = ""
+
+            Connections {
+                target: chrome
+                function onCardChanged(): void {
+                    Editing.card = chrome.card;
+                    tiling.restart();
+                }
+            }
+
+            Connections {
+                target: Settings.values
+                function onGapsOutChanged(): void {
+                    tiling.restart();
+                }
+            }
+
+            // Tab changes move the card a few times in a row: tile once.
+            Timer {
+                id: tiling
+                interval: 150
+                onTriggered: root.tileInto(chrome.card, window.width, window.height)
+            }
 
             mask: Region {
                 item: chrome.sheet
@@ -140,6 +211,7 @@ Scope {
                 id: chrome
                 tabs: [{ value: "borders", label: "Borders" }, { value: "space", label: "Space" }, { value: "motion", label: "Motion" }]
                 glass: true
+                cardTop: Theme.island.height + Theme.spacing.l * 2
                 onCancelled: root.cancel()
                 onFinished: root.close()
 

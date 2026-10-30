@@ -33,6 +33,7 @@ Scope {
         Editing.toEmptyWorkspace();
         Wallpaper.rescan();
         Editing.desktop = true;
+        Editing.hideDock = true;
         editor.active = true;
     }
 
@@ -41,6 +42,7 @@ Scope {
             return;
         editor.active = false;
         Editing.desktop = false;
+        Editing.hideDock = false;
         Editing.back();
     }
 
@@ -88,17 +90,14 @@ Scope {
             // The desktop as a card between the island and the sheet (like GNOME's workspaces):
             // the wallpaper and the widgets draw themselves into it (customize/Editing.qml), the
             // background color around it. It follows the sheet's height as tabs change.
-            readonly property real cardTop: Theme.island.height + Theme.spacing.l * 2
-            readonly property real cardBottom: chrome.sheet.y - Theme.spacing.l * 1.5
-            readonly property real cardScale: Math.min((width - Theme.spacing.l * 4) / width,
-                                                       Math.max(cardBottom - cardTop, 1) / height)
-            readonly property rect card: Qt.rect((width - width * cardScale) / 2,
-                                                 cardTop + (cardBottom - cardTop - height * cardScale) / 2,
-                                                 width * cardScale, height * cardScale)
-
-            onCardChanged: Editing.card = card
+            Connections {
+                target: chrome
+                function onCardChanged(): void {
+                    Editing.card = chrome.card;
+                }
+            }
             Component.onCompleted: {
-                Editing.card = card;
+                Editing.card = chrome.card;
                 Editing.cardScreen = screen?.name ?? "";
             }
             Component.onDestruction: Editing.cardScreen = ""
@@ -125,6 +124,7 @@ Scope {
                     { value: "text", label: "Size and text" }
                 ]
                 glass: true
+                cardTop: Theme.island.height + Theme.spacing.l * 2
                 // The colors take about a second to be made again after these changes.
                 status: Wallpaper.busy || ColorScheme.busy ? "Making the colors…" : ""
                 onCancelled: root.cancel()

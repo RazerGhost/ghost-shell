@@ -12,6 +12,9 @@ Singleton {
 
     property bool desktop: false
     property bool dock: false
+    // The desktop and windows editors keep the dock out of the way: their sheet is where it
+    // would be (the island stays, like Android's status bar, showing colors and sizes).
+    property bool hideDock: false
 
     // The desktop drawn as a card while an editor is open (like GNOME's workspaces): on this
     // screen ("" while not), in this rectangle of it. The wallpaper (wallpaper/WallpaperLayer.qml)
@@ -20,14 +23,16 @@ Singleton {
     property string cardScreen: ""
     property rect card: Qt.rect(0, 0, 0, 0)
 
-    // The workspace to come back to; 0 while not away.
+    // The workspace to come back to, and the empty one gone to; 0 while not away.
     property int awayFrom: 0
+    property int emptyWorkspace: 0
 
     // Goes to a workspace past the ones in use (it's empty).
     function toEmptyWorkspace(): void {
         awayFrom = Hyprland.focusedWorkspace?.id ?? 1;
         const used = Hyprland.workspaces.values.map(w => w.id).filter(id => id > 0);
-        Hyprland.dispatch(`hl.dsp.focus({ workspace = ${Math.max(0, ...used) + 1} })`);
+        emptyWorkspace = Math.max(0, ...used) + 1;
+        Hyprland.dispatch(`hl.dsp.focus({ workspace = ${emptyWorkspace} })`);
     }
 
     function back(): void {
@@ -35,5 +40,6 @@ Singleton {
             return;
         Hyprland.dispatch(`hl.dsp.focus({ workspace = ${awayFrom} })`);
         awayFrom = 0;
+        emptyWorkspace = 0;
     }
 }

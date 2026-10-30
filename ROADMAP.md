@@ -982,9 +982,18 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
 - The desktop editor publishes its card (`Editing.card`, `cardScreen`): the wallpaper layer
   clips its picture to it with the background color around (animating in and out), and the
   widgets' layer scales them into it; dragging divides the pointer's move by the scale, and
-  their input and blur regions are computed with it (`desktop/WidgetRegion.qml`). Next: the
-  windows (the examples tiled into the card with `hl.monitor`'s `reserved_area`), the dock and
-  island.
+  their input and blur regions are computed with it (`desktop/WidgetRegion.qml`).
+- The windows editor shows the same card, and its example windows tile inside it: their
+  workspace gets a `gaps_out` workspace rule (`hyprctl eval`, a table `{ top, right, bottom,
+  left }`; a string is refused) of the space around the card minus what bars reserve plus your
+  own gaps, so borders, corners and gaps stay Hyprland's own; closing reloads Hyprland, which
+  drops the rule. Chosen over `hl.monitor`'s `reserved_area`, which would set the screen's
+  mode again on every resize. The card's geometry moved into `EditorChrome` (three editors).
+- The island and dock in the other editors (user's question): the lock screen editor covers
+  both; the desktop and windows editors keep the island (like Android's status bar: colors,
+  sizes and glass show on it) and hide the dock (`Editing.hideDock`: its sheet is where the
+  dock would be, and the bottom edge doesn't reveal it); the dock and island editor shows both
+  at their edges, no card.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

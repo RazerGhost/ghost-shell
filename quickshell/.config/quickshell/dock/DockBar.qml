@@ -36,7 +36,7 @@ PanelWindow {
     // Settings' dockMode "always": shown all the time, with its space reserved so windows tile
     // above it.
     readonly property bool always: Settings.values.dockMode === "always"
-    readonly property bool shown: revealed || always || Editing.dock
+    readonly property bool shown: !Editing.hideDock && (revealed || always || Editing.dock)
     onShownChanged: {
         if (shown)
             DockState.shownOn = screen.name;
@@ -63,7 +63,8 @@ PanelWindow {
     // bar itself: right after the reveal that's still below the screen, the pointer would be
     // outside the input area, and the dock would take that as the pointer leaving and hide again.
     mask: Region {
-        item: window.shown ? hitArea : trigger
+        // Nothing while an editor keeps the dock out of the way (customize/Editing.qml).
+        item: Editing.hideDock ? null : window.shown ? hitArea : trigger
 
         Region {
             item: menu.visible ? menu : null
