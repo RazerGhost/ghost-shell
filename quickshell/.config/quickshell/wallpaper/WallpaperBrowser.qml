@@ -75,15 +75,26 @@ Singleton {
             root.pictures = root.pictures.concat(found.pictures);
             root.page++;
             root.lastPage = found.lastPage;
+            Qt.callLater(root.fill);
         };
         request.open("GET", Wallhaven.searchUrl(words.trim().split(/\s+/), style, page + 1, false));
         request.send();
+    }
+
+    // More pages while the ones in don't fill the window (nothing to scroll yet, so scrolling to
+    // the end can't ask for them; a maximized window holds more than a page).
+    readonly property bool hasMore: page === 0 || page < lastPage
+    function fill(): void {
+        if (open && chosen === null && hasMore && !failed && grid.count > 0 && grid.contentHeight <= grid.height)
+            loadMore();
     }
 
     onOpenChanged: {
         if (open && pictures.length === 0)
             search();
     }
+    // Still open after a shell reload: the results are gone, so look again.
+    Component.onCompleted: if (open && pictures.length === 0) search()
 
     // Downloads, one at a time in the order asked: { id, set } (set: make it the wallpaper after).
     property var queue: []
@@ -231,6 +242,8 @@ Singleton {
             model: root.pictures
             keyNavigationEnabled: true
             onAtYEndChanged: if (atYEnd && count > 0) root.loadMore()
+            onHeightChanged: Qt.callLater(root.fill)
+            onWidthChanged: Qt.callLater(root.fill) // more columns
 
             Keys.onReturnPressed: if (currentIndex >= 0) root.chosen = root.pictures[currentIndex]
             Keys.onEnterPressed: if (currentIndex >= 0) root.chosen = root.pictures[currentIndex]
@@ -326,20 +339,22 @@ Singleton {
 
                 Text {
                     anchors.centerIn: parent
-                    text: root.failed ? "wallhaven didn't answer. Scroll down or search again to retry."
+                    visible: !more.visible
+                    text: root.failed ? "wallhaven didn't answer. Try again in a moment."
                         : root.loading ? "Looking…"
                         : root.page > 0 && root.pictures.length === 0 ? "Nothing found"
-                        : root.page > 0 && root.page >= root.lastPage ? "That's all of them" : ""
+                        : root.page > 0 && !root.hasMore ? "That's all of them" : ""
                     color: Colors.m3onSurfaceVariant
                     font.family: Theme.font.sans
                     font.pixelSize: Theme.font.normal
                 }
 
-                // Retrying after a failed page: scrolling to the end again doesn't move atYEnd.
-                MouseArea {
-                    anchors.fill: parent
-                    enabled: root.failed
-                    cursorShape: Qt.PointingHandCursor
+                // Also after a failed page: scrolling to the end again doesn't move atYEnd.
+                TextButton {
+                    id: more
+                    anchors.centerIn: parent
+                    visible: !root.loading && root.page > 0 && root.pictures.length > 0 && root.hasMore
+                    text: root.failed ? "Try again" : "Load more"
                     onClicked: root.loadMore()
                 }
             }

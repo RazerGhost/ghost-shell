@@ -1477,7 +1477,9 @@ search field. Konachan was looked at and dropped (user: not the kind of anime th
 User's choice: finding art belongs in its own window like Settings, not in the desktop editor.
 `wallpaper/WallpaperBrowser.qml` (a `FloatingWindow`, "Wallpapers"): a search field and the
 styles as chips (Top, Sky, Lofi, Painterly, Minimal), wallhaven's results as pictures in a grid,
-more pages as you scroll to the end; a check on the ones in your folder already. Click one (or
+more pages as you scroll to the end (and while the pictures don't fill the window, so a
+maximized one isn't stuck at one page; user's find), or "Load more" at the end; a check on the
+ones in your folder already. Click one (or
 arrow keys and Enter) for a larger look: the thumbnail at once, the full picture over it; Left and
 Right step through, Escape goes back; Download, or Set as wallpaper (downloads first). Nothing is
 downloaded until you pick it. Downloads run one at a time through `ghost wallpapers fetch <id>`,
