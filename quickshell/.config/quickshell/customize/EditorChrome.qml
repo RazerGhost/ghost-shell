@@ -45,6 +45,10 @@ Item {
 
     anchors.fill: parent
     focus: true
+    // Takes the keyboard itself for Escape and Enter: what an editor shows can claim it (the lock
+    // screen's password field, `focus: true` in the same window, won it and then, switched off,
+    // gave the keys to nothing).
+    Component.onCompleted: forceActiveFocus()
 
     Keys.onEscapePressed: root.cancelled()
     Keys.onReturnPressed: root.finished()
