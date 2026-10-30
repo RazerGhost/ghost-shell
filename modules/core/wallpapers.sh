@@ -87,7 +87,8 @@ got=0 failed=0 page=1
 while ((got < count && page <= 5)); do
     url=$(WORDS="${words[*]}" STYLE=$style PAGE=$page GENERAL=$general js_with "$lib" '
         const words = process.env.WORDS.split(/\s+/).filter(w => w !== "");
-        process.stdout.write(lib.searchUrl(words, process.env.STYLE, Number(process.env.PAGE), process.env.GENERAL === "true"));
+        process.stdout.write(lib.searchUrl({ words: words, style: process.env.STYLE, page: Number(process.env.PAGE),
+                                            general: process.env.GENERAL === "true" }));
     ')
     list=$(curl -fsS --max-time 20 "$url") || fail "wallhaven didn't answer (no network?)"
     # One "<file> <url>" per checked picture.

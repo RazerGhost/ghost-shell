@@ -1,8 +1,8 @@
 // The Wallpapers window (user's choice: its own window like Settings, not a tile in the desktop
 // editor): finds art on wallhaven.cc, anime by default and only ever safe for work. Search, or
-// pick one of your styles, and the results come as pictures, more as you scroll; click one for a
-// larger look, then Download (into your folder) or Set as wallpaper. Nothing is downloaded until
-// you choose it. The searches and the checks on each result are services/Wallhaven.js (tested);
+// pick one of your styles, and one of wallhaven's colors if you like; the results come as
+// pictures, more as you scroll. Click one for a larger look, then Download (into your folder) or
+// Set as wallpaper, or one of its tags for more like it. Nothing is downloaded until you choose it. The searches and the checks on each result are services/Wallhaven.js (tested);
 // downloading is `ghost wallpapers fetch <id>`, which checks the picture again. Opened from the
 // desktop editor's Wallpaper tab, the picker strip, the launcher or `qs ipc call wallpapers browse`.
 pragma Singleton
@@ -28,9 +28,12 @@ Singleton {
         property bool open: false
     }
 
-    // The search: your words and the chosen style ("" = the month's best).
+    // The search: your words and the chosen style ("" = the month's best), or a picture's tag
+    // ({ id, name }; "More like this", on its own), and a color ("" = any; Wallhaven.colors).
     property string words: ""
     property string style: ""
+    property var tag: null
+    property string color: ""
     // What's found so far, `page` pages of `lastPage`.
     property var pictures: []
     property int page: 0
@@ -82,7 +85,8 @@ Singleton {
             root.lastPage = found.lastPage;
             Qt.callLater(root.fill);
         };
-        request.open("GET", Wallhaven.searchUrl(words.trim().split(/\s+/), style, page + 1, false));
+        request.open("GET", Wallhaven.searchUrl({ words: words.trim().split(/\s+/), style: style, page: page + 1,
+                                                  tag: tag?.id ?? "", color: color }));
         request.send();
     }
 
@@ -100,6 +104,45 @@ Singleton {
     }
     // Still open after a shell reload: the results are gone, so look again.
     Component.onCompleted: if (open && pictures.length === 0) search()
+
+    // "More like this": the pictures with one of the chosen picture's tags (wallhaven's own
+    // "similar" search isn't open to the API without an account). The tags come from the
+    // picture's page, asked for once it's been shown a moment (stepping through quickly would
+    // spend wallhaven's 45 requests a minute).
+    property var chosenTags: []
+
+    function moreLike(t: var): void {
+        tag = t;
+        style = "";
+        searchField.text = "";
+        chosen = null;
+        search();
+        grid.forceActiveFocus();
+    }
+
+    onChosenChanged: {
+        chosenTags = [];
+        if (chosen)
+            tagsTimer.restart();
+    }
+
+    Timer {
+        id: tagsTimer
+        interval: 400
+        onTriggered: {
+            const asked = root.chosen;
+            const url = asked ? Wallhaven.pictureUrl(asked.id) : "";
+            if (url === "")
+                return;
+            const request = new XMLHttpRequest();
+            request.onreadystatechange = () => {
+                if (request.readyState === XMLHttpRequest.DONE && request.status === 200 && root.chosen === asked)
+                    root.chosenTags = Wallhaven.tags(request.responseText, 8);
+            };
+            request.open("GET", url);
+            request.send();
+        }
+    }
 
     // Downloads, one at a time in the order asked: { id, set } (set: make it the wallpaper after).
     property var queue: []
@@ -193,8 +236,13 @@ Singleton {
             SearchField {
                 id: searchField
                 width: Math.max(Theme.wallpaper.browserThumb, parent.width - styles.width - parent.spacing)
-                placeholder: root.style ? "Narrow it down (optional)" : "Search wallhaven (or the month's best)"
-                onTextChanged: root.words = text
+                placeholder: root.tag ? "" : root.style ? "Narrow it down (optional)" : "Search wallhaven (or the month's best)"
+                onTextChanged: {
+                    root.words = text;
+                    // Typing starts a search of your own.
+                    if (text !== "")
+                        root.tag = null;
+                }
                 onKeyPressed: event => {
                     if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                         root.search();
@@ -203,6 +251,18 @@ Singleton {
                         grid.forceActiveFocus();
                         event.accepted = true;
                     }
+                }
+
+                // The tag being looked at ("More like this"), × back to the month's best.
+                TextButton {
+                    visible: root.tag !== null
+                    text: "Like: " + (root.tag?.name ?? "") + "  ×"
+                    color: Colors.m3secondaryContainer
+                    onClicked: {
+                        root.tag = null;
+                        root.search();
+                    }
+                    Accessible.name: "Stop showing pictures like " + (root.tag?.name ?? "")
                 }
             }
 
@@ -217,11 +277,81 @@ Singleton {
                         required property var modelData
                         width: Theme.wallpaper.browserThumb / 2.4
                         text: modelData.label
-                        chosen: root.style === modelData.value
+                        chosen: root.tag === null && root.style === modelData.value
                         onClicked: {
                             root.style = modelData.value;
+                            root.tag = null;
                             root.search();
                         }
+                    }
+                }
+            }
+        }
+
+        // wallhaven's colors: pictures with a lot of one. Click the chosen one again for any color.
+        Row {
+            id: colorRow
+
+            anchors.top: searchRow.bottom
+            anchors.left: parent.left
+            anchors.margins: Theme.spacing.l
+            anchors.topMargin: Theme.spacing.m
+            spacing: Theme.spacing.xs
+            visible: root.chosen === null
+
+            Accessible.role: Accessible.Grouping
+            Accessible.name: "Colors"
+
+            Repeater {
+                model: Wallhaven.colors
+
+                Rectangle {
+                    id: swatch
+
+                    required property var modelData
+                    readonly property bool picked: root.color === modelData.hex
+
+                    function toggle(): void {
+                        root.color = picked ? "" : modelData.hex;
+                        root.search();
+                    }
+
+                    width: Theme.icon.normal + Theme.spacing.xs
+                    height: width
+                    radius: width / 2
+                    color: "#" + modelData.hex
+                    border.width: picked ? Theme.outline.strong : Theme.outline.normal
+                    border.color: picked ? Colors.m3primary : Colors.m3outlineVariant
+                    scale: picked ? 1.15 : swatchMouse.containsMouse ? 1.08 : 1
+                    Behavior on scale {
+                        NumberAnimation { duration: Theme.anim.fast }
+                    }
+
+                    Accessible.role: Accessible.CheckBox
+                    Accessible.name: modelData.name
+                    Accessible.checked: picked
+                    Accessible.onPressAction: toggle()
+                    activeFocusOnTab: true
+                    Keys.onReturnPressed: toggle()
+                    Keys.onEnterPressed: toggle()
+                    Keys.onSpacePressed: toggle()
+
+                    FocusRing {
+                        radius: swatch.radius
+                    }
+
+                    MouseArea {
+                        id: swatchMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: swatch.toggle()
+                    }
+
+                    Tooltip {
+                        target: swatch
+                        text: swatch.modelData.name
+                        shown: swatchMouse.containsMouse || swatch.activeFocus
                     }
                 }
             }
@@ -233,7 +363,7 @@ Singleton {
 
             readonly property int columns: Math.max(2, Math.floor(width / Theme.wallpaper.browserThumb))
 
-            anchors.top: searchRow.bottom
+            anchors.top: colorRow.bottom
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
@@ -408,7 +538,7 @@ Singleton {
                 id: large
 
                 anchors.top: parent.top
-                anchors.bottom: actions.top
+                anchors.bottom: tagRow.top
                 anchors.bottomMargin: Theme.spacing.m
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: Math.min(parent.width, height * 16 / 9)
@@ -448,6 +578,42 @@ Singleton {
                     styleColor: "#80000000"
                     font.family: Theme.font.sans
                     font.pixelSize: Theme.font.small
+                }
+            }
+
+            // Its tags: click one for more like it.
+            Row {
+                id: tagRow
+
+                anchors.bottom: actions.top
+                anchors.bottomMargin: Theme.spacing.m
+                anchors.horizontalCenter: parent.horizontalCenter
+                height: Theme.island.height
+                spacing: Theme.spacing.xs
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    rightPadding: Theme.spacing.s
+                    text: root.chosenTags.length > 0 ? "More like this:" : ""
+                    color: Colors.m3onSurfaceVariant
+                    font.family: Theme.font.sans
+                    font.pixelSize: Theme.font.normal
+                }
+
+                Repeater {
+                    // As many as fit on one line.
+                    model: root.chosenTags
+
+                    TextButton {
+                        required property var modelData
+                        required property int index
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: x + width <= preview.width
+                        text: modelData.name
+                        color: Colors.tint
+                        onClicked: root.moreLike(modelData)
+                        Accessible.name: "More like this: " + modelData.name
+                    }
                 }
             }
 

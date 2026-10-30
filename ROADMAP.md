@@ -1490,6 +1490,15 @@ wallpapers", which finishes the editor first: windows show under it), the picker
 more", Settings -> Appearance, the launcher ("Wallpapers") and `qs ipc call wallpapers browse`.
 The editor's More art tile with its styles and Get 12 is gone. The title bar is shared with
 Settings now (`widgets/WindowTitleBar.qml`; `WindowButton` and `OptionChip` moved to widgets/).
+- More like this and colors (user's pick): the large view lists the picture's tags (from its
+  page in the API, asked for once it's shown 0.4 s, so stepping through quickly doesn't spend
+  wallhaven's 45 requests a minute); clicking one shows the best pictures with that tag ("Like:
+  clouds ×" in the search field; typing, a style or × leave it). wallhaven's own similar search
+  (`like:<id>`) answers 403 without an account (checked), so it's a tag. A row of wallhaven's 29
+  colors under the search narrows any search to pictures with a lot of one (its palette only; a
+  color alone sorts by all-time favourites, since a month's best in one color is a handful).
+  `Wallhaven.searchUrl` takes `{ words, style, page, general, tag, color }`; `colors`, `tags`
+  tested.
 - The system's wallpaper collections are no longer offered (user's request: they included
   pictures the user didn't want, like headsets): the picker, the editors and the slideshow show only your
   folder (the slideshow's "From all pictures" is gone). `cachyos-wallpapers` and
