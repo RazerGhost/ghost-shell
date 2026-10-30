@@ -999,7 +999,10 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   spaced, wrapping only when a row is full. A setting is a `customize/SheetItem.qml` (its name
   on top, the control under it, macOS/iOS-sheet style), picture cards keep their size, a
   scrolling row takes the whole row. (First tried: equal cells stretched to the sheet's width;
-  labels ended up far from their controls with gaps between, user: "horrible".)
+  labels ended up far from their controls with gaps between, user: "horrible".) Lock screen
+  editor (user's review): the clock's style and font cards are taller (`ChoiceCards.cardHeight`)
+  with place, size and show stacked beside them; blur and darkening stacked at the end of the
+  picture row.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

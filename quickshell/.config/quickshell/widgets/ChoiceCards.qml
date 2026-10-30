@@ -21,6 +21,7 @@ Column {
     signal picked(var value)
 
     property real cardWidth: Theme.settings.card
+    property real cardHeight: Math.round(cardWidth * 10 / 16)
 
     // As wide as its cards in one row; a scrolling row takes the whole row of its sheet (the
     // editor's SheetGrid, less its padding).
@@ -109,7 +110,7 @@ Column {
             Rectangle {
                 id: frame
                 width: root.cardWidth
-                height: Math.round(width * 10 / 16)
+                height: root.cardHeight
                 radius: Theme.radius.m
                 color: Colors.m3surfaceContainerHigh
                 clip: true

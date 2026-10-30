@@ -272,6 +272,7 @@ Singleton {
     // The on-screen editors (customize/).
     readonly property QtObject editor: QtObject {
         readonly property int subtitle: root.px(220) // a setting's subtitle wraps at least this wide (SheetItem.qml)
+        readonly property int clockCard: root.px(132) // the lock screen editor's clock style and font cards
         readonly property int sample: root.px(360) // the windows editor's sample window
     }
 

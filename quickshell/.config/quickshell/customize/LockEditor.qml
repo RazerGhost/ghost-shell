@@ -177,13 +177,15 @@ Scope {
                     }
                 }
 
-                // Clock: style and font by sight, then place, size and the time and date, side
-                // by side as far as the sheet is wide.
+                // Clock: style and font as tall cards, then place, size and the time and date
+                // stacked beside them.
                 SheetGrid {
                     visible: chrome.tab === "clock"
 
                     // The same card size as the fonts beside it, so the two rows line up.
                     ChoiceCards {
+                        cardWidth: Theme.editor.clockCard
+                        cardHeight: Math.round(Theme.editor.clockCard * 1.1)
                         title: "Style"
                         options: LockClockJs.styles.map(v => ({ value: v, label: ({ big: "Big", stacked: "Stacked", thin: "Thin", analog: "Analog" })[v] }))
                         current: LockClockJs.pick(Settings.values.lockClockStyle, LockClockJs.styles)
@@ -202,6 +204,8 @@ Scope {
                     }
 
                     ChoiceCards {
+                        cardWidth: Theme.editor.clockCard
+                        cardHeight: Math.round(Theme.editor.clockCard * 1.1)
                         id: fontCards
                         title: "Font"
                         options: ["", "Inter Display", "Noto Serif", "C059", "Nimbus Sans Narrow", "MesloLGS Nerd Font"]
@@ -218,60 +222,65 @@ Scope {
                                     text: "10:09"
                                     color: Colors.m3onSurface
                                     font.family: parent.parent.option.value || Theme.font.sans
-                                    font.pixelSize: parent.height * 0.36
+                                    font.pixelSize: Math.min(parent.height * 0.36, parent.width * 0.24)
                                     font.weight: Font.Bold
                                 }
                             }
                         }
                     }
 
-                    SheetItem {
-                        title: "Place"
+                    // Place, size and the time and date stacked beside the cards.
+                    Column {
+                        spacing: Theme.spacing.m
 
-                        Segmented {
-                            options: LockClockJs.layouts.map(v => ({ value: v, label: ({ top: "Top", center: "Middle", left: "Bottom left" })[v] }))
-                            current: LockClockJs.pick(Settings.values.lockLayout, LockClockJs.layouts)
-                            onPicked: v => Settings.values.lockLayout = v
+                        SheetItem {
+                            title: "Place"
+
+                            Segmented {
+                                options: LockClockJs.layouts.map(v => ({ value: v, label: ({ top: "Top", center: "Middle", left: "Bottom left" })[v] }))
+                                current: LockClockJs.pick(Settings.values.lockLayout, LockClockJs.layouts)
+                                onPicked: v => Settings.values.lockLayout = v
+                            }
                         }
-                    }
 
-                    SheetItem {
-                        title: "Size"
+                        SheetItem {
+                            title: "Size"
 
-                        Segmented {
-                            options: LockClockJs.sizes.map(v => ({ value: v, label: v + " %" }))
-                            current: LockClockJs.pick(Settings.values.lockClockSize, LockClockJs.sizes)
-                            onPicked: v => Settings.values.lockClockSize = v
+                            Segmented {
+                                options: LockClockJs.sizes.map(v => ({ value: v, label: v + " %" }))
+                                current: LockClockJs.pick(Settings.values.lockClockSize, LockClockJs.sizes)
+                                onPicked: v => Settings.values.lockClockSize = v
+                            }
                         }
-                    }
 
-                    SheetItem {
-                        title: "Show"
+                        SheetItem {
+                            title: "Show"
 
-                        Row {
-                            spacing: Theme.spacing.m
+                            Row {
+                                spacing: Theme.spacing.m
 
-                            Repeater {
-                                model: [{ key: "lockClock", label: "Time" }, { key: "lockDate", label: "Date" }]
+                                Repeater {
+                                    model: [{ key: "lockClock", label: "Time" }, { key: "lockDate", label: "Date" }]
 
-                                Row {
-                                    id: shown
-                                    required property var modelData
-                                    spacing: Theme.spacing.s
+                                    Row {
+                                        id: shown
+                                        required property var modelData
+                                        spacing: Theme.spacing.s
 
-                                    Text {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        text: shown.modelData.label
-                                        color: Colors.m3onSurface
-                                        font.family: Theme.font.sans
-                                        font.pixelSize: Theme.font.normal
-                                    }
+                                        Text {
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text: shown.modelData.label
+                                            color: Colors.m3onSurface
+                                            font.family: Theme.font.sans
+                                            font.pixelSize: Theme.font.normal
+                                        }
 
-                                    Switch {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        label: "Show the " + shown.modelData.label.toLowerCase()
-                                        checked: Settings.values[shown.modelData.key]
-                                        onToggled: Settings.values[shown.modelData.key] = !checked
+                                        Switch {
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            label: "Show the " + shown.modelData.label.toLowerCase()
+                                            checked: Settings.values[shown.modelData.key]
+                                            onToggled: Settings.values[shown.modelData.key] = !checked
+                                        }
                                     }
                                 }
                             }
@@ -284,6 +293,8 @@ Scope {
                     visible: chrome.tab === "picture"
 
                     ChoiceCards {
+                        // The row of pictures takes what the blur and darkening beside it leave.
+                        width: parent.width - parent.leftPadding - parent.rightPadding - pictureStack.width - parent.spacing
                         scrolls: true
                         // Pictures only: the lock and login screens can't play a video.
                         options: [{ value: "", label: "Desktop's" }].concat(
@@ -301,27 +312,33 @@ Scope {
                         }
                     }
 
-                    SheetItem {
-                        title: "Blur"
+                    // Blur and darkening stacked at the end of the row.
+                    Column {
+                        id: pictureStack
+                        spacing: Theme.spacing.m
 
-                        Stepper {
-                            label: "Blur"
-                            values: Array.from({ length: 11 }, (_, i) => i * 10)
-                            value: Settings.values.lockBlur
-                            format: v => v === 0 ? "Off" : v + " %"
-                            onPicked: v => Settings.values.lockBlur = v
+                        SheetItem {
+                            title: "Blur"
+
+                            Stepper {
+                                label: "Blur"
+                                values: Array.from({ length: 11 }, (_, i) => i * 10)
+                                value: Settings.values.lockBlur
+                                format: v => v === 0 ? "Off" : v + " %"
+                                onPicked: v => Settings.values.lockBlur = v
+                            }
                         }
-                    }
 
-                    SheetItem {
-                        title: "Darken"
+                        SheetItem {
+                            title: "Darken"
 
-                        Stepper {
-                            label: "Darken"
-                            values: Array.from({ length: 13 }, (_, i) => i * 5) // up to 60 %
-                            value: Settings.values.lockDim
-                            format: v => v === 0 ? "Off" : v + " %"
-                            onPicked: v => Settings.values.lockDim = v
+                            Stepper {
+                                label: "Darken"
+                                values: Array.from({ length: 13 }, (_, i) => i * 5) // up to 60 %
+                                value: Settings.values.lockDim
+                                format: v => v === 0 ? "Off" : v + " %"
+                                onPicked: v => Settings.values.lockDim = v
+                            }
                         }
                     }
                 }
