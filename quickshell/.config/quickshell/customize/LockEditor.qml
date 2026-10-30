@@ -48,6 +48,45 @@ Scope {
         editor.active = false;
     }
 
+    // An outline around a part of the lock screen in the card (`area`, in the lock screen's own
+    // units), its line scaled back to the usual width; clicking it opens that part's tab.
+    component Outline: Rectangle {
+        id: outline
+
+        property string tab
+        property string name
+        property bool shown
+        property rect area
+        // The editor's frame (an inline component can't see the file's ids).
+        required property EditorChrome sheet
+
+        visible: shown
+        x: area.x - Theme.spacing.m
+        y: area.y - Theme.spacing.m
+        width: area.width + Theme.spacing.m * 2
+        height: area.height + Theme.spacing.m * 2
+        radius: Theme.radius.l
+        color: outlineMouse.containsMouse ? Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, Theme.state.hover)
+                                          : "transparent"
+        border.width: Theme.outline.normal / sheet.cardScale
+        border.color: sheet.tab === tab || activeFocus ? Colors.m3primary
+                    : Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, 0.5)
+
+        Accessible.role: Accessible.Button
+        Accessible.name: name
+        Accessible.onPressAction: sheet.tab = tab
+        activeFocusOnTab: true
+        Keys.onSpacePressed: sheet.tab = tab
+
+        MouseArea {
+            id: outlineMouse
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: sheet.tab = outline.tab
+        }
+    }
+
     LazyLoader {
         id: editor
 
@@ -88,41 +127,37 @@ Scope {
                         takesKeyboard: false
 
                         LockStatus {
+                            id: status
                             width: parent.width
                         }
                     }
 
-                    // The clock, outlined like an iOS lock screen widget being edited; click it
-                    // for the clock's options. Its line is scaled back to the usual width.
-                    Rectangle {
+                    // The clock and the widgets under it, outlined like an iOS lock screen being
+                    // edited; click one for its tab.
+                    Outline {
                         readonly property Item clock: lock.clockItem
                         readonly property Item column: clock?.parent ?? null
 
-                        visible: (clock?.visible ?? false) || chrome.tab === "clock"
-                        x: (column?.x ?? 0) + (clock?.x ?? 0) - Theme.spacing.m
-                        y: (column?.y ?? 0) + (clock?.y ?? 0) - Theme.spacing.m
-                        width: (clock?.width ?? 0) + Theme.spacing.m * 2
-                        height: (clock?.height ?? 0) + Theme.spacing.m * 2
-                        radius: Theme.radius.l
-                        color: clockMouse.containsMouse ? Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, Theme.state.hover)
-                                                        : "transparent"
-                        border.width: Theme.outline.normal / chrome.cardScale
-                        border.color: chrome.tab === "clock" || activeFocus ? Colors.m3primary
-                                    : Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, 0.5)
+                        sheet: chrome
+                        tab: "clock"
+                        name: "The clock's options"
+                        shown: (clock?.visible ?? false) || chrome.tab === "clock"
+                        area: Qt.rect((column?.x ?? 0) + (clock?.x ?? 0), (column?.y ?? 0) + (clock?.y ?? 0),
+                                      clock?.width ?? 0, clock?.height ?? 0)
+                    }
 
-                        Accessible.role: Accessible.Button
-                        Accessible.name: "The clock's options"
-                        Accessible.onPressAction: chrome.tab = "clock"
-                        activeFocusOnTab: true
-                        Keys.onSpacePressed: chrome.tab = "clock"
+                    Outline {
+                        // LockStatus in the clock's column (through LockContent's slot under the date).
+                        readonly property Item slot: status.parent
+                        readonly property Item column: slot?.parent ?? null
 
-                        MouseArea {
-                            id: clockMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: chrome.tab = "clock"
-                        }
+                        sheet: chrome
+                        tab: "widgets"
+                        name: "The widgets' options"
+                        shown: status.height > 0 || chrome.tab === "widgets"
+                        area: Qt.rect((column?.x ?? 0) + (slot?.x ?? 0) + status.contentX,
+                                      (column?.y ?? 0) + (slot?.y ?? 0) + (slot?.topPadding ?? 0),
+                                      status.contentWidth, Math.max(status.height, Theme.lock.widget))
                     }
                 }
             }
@@ -402,7 +437,8 @@ Scope {
                 }
 
                 // Widgets: the round ones under the clock, picked like iOS's (in the order
-                // clicked, up to four), and the media controls.
+                // clicked, up to four; the ones on come first, in the row's order, and drag onto
+                // each other to change it), and the media controls.
                 SheetTiles {
                     visible: chrome.tab === "widgets"
 
@@ -414,15 +450,16 @@ Scope {
                                                         todo: "To-do", event: "Next event" })
 
                         title: "Under the clock"
-                        subtitle: "Up to four, in the order you pick them · an event's title shows to anyone"
+                        subtitle: "Up to four · drag to change their order · an event's title shows to anyone"
                         weight: 3
 
                         Row {
+                            id: picks
                             anchors.centerIn: parent
                             spacing: Theme.spacing.l
 
                             Repeater {
-                                model: LockWidgets.known
+                                model: widgetsTile.list.concat(LockWidgets.known.filter(id => !widgetsTile.list.includes(id)))
 
                                 Column {
                                     id: pick
@@ -434,6 +471,10 @@ Scope {
 
                                     function toggle(): void {
                                         Settings.values.lockWidgets = LockWidgets.toggled(widgetsTile.list, modelData);
+                                    }
+
+                                    function moveTo(to: int): void {
+                                        Settings.values.lockWidgets = LockWidgets.moved(widgetsTile.list, place, to);
                                     }
 
                                     spacing: Theme.spacing.s
@@ -449,11 +490,25 @@ Scope {
                                     Keys.onReturnPressed: toggle()
                                     Keys.onEnterPressed: toggle()
                                     Keys.onSpacePressed: toggle()
+                                    // Shift + Left / Right moves one that's on along the row.
+                                    Keys.onPressed: event => {
+                                        if (on && event.modifiers & Qt.ShiftModifier
+                                                && (event.key === Qt.Key_Left || event.key === Qt.Key_Right)) {
+                                            const id = modelData;
+                                            moveTo(place + (event.key === Qt.Key_Left ? -1 : 1));
+                                            // The row is made again in its new order: the keyboard
+                                            // stays on the one that moved.
+                                            Qt.callLater(() => Array.from(picks.children).find(c => c.modelData === id)?.forceActiveFocus());
+                                            event.accepted = true;
+                                        }
+                                    }
 
                                     Item {
                                         width: sample.width
                                         height: sample.height
                                         anchors.horizontalCenter: parent.horizontalCenter
+                                        // Over the others while dragged.
+                                        z: dragArea.drag.active ? 1 : 0
 
                                         LockWidget {
                                             id: sample
@@ -486,10 +541,30 @@ Scope {
                                             radius: height / 2
                                         }
 
+                                        // Click to add or take off; drag one that's on onto another to put it
+                                        // there.
                                         MouseArea {
+                                            id: dragArea
+
+                                            property bool dragged: false
+
                                             anchors.fill: parent
-                                            cursorShape: pick.on || !pick.full ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                            onClicked: pick.toggle()
+                                            cursorShape: drag.active ? Qt.ClosedHandCursor
+                                                       : pick.on || !pick.full ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                            drag.target: pick.on ? sample : null
+                                            drag.onActiveChanged: if (drag.active) dragged = true
+                                            onPressed: dragged = false
+                                            onClicked: if (!dragged) pick.toggle()
+                                            onReleased: {
+                                                if (!dragged)
+                                                    return;
+                                                const at = sample.mapToItem(picks, sample.width / 2, sample.height / 2);
+                                                const target = picks.childAt(at.x, at.y);
+                                                sample.x = 0;
+                                                sample.y = 0;
+                                                if (target && target !== pick && target.on)
+                                                    pick.moveTo(target.place);
+                                            }
                                         }
                                     }
 

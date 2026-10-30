@@ -50,6 +50,12 @@ Singleton {
         apply.start(["sh", Quickshell.env("HOME") + "/.config/matugen/wallpaper.sh", path]);
     }
 
+    // No wallpaper again (Hyprland's default shows), colors from the last seed color: the desktop
+    // editor's Cancel when none was chosen before it opened.
+    function clear(): void {
+        apply.start(["sh", Quickshell.env("HOME") + "/.config/matugen/wallpaper.sh", "--none"]);
+    }
+
     onFolderChanged: rescan()
 
     LatestProcess {

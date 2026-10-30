@@ -6,6 +6,8 @@
 #   wallpaper.sh             colors again from the current wallpaper (renders templates added
 #                            since, or after switching between light and dark); with no
 #                            wallpaper, from the last seed color (the default one at first)
+#   wallpaper.sh --none      no wallpaper (Hyprland's default shows), colors from the last seed
+#                            color (the desktop editor's Cancel, when none was chosen before)
 # Light or dark, the color style, contrast and accent come from the shell (Settings ->
 # Appearance), which writes them to ~/.local/state/quickshell/scheme; dark when that's missing.
 # GTK apps get light or dark through gsettings.
@@ -64,6 +66,12 @@ from_seed() {
 case "${1-}" in
     "#"*)
         from_seed "$1"
+        ;;
+    --none)
+        mkdir -p "$state"
+        bun -e 'require("fs").writeFileSync(process.argv[1], JSON.stringify({ path: "" }, null, 4) + "\n");' \
+            "$state/wallpaper.json"
+        from_seed "$(cat "$state/seed" 2>/dev/null || echo "$default_seed")"
         ;;
     "")
         current=$(bun -e 'process.stdout.write(require(process.argv[1]).path || "")' \

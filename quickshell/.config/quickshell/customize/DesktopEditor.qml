@@ -52,8 +52,12 @@ Scope {
 
     function cancel(): void {
         Presets.restore(Settings.values, saved);
-        if (Wallpaper.path !== savedWallpaper && savedWallpaper !== "")
-            Wallpaper.set(savedWallpaper);
+        if (Wallpaper.path !== savedWallpaper) {
+            if (savedWallpaper !== "")
+                Wallpaper.set(savedWallpaper);
+            else
+                Wallpaper.clear();
+        }
         close();
     }
 

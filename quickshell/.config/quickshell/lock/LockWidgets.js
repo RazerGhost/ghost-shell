@@ -22,6 +22,16 @@ function shown(saved, values) {
     return out;
 }
 
+// `list` with the widget at `from` moved to `to` (clamped into the list).
+function moved(list, from, to) {
+    const out = list.slice();
+    if (from < 0 || from >= out.length)
+        return out;
+    const [id] = out.splice(from, 1);
+    out.splice(Math.max(0, Math.min(to, out.length)), 0, id);
+    return out;
+}
+
 // `list` with `id` taken off, or added at the end while there's room.
 function toggled(list, id) {
     if (list.includes(id))

@@ -1075,8 +1075,9 @@ from the idle lock; every other lock ends it).
   message line. The login screen gets only the settings it uses (filtered by `greeter/sync.sh`
   with bun), and its shared folder is readable by the greeter alone (`ghost greeter` applies
   it; it was readable by every user).
-- Not done: Cancel in the desktop editor can't go back to Hyprland's default wallpaper when
-  none was chosen before (the wallpaper service has no "none" to set).
+- Cancel in the desktop editor goes back to Hyprland's default wallpaper when none was chosen
+  before (fixed later the same day: `wallpaper.sh --none`, `Wallpaper.clear()`; the colors
+  come from the last seed color, as before the editor).
 
 ### Quick settings editor (done, verified on the laptop 2026-10-30)
 User's pick after the review: Android's edit mode, on the panel itself.
@@ -1125,6 +1126,11 @@ User's pick: an iOS-like row of small widgets under the clock, picked in the loc
   a number on each shows its place in the row; the media controls' switch beside them. Both
   left Settings -> Lock screen, which keeps the message, the grace period and the login screen.
 - The ring is shared with the desktop's battery widget (`widgets/ProgressRing.qml`).
+- Follow-ups (user's request): in the tab the ones that are on come first, in the row's
+  order, and dragging one onto another moves it there (Shift + Left / Right with the keyboard;
+  `LockWidgets.moved`, tested); on the lock screen in the card, the player and widgets are
+  outlined like the clock, and clicking them opens the Widgets tab (one `Outline` component
+  for both).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
