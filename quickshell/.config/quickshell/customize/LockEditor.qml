@@ -293,8 +293,12 @@ Scope {
                     visible: chrome.tab === "picture"
 
                     ChoiceCards {
-                        // The row of pictures takes what the blur and darkening beside it leave.
-                        width: parent.width - parent.leftPadding - parent.rightPadding - pictureStack.width - parent.spacing
+                        // The row of pictures takes what the sliders beside it leave.
+                        width: parent.width - parent.leftPadding - parent.rightPadding - pictureDivider.width - pictureStack.width - parent.spacing * 2
+                        title: "Picture"
+                        fadeColor: chrome.solid
+                        // Larger than other cards: about as tall as the sliders beside them.
+                        cardWidth: Theme.editor.pictureCard
                         scrolls: true
                         // Pictures only: the lock and login screens can't play a video.
                         options: [{ value: "", label: "Desktop's" }].concat(
@@ -312,32 +316,39 @@ Scope {
                         }
                     }
 
-                    // Blur and darkening stacked at the end of the row.
+                    Rectangle {
+                        id: pictureDivider
+                        width: 1
+                        height: pictureStack.height
+                        color: Colors.m3outlineVariant
+                    }
+
+                    // Blur and darkening as sliders, stacked beside the pictures.
                     Column {
                         id: pictureStack
                         spacing: Theme.spacing.m
 
                         SheetItem {
-                            title: "Blur"
+                            title: "Blur  ·  " + (Settings.values.lockBlur === 0 ? "Off" : Settings.values.lockBlur + " %")
 
-                            Stepper {
+                            LevelSlider {
+                                width: Theme.editor.slider
+                                icon: "blur_on"
                                 label: "Blur"
-                                values: Array.from({ length: 11 }, (_, i) => i * 10)
-                                value: Settings.values.lockBlur
-                                format: v => v === 0 ? "Off" : v + " %"
-                                onPicked: v => Settings.values.lockBlur = v
+                                value: Settings.values.lockBlur / 100
+                                onMoved: v => Settings.values.lockBlur = Math.round(v * 10) * 10
                             }
                         }
 
                         SheetItem {
-                            title: "Darken"
+                            title: "Darken  ·  " + (Settings.values.lockDim === 0 ? "Off" : Settings.values.lockDim + " %")
 
-                            Stepper {
+                            LevelSlider {
+                                width: Theme.editor.slider
+                                icon: "contrast"
                                 label: "Darken"
-                                values: Array.from({ length: 13 }, (_, i) => i * 5) // up to 60 %
-                                value: Settings.values.lockDim
-                                format: v => v === 0 ? "Off" : v + " %"
-                                onPicked: v => Settings.values.lockDim = v
+                                value: Settings.values.lockDim / 60
+                                onMoved: v => Settings.values.lockDim = Math.round(v * 12) * 5
                             }
                         }
                     }

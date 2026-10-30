@@ -17,6 +17,9 @@ Column {
     property Component art
     // One row that scrolls sideways (many choices: the wallpapers), instead of wrapping rows.
     property bool scrolls: false
+    // A scrolling row fades out at its end into this (the color behind it), so it reads as
+    // going on; transparent: no fade.
+    property color fadeColor: "transparent"
 
     signal picked(var value)
 
@@ -82,6 +85,18 @@ Column {
             boundsBehavior: Flickable.StopAtBounds
             model: root.scrolls ? root.options : []
             delegate: cardComponent
+        }
+
+        Rectangle {
+            anchors.right: row.right
+            width: Theme.spacing.l * 3
+            height: row.height
+            visible: root.scrolls && root.fadeColor.a > 0 && !row.atXEnd
+            gradient: Gradient {
+                orientation: Gradient.Horizontal
+                GradientStop { position: 0; color: "transparent" }
+                GradientStop { position: 1; color: root.fadeColor }
+            }
         }
     }
 

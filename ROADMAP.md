@@ -1001,8 +1001,9 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   scrolling row takes the whole row. (First tried: equal cells stretched to the sheet's width;
   labels ended up far from their controls with gaps between, user: "horrible".) Lock screen
   editor (user's review): the clock's style and font cards are taller (`ChoiceCards.cardHeight`)
-  with place, size and show stacked beside them; blur and darkening stacked at the end of the
-  picture row.
+  with place, size and show stacked beside them. Picture: a titled row of larger pictures that
+  fades out at its end (`ChoiceCards.fadeColor`), a divider, and blur and darkening as sliders
+  (their values in the titles), the row and sliders the same height.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
