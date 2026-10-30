@@ -135,7 +135,10 @@ Scope {
                     visible: chrome.tab === "wallpaper"
 
                     ChoiceCards {
+                        title: "Wallpaper"
                         scrolls: true
+                        cardWidth: Theme.editor.pictureCard
+                        fadeColor: Colors.surfaceTranslucent
                         options: Wallpaper.pictures.map(p => ({ value: p.filePath, label: p.fileName, thumb: p.video ? p.thumb : p.filePath }))
                         current: Wallpaper.path
                         onPicked: v => Wallpaper.set(v)
@@ -228,18 +231,15 @@ Scope {
                         title: "Color style"
                         subtitle: "How the colors are drawn from the wallpaper"
 
-                        Stepper {
-                            label: "Color style"
-                            values: ColorSchemeJs.styles
-                            valueWidth: Theme.settings.stepperWide
-                            value: Settings.values.colorStyle
-                            format: v => ({
-                                "scheme-tonal-spot": "Tonal (default)", "scheme-vibrant": "Vibrant",
+                        Segmented {
+                            options: ColorSchemeJs.styles.map(v => ({ value: v, label: ({
+                                "scheme-tonal-spot": "Tonal", "scheme-vibrant": "Vibrant",
                                 "scheme-expressive": "Expressive", "scheme-content": "Content",
                                 "scheme-fidelity": "Faithful", "scheme-fruit-salad": "Fruit salad",
                                 "scheme-rainbow": "Rainbow", "scheme-neutral": "Neutral",
-                                "scheme-monochrome": "Monochrome"
-                            })[v] ?? v
+                                "scheme-monochrome": "Mono"
+                            })[v] ?? v }))
+                            current: Settings.values.colorStyle
                             onPicked: v => Settings.values.colorStyle = v
                         }
                     }
@@ -260,30 +260,68 @@ Scope {
                 SheetGrid {
                     visible: chrome.tab === "widgets"
 
-                    Repeater {
-                        model: [
-                            { key: "desktopClock", title: "Clock", subtitle: "The time and date" },
-                            { key: "desktopWeather", title: "Weather", subtitle: "From the town in Weather and clock" },
-                            { key: "desktopMedia", title: "Media", subtitle: "While something plays" }
+                    // On/off cards with a small look at each, like the iOS widget gallery.
+                    ChoiceCards {
+                        title: "Widgets"
+                        subtitle: "Click to show or hide; drag one on the desktop by its handle"
+                        options: [
+                            { value: "desktopClock", label: "Clock" },
+                            { value: "desktopWeather", label: "Weather" },
+                            { value: "desktopMedia", label: "Media, while playing" }
                         ]
+                        chosenValues: ["desktopClock", "desktopWeather", "desktopMedia"].filter(k => Settings.values[k])
+                        onPicked: v => Settings.values[v] = !Settings.values[v]
+                        art: Component {
+                            Rectangle {
+                                readonly property string kind: parent.option.value
+                                color: Colors.m3surfaceContainerHighest
 
-                        SheetItem {
-                            id: widgetRow
-                            required property var modelData
-                            title: modelData.title
-                            subtitle: modelData.subtitle
+                                Text {
+                                    anchors.centerIn: parent
+                                    visible: parent.kind === "desktopClock"
+                                    text: "10:09"
+                                    color: Colors.m3onSurface
+                                    font.family: Theme.font.sans
+                                    font.pixelSize: parent.height * 0.32
+                                    font.weight: Font.Bold
+                                }
 
-                            Switch {
-                                label: widgetRow.modelData.title + " on the desktop"
-                                checked: Settings.values[widgetRow.modelData.key]
-                                onToggled: Settings.values[widgetRow.modelData.key] = !checked
+                                Row {
+                                    anchors.centerIn: parent
+                                    visible: parent.kind === "desktopWeather"
+                                    spacing: Theme.spacing.xs
+
+                                    MaterialIcon {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        icon: Weather.current?.icon ?? "partly_cloudy_day"
+                                        color: Colors.m3primary
+                                        font.pixelSize: Theme.icon.normal * 1.4
+                                    }
+
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: (Weather.current?.temperature ?? 18) + "°"
+                                        color: Colors.m3onSurface
+                                        font.family: Theme.font.sans
+                                        font.pixelSize: Theme.font.title
+                                        font.weight: Font.DemiBold
+                                    }
+                                }
+
+                                MaterialIcon {
+                                    anchors.centerIn: parent
+                                    visible: parent.kind === "desktopMedia"
+                                    icon: "music_note"
+                                    color: Colors.m3primary
+                                    font.pixelSize: Theme.icon.normal * 1.6
+                                }
                             }
                         }
                     }
 
                     SheetItem {
                         title: "Places"
-                        subtitle: "Drag a widget by the handle in its corner to move it"
+                        subtitle: "Where you dragged them"
 
                         TextButton {
                             text: "Back to the start"
@@ -310,14 +348,14 @@ Scope {
 
                     SheetItem {
                         visible: Settings.values.glass
-                        title: "See-through"
+                        title: "Solid  ·  " + Settings.values.glassOpacity + " %"
 
-                        Stepper {
-                            label: "Glass opacity"
-                            values: Array.from({ length: 14 }, (_, i) => 20 + i * 5)
-                            value: Settings.values.glassOpacity
-                            format: v => v + " %"
-                            onPicked: v => Settings.values.glassOpacity = v
+                        LevelSlider {
+                            width: Theme.editor.slider
+                            icon: "opacity"
+                            label: "How solid the glass is"
+                            value: (Settings.values.glassOpacity - 20) / 65
+                            onMoved: v => Settings.values.glassOpacity = 20 + Math.round(v * 13) * 5
                         }
                     }
 
@@ -325,13 +363,10 @@ Scope {
                         title: "Blur"
                         subtitle: "Behind the glass, menus and see-through windows"
 
-                        Stepper {
-                            label: "Blur style"
-                            values: HyprlandConfig.blurStyles
-                            valueWidth: Theme.settings.stepperWide
-                            value: HyprlandConfig.blurStyle(Settings.values.blurStyle)
-                            format: v => ({ kawase: "Classic", frost: "Frost", acrylic: "Acrylic", prism: "Prism",
-                                            aurora: "Aurora", haze: "Haze" })[v] ?? v
+                        Segmented {
+                            options: HyprlandConfig.blurStyles.map(v => ({ value: v, label: ({ kawase: "Classic", frost: "Frost", acrylic: "Acrylic", prism: "Prism",
+                                                                                                aurora: "Aurora", haze: "Haze" })[v] ?? v }))
+                            current: HyprlandConfig.blurStyle(Settings.values.blurStyle)
                             onPicked: v => Settings.values.blurStyle = v
                         }
                     }
@@ -352,23 +387,28 @@ Scope {
                 SheetGrid {
                     visible: chrome.tab === "text"
 
-                    SheetItem {
-                        title: "Shell size"
+                    // The shell's size and its text, stacked.
+                    Column {
+                        spacing: Theme.spacing.m
 
-                        Segmented {
-                            options: ThemeScale.sizes.map(v => ({ value: v, label: Math.round(v * 100) + " %" }))
-                            current: Theme.scale
-                            onPicked: v => Settings.values.uiScale = v
+                        SheetItem {
+                            title: "Shell size"
+
+                            Segmented {
+                                options: ThemeScale.sizes.map(v => ({ value: v, label: Math.round(v * 100) + " %" }))
+                                current: Theme.scale
+                                onPicked: v => Settings.values.uiScale = v
+                            }
                         }
-                    }
 
-                    SheetItem {
-                        title: "Text size"
+                        SheetItem {
+                            title: "Text size"
 
-                        Segmented {
-                            options: ThemeScale.textSizes.map(v => ({ value: v, label: Math.round(v * 100) + " %" }))
-                            current: Theme.textScale
-                            onPicked: v => Settings.values.textScale = v
+                            Segmented {
+                                options: ThemeScale.textSizes.map(v => ({ value: v, label: Math.round(v * 100) + " %" }))
+                                current: Theme.textScale
+                                onPicked: v => Settings.values.textScale = v
+                            }
                         }
                     }
 
@@ -394,31 +434,36 @@ Scope {
                         }
                     }
 
-                    SheetItem {
-                        title: "Icons"
-                        subtitle: "Apps' icons; the shell's own (dock, launcher) after it restarts"
+                    // The icon theme, and restarting for the shell's own icons, stacked.
+                    Column {
+                        spacing: Theme.spacing.m
 
-                        Stepper {
-                            label: "Icon theme"
-                            values: root.iconThemes
-                            valueWidth: Theme.settings.stepperWide
-                            value: Settings.values.iconTheme
-                            format: v => v.replace(/^Colloid-?/, "Colloid ").trim()
-                            onPicked: v => Settings.values.iconTheme = v
+                        SheetItem {
+                            title: "Icons"
+                            subtitle: "Apps' icons; the shell's own (dock, launcher) after it restarts"
+
+                            Stepper {
+                                label: "Icon theme"
+                                values: root.iconThemes
+                                valueWidth: Theme.settings.stepperWide
+                                value: Settings.values.iconTheme
+                                format: v => v.replace(/^Colloid-?/, "Colloid ").trim()
+                                onPicked: v => Settings.values.iconTheme = v
+                            }
                         }
-                    }
 
-                    // The shell reads the icon theme when it starts (QS_ICON_THEME, hypr/shell.sh).
-                    SheetItem {
-                        visible: Settings.values.iconTheme !== root.startIconTheme
-                        title: "Restart the shell for its own icons"
-                        subtitle: "Keeps these changes; clears the notification list"
+                        // The shell reads the icon theme when it starts (QS_ICON_THEME, hypr/shell.sh).
+                        SheetItem {
+                            visible: Settings.values.iconTheme !== root.startIconTheme
+                            title: "Restart the shell for its own icons"
+                            subtitle: "Keeps these changes; clears the notification list"
 
-                        TextButton {
-                            text: "Restart"
-                            onClicked: {
-                                root.close();
-                                Quickshell.execDetached(["sh", "-c", "pkill -x qs; sleep 1; exec \"$HOME\"/.config/hypr/shell.sh"]);
+                            TextButton {
+                                text: "Restart"
+                                onClicked: {
+                                    root.close();
+                                    Quickshell.execDetached(["sh", "-c", "pkill -x qs; sleep 1; exec \"$HOME\"/.config/hypr/shell.sh"]);
+                                }
                             }
                         }
                     }

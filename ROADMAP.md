@@ -1003,7 +1003,11 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   editor (user's review): the clock's style and font cards are taller (`ChoiceCards.cardHeight`)
   with place, size and show stacked beside them. Picture: a titled row of larger pictures that
   fades out at its end (`ChoiceCards.fadeColor`), a divider, and blur and darkening as sliders
-  (their values in the titles), the row and sliders the same height.
+  (their values in the titles), the row and sliders the same height. Desktop editor (same
+  review): a titled row of larger wallpapers fading at the end; color styles as segments, all
+  colors in one row; the widgets as on/off cards with a small look at each, like the iOS widget
+  gallery (`ChoiceCards.chosenValues` for several at once); glass's solidity as a slider and
+  the blur styles as segments; shell and text size stacked, then fonts, then icons.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

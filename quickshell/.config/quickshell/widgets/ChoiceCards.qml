@@ -14,6 +14,9 @@ Column {
     // [{ value, label }]
     required property var options
     property var current
+    // Several chosen at once (on/off cards: the desktop widgets) instead of `current`; picked()
+    // then means "toggle this one".
+    property var chosenValues: null
     property Component art
     // One row that scrolls sideways (many choices: the wallpapers), instead of wrapping rows.
     property bool scrolls: false
@@ -107,11 +110,12 @@ Column {
             id: card
 
             required property var modelData
-            readonly property bool chosen: modelData.value === root.current
+            readonly property bool chosen: root.chosenValues ? root.chosenValues.includes(modelData.value)
+                                                                 : modelData.value === root.current
 
             spacing: Theme.spacing.xs
 
-            Accessible.role: Accessible.RadioButton
+            Accessible.role: root.chosenValues ? Accessible.CheckBox : Accessible.RadioButton
             Accessible.name: modelData.label
             Accessible.checked: chosen
             Accessible.onPressAction: root.picked(modelData.value)
