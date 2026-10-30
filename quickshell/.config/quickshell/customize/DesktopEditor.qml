@@ -126,6 +126,7 @@ Scope {
             EditorChrome {
                 id: chrome
                 tabs: [
+                    { value: "looks", label: "Looks" },
                     { value: "themes", label: "Themes" },
                     { value: "wallpaper", label: "Wallpaper" },
                     { value: "colors", label: "Colors" },
@@ -139,6 +140,69 @@ Scope {
                 status: Wallpaper.busy || ColorScheme.busy ? "Making the colors…" : ""
                 onCancelled: root.cancel()
                 onFinished: root.close()
+
+                // Looks: the style presets over your wallpaper: a panel in each look's glass and
+                // corners (how it draws the colors shows once picked).
+                SheetTiles {
+                    visible: chrome.tab === "looks"
+
+                    LooksTile {
+                        subtitle: "Glass, blur, corners and color style, over your wallpaper and widgets"
+                        presets: Presets.desktop
+                        fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)
+                        art: Component {
+                            Item {
+                                id: look
+                                readonly property var values: parent.option.values
+
+                                Image {
+                                    anchors.fill: parent
+                                    source: Wallpaper.stillPath ? "file://" + Wallpaper.stillPath : ""
+                                    fillMode: Image.PreserveAspectCrop
+                                    sourceSize.width: width * 2
+                                    asynchronous: true
+                                }
+
+                                // A panel as the shell would draw it in this look.
+                                Rectangle {
+                                    anchors.centerIn: parent
+                                    width: parent.width * 0.62
+                                    height: parent.height * 0.5
+                                    radius: Theme.radius.m * look.values.cornerScale
+                                    color: Qt.rgba(Colors.m3surfaceContainer.r, Colors.m3surfaceContainer.g, Colors.m3surfaceContainer.b,
+                                                   look.values.glass ? look.values.glassOpacity / 100 : 0.85)
+                                    border.width: look.values.glass ? Theme.glass.edge : 0
+                                    border.color: Colors.glassEdge
+
+                                    Column {
+                                        anchors.centerIn: parent
+                                        width: parent.width * 0.7
+                                        spacing: Theme.spacing.xs
+
+                                        Rectangle {
+                                            width: parent.width * 0.35
+                                            height: Theme.spacing.s
+                                            radius: height / 2 * Math.min(look.values.cornerScale, 1)
+                                            color: Colors.m3primary
+                                        }
+
+                                        Repeater {
+                                            model: 2
+
+                                            Rectangle {
+                                                width: parent.width * (index === 0 ? 1 : 0.7)
+                                                height: Theme.spacing.xs
+                                                radius: height / 2 * Math.min(look.values.cornerScale, 1)
+                                                color: Colors.m3onSurfaceVariant
+                                                opacity: 0.6
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 // Themes: your saved looks, like Android's (Themes.js): the wallpaper with the
                 // accent and font on it; click one to switch to it. Saving and deleting beside.

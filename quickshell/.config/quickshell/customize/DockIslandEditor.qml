@@ -74,11 +74,108 @@ Scope {
 
             EditorChrome {
                 id: chrome
-                tabs: [{ value: "island", label: "Island" }, { value: "dock", label: "Dock" }]
+                tabs: [{ value: "looks", label: "Looks" }, { value: "island", label: "Island" }, { value: "dock", label: "Dock" }]
                 glass: true
                 centered: true
                 onCancelled: root.cancel()
                 onFinished: root.close()
+
+                // Looks: the island and dock in each look, small on your wallpaper: the dots, the
+                // clock as it would read, and the dock (faint when it waits at the edge).
+                SheetTiles {
+                    visible: chrome.tab === "looks"
+
+                    LooksTile {
+                        subtitle: "How much the island shows, and the dock"
+                        presets: Presets.dockIsland
+                        fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)
+                        art: Component {
+                            Item {
+                                id: look
+                                readonly property var values: parent.option.values
+                                readonly property real unit: width / 40
+
+                                Image {
+                                    anchors.fill: parent
+                                    source: Wallpaper.stillPath ? "file://" + Wallpaper.stillPath : ""
+                                    fillMode: Image.PreserveAspectCrop
+                                    sourceSize.width: width * 2
+                                    asynchronous: true
+                                }
+
+                                // The island at the top edge.
+                                Rectangle {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    width: islandRow.width + look.unit * 3
+                                    height: look.unit * 3.2
+                                    radius: height / 2
+                                    color: Colors.m3surfaceContainer
+
+                                    Row {
+                                        id: islandRow
+                                        anchors.centerIn: parent
+                                        spacing: look.unit
+
+                                        Row {
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            spacing: look.unit * 0.4
+
+                                            Repeater {
+                                                model: look.values.workspaceDots || 2
+
+                                                Rectangle {
+                                                    width: look.unit * 0.8
+                                                    height: width
+                                                    radius: width / 2
+                                                    color: index === 0 ? Colors.m3primary : Colors.m3onSurfaceVariant
+                                                }
+                                            }
+                                        }
+
+                                        Text {
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text: (look.values.clockDate ? "Fri 30  " : "") + (look.values.clockSeconds ? "14:32:05" : "14:32")
+                                            color: Colors.m3onSurface
+                                            font.family: Theme.font.sans
+                                            font.pixelSize: look.unit * 1.6
+                                            font.weight: Font.DemiBold
+                                        }
+                                    }
+                                }
+
+                                // The dock at the bottom, its icons at the look's size.
+                                Rectangle {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    anchors.bottom: parent.bottom
+                                    anchors.bottomMargin: look.unit
+                                    width: dockRow.width + look.unit * 2
+                                    height: dockRow.height + look.unit * 1.2
+                                    radius: look.unit * 1.6
+                                    color: Colors.m3surfaceContainer
+                                    opacity: look.values.dockMode === "always" ? 1 : 0.35
+
+                                    Row {
+                                        id: dockRow
+                                        anchors.centerIn: parent
+                                        spacing: look.unit * 0.5
+
+                                        Repeater {
+                                            model: 5
+
+                                            Rectangle {
+                                                width: look.unit * 2.6 * look.values.dockIconSize / 44
+                                                height: width
+                                                radius: width * 0.3
+                                                color: index === 0 ? Colors.m3primary : Colors.m3onSurfaceVariant
+                                                opacity: 0.85
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 // Island: the workspace dots (drawn at your count), the clock (as it will read) and
                 // which status icons show.

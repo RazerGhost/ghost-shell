@@ -1203,6 +1203,25 @@ password field with its hints: where they would, they stop just above it, and be
 may go lower (`LockClock.offset`, `clamped`, tested). Picking a Place or a look starts again
 from that place; Cancel puts the old one back.
 
+### Presets in every editor (built 2026-10-30)
+User's request. Each on-screen editor opens on a Looks tab: its presets as picture cards drawn
+on your wallpaper (`customize/LooksTile.qml`, shared with the lock screen's looks; "Yours"
+first while your settings match none). Picking one sets its settings at once; each can still
+be changed after, and Cancel puts the old ones back (`customize/Presets.js`, tested: each sets
+only its editor's settings, with values its controls offer, none twice).
+- Desktop (style over your wallpaper, accent and widgets: glass, blur, corners, color style
+  and contrast): Ghost (the defaults), Frosted, Vivid, Calm, Solid, Sharp. The card: a panel in
+  the look's glass and corners.
+- Dock and island: Ghost, Minimal (dots only in use, fewer status icons, small dock), Desk (the
+  dock always shown and larger, the day in the island), Everything (eight dots, day and
+  seconds). The card: the island as it would read, and the dock (faint while it waits at the
+  edge).
+- Windows: Ghost, Tight, Spacious (wide gaps, a glow), Playful (turning border, glow, wobble,
+  their own borders for floating windows), Still (no motion). The card: two windows at the
+  look's gaps, corners and border.
+- `Presets.current` compares lists by their contents (the hidden status icons), and `apply`
+  copies them, so editing your settings after never changes a preset.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

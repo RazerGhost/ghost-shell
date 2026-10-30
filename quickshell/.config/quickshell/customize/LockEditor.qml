@@ -171,50 +171,39 @@ Scope {
                 SheetTiles {
                     visible: chrome.tab === "looks"
 
-                    SheetTile {
-                        title: "Looks"
+                    LooksTile {
                         subtitle: "Your picture with each look's clock"
+                        presets: Presets.lock
+                        fadeColor: Qt.tint(chrome.solid, Colors.tint)
+                        art: Component {
+                            Item {
+                                id: look
+                                readonly property var values: parent.option.values
 
-                        ChoiceCards {
-                            anchors.centerIn: parent
-                            options: (Presets.current(Settings.values, Presets.lock) === "" ? [{ value: "", label: "Yours" }] : [])
-                                .concat(Presets.lock.map(p => ({ value: p.name, label: p.name })))
-                            current: Presets.current(Settings.values, Presets.lock)
-                            onPicked: v => {
-                                if (v !== "")
-                                    Presets.apply(Settings.values, Presets.lock, v);
-                            }
-                            art: Component {
-                                Item {
-                                    id: look
-                                    readonly property var values: parent.option.value === "" ? Settings.values
-                                        : Presets.lock.find(p => p.name === parent.option.value).values
+                                Image {
+                                    anchors.fill: parent
+                                    source: Wallpaper.lockPath ? "file://" + Wallpaper.lockPath : ""
+                                    fillMode: Image.PreserveAspectCrop
+                                    sourceSize.width: width * 2
+                                    asynchronous: true
+                                }
 
-                                    Image {
-                                        anchors.fill: parent
-                                        source: Wallpaper.lockPath ? "file://" + Wallpaper.lockPath : ""
-                                        fillMode: Image.PreserveAspectCrop
-                                        sourceSize.width: width * 2
-                                        asynchronous: true
-                                    }
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: "black"
+                                    opacity: look.values.lockDim / 100 + 0.1
+                                }
 
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        color: "black"
-                                        opacity: look.values.lockDim / 100 + 0.1
-                                    }
-
-                                    MiniClock {
-                                        box: look
-                                        style: look.values.lockClockStyle
-                                        family: look.values.lockClockFont || Theme.font.sans
-                                        fill: 0.5
-                                        // Placed by its shrunk size, like the look's place on the screen.
-                                        transformOrigin: Item.TopLeft
-                                        x: look.values.lockLayout === "left" ? look.width * 0.08 : (look.width - width * scale) / 2
-                                        y: look.values.lockLayout === "top" ? look.height * 0.12
-                                           : look.values.lockLayout === "center" ? (look.height - height * scale) / 2 : look.height * 0.88 - height * scale
-                                    }
+                                MiniClock {
+                                    box: look
+                                    style: look.values.lockClockStyle
+                                    family: look.values.lockClockFont || Theme.font.sans
+                                    fill: 0.5
+                                    // Placed by its shrunk size, like the look's place on the screen.
+                                    transformOrigin: Item.TopLeft
+                                    x: look.values.lockLayout === "left" ? look.width * 0.08 : (look.width - width * scale) / 2
+                                    y: look.values.lockLayout === "top" ? look.height * 0.12
+                                       : look.values.lockLayout === "center" ? (look.height - height * scale) / 2 : look.height * 0.88 - height * scale
                                 }
                             }
                         }

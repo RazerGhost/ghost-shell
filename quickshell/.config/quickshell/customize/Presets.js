@@ -13,6 +13,34 @@ const lock = [
     { name: "Editorial", values: { lockClockStyle: "big", lockLayout: "center", lockClockSize: 125, lockClockFont: "C059", lockBlur: 80, lockDim: 35, lockClockOffset: null, lockWidgetsOffset: null } }
 ];
 
+// The desktop's style, over your wallpaper, accent and widgets: the glass, blur, corners and how
+// the colors are drawn.
+const desktop = [
+    { name: "Ghost", values: { glass: true, glassOpacity: 45, blurStyle: "kawase", cornerScale: 1, colorStyle: "scheme-tonal-spot", colorContrast: 0 } },
+    { name: "Frosted", values: { glass: true, glassOpacity: 30, blurStyle: "frost", cornerScale: 1.5, colorStyle: "scheme-vibrant", colorContrast: 0 } },
+    { name: "Vivid", values: { glass: true, glassOpacity: 55, blurStyle: "acrylic", cornerScale: 1, colorStyle: "scheme-expressive", colorContrast: 0 } },
+    { name: "Calm", values: { glass: true, glassOpacity: 60, blurStyle: "haze", cornerScale: 1.5, colorStyle: "scheme-neutral", colorContrast: -0.5 } },
+    { name: "Solid", values: { glass: false, glassOpacity: 85, blurStyle: "kawase", cornerScale: 0.5, colorStyle: "scheme-tonal-spot", colorContrast: 0.5 } },
+    { name: "Sharp", values: { glass: false, glassOpacity: 85, blurStyle: "kawase", cornerScale: 0, colorStyle: "scheme-monochrome", colorContrast: 0.5 } }
+];
+
+// The island and dock: how much the island shows and when and how large the dock is.
+const dockIsland = [
+    { name: "Ghost", values: { dockMode: "hide", dockIconSize: 44, workspaceDots: 5, hiddenStatusIcons: [], clockDate: false, clockSeconds: false, islandMedia: true } },
+    { name: "Minimal", values: { dockMode: "hide", dockIconSize: 36, workspaceDots: 0, hiddenStatusIcons: ["bluetooth", "vpn", "updates", "timer"], clockDate: false, clockSeconds: false, islandMedia: false } },
+    { name: "Desk", values: { dockMode: "always", dockIconSize: 52, workspaceDots: 5, hiddenStatusIcons: [], clockDate: true, clockSeconds: false, islandMedia: true } },
+    { name: "Everything", values: { dockMode: "always", dockIconSize: 44, workspaceDots: 8, hiddenStatusIcons: [], clockDate: true, clockSeconds: true, islandMedia: false } }
+];
+
+// Windows: borders, corners, gaps and motion.
+const windows = [
+    { name: "Ghost", values: { borderSize: 2, rounding: 10, borderSpin: false, windowGlow: false, windowKindBorders: false, gapsIn: 5, gapsOut: 20, animationSpeed: 1, windowAnimation: "popin", workspaceAnimation: "fade", wobble: false } },
+    { name: "Tight", values: { borderSize: 1, rounding: 4, borderSpin: false, windowGlow: false, windowKindBorders: false, gapsIn: 2, gapsOut: 6, animationSpeed: 1.5, windowAnimation: "slide", workspaceAnimation: "slide", wobble: false } },
+    { name: "Spacious", values: { borderSize: 2, rounding: 16, borderSpin: false, windowGlow: true, windowKindBorders: false, gapsIn: 12, gapsOut: 32, animationSpeed: 1, windowAnimation: "popin", workspaceAnimation: "slidefade", wobble: false } },
+    { name: "Playful", values: { borderSize: 3, rounding: 20, borderSpin: true, windowGlow: true, windowKindBorders: true, gapsIn: 8, gapsOut: 24, animationSpeed: 1, windowAnimation: "gnomed", workspaceAnimation: "slidevert", wobble: true } },
+    { name: "Still", values: { borderSize: 1, rounding: 10, borderSpin: false, windowGlow: false, windowKindBorders: false, gapsIn: 5, gapsOut: 20, animationSpeed: 0, windowAnimation: "popin", workspaceAnimation: "fade", wobble: false } }
+];
+
 // Every setting the lock screen editor changes, for its Cancel.
 const lockKeys = ["lockClockStyle", "lockLayout", "lockClockOffset", "lockWidgetsOffset", "lockClockSize", "lockClockFont", "lockBlur", "lockDim",
                   "lockWallpaper", "lockClock", "lockDate", "lockWidgets", "lockMedia"];
@@ -47,9 +75,11 @@ function restore(values, saved) {
         values[key] = saved[key];
 }
 
-// The preset whose values all match the settings, else "" (a look of your own).
+// The preset whose values all match the settings, else "" (a look of your own). Lists and
+// objects (the hidden status icons) by their contents.
 function current(values, presets) {
-    const match = presets.find(p => Object.keys(p.values).every(k => values?.[k] === p.values[k]));
+    const same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+    const match = presets.find(p => Object.keys(p.values).every(k => same(values?.[k], p.values[k])));
     return match ? match.name : "";
 }
 
@@ -59,5 +89,5 @@ function apply(values, presets, name) {
     if (!preset)
         return;
     for (const key of Object.keys(preset.values))
-        values[key] = preset.values[key];
+        values[key] = JSON.parse(JSON.stringify(preset.values[key])); // a copy: lists stay the preset's
 }

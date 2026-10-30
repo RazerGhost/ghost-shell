@@ -220,11 +220,90 @@ Scope {
 
             EditorChrome {
                 id: chrome
-                tabs: [{ value: "borders", label: "Borders" }, { value: "space", label: "Space" }, { value: "motion", label: "Motion" }]
+                tabs: [{ value: "looks", label: "Looks" }, { value: "borders", label: "Borders" }, { value: "space", label: "Space" },
+                       { value: "motion", label: "Motion" }]
                 glass: true
                 cardTop: Theme.island.height + Theme.spacing.l * 2
                 onCancelled: root.cancel()
                 onFinished: root.close()
+
+                // Looks: two windows side by side on your wallpaper at each look's gaps, corners and
+                // border (the motion shows once picked: Play in Motion).
+                SheetTiles {
+                    visible: chrome.tab === "looks"
+
+                    LooksTile {
+                        subtitle: "Borders, corners, gaps and motion"
+                        presets: Presets.windows
+                        fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)
+                        art: Component {
+                            Item {
+                                id: look
+                                readonly property var values: parent.option.values
+                                // Gaps and corners larger than to scale, so the looks tell apart.
+                                readonly property real unit: width / 640
+
+                                Image {
+                                    anchors.fill: parent
+                                    source: Wallpaper.stillPath ? "file://" + Wallpaper.stillPath : ""
+                                    fillMode: Image.PreserveAspectCrop
+                                    sourceSize.width: width * 2
+                                    asynchronous: true
+                                }
+
+                                Repeater {
+                                    model: 2
+
+                                    Rectangle {
+                                        readonly property real outer: Math.max(look.values.gapsOut * look.unit * 2, 1)
+                                        readonly property real inner: Math.max(look.values.gapsIn * look.unit * 2, 1)
+
+                                        x: outer + index * (width + inner)
+                                        y: outer
+                                        width: (look.width - outer * 2 - inner) / 2
+                                        height: look.height - outer * 2
+                                        radius: look.values.rounding * look.unit * 2
+                                        color: Colors.m3surfaceContainer
+                                        border.width: Math.max(1, look.values.borderSize * 0.6)
+                                        border.color: index === 0 ? Colors.m3primary : Colors.m3outlineVariant
+
+                                        // The glow inside the focused window's edge.
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            anchors.margins: parent.border.width
+                                            visible: index === 0 && look.values.windowGlow
+                                            radius: Math.max(0, parent.radius - parent.border.width)
+                                            color: "transparent"
+                                            border.width: Math.max(2, parent.border.width * 2)
+                                            border.color: Qt.rgba(Colors.m3primary.r, Colors.m3primary.g, Colors.m3primary.b, 0.35)
+                                        }
+                                    }
+                                }
+
+                                // Motion off: said, since it can't show in a picture.
+                                Rectangle {
+                                    visible: look.values.animationSpeed === 0
+                                    anchors.right: parent.right
+                                    anchors.top: parent.top
+                                    anchors.margins: Theme.spacing.xs
+                                    width: still.width + Theme.spacing.s
+                                    height: still.height + Theme.spacing.xs
+                                    radius: height / 2
+                                    color: Colors.m3surfaceContainerHighest
+
+                                    Text {
+                                        id: still
+                                        anchors.centerIn: parent
+                                        text: "No motion"
+                                        color: Colors.m3onSurface
+                                        font.family: Theme.font.sans
+                                        font.pixelSize: Theme.font.small
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 // Borders: a sample window for the width and the corners, and the extras.
                 SheetTiles {

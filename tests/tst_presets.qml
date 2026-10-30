@@ -1,6 +1,8 @@
 import QtQuick
 import QtTest
 import "../quickshell/.config/quickshell/customize/Presets.js" as Presets
+import "../quickshell/.config/quickshell/settings/HyprlandConfig.js" as HyprlandConfig
+import "../quickshell/.config/quickshell/theme/ThemeScale.js" as ThemeScale
 
 TestCase {
     name: "Presets"
@@ -22,6 +24,39 @@ TestCase {
         compare(Presets.current(values, Presets.lock), "Analog");
         Presets.apply(values, Presets.lock, "Nope");
         compare(values.lockClockStyle, "analog");
+    }
+
+    // Each editor's presets set only what that editor's Cancel puts back, with values its controls
+    // offer, and no two are the same.
+    function test_editorPresets() {
+        const sets = [[Presets.lock, Presets.lockKeys], [Presets.desktop, Presets.desktopKeys],
+                      [Presets.dockIsland, Presets.dockIslandKeys], [Presets.windows, Presets.windowsKeys]];
+        for (const [presets, keys] of sets) {
+            for (const p of presets)
+                for (const key of Object.keys(p.values))
+                    verify(keys.includes(key), p.name + ": " + key);
+            compare(new Set(presets.map(p => JSON.stringify(p.values))).size, presets.length);
+        }
+        for (const p of Presets.desktop) {
+            verify(HyprlandConfig.blurStyles.includes(p.values.blurStyle), p.name);
+            verify(ThemeScale.corners.includes(p.values.cornerScale), p.name);
+        }
+        for (const p of Presets.dockIsland) {
+            verify(ThemeScale.dockIcons.includes(p.values.dockIconSize), p.name);
+            verify(ThemeScale.workspaceDots.includes(p.values.workspaceDots), p.name);
+        }
+        for (const p of Presets.windows)
+            verify(HyprlandConfig.animationSpeeds.includes(p.values.animationSpeed), p.name);
+        // The first of each is how a fresh install looks.
+        compare(Presets.current({ dockMode: "hide", dockIconSize: 44, workspaceDots: 5, hiddenStatusIcons: [],
+                                  clockDate: false, clockSeconds: false, islandMedia: true }, Presets.dockIsland), "Ghost");
+    }
+
+    function test_applyCopies() {
+        const values = {};
+        Presets.apply(values, Presets.dockIsland, "Minimal");
+        values.hiddenStatusIcons.push("wifi");
+        verify(!Presets.dockIsland[1].values.hiddenStatusIcons.includes("wifi"));
     }
 
     function test_presetsAreDistinct() {
