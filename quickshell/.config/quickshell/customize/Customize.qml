@@ -63,8 +63,15 @@ Scope {
         id: looksRead
         property string from
         command: ["cat", from]
+        onExited: code => {
+            if (code !== 0)
+                Notifications.send("Customize", "dialog-warning", "Couldn't import the looks",
+                                   looksRead.from + " couldn't be read.", false, []);
+        }
         stdout: StdioCollector {
             onStreamFinished: {
+                if (text === "")
+                    return;
                 let file;
                 try {
                     file = JSON.parse(text);
@@ -79,7 +86,15 @@ Scope {
                 const merged = LooksFile.imported(here, file, Quickshell.env("HOME"));
                 for (const key of LooksFile.keys)
                     Settings.values[key] = merged[key];
-                const count = LooksFile.keys.reduce((n, key) => n + (Array.isArray(file[key]) ? file[key].length : 0), 0);
+                // An editor open now keeps them through its Cancel: they're part of its "before".
+                for (const editor of [lockEditor, desktopEditor, dockIslandEditor, windowsEditor]) {
+                    const before = Object.assign({}, editor.saved);
+                    for (const key of LooksFile.keys)
+                        if (key in before)
+                            before[key] = merged[key];
+                    editor.saved = before;
+                }
+                const count = LooksFile.count(file);
                 Notifications.send("Customize", "preferences-desktop-theme", "Looks imported",
                                    count + " themes and looks from your dotfiles, merged with this machine's.", false, []);
             }
@@ -90,6 +105,9 @@ Scope {
         target: "customize"
 
         function importLooks(path: string): void {
+            // One at a time: a second while the first reads would rename what the notice names.
+            if (looksRead.running)
+                return;
             looksRead.from = path;
             looksRead.running = true;
         }

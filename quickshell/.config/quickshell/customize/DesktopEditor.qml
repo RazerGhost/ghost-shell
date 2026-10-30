@@ -488,7 +488,8 @@ Scope {
                                 }
                             }
                         }
-    
+                    }
+
                     // More art from wallhaven.cc into your folder (ghost wallpapers get): the month's
                     // best anime, or what the words find; safe for work only.
                     SheetTile {
@@ -526,7 +527,7 @@ Scope {
                                 if (running)
                                     return;
                                 const words = artWords.text.trim().split(/\s+/).filter(w => w !== "");
-                                command = [Quickshell.env("HOME") + "/.local/bin/ghost", "wallpapers", "get"].concat(words).concat(["--count", "12"]);
+                                command = [Quickshell.env("HOME") + "/.local/bin/ghost", "wallpapers", "get", "--count", "12", "--"].concat(words);
                                 running = true;
                             }
 
@@ -542,7 +543,6 @@ Scope {
                             }
                         }
                     }
-                }
                 }
 
                 // Colors: light or dark, the accent as swatches, how the colors are drawn, contrast.

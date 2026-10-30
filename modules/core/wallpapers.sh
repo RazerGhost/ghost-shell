@@ -4,7 +4,7 @@
 # ~/Pictures/Wallpapers by default), never into the repo. No account: wallhaven's public search
 # API. `ghost wallpapers` runs this; the desktop editor's Wallpaper tab too.
 #
-#   ghost wallpapers get [search words] [--count N] [--general]
+#   ghost wallpapers get [--count N] [--general] [--] [search words]
 #       the month's best (or the best matching the words), at least 1920x1080 in 16:9; N of them
 #       (12 by default, at most 48) that aren't in the folder yet. --general: illustrations and
 #       scenery too, not only anime.
@@ -17,8 +17,10 @@ shift
 count=12 categories=010 words=()
 while (($#)); do
     case $1 in
-        --count) [[ ${2:-} =~ ^[0-9]+$ ]] || fail "--count needs a number"; count=$2; shift 2 ;;
+        --count) [[ ${2:-} =~ ^[0-9]+$ ]] || fail "--count needs a number"; count=$((10#$2)); shift 2 ;;
         --general) categories=110; shift ;;
+        # The rest are search words, even ones starting with "--" (the shell's search field).
+        --) shift; words+=("$@"); break ;;
         *) words+=("$1"); shift ;;
     esac
 done
@@ -36,7 +38,7 @@ mkdir -p "$folder"
 
 # The search, in wallhaven's API: SFW only (purity=100), the chosen categories, big enough, 16:9;
 # the words as a query, else the month's top list. Pages until there are enough new ones.
-got=0 page=1
+got=0 failed=0 page=1
 while ((got < count && page <= 5)); do
     url=$(WORDS="${words[*]}" CATS=$categories PAGE=$page bun -e '
         const q = process.env.WORDS.trim();
@@ -47,18 +49,21 @@ while ((got < count && page <= 5)); do
         process.stdout.write("https://wallhaven.cc/api/v1/search?" + params);
     ')
     list=$(curl -fsS --max-time 20 "$url") || fail "wallhaven didn't answer (no network?)"
-    # One "<id> <url>" per picture: images only, and only wallhaven's own file host.
+    # One "<id> <extension> <url>" per picture: safe for work, a JPEG or PNG, from wallhaven's own
+    # file host, its id letters and digits only (the file name is made from it).
     mapfile -t found < <(LIST="$list" bun -e '
         const data = JSON.parse(process.env.LIST).data ?? [];
+        const ext = { "image/jpeg": "jpg", "image/png": "png" };
         for (const w of data)
-            if (w.purity === "sfw" && /^image\/(jpeg|png)$/.test(w.file_type) && /^https:\/\/w\.wallhaven\.cc\/full\//.test(w.path))
-                console.log(w.id + " " + w.path);
+            if (w.purity === "sfw" && ext[w.file_type] && /^[a-z0-9]+$/i.test(w.id)
+                && /^https:\/\/w\.wallhaven\.cc\/full\/[a-z0-9]+\/wallhaven-[a-z0-9]+\.(jpg|png)$/i.test(w.path))
+                console.log(w.id + " " + ext[w.file_type] + " " + w.path);
     ')
     ((${#found[@]})) || break
     for entry in "${found[@]}"; do
         ((got < count)) || break
-        id=${entry%% *} src=${entry#* }
-        file="$folder/wallhaven-$id.${src##*.}"
+        read -r id ext src <<<"$entry"
+        file="$folder/wallhaven-$id.$ext"
         [[ -e $file ]] && continue
         if curl -fsS --max-time 60 -o "$file.part" "$src"; then
             mv "$file.part" "$file"
@@ -66,8 +71,9 @@ while ((got < count && page <= 5)); do
             echo "  $(basename "$file")"
         else
             rm -f "$file.part"
+            failed=$((failed + 1))
         fi
     done
     page=$((page + 1))
 done
-echo "$got new wallpapers in $folder (from wallhaven.cc)."
+echo "$got new wallpapers in $folder (from wallhaven.cc)$( ((failed)) && echo ", $failed couldn't be downloaded")."

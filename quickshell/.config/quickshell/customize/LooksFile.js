@@ -37,6 +37,20 @@ function exported(settings, home) {
     return out;
 }
 
+// The looks with a name, each name once (the first): a hand-edited file can't add two of one.
+function named(looks) {
+    const out = [];
+    for (const look of looks)
+        if (typeof look?.name === "string" && look.name !== "" && !out.some(o => o.name === look.name))
+            out.push(look);
+    return out;
+}
+
+// How many looks the file brings, as they'd be merged.
+function count(file) {
+    return keys.reduce((n, key) => n + named(list(file?.[key])).length, 0);
+}
+
 // The settings with the file's looks merged in: one with the same name as one here replaces it
 // (the file is what was shared), new ones are added after; the others here stay. Returns only
 // the lists (the keys above), to write over the settings'.
@@ -44,8 +58,7 @@ function imported(settings, file, home) {
     const out = {};
     for (const key of keys) {
         const mine = list(settings?.[key]);
-        const theirs = list(file?.[key]).filter(look => typeof look?.name === "string" && look.name !== "")
-            .map(look => moved(look, home, true));
+        const theirs = named(list(file?.[key])).map(look => moved(look, home, true));
         const merged = mine.map(look => theirs.find(t => t.name === look.name) ?? look);
         for (const look of theirs)
             if (!mine.some(m => m.name === look.name))

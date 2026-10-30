@@ -36,5 +36,9 @@ TestCase {
         compare(merged.themes.map(t => t.name), ["Night", "Only here", "New"]);
         compare(merged.themes[0].wallpaper, "/home/b/new.png");
         compare(merged.lockLooks, []);
+        // Two of one name in the file: the first counts.
+        const twice = LooksFile.imported({}, { dockLooks: [{ name: "A", values: { a: 1 } }, { name: "A", values: { a: 2 } }] }, "/h");
+        compare(twice.dockLooks, [{ name: "A", values: { a: 1 } }]);
+        compare(LooksFile.count({ themes: [{ name: "A" }, { name: "" }, { name: "A" }, { name: "B" }] }), 2);
     }
 }

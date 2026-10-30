@@ -20,14 +20,22 @@ Column {
         .filter(id => !id.startsWith("battery") || Battery.present)
     spacing: Theme.spacing.l
 
-    MediaCard {
-        id: media
+    // The player, in a holder that stays enabled: in the editor the card takes no input, and
+    // its outline beside it still has to (a disabled parent disables its children).
+    Item {
+        id: player
         width: parent.width
-        visible: Settings.values.lockMedia && player !== null
-        enabled: root.lock.editor === null
-        transform: PartShift { content: root.lock; name: "player"; target: media }
+        height: media.height
+        visible: Settings.values.lockMedia && Media.player !== null
+        transform: PartShift { content: root.lock; name: "player"; target: player }
 
-        PartOutline { content: root.lock; part: "player"; target: media; tab: "widgets"; name: "The player" }
+        MediaCard {
+            id: media
+            width: parent.width
+            enabled: root.lock.editor === null
+        }
+
+        PartOutline { content: root.lock; part: "player"; target: player; tab: "widgets"; name: "The player" }
     }
 
     Row {

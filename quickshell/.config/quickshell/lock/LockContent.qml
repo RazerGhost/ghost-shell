@@ -126,7 +126,10 @@ Item {
     // The field's own move, and where it ends up with its hints: what the other parts keep
     // clear of, besides the login screen's power buttons and the message line at the bottom.
     readonly property var fieldMove: shiftOf("field", fieldColumn)
-    readonly property var fieldArea: ({ x: fieldColumn.x + fieldShift + fieldMove.x, y: fieldColumn.y + fieldMove.y,
+    // Where the field's column is laid out, without its shake (a wrong password moves it side to
+    // side for a moment: the clamp would hold it still at an edge, and parts beside it would jump).
+    readonly property real fieldX: fieldColumn.x - fieldColumn.anchors.horizontalCenterOffset
+    readonly property var fieldArea: ({ x: fieldX + fieldShift + fieldMove.x, y: fieldColumn.y + fieldMove.y,
                                         width: fieldColumn.width, height: fieldColumn.height + belowReserve })
     readonly property var bottomRow: (powerRow.visible ? [{ x: powerRow.x, y: powerRow.y, width: powerRow.width, height: powerRow.height }] : [])
         .concat(messageLine.visible ? [{ x: messageLine.x, y: messageLine.y, width: messageLine.width, height: messageLine.height }] : [])
@@ -139,7 +142,7 @@ Item {
         for (let p = item; p && p !== root; p = p.parent)
             void (p.x + p.y + p.width + p.height);
         const field = name === "field";
-        const at = field ? Qt.point(fieldColumn.x + fieldShift, fieldColumn.y) : item.parent.mapToItem(root, item.x, item.y);
+        const at = field ? Qt.point(fieldX + fieldShift, fieldColumn.y) : item.parent.mapToItem(root, item.x, item.y);
         const place = LockClockJs.placeOf(Settings.values.lockPlaces, name, Settings.values);
         const extra = by ?? drags[name] ?? Qt.point(0, 0);
         return LockClockJs.clamped({ x: at.x, y: at.y, width: item.width, height: field ? item.height + belowReserve : item.height },
@@ -168,9 +171,14 @@ Item {
         const next = Object.assign({}, drags);
         delete next[name];
         drags = next;
-        if (!small)
+        if (!small) {
             Settings.values.lockPlaces = LockClockJs.withPlace(Settings.values.lockPlaces, name,
                                                                { x: shift.x / width, y: shift.y / height }, Settings.values, parts);
+            // Carried into lockPlaces now: no longer read, and gone so a look or a Place resetting
+            // lockPlaces doesn't bring them back.
+            Settings.values.lockClockOffset = null;
+            Settings.values.lockWidgetsOffset = null;
+        }
         Qt.callLater(() => settling = false);
     }
 
@@ -263,11 +271,10 @@ Item {
         // In the bottom-left layout, moved right when a large clock reaches under it; and where
         // it was dragged in the editor (glides there). No input while editing.
         enabled: root.editor === null
-        transform: Translate {
+        transform: GlideTranslate {
+            content: root
             x: root.fieldShift + root.fieldMove.x
             y: root.fieldMove.y
-            Behavior on x { enabled: !root.dragging && !root.settling; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
-            Behavior on y { enabled: !root.dragging && !root.settling; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
         }
         spacing: Theme.spacing.m
 
@@ -401,7 +408,7 @@ Item {
     // Under the field, hanging from it: the hints and "Wrong password" appear and go without
     // moving the field (in its column they pushed it up into the lines under the clock).
     Column {
-        transform: Translate { x: root.fieldShift + root.fieldMove.x; y: root.fieldMove.y }
+        transform: GlideTranslate { content: root; x: root.fieldShift + root.fieldMove.x; y: root.fieldMove.y }
         anchors.top: fieldColumn.bottom
         anchors.topMargin: Theme.spacing.m
         anchors.horizontalCenter: fieldColumn.horizontalCenter

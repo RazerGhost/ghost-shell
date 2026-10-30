@@ -47,8 +47,11 @@ function clamped(rect, dx, dy, sw, sh, fields, margin, gap) {
     for (const field of list) {
         const across = x < field.x + field.width + gap && x + rect.width > field.x - gap;
         const below = y + rect.height > field.y - gap && y < field.y + field.height + gap;
-        if (across && below)
-            y = Math.max(margin, field.y - gap - rect.height);
+        if (!across || !below)
+            continue;
+        // Above it when there's room (the field dragged near the top may leave none), else under it.
+        const above = field.y - gap - rect.height;
+        y = above >= margin ? above : Math.min(field.y + field.height + gap, sh - margin - rect.height);
     }
     return { x: x - rect.x, y: y - rect.y };
 }

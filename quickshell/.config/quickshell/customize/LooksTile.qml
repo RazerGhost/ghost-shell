@@ -38,12 +38,26 @@ SheetTile {
     readonly property bool chosenIsYours: saved.some(l => l.name === chosen)
     // The look of yours being edited: picked or just saved; none after picking a preset.
     property string editing: ""
+    // This tile is writing the list itself (saving, following, renaming, deleting). When it
+    // changes from elsewhere (an import), the look being edited may have been replaced: start
+    // again from what's chosen, rather than saving over it.
+    property bool writing: false
+    onSavedChanged: {
+        if (!writing)
+            editing = chosenIsYours ? chosen : "";
+    }
+
+    function write(list: var): void {
+        writing = true;
+        Settings.values[savedKey] = list;
+        writing = false;
+    }
 
     Component.onCompleted: editing = chosenIsYours ? chosen : ""
 
     function save(): void {
         const look = SavedLooks.made(looks.map(l => l.name), Settings.values, savedKeys, savedPrefix);
-        Settings.values[savedKey] = saved.concat([look]);
+        write(saved.concat([look]));
         editing = look.name;
     }
 
@@ -61,7 +75,7 @@ SheetTile {
             if (!tile.live || tile.chosen !== "" || !tile.saved.some(l => l.name === tile.editing))
                 return;
             const values = SavedLooks.made([], Settings.values, tile.savedKeys, "").values;
-            Settings.values[tile.savedKey] = tile.saved.map(l => l.name === tile.editing ? { name: l.name, values } : l);
+            tile.write(tile.saved.map(l => l.name === tile.editing ? { name: l.name, values } : l));
         }
     }
 
@@ -84,7 +98,7 @@ SheetTile {
             // A name that's empty or taken isn't kept: the field shows the name again.
             onAccepted: {
                 const from = tile.chosen;
-                Settings.values[tile.savedKey] = SavedLooks.renamed(tile.saved, from, text, tile.presets.map(p => p.name));
+                tile.write(SavedLooks.renamed(tile.saved, from, text, tile.presets.map(p => p.name)));
                 if (tile.editing === from)
                     tile.editing = tile.chosen;
                 text = tile.chosen;
@@ -105,7 +119,7 @@ SheetTile {
             label: "Delete " + tile.chosen
             onClicked: {
                 tile.editing = "";
-                Settings.values[tile.savedKey] = SavedLooks.removed(tile.saved, tile.chosen);
+                tile.write(SavedLooks.removed(tile.saved, tile.chosen));
             }
         }
     }

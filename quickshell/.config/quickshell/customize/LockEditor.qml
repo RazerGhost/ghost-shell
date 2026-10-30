@@ -275,6 +275,8 @@ Scope {
                                     onPicked: v => {
                                         Settings.values.lockLayout = v;
                                         Settings.values.lockPlaces = null;
+                                        Settings.values.lockClockOffset = null;
+                                        Settings.values.lockWidgetsOffset = null;
                                     }
                                 }
                         }

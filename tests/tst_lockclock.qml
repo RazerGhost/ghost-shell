@@ -51,6 +51,9 @@ TestCase {
         const buttons = { x: 1700, y: 1000, width: 180, height: 48 };
         // Dragged down to the bottom right: stops above the buttons (1000 - 24 - 200 = 776).
         compare(LockClock.clamped(rect, 800, 800, 1920, 1080, [field, buttons], 32, 24), { x: 728, y: 576 });
+        // The field dragged near the top: no room above it, so under it (100 + 40 + 24 = 164).
+        const high = { x: 790, y: 100, width: 340, height: 40 };
+        compare(LockClock.clamped(rect, 0, -150, 1920, 1080, high, 32, 24), { x: 0, y: -36 });
         // At the bottom left, beside them: down to the bottom margin (1080 - 32 - 200 = 848).
         compare(LockClock.clamped(rect, -700, 800, 1920, 1080, [field, buttons], 32, 24), { x: -700, y: 648 });
     }
