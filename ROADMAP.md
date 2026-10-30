@@ -1192,7 +1192,7 @@ fixed:
   (the name field beside the gallery while one is current; `Themes.renamed`, tested: an empty
   or taken name is ignored).
 
-### Lock screen: drag the clock and widgets (built 2026-10-30)
+### Lock screen: drag the clock and widgets (done, verified on the laptop 2026-10-30)
 User's pick. In the lock screen editor the clock's and the widgets' outlines can be dragged (or
 moved with the arrow keys while one has the keyboard), each on its own (user's choice after
 trying them as one group): the clock with its date (`lockClockOffset`) and the player with
@@ -1203,7 +1203,7 @@ password field with its hints: where they would, they stop just above it, and be
 may go lower (`LockClock.offset`, `clamped`, tested). Picking a Place or a look starts again
 from that place; Cancel puts the old one back.
 
-### Presets in every editor (built 2026-10-30)
+### Presets in every editor (done, verified on the laptop 2026-10-30)
 User's request. Each on-screen editor opens on a Looks tab: its presets as picture cards drawn
 on your wallpaper (`customize/LooksTile.qml`, shared with the lock screen's looks; "Yours"
 first while your settings match none). Picking one sets its settings at once; each can still
@@ -1248,7 +1248,7 @@ only its editor's settings, with values its controls offer, none twice).
   a list read back from the file isn't a JavaScript Array, which `Presets.same` now handles
   (the lock and dock presets hold lists).
 
-### Customize menu and keyboard in the editors (built 2026-10-30)
+### Customize menu and keyboard in the editors (done, verified on the laptop 2026-10-30)
 User's request: a key for choosing what to customize instead of the launcher or Settings, and
 the keyboard built into the editors' design.
 - Super+U (`qs ipc call customize menu`): a card over the dimmed screen with a tile per editor
