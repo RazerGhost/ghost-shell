@@ -2,7 +2,8 @@
 // editor): finds art on wallhaven.cc, anime by default and only ever safe for work. Search, or
 // pick one of your styles, and one of wallhaven's colors if you like; the results come as
 // pictures, more as you scroll. Click one for a larger look, then Download (into your folder) or
-// Set as wallpaper, or one of its tags for more like it. Nothing is downloaded until you choose it. The searches and the checks on each result are services/Wallhaven.js (tested);
+// Set as wallpaper, or one of its tags for more like it. Nothing is downloaded until you choose it.
+// "Yours" shows the pictures in your folder the same way, to set one or delete it (to the trash). The searches and the checks on each result are services/Wallhaven.js (tested);
 // downloading is `ghost wallpapers fetch <id>`, which checks the picture again. Opened from the
 // desktop editor's Wallpaper tab, the picker strip, the launcher or `qs ipc call wallpapers browse`.
 pragma Singleton
@@ -44,6 +45,66 @@ Singleton {
     property int searchId: 0
     // The picture shown large (null: the grid).
     property var chosen: null
+
+    // "find" (wallhaven) or "yours" (your folder).
+    property string mode: "find"
+    // Your folder's pictures in the results' shape; `path` marks them as yours.
+    readonly property var yours: Wallpaper.pictures.map(p => {
+        const picture = "file://" + (p.video ? p.thumb : p.filePath);
+        return { id: "", file: p.fileName, thumb: picture, url: picture, resolution: "", path: p.filePath,
+                 darkPath: p.darkPath };
+    })
+    // What the grid shows.
+    readonly property var shown: mode === "yours" ? yours : pictures
+
+    function showMode(next: string): void {
+        if (next === mode)
+            return;
+        chosen = null;
+        mode = next;
+        grid.currentIndex = 0;
+        grid.contentY = 0;
+        if (next === "yours")
+            Wallpaper.rescan();
+    }
+
+    // Moves a picture of yours to the trash (gio trash: it can be got back), its dark version
+    // with it. Not the wallpaper you have now.
+    function trash(picture: var): void {
+        if (!picture?.path || picture.path === Wallpaper.path || picture.darkPath === Wallpaper.path)
+            return;
+        const at = shown.indexOf(picture);
+        trashing.command = ["gio", "trash", "--"].concat(picture.darkPath ? [picture.path, picture.darkPath] : [picture.path]);
+        trashing.next = at;
+        trashing.running = true;
+    }
+
+    Process {
+        id: trashing
+        property int next: -1
+        onExited: code => {
+            if (code !== 0) {
+                Notifications.send("Wallpapers", "dialog-warning", "Couldn't delete the picture",
+                                   "gio trash exited with " + code + ".", false, []);
+                return;
+            }
+            Wallpaper.rescan();
+        }
+    }
+
+    // After a delete, the large view moves to the picture now in its place (or back to the grid).
+    Connections {
+        target: Wallpaper
+
+        function onPicturesChanged(): void {
+            if (root.mode !== "yours" || root.chosen === null || trashing.next < 0)
+                return;
+            const list = root.yours;
+            root.chosen = list.length === 0 ? null : list[Math.min(trashing.next, list.length - 1)];
+            grid.currentIndex = Math.max(0, Math.min(trashing.next, list.length - 1));
+            trashing.next = -1;
+        }
+    }
 
     // The files already in your folder (wallhaven-<id>.<ext>), to mark what you have.
     readonly property var owned: Wallpaper.pictures.map(p => p.fileName)
@@ -94,7 +155,7 @@ Singleton {
     // the end can't ask for them; a maximized window holds more than a page).
     readonly property bool hasMore: page === 0 || page < lastPage
     function fill(): void {
-        if (open && chosen === null && hasMore && !failed && grid.count > 0 && grid.contentHeight <= grid.height)
+        if (open && mode === "find" && chosen === null && hasMore && !failed && grid.count > 0 && grid.contentHeight <= grid.height)
             loadMore();
     }
 
@@ -122,7 +183,7 @@ Singleton {
 
     onChosenChanged: {
         chosenTags = [];
-        if (chosen)
+        if (chosen && !chosen.path)
             tagsTimer.restart();
     }
 
@@ -233,9 +294,41 @@ Singleton {
             spacing: Theme.spacing.s
             visible: root.chosen === null
 
+            Segmented {
+                id: modes
+                anchors.verticalCenter: parent.verticalCenter
+                tabs: true
+                options: [{ value: "find", label: "Find" }, { value: "yours", label: "Yours" }]
+                current: root.mode
+                onPicked: v => root.showMode(v)
+            }
+
+            // Yours: how many, and the folder.
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                visible: root.mode === "yours"
+                width: parent.width - modes.width - openFolder.width - parent.spacing * 2
+                leftPadding: Theme.spacing.s
+                text: root.yours.length + (root.yours.length === 1 ? " picture in " : " pictures in ")
+                      + Wallpaper.folder.replace(Quickshell.env("HOME"), "~")
+                elide: Text.ElideMiddle
+                color: Colors.m3onSurfaceVariant
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.normal
+            }
+
+            TextButton {
+                id: openFolder
+                anchors.verticalCenter: parent.verticalCenter
+                visible: root.mode === "yours"
+                text: "Open folder"
+                onClicked: Apps.run(["sh", "-c", 'mkdir -p "$1" && exec xdg-open "$1"', "sh", Wallpaper.folder], "xdg-open", "")
+            }
+
             SearchField {
                 id: searchField
-                width: Math.max(Theme.wallpaper.browserThumb, parent.width - styles.width - parent.spacing)
+                visible: root.mode === "find"
+                width: Math.max(Theme.wallpaper.browserThumb, parent.width - modes.width - styles.width - parent.spacing * 2)
                 placeholder: root.tag ? "" : root.style ? "Narrow it down (optional)" : "Search wallhaven (or the month's best)"
                 onTextChanged: {
                     root.words = text;
@@ -268,6 +361,7 @@ Singleton {
 
             Row {
                 id: styles
+                visible: root.mode === "find"
                 spacing: Theme.spacing.xs
 
                 Repeater {
@@ -297,7 +391,8 @@ Singleton {
             anchors.margins: Theme.spacing.l
             anchors.topMargin: Theme.spacing.m
             spacing: Theme.spacing.xs
-            visible: root.chosen === null
+            visible: root.chosen === null && root.mode === "find"
+            height: visible ? implicitHeight : 0
 
             Accessible.role: Accessible.Grouping
             Accessible.name: "Colors"
@@ -374,15 +469,15 @@ Singleton {
             boundsBehavior: Flickable.StopAtBounds
             cellWidth: Math.floor(width / columns)
             cellHeight: Math.round((cellWidth - Theme.spacing.s) * 9 / 16) + Theme.spacing.s
-            model: root.pictures
+            model: root.shown
             keyNavigationEnabled: true
-            onAtYEndChanged: if (atYEnd && count > 0) root.loadMore()
+            onAtYEndChanged: if (atYEnd && count > 0 && root.mode === "find") root.loadMore()
             onHeightChanged: Qt.callLater(root.fill)
             onWidthChanged: Qt.callLater(root.fill) // more columns
 
-            Keys.onReturnPressed: if (currentIndex >= 0) root.chosen = root.pictures[currentIndex]
-            Keys.onEnterPressed: if (currentIndex >= 0) root.chosen = root.pictures[currentIndex]
-            Keys.onSpacePressed: if (currentIndex >= 0) root.chosen = root.pictures[currentIndex]
+            Keys.onReturnPressed: if (currentIndex >= 0) root.chosen = root.shown[currentIndex]
+            Keys.onEnterPressed: if (currentIndex >= 0) root.chosen = root.shown[currentIndex]
+            Keys.onSpacePressed: if (currentIndex >= 0) root.chosen = root.shown[currentIndex]
             Keys.onUpPressed: event => {
                 if (currentIndex < columns)
                     searchField.focusInput();
@@ -398,7 +493,9 @@ Singleton {
 
                 required property var modelData
                 required property int index
-                readonly property bool have: root.owned.includes(modelData.file)
+                // Its check in Find; in Yours, the wallpaper you have now.
+                readonly property bool have: modelData.path ? Wallpaper.path === modelData.path || Wallpaper.path === modelData.darkPath
+                                                            : root.owned.includes(modelData.file)
                 readonly property bool coming: root.pending.includes(modelData.id)
 
                 width: grid.cellWidth
@@ -408,8 +505,8 @@ Singleton {
                 onClicked: root.chosen = modelData
 
                 Accessible.role: Accessible.Button
-                Accessible.name: "Wallpaper " + (index + 1) + ", " + modelData.resolution
-                                 + (have ? ", downloaded" : coming ? ", downloading" : "")
+                Accessible.name: modelData.path ? modelData.file + (have ? ", your wallpaper" : "")
+                    : "Wallpaper " + (index + 1) + ", " + modelData.resolution + (have ? ", downloaded" : coming ? ", downloading" : "")
                 Accessible.onPressAction: root.chosen = modelData
 
                 ClippingRectangle {
@@ -461,7 +558,7 @@ Singleton {
 
                     MaterialIcon {
                         anchors.centerIn: parent
-                        icon: cell.have ? "check" : "downloading"
+                        icon: cell.modelData.path ? "wallpaper" : cell.have ? "check" : "downloading"
                         color: Colors.m3onPrimaryContainer
                         font.pixelSize: Theme.icon.small
                     }
@@ -475,7 +572,8 @@ Singleton {
                 Text {
                     anchors.centerIn: parent
                     visible: !more.visible
-                    text: root.failed ? "wallhaven didn't answer. Try again in a moment."
+                    text: root.mode === "yours" ? (root.yours.length === 0 ? "None yet: find some under Find" : "")
+                        : root.failed ? "wallhaven didn't answer. Try again in a moment."
                         : root.loading ? "Looking…"
                         : root.page > 0 && root.pictures.length === 0 ? "Nothing found"
                         : root.page > 0 && !root.hasMore ? "That's all of them" : ""
@@ -488,7 +586,7 @@ Singleton {
                 TextButton {
                     id: more
                     anchors.centerIn: parent
-                    visible: !root.loading && root.page > 0 && root.pictures.length > 0 && root.hasMore
+                    visible: root.mode === "find" && !root.loading && root.page > 0 && root.pictures.length > 0 && root.hasMore
                     text: root.failed ? "Try again" : "Load more"
                     onClicked: root.loadMore()
                 }
@@ -510,21 +608,26 @@ Singleton {
             focus: visible
             onVisibleChanged: if (visible) forceActiveFocus()
 
-            readonly property int at: root.chosen ? root.pictures.indexOf(root.chosen) : -1
+            // By path for yours: a rescan makes new entries for the same pictures.
+            readonly property int at: root.chosen === null ? -1
+                : root.shown.findIndex(p => p === root.chosen || (p.path && p.path === root.chosen.path))
+            readonly property bool own: !!root.chosen?.path
+            readonly property bool current: own && (Wallpaper.path === root.chosen.path || Wallpaper.path === root.chosen.darkPath)
             readonly property bool have: root.chosen !== null && root.owned.includes(root.chosen.file)
             readonly property bool coming: root.chosen !== null && root.pending.includes(root.chosen.id)
 
             function step(by: int): void {
                 const next = at + by;
-                if (next < 0 || next >= root.pictures.length)
+                if (next < 0 || next >= root.shown.length)
                     return;
-                root.chosen = root.pictures[next];
+                root.chosen = root.shown[next];
                 grid.currentIndex = next;
-                if (next >= root.pictures.length - 2)
+                if (root.mode === "find" && next >= root.pictures.length - 2)
                     root.loadMore();
             }
 
             function back(): void {
+                deleteButton.armed = false;
                 root.chosen = null;
                 grid.positionViewAtIndex(grid.currentIndex, GridView.Contain);
                 grid.forceActiveFocus();
@@ -533,6 +636,8 @@ Singleton {
             Keys.onEscapePressed: back()
             Keys.onLeftPressed: step(-1)
             Keys.onRightPressed: step(1)
+            Keys.onDeletePressed: if (own) deleteButton.press()
+            onAtChanged: deleteButton.armed = false
 
             ClippingRectangle {
                 id: large
@@ -634,7 +739,7 @@ Singleton {
 
                 Text {
                     anchors.centerIn: parent
-                    text: (root.chosen?.resolution ?? "") + "  ·  " + (preview.at + 1) + " of " + root.pictures.length
+                    text: (preview.own ? root.chosen.file : root.chosen?.resolution ?? "") + "  ·  " + (preview.at + 1) + " of " + root.shown.length
                     color: Colors.m3onSurfaceVariant
                     font.family: Theme.font.sans
                     font.pixelSize: Theme.font.normal
@@ -646,16 +751,51 @@ Singleton {
                     spacing: Theme.spacing.s
 
                     TextButton {
+                        visible: !preview.own
                         text: preview.have ? "Downloaded" : preview.coming ? "Downloading…" : "Download"
                         enabled: !preview.have && !preview.coming
                         onClicked: root.download(root.chosen, false)
                     }
 
+                    // Yours: to the trash, after a second click (or Delete twice) within 4 s.
+                    // Not the wallpaper you have now: pick another first.
                     TextButton {
-                        text: Wallpaper.path === Wallpaper.folder + "/" + (root.chosen?.file ?? "") ? "Your wallpaper" : "Set as wallpaper"
+                        id: deleteButton
+
+                        property bool armed: false
+
+                        function press(): void {
+                            if (!enabled)
+                                return;
+                            if (!armed) {
+                                armed = true;
+                                disarm.restart();
+                                return;
+                            }
+                            armed = false;
+                            root.trash(root.chosen);
+                        }
+
+                        visible: preview.own
+                        enabled: !preview.current && !trashing.running
+                        text: preview.current ? "Your wallpaper now" : armed ? "Delete? Click again" : "Delete"
+                        color: armed ? Colors.m3errorContainer : "transparent"
+                        onClicked: press()
+
+                        Timer {
+                            id: disarm
+                            interval: 4000
+                            onTriggered: deleteButton.armed = false
+                        }
+                    }
+
+                    TextButton {
+                        readonly property bool isCurrent: preview.own ? preview.current
+                            : Wallpaper.path === Wallpaper.folder + "/" + (root.chosen?.file ?? "")
+                        text: isCurrent ? "Your wallpaper" : "Set as wallpaper"
                         filled: true
-                        enabled: text === "Set as wallpaper"
-                        onClicked: root.download(root.chosen, true)
+                        enabled: !isCurrent
+                        onClicked: preview.own ? Wallpaper.set(root.chosen.path) : root.download(root.chosen, true)
                     }
                 }
             }

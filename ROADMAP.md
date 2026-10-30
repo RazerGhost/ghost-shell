@@ -1499,6 +1499,11 @@ Settings now (`widgets/WindowTitleBar.qml`; `WindowButton` and `OptionChip` move
   color alone sorts by all-time favourites, since a month's best in one color is a handful).
   `Wallhaven.searchUrl` takes `{ words, style, page, general, tag, color }`; `colors`, `tags`
   tested.
+- Yours (user's request): a Find / Yours switch at the top; Yours shows your folder's pictures
+  in the same grid (the wallpaper you have now marked), with how many and Open folder. In the
+  large view, Set as wallpaper, or Delete: to the trash (`gio trash`, so it can be got back; a
+  picture's dark version with it) after a second click within 4 s (or Delete twice); not the
+  wallpaper you have now. Checked in a scratch copy: the grid and the large view.
 - The system's wallpaper collections are no longer offered (user's request: they included
   pictures the user didn't want, like headsets): the picker, the editors and the slideshow show only your
   folder (the slideshow's "From all pictures" is gone). `cachyos-wallpapers` and
@@ -1512,7 +1517,7 @@ in the user's styles (a centred figure at dusk, a rain window, a sky scene, a pa
 the widget boxes exact, the lock ones estimated from Theme's sizes). Most lock looks stacked
 the clock, player and widgets in the middle, over the picture's subject; Corner scattered its
 parts (the widgets clamped to the top edge, apart from the player); Flanked's widgets floated
-far from the clock. Changed (`customize/Presets.js`; tests pass under bun, qmltestrunner not run):
+far from the clock. Changed (`customize/Presets.js`; tests pass, qmltestrunner on the laptop: 325):
 - Lock: Corner is now Side (a thin clock, the date, the player and four widgets in one column on
   the left third; with the quiet side on it moves to the calmer side); Editorial in the
   bottom-left corner (a serif clock like a magazine cover); Minimal at the top instead of the
