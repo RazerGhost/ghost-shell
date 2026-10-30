@@ -120,6 +120,13 @@ function gridSnapped(x, y, w, h, sw, sh, cell) {
     return { x: axis(x, w, sw), y: axis(y, h, sh) };
 }
 
+// An arrow key's move ("left", "right", "up", "down"): one grid line (`cell` px) while the grid
+// is on, else `step` px; { dx, dy }, or null for another key.
+function keyStep(direction, cell, step) {
+    const by = cell > 0 ? cell : step;
+    return ({ left: { dx: -by, dy: 0 }, right: { dx: by, dy: 0 }, up: { dx: 0, dy: -by }, down: { dx: 0, dy: by } })[direction] ?? null;
+}
+
 // A widget w x h px at its saved `place` (fractions) on a sw x sh screen, moved (dx, dy) px with
 // the keyboard (the desktop editor): onto the grid when it's on (`cell` px, else 0), kept on
 // the screen; its new place as fractions.

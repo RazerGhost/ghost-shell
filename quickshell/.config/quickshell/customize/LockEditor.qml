@@ -402,7 +402,7 @@ Scope {
                     }
                 }
 
-                // Widgets: the round ones under the clock, picked like iOS's (in the order
+                // Widgets: the lock screen's, picked like iOS's (in the order
                 // clicked, up to four; the ones on come first, in the row's order, and drag onto
                 // each other to change it), and the media controls.
                 SheetTiles {
@@ -412,11 +412,9 @@ Scope {
                         id: widgetsTile
 
                         readonly property var list: LockWidgets.shown(Settings.values.lockWidgets, Settings.values)
-                        readonly property var names: ({ weather: "Weather", weatherWide: "Weather, wide", battery: "Battery",
-                                                        batteryWide: "Battery, wide", notifications: "Notifications",
-                                                        todo: "To-do", timer: "Timer", event: "Next event" })
+                        readonly property var names: LockWidgets.names
 
-                        title: "Under the clock"
+                        title: "Widgets"
                         subtitle: "Up to " + LockWidgets.most + " · drag to change their order · an event's title shows to anyone"
                         weight: 3
 
@@ -427,7 +425,7 @@ Scope {
 
                             Repeater {
                                 model: widgetsTile.list.concat(LockWidgets.known.filter(id => !widgetsTile.list.includes(id)))
-                                    .filter(id => !id.startsWith("battery") || Battery.present)
+                                    .filter(id => LockWidgets.available([id], Battery.present).length > 0)
 
                                 Column {
                                     id: pick
@@ -450,7 +448,7 @@ Scope {
                                     Behavior on opacity { NumberAnimation { duration: Theme.anim.fast } }
 
                                     Accessible.role: Accessible.CheckBox
-                                    Accessible.name: widgetsTile.names[modelData] + " under the clock"
+                                    Accessible.name: widgetsTile.names[modelData] + " on the lock screen"
                                     Accessible.checkable: true
                                     Accessible.checked: on
                                     Accessible.onPressAction: toggle()

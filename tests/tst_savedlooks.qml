@@ -34,6 +34,17 @@ TestCase {
         compare(SavedLooks.removed(looks, "Look 1").map(l => l.name), ["Look 2"]);
     }
 
+    function test_followed() {
+        const looks = [{ name: "Mine", values: { a: 1 } }, { name: "Other", values: { a: 5 } }];
+        // Editing Mine, a setting changed (nothing matches now): saved into Mine.
+        compare(SavedLooks.followed(looks, "Mine", "", { a: 2, b: 9 }, ["a"]),
+                [{ name: "Mine", values: { a: 2 } }, { name: "Other", values: { a: 5 } }]);
+        // A look or preset matches, nothing's edited, or Mine is gone: nothing changes.
+        compare(SavedLooks.followed(looks, "Mine", "Classic", { a: 2 }, ["a"]), null);
+        compare(SavedLooks.followed(looks, "", "", { a: 2 }, ["a"]), null);
+        compare(SavedLooks.followed(looks, "Gone", "", { a: 2 }, ["a"]), null);
+    }
+
     // Each gallery's saved looks are in its editor's Cancel list, so Cancel puts them back.
     function test_cancelKeepsThem() {
         verify(Presets.lockKeys.includes("lockLooks"));

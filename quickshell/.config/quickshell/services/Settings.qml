@@ -250,7 +250,7 @@ Singleton {
             property bool soundDevices: true    // charger, USB
             property bool soundFeedback: true   // volume keys, screenshots
             property bool soundBattery: true    // low battery
-            // Under the clock on the lock screen (lock/LockStatus.qml); never on the login screen.
+            // The lock screen's player and widgets (lock/LockStatus.qml); never on the login screen.
             property bool lockMedia: true
             // The round widgets in your order (lock/LockWidgets.js); null until picked in the
             // lock screen editor. "event" shows the next event's title to anyone at the locked

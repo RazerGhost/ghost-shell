@@ -1,5 +1,5 @@
-// Which widgets the lock screen shows in its row under the clock (lock/LockStatus.qml), in your
-// order (Settings' lockWidgets), picked in the lock screen editor. Plain JavaScript, so it can
+// Which widgets the lock screen shows (lock/LockStatus.qml), in your order (Settings'
+// lockWidgets), picked in the lock screen editor; each can be placed on its own there. Plain JavaScript, so it can
 // be tested on its own (tests/tst_lockwidgets.qml).
 .pragma library
 
@@ -8,6 +8,15 @@
 // `most`.
 const known = ["weather", "weatherWide", "battery", "batteryWide", "notifications", "todo", "timer", "event"];
 const most = 4;
+
+// Their names, for the editor and screen readers.
+const names = { weather: "Weather", weatherWide: "Weather, wide", battery: "Battery", batteryWide: "Battery, wide",
+                notifications: "Notifications", todo: "To-do", timer: "Timer", event: "Next event" };
+
+// `list` without the battery's widgets on a machine without a battery.
+function available(list, hasBattery) {
+    return list.filter(id => hasBattery || !id.startsWith("battery"));
+}
 
 // A saved list made safe: known ids only, each once, at most `most`. Without a list yet, the
 // lines the lock screen showed before (its old switches, `values`), in their order.

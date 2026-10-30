@@ -46,6 +46,16 @@ function renamed(looks, from, to, taken) {
     return looks.map(l => l.name === from ? Object.assign({}, l, { name }) : l);
 }
 
+// A setting changed while your look `editing` was chosen (now none matches, `chosen` is ""): the
+// looks with the settings now saved into it, or null when nothing should change (another look
+// or a preset matches, nothing's being edited, or that look is gone).
+function followed(looks, editing, chosen, values, keys) {
+    if (chosen !== "" || editing === "" || !looks.some(l => l.name === editing))
+        return null;
+    const now = made([], values, keys, "").values;
+    return looks.map(l => l.name === editing ? { name: l.name, values: now } : l);
+}
+
 function removed(looks, name) {
     return looks.filter(l => l.name !== name);
 }

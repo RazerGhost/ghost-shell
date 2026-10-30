@@ -36,6 +36,20 @@ json_edit() {
     '
 }
 
+# Runs bun code ($2) with a QML JavaScript library's functions in scope ($1: the shell's tested
+# .js files; their ".pragma library" and ".import" lines are QML's, so they're dropped, and they
+# mustn't need what they import). Paths and data go in through the environment, never into the
+# code: JS_LIB is the library's path. `fs` is there too.
+js_with() {
+    JS_LIB="$1" bun -e "
+        const fs = require('fs');
+        const source = fs.readFileSync(process.env.JS_LIB, 'utf8').replace(/^\.(pragma|import) .*\$/gm, '');
+        const names = [...source.matchAll(/^(?:function|const)\s+(\w+)/gm)].map(m => m[1]);
+        const lib = new Function(source + '\nreturn { ' + names.join(', ') + ' };')();
+        $2
+    "
+}
+
 # The repo's Stow packages, one per line: every top-level folder but the ones that aren't
 # (system/ mirrors /, the rest are the setup, tests and docs). Run from the repo's root.
 stow_packages() {

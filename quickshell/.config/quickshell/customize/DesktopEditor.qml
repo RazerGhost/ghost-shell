@@ -732,15 +732,13 @@ Scope {
                                 // Shift + arrows move this widget on the desktop (one grid step, or
                                 // Theme.spacing.l * 2 without the grid); it's outlined there.
                                 Keys.onPressed: event => {
-                                    const arrows = [Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down];
-                                    if (!(event.modifiers & Qt.ShiftModifier) || !arrows.includes(event.key) || !on)
+                                    const direction = ({ [Qt.Key_Left]: "left", [Qt.Key_Right]: "right", [Qt.Key_Up]: "up", [Qt.Key_Down]: "down" })[event.key];
+                                    if (!(event.modifiers & Qt.ShiftModifier) || !direction || !on)
                                         return;
                                     const kind = DesktopWidgetsJs.kinds.find(k => k.key === modelData.key);
                                     const screen = Quickshell.screens[0];
                                     const grid = Settings.values.desktopGrid ? Theme.px(DesktopWidgetsJs.gridSize(Settings.values.desktopGridSize)) : 0;
-                                    const step = grid || Theme.spacing.l * 2;
-                                    const dx = event.key === Qt.Key_Left ? -step : event.key === Qt.Key_Right ? step : 0;
-                                    const dy = event.key === Qt.Key_Up ? -step : event.key === Qt.Key_Down ? step : 0;
+                                    const { dx, dy } = DesktopWidgetsJs.keyStep(direction, grid, Theme.spacing.l * 2);
                                     const place = DesktopWidgetsJs.nudged(DesktopWidgetsJs.place(Settings.values.desktopWidgets, kind.name), dx, dy,
                                                                           kind.medium ? Theme.desktop.medium : Theme.desktop.size, Theme.desktop.size,
                                                                           screen?.width ?? 1920, screen?.height ?? 1080, grid);

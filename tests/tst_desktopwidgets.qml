@@ -79,6 +79,12 @@ TestCase {
         verify(edge.x + 168 <= 1920 && edge.y + 168 <= 1080);
     }
 
+    function test_keyStep() {
+        compare(DesktopWidgets.keyStep("left", 0, 48), { dx: -48, dy: 0 });
+        compare(DesktopWidgets.keyStep("down", 32, 48), { dx: 0, dy: 32 });
+        compare(DesktopWidgets.keyStep("tab", 32, 48), null);
+    }
+
     function test_nudged() {
         // No grid: by the step, kept on the screen.
         compare(DesktopWidgets.nudged({ x: 0.5, y: 0.5 }, 48, 0, 168, 168, 1920, 1080, 0), { x: (960 + 48) / 1920, y: 0.5 });

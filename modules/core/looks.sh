@@ -16,25 +16,14 @@ file="$PWD/looks.json"
 settings="$HOME/.local/state/quickshell/settings.json"
 rules="quickshell/.config/quickshell/customize/LooksFile.js"
 
-# Runs JavaScript with LooksFile's functions in scope (everything but its ".pragma library" line).
-with_rules() {
-    LOOKS_RULES="$rules" bun -e "
-        const fs = require('fs');
-        const { exported, imported } = new Function(fs.readFileSync(process.env.LOOKS_RULES, 'utf8')
-            .replace(/^\.pragma library\$/m, '') + '\nreturn { exported, imported };')();
-        $1
-    "
-}
-
 case ${1:-} in
     export)
         [[ -f $settings ]] || fail "no settings yet ($settings)"
-        SETTINGS="$settings" OUT="$file" with_rules '
+        SETTINGS="$settings" OUT="$file" js_with "$rules" '
             const settings = JSON.parse(fs.readFileSync(process.env.SETTINGS, "utf8"));
-            const looks = exported(settings, process.env.HOME);
+            const looks = lib.exported(settings, process.env.HOME);
             fs.writeFileSync(process.env.OUT, JSON.stringify(looks, null, 4) + "\n");
-            const count = ["themes", "lockLooks", "dockLooks", "windowLooks", "widgetLooks"].reduce((n, k) => n + looks[k].length, 0);
-            console.log(`${count} themes and looks written to looks.json: commit and push it to share them.`);
+            console.log(`${lib.count(looks)} themes and looks written to looks.json: commit and push it to share them.`);
         '
         ;;
     import)
@@ -42,12 +31,13 @@ case ${1:-} in
         if qs ipc call customize importLooks "$file" >/dev/null 2>&1; then
             echo "Merged into the running shell's settings."
         else
-            json_edit "$settings" "
-                const fs = require('fs');
-                const { imported } = new Function(fs.readFileSync('$rules', 'utf8')
-                    .replace(/^\.pragma library\$/m, '') + '\nreturn { imported };')();
-                Object.assign(data, imported(data, JSON.parse(fs.readFileSync('$file', 'utf8')), process.env.HOME));
-            "
+            SETTINGS="$settings" FILE="$file" js_with "$rules" '
+                const path = process.env.SETTINGS;
+                const data = fs.existsSync(path) ? JSON.parse(fs.readFileSync(path, "utf8")) : {};
+                Object.assign(data, lib.imported(data, JSON.parse(fs.readFileSync(process.env.FILE, "utf8")), process.env.HOME));
+                fs.mkdirSync(require("path").dirname(path), { recursive: true });
+                fs.writeFileSync(path, JSON.stringify(data, null, 4) + "\n");
+            '
             echo "Merged into $settings."
         fi
         ;;

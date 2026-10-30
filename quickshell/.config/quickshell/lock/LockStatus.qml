@@ -5,7 +5,7 @@ import qs.theme
 import "LockClock.js" as LockClockJs
 import "LockWidgets.js" as LockWidgets
 
-// Under the clock on the lock screen (not the login screen): the media player, like the
+// On the lock screen (not the login screen), under the clock until moved: the media player, like the
 // island's small one, and a row of round widgets, like iOS's (LockWidget.qml: weather, battery,
 // notifications, to-dos, the timer, the next event), picked in the lock screen editor. The
 // player and each widget have their own place there, dragged like the clock (PartShift.qml).
@@ -16,8 +16,7 @@ Column {
     required property Item lock
 
     // Not the battery on a machine without one.
-    readonly property var widgets: LockWidgets.shown(Settings.values.lockWidgets, Settings.values)
-        .filter(id => !id.startsWith("battery") || Battery.present)
+    readonly property var widgets: LockWidgets.available(LockWidgets.shown(Settings.values.lockWidgets, Settings.values), Battery.present)
     spacing: Theme.spacing.l
 
     // The player, in a holder that stays enabled: in the editor the card takes no input, and
@@ -58,7 +57,7 @@ Column {
                     part: widget.modelData
                     target: widget
                     tab: "widgets"
-                    name: "The " + widget.modelData + " widget"
+                    name: "The " + LockWidgets.names[widget.modelData] + " widget"
                     radius: height / 2
                 }
             }

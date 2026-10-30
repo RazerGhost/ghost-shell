@@ -19,6 +19,14 @@ TestCase {
         compare(LockWidgets.shown([], { lockWeather: true }), []);
     }
 
+    function test_available() {
+        compare(LockWidgets.available(["weather", "battery", "batteryWide", "todo"], false), ["weather", "todo"]);
+        compare(LockWidgets.available(["battery"], true), ["battery"]);
+        // Every one has a name.
+        for (const id of LockWidgets.known)
+            verify(typeof LockWidgets.names[id] === "string", id);
+    }
+
     function test_toggled() {
         compare(LockWidgets.toggled(["weather"], "todo"), ["weather", "todo"]);
         compare(LockWidgets.toggled(["weather", "todo"], "weather"), ["todo"]);

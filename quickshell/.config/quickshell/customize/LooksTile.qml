@@ -72,10 +72,9 @@ SheetTile {
         id: follow
         interval: 0
         onTriggered: {
-            if (!tile.live || tile.chosen !== "" || !tile.saved.some(l => l.name === tile.editing))
-                return;
-            const values = SavedLooks.made([], Settings.values, tile.savedKeys, "").values;
-            tile.write(tile.saved.map(l => l.name === tile.editing ? { name: l.name, values } : l));
+            const next = tile.live ? SavedLooks.followed(tile.saved, tile.editing, tile.chosen, Settings.values, tile.savedKeys) : null;
+            if (next)
+                tile.write(next);
         }
     }
 

@@ -3,7 +3,7 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// One of the lock screen's widgets under the clock, like iOS's: round, on a translucent
+// One of the lock screen's widgets, like iOS's: round (or wide), on a translucent
 // circle. Weather (its icon and temperature), battery (a ring with the percentage), how many
 // notifications came in (never what they say) and to-dos are open, the timer (a ring emptying
 // around the time left); the next event is wide, its
@@ -130,6 +130,7 @@ Surface {
         spacing: Theme.spacing.s
 
         MaterialIcon {
+            id: wideIcon
             anchors.verticalCenter: parent.verticalCenter
             icon: Weather.current?.icon ?? "cloud_off"
             color: Colors.m3onSurfaceVariant
@@ -137,6 +138,7 @@ Surface {
         }
 
         Text {
+            id: wideTemperature
             anchors.verticalCenter: parent.verticalCenter
             text: Weather.current ? Weather.current.temperature + "°" : "–"
             color: Colors.m3onSurface
@@ -147,7 +149,8 @@ Surface {
 
         Column {
             anchors.verticalCenter: parent.verticalCenter
-            width: root.width - Theme.lock.widgetInset * 2 - Theme.icon.normal * 1.4 - Theme.font.title * 2 - Theme.spacing.s * 2
+            // What's left beside the icon and the temperature (-12° or a three-digit °F fit too).
+            width: Math.max(0, root.width - Theme.lock.widgetInset * 2 - wideIcon.width - wideTemperature.width - Theme.spacing.s * 2)
 
             Text {
                 width: parent.width

@@ -244,7 +244,7 @@ Singleton {
         readonly property int face:       root.px(96) // your picture on the login screen
         readonly property int shake:      root.px(12) // how far a wrong password shakes the field
         readonly property int moved:      24  // px the pointer must move to end the grace period
-        readonly property int widget:     root.text(72) // a round widget under the clock (LockWidget.qml)
+        readonly property int widget:     root.text(72) // a lock screen widget's height, a round one's width (LockWidget.qml)
         readonly property int widgetGap:  root.px(12)
         readonly property int ringWidth:  root.px(6)  // the timer's ring in them
         readonly property int gaugeWidth: root.px(3)  // the battery's gauge, thinner, like iOS's

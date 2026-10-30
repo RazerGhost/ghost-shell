@@ -125,7 +125,8 @@ new setup step.
   (user's choice: a strip, not a menu; it stretched the island itself until 2026-10-28; the
   bottom edge is the dock's) with one row of
   pictures: `~/Pictures/Wallpapers` first (local folder only: the user prefers anime art and
-  illustrations, not photos, and picks them themselves; corrected 2026-10-29), then the built-in ones: Hyprland's `/usr/share/hypr/wall*.png` and
+  illustrations, not photos, and picks them themselves; corrected 2026-10-29; since 2026-10-30
+  `ghost wallpapers get` can fetch art into it, see "More wallpapers"), then the built-in ones: Hyprland's `/usr/share/hypr/wall*.png` and
   the `cachyos-wallpapers` package (in packages.txt). Those stay in their packages, not in this
   repo: their licensing is unclear (no artist credits) and they're ~200 MB. The row scrolls
   sideways (user's choice: one horizontal row, own and built-in together).
@@ -1419,6 +1420,32 @@ the sky and today's high and low) and "Battery, wide" (a bar filling with the ch
 percentage and the time left or until full), in the lock screen editor's Widgets tab. Twice as
 wide as the round ones, like the next event, but one of the four (`LockWidgets.known`). Machines
 without a battery get neither battery widget.
+
+### Review of the lock screen restructuring and the rest (2026-10-30)
+Two read-only reviews of everything since the presets review, findings checked, then fixed:
+- Bugs: the More art tile sat inside the Wallpaper tile (one brace short); in the editor the
+  player's outline couldn't be dragged or focused (the disabled card disabled it: the card is
+  now in a holder with the outline beside it); old lock offsets on a machine that still had
+  them came back with a look or a Place pick (looks, the Place picker and the first drag now
+  clear them, and Cancel and saved looks keep them); looks imported while an editor was open
+  were undone by its Cancel or saved over by the look being edited (they now join the editor's
+  "before", and a gallery whose list changes from elsewhere stops editing); a wrong password's
+  shake was cancelled by the clamp at an edge and made parts beside the field jump (the field's
+  place leaves the shake out); a part with no room above a field dragged near the top now goes
+  under it (tested); the field's hints glide with it.
+- `wallpapers.sh`: a picture's id must be letters and digits and its extension comes from its
+  type (a JPEG or PNG), `--` ends the options (the search field's words can start with --),
+  `--count 08` works, failed downloads are counted. Imports: a file that can't be read says so,
+  names are taken once, the count is of what's merged, a second import waits for the first.
+- Structure: `GlideTranslate` (the glide shared by PartShift, the field and its hints);
+  `LockWidgets.names` and `available` (screen readers hear "Battery, wide", not an id);
+  `js_with` in modules/lib.sh runs a QML JavaScript library from bun for `ghost keybinds` and
+  `ghost looks`, paths through the environment; `SavedLooks.followed` and
+  `DesktopWidgets.keyStep` hold the rules the gallery and the keyboard move used (tested); the
+  wide weather measures its temperature instead of guessing its width; "under the clock" is
+  gone from names and comments now that parts go anywhere.
+- Not done: the lock looks' preview cards draw wide widgets as dots and don't show a moved date
+  or player.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
