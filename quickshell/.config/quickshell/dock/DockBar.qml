@@ -193,6 +193,11 @@ PanelWindow {
                                 if (dragging)
                                     previews.close();
                             }
+                            // Rebuilt mid-drag (its app's windows changed): the drag is over.
+                            Component.onDestruction: {
+                                if (dragging)
+                                    window.dragging = false;
+                            }
                             // Dropped up off the dock: unpinned. Along it: put among the pinned
                             // apps where the icon's middle landed (pinning a running one), unless
                             // a running one is let go past the pinned ones.

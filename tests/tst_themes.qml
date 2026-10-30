@@ -11,6 +11,14 @@ TestCase {
         // Unknown keys dropped; the card's color kept when it's text.
         compare(Themes.valid([{ name: "A", wallpaper: "/a.png", primary: 3, values: { glass: true, uiScale: 120 } }]),
                 [{ name: "A", wallpaper: "/a.png", primary: "", values: { glass: true } }]);
+        // Nothing of its own left: dropped (it would match any look).
+        compare(Themes.valid([{ name: "A", wallpaper: "/a.png", values: { uiScale: 120 } }]), []);
+    }
+
+    function test_applicable() {
+        const current = { glassOpacity: 45, glass: true, desktopWidgets: {}, fontSans: "" };
+        compare(Themes.applicable({ glassOpacity: "x", glass: false, desktopWidgets: 5, fontSans: "Inter" }, current),
+                { glass: false, fontSans: "Inter" });
     }
 
     function test_made() {

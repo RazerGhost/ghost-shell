@@ -11,7 +11,9 @@ import "LockWidgets.js" as LockWidgets
 Column {
     id: root
 
+    // Not the battery on a machine without one.
     readonly property var widgets: LockWidgets.shown(Settings.values.lockWidgets, Settings.values)
+        .filter(id => id !== "battery" || Battery.present)
     // What it covers across (the lock screen editor outlines it): the row of widgets can be wider
     // than the column, or narrower without the player.
     readonly property real contentX: media.visible ? Math.min(0, row.x) : row.x

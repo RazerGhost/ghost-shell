@@ -94,7 +94,6 @@ Item {
 
         Tile {
             width: tileGrid.tileWidth
-            visible: BluetoothStatus.adapter !== null
             icon: BluetoothStatus.icon
             title: "Bluetooth"
             subtitle: BluetoothStatus.label
@@ -349,6 +348,8 @@ Item {
                     itemId: modelData
                     title: root.info[modelData].title
                     control: ({ wifi: wifiTile, bluetooth: bluetoothTile, sound: soundTile, power: powerTile })[modelData]
+                    // No Bluetooth adapter: no tile, and no empty place for it in the grid.
+                    visible: modelData !== "bluetooth" || BluetoothStatus.adapter !== null
                     editing: root.editing
                     onRemoveRequested: Settings.values.quickTiles = QuickItems.removed(root.tileList, itemId)
                     onMoveRequested: to => Settings.values.quickTiles = QuickItems.moved(root.tileList, index, to)

@@ -421,6 +421,7 @@ Scope {
 
                             Repeater {
                                 model: widgetsTile.list.concat(LockWidgets.known.filter(id => !widgetsTile.list.includes(id)))
+                                    .filter(id => id !== "battery" || Battery.present)
 
                                 Column {
                                     id: pick

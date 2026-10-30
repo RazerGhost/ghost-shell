@@ -53,7 +53,7 @@ Scope {
 
     function cancel(): void {
         Presets.restore(Settings.values, saved);
-        if (Wallpaper.path !== savedWallpaper) {
+        if (Wallpaper.target !== savedWallpaper) {
             if (savedWallpaper !== "")
                 Wallpaper.set(savedWallpaper);
             else
@@ -153,8 +153,8 @@ Scope {
                         const theme = themes.find(t => t.name === name);
                         if (!theme)
                             return;
-                        Presets.restore(Settings.values, theme.values);
-                        if (theme.wallpaper !== Wallpaper.path) {
+                        Presets.restore(Settings.values, Themes.applicable(theme.values, Settings.values));
+                        if (theme.wallpaper !== Wallpaper.target) {
                             if (theme.wallpaper !== "")
                                 Wallpaper.set(theme.wallpaper);
                             else
@@ -201,7 +201,10 @@ Scope {
                                     Image {
                                         anchors.fill: parent
                                         readonly property var picture: Wallpaper.pictures.find(p => p.filePath === look.theme.wallpaper)
-                                        source: look.theme.wallpaper ? "file://" + (picture?.video ? picture.thumb : look.theme.wallpaper) : ""
+                                        // A video by its thumbnail; without one (not scanned), just the color.
+                                        readonly property string file: picture?.video ? picture.thumb ?? ""
+                                                                     : Wallpaper.isVideoPath(look.theme.wallpaper) ? "" : look.theme.wallpaper
+                                        source: file ? "file://" + file : ""
                                         fillMode: Image.PreserveAspectCrop
                                         sourceSize.width: width * 2
                                         asynchronous: true
@@ -287,7 +290,7 @@ Scope {
                             scrolls: true
                             cardWidth: Theme.editor.pictureCard
                             options: Wallpaper.pictures.map(p => ({ value: p.filePath, label: p.fileName, thumb: p.video ? p.thumb : p.filePath }))
-                            current: Wallpaper.path
+                            current: Wallpaper.target
                             onPicked: v => Wallpaper.set(v)
                             art: Component {
                                 Image {

@@ -80,6 +80,13 @@ MouseArea {
         if (!dragging)
             return;
         dropped(dragOffset.x, dragOffset.y);
+        endDrag();
+    }
+    // The grab taken away (another surface, a closed window rebuilding the dock's items): the
+    // drag just ends, so the dock doesn't stay shown for it.
+    onCanceled: endDrag()
+
+    function endDrag(): void {
         dragging = false;
         dragOffset = Qt.point(0, 0);
     }

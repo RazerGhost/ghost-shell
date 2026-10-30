@@ -21,6 +21,9 @@ Singleton {
     // A live wallpaper (a video), and the still picture for it: a frame that matugen's
     // wallpaper.sh made (the colors come from it; the lock and login screens show it).
     readonly property bool isVideo: WallpapersJs.isVideo(path)
+    function isVideoPath(file: string): bool {
+        return WallpapersJs.isVideo(file);
+    }
     readonly property string stillPath: isVideo ? Quickshell.env("HOME") + "/.local/state/quickshell/video-frame.jpg" : path
     // The lock and login screens' picture: the one chosen in settings, or else the desktop's.
     readonly property string lockPath: Settings.values.lockWallpaper || stillPath
@@ -41,19 +44,52 @@ Singleton {
         scan.start();
     }
 
-    // A new wallpaper's colors are being made (wallpaper.sh runs matugen; about a second).
-    readonly property bool busy: apply.running
+    // A new wallpaper's colors are being made (wallpaper.sh runs matugen; about a second), or
+    // it waits for the color scheme's run.
+    readonly property bool busy: apply.running || waiting !== null
+
+    // The wallpaper last asked for ("" for none). `path` only changes once wallpaper.sh has
+    // written it (for a video, after its frame is made), so the desktop editor's Cancel and
+    // themes compare with `target`: the one asked for while it's on its way, else `path`.
+    property string requested: ""
+    readonly property string target: busy ? requested : path
+    // wallpaper.sh's argument while it waits for ColorScheme's run to end (null: nothing waits).
+    property var waiting: null
 
     // matugen's wallpaper.sh saves the choice (the file below, which updates `path`) and runs
     // matugen; `ghost theme` uses the same script.
     function set(path: string): void {
-        apply.start(["sh", Quickshell.env("HOME") + "/.config/matugen/wallpaper.sh", path]);
+        run(path, path);
     }
 
     // No wallpaper again (Hyprland's default shows), colors from the last seed color: the desktop
     // editor's Cancel when none was chosen before it opened.
     function clear(): void {
-        apply.start(["sh", Quickshell.env("HOME") + "/.config/matugen/wallpaper.sh", "--none"]);
+        run("--none", "");
+    }
+
+    // After the color scheme's own run when one is coming (a theme or Cancel changes the colors'
+    // settings and the wallpaper at once): both run wallpaper.sh, and side by side the one
+    // reading the old scheme could finish last.
+    function run(argument: string, wanted: string): void {
+        requested = wanted;
+        if (ColorScheme.busy) {
+            waiting = argument;
+            return;
+        }
+        apply.start(["sh", Quickshell.env("HOME") + "/.config/matugen/wallpaper.sh", argument]);
+    }
+
+    Connections {
+        target: ColorScheme
+
+        function onBusyChanged(): void {
+            if (ColorScheme.busy || root.waiting === null)
+                return;
+            const argument = root.waiting;
+            root.waiting = null;
+            apply.start(["sh", Quickshell.env("HOME") + "/.config/matugen/wallpaper.sh", argument]);
+        }
     }
 
     onFolderChanged: rescan()

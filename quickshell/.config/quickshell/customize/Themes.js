@@ -22,7 +22,21 @@ function valid(saved) {
                 if (key in t.values)
                     values[key] = t.values[key];
             return { name: t.name, wallpaper: t.wallpaper, primary: typeof t.primary === "string" ? t.primary : "", values };
-        });
+        })
+        // Without any of its settings left it would match every look on its wallpaper.
+        .filter(t => Object.keys(t.values).length > 0);
+}
+
+// A theme's values that fit the settings they go into: each of the same kind as the setting is
+// now (a number for a number, an object for the widgets' places), so a hand-edited file can't
+// put text where a number goes.
+function applicable(values, current) {
+    const kind = v => v === null ? "null" : Array.isArray(v) ? "array" : typeof v;
+    const out = {};
+    for (const key of Object.keys(values))
+        if (kind(values[key]) === kind(current[key]))
+            out[key] = values[key];
+    return out;
 }
 
 // The look now as a theme named "Theme N" (the first number not taken).
