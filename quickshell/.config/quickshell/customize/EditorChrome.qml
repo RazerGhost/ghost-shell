@@ -5,9 +5,10 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// What every on-screen editor has around what it edits: Cancel and Done in the top corners
-// (Escape and Enter too), and a sheet at the bottom with tabs. The tabs' contents go inside;
-// each shows itself for its `tab`. Fills the editor's window.
+// What every on-screen editor has around what it edits: a wide sheet at the bottom with Cancel,
+// the tabs and Done along its top (Escape and Enter too). The tabs' contents go inside; each
+// shows itself for its `tab`, the tall ones in two columns (wide and short leaves the card
+// above more room). Fills the editor's window.
 //
 // The sheet is a panel like the shell's own, so the glass settings show on it while they're
 // changed: with `glass` Hyprland blurs behind it (the editor's window must ask for that, see
@@ -28,9 +29,6 @@ Item {
     property string status
     default property alias content: sheetColumn.data
     readonly property Item sheet: sheet
-    // Cancel's and Done's pills, for an editor's input mask (the desktop editor's).
-    property Item cancelPill: null
-    property Item donePill: null
 
     signal cancelled()
     signal finished()
@@ -44,39 +42,6 @@ Item {
     Keys.onEscapePressed: root.cancelled()
     Keys.onReturnPressed: root.finished()
     Keys.onEnterPressed: root.finished()
-
-    Repeater {
-        model: [{ text: "Cancel", left: true }, { text: "Done", left: false }]
-
-        Surface {
-            id: pill
-            required property var modelData
-            anchors.top: parent.top
-            anchors.left: modelData.left ? parent.left : undefined
-            anchors.right: modelData.left ? undefined : parent.right
-            anchors.margins: Theme.spacing.l * 2
-            width: button.width + Theme.spacing.xs * 2
-            height: button.height + Theme.spacing.xs * 2
-            radius: Theme.radius.full
-            // Glass only with Hyprland's blur behind; over the lock screen they stay solid.
-            color: root.glass ? Colors.surfaceTranslucent : root.solid
-
-            Component.onCompleted: {
-                if (modelData.left)
-                    root.cancelPill = this;
-                else
-                    root.donePill = this;
-            }
-
-            TextButton {
-                id: button
-                anchors.centerIn: parent
-                text: pill.modelData.text
-                filled: !pill.modelData.left
-                onClicked: pill.modelData.left ? root.cancelled() : root.finished()
-            }
-        }
-    }
 
     Item {
         id: sheet
@@ -120,12 +85,35 @@ Item {
             width: parent.width
             topPadding: Theme.spacing.l
 
-            Segmented {
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: root.tabs.length > 1
-                options: root.tabs
-                current: root.tab
-                onPicked: v => root.tab = v
+            // Cancel, the tabs, Done.
+            Item {
+                x: Theme.spacing.l
+                width: parent.width - Theme.spacing.l * 2
+                height: tabSwitch.height
+
+                TextButton {
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "Cancel"
+                    onClicked: root.cancelled()
+                }
+
+                Segmented {
+                    id: tabSwitch
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    opacity: root.tabs.length > 1 ? 1 : 0
+                    options: root.tabs
+                    current: root.tab
+                    onPicked: v => root.tab = v
+                }
+
+                TextButton {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "Done"
+                    filled: true
+                    onClicked: root.finished()
+                }
             }
 
             Text {

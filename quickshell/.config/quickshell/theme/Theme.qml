@@ -271,7 +271,7 @@ Singleton {
 
     // The on-screen editors (customize/).
     readonly property QtObject editor: QtObject {
-        readonly property int sheet: root.px(720) // the sheet at the bottom, at most
+        readonly property int sheet: root.px(1240) // the sheet at the bottom, at most
         readonly property int sample: root.px(360) // the windows editor's sample window
     }
 

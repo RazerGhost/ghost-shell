@@ -975,7 +975,9 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   mirror; the `no_screen_share` layer rule draws it black instead of leaving it out), so each
   editor draws its own: the lock screen editor scales LockContent (laid out at the screen's
   size) into the card, which follows the sheet's height as tabs change; the clock's outline
-  is inside the card. Next: the desktop (wallpaper and widgets drawn in the card), the windows
+  is inside the card. User's review: more room for both. Cancel and Done moved into the sheet's
+  top row (beside the tabs), the sheet is up to 1240 px wide and every tall tab is two columns
+  side by side in all four editors, so the sheet is shorter and the card larger. Next: the desktop (wallpaper and widgets drawn in the card), the windows
   (the examples tiled into it with `hl.monitor`'s `reserved_area`), the dock and island.
 
 ### Not doing (user's call, 2026-10-28)

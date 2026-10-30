@@ -62,15 +62,11 @@ Scope {
             // (right-click an app to pin or move it).
             mask: Region {
                 item: chrome.sheet
-                Region { item: chrome.cancelPill }
-                Region { item: chrome.donePill }
             }
 
             BackgroundEffect.blurRegion: Region {
                 item: chrome.sheet
                 radius: chrome.sheet.radius
-                Region { item: chrome.cancelPill; radius: Theme.radius.full }
-                Region { item: chrome.donePill; radius: Theme.radius.full }
             }
 
             EditorChrome {
@@ -82,182 +78,198 @@ Scope {
                 onFinished: root.close()
 
                 // Island: dots, clock, status icons.
-                Column {
-                    width: parent.width
+                Row {
                     visible: chrome.tab === "island"
+                    width: parent.width
 
-                    SettingRow {
-                        title: "Workspace dots"
-                        subtitle: Settings.values.workspaceDots === 0 ? "Only the ones in use; scrolling steps between them" : "Always this many, more when in use"
-
-                        Segmented {
-                            options: ThemeScale.workspaceDots.map(v => ({ value: v, label: v === 0 ? "In use" : String(v) }))
-                            current: ThemeScale.pick(Settings.values.workspaceDots, ThemeScale.workspaceDots, 5)
-                            onPicked: v => Settings.values.workspaceDots = v
-                        }
-                    }
-
-                    Repeater {
-                        model: [
-                            { key: "clockDate", title: "The day next to the time", subtitle: "Thu 29  14:32" },
-                            { key: "clockSeconds", title: "Seconds", subtitle: "" },
-                            { key: "islandMedia", title: "Music takes the clock's place", subtitle: "Its cover while it plays; hover it for the time" }
-                        ]
-
-                        SettingRow {
-                            id: clockRow
-                            required property var modelData
-                            title: modelData.title
-                            subtitle: modelData.subtitle
-
-                            Switch {
-                                label: clockRow.modelData.title
-                                checked: Settings.values[clockRow.modelData.key]
-                                onToggled: Settings.values[clockRow.modelData.key] = !checked
-                            }
-                        }
-                    }
-
-                    // Status icons as chips, filled while shown (the privacy ones always show:
-                    // recording, microphone, camera, screen sharing).
                     Column {
-                        x: Theme.spacing.l
-                        width: parent.width - Theme.spacing.l * 2
-                        topPadding: Theme.spacing.s
-                        bottomPadding: Theme.spacing.m
-                        spacing: Theme.spacing.s
+                        width: parent.width / 2
 
-                        Text {
-                            text: "Status icons"
-                            color: Colors.m3onSurface
-                            font.family: Theme.font.sans
-                            font.pixelSize: Theme.font.normal
-                            font.weight: Font.Medium
-                        }
+                            SettingRow {
+                                title: "Workspace dots"
+                                subtitle: Settings.values.workspaceDots === 0 ? "Only the ones in use; scrolling steps between them" : "Always this many, more when in use"
 
-                        Flow {
-                            width: parent.width
-                            spacing: Theme.spacing.s
+                                Segmented {
+                                    options: ThemeScale.workspaceDots.map(v => ({ value: v, label: v === 0 ? "In use" : String(v) }))
+                                    current: ThemeScale.pick(Settings.values.workspaceDots, ThemeScale.workspaceDots, 5)
+                                    onPicked: v => Settings.values.workspaceDots = v
+                                }
+                            }
 
                             Repeater {
                                 model: [
-                                    { key: "wifi", icon: "wifi", label: "Wi-Fi" },
-                                    { key: "bluetooth", icon: "bluetooth", label: "Bluetooth" },
-                                    { key: "vpn", icon: "vpn_key", label: "VPN" },
-                                    { key: "airplane", icon: "flight", label: "Airplane" },
-                                    { key: "timer", icon: "timer", label: "Timer" },
-                                    { key: "updates", icon: "download", label: "Updates" },
-                                    { key: "muted", icon: "volume_off", label: "Muted" },
-                                    { key: "battery", icon: "battery_full", label: "Battery" }
+                                    { key: "clockDate", title: "The day next to the time", subtitle: "Thu 29  14:32" },
+                                    { key: "clockSeconds", title: "Seconds", subtitle: "" },
+                                    { key: "islandMedia", title: "Music takes the clock's place", subtitle: "Its cover while it plays; hover it for the time" }
                                 ]
 
-                                Rectangle {
-                                    id: chip
-
+                                SettingRow {
+                                    id: clockRow
                                     required property var modelData
-                                    readonly property var hidden: Array.from(Settings.values.hiddenStatusIcons ?? [])
-                                    readonly property bool shown: !hidden.includes(modelData.key)
+                                    title: modelData.title
+                                    subtitle: modelData.subtitle
 
-                                    function toggle(): void {
-                                        Settings.values.hiddenStatusIcons = shown ? [...hidden, modelData.key]
-                                                                                  : hidden.filter(k => k !== modelData.key);
-                                    }
-
-                                    width: chipRow.width + Theme.spacing.m * 2
-                                    height: Theme.island.height
-                                    radius: Theme.radius.full
-                                    color: shown ? Colors.m3primaryContainer : "transparent"
-                                    border.width: shown ? 0 : 1
-                                    border.color: Colors.m3outlineVariant
-
-                                    Accessible.role: Accessible.CheckBox
-                                    Accessible.name: modelData.label
-                                    Accessible.checked: shown
-                                    Accessible.onToggleAction: toggle()
-                                    activeFocusOnTab: true
-                                    Keys.onReturnPressed: toggle()
-                                    Keys.onSpacePressed: toggle()
-
-                                    Row {
-                                        id: chipRow
-                                        anchors.centerIn: parent
-                                        spacing: Theme.spacing.xs
-
-                                        MaterialIcon {
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            icon: chip.modelData.icon
-                                            color: chip.shown ? Colors.m3onPrimaryContainer : Colors.m3onSurfaceVariant
-                                            font.pixelSize: Theme.icon.small
-                                        }
-
-                                        Text {
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            text: chip.modelData.label
-                                            color: chip.shown ? Colors.m3onPrimaryContainer : Colors.m3onSurfaceVariant
-                                            font.family: Theme.font.sans
-                                            font.pixelSize: Theme.font.small
-                                        }
-                                    }
-
-                                    StateLayer {
-                                        radius: chip.radius
-                                        color: Colors.m3onSurface
-                                        hovered: chipMouse.containsMouse
-                                    }
-
-                                    FocusRing {
-                                        radius: chip.radius
-                                    }
-
-                                    MouseArea {
-                                        id: chipMouse
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: chip.toggle()
+                                    Switch {
+                                        label: clockRow.modelData.title
+                                        checked: Settings.values[clockRow.modelData.key]
+                                        onToggled: Settings.values[clockRow.modelData.key] = !checked
                                     }
                                 }
                             }
-                        }
+                    }
+
+                    Column {
+                        width: parent.width / 2
+
+                            // Status icons as chips, filled while shown (the privacy ones always show:
+                            // recording, microphone, camera, screen sharing).
+                            Column {
+                                x: Theme.spacing.l
+                                width: parent.width - Theme.spacing.l * 2
+                                topPadding: Theme.spacing.s
+                                bottomPadding: Theme.spacing.m
+                                spacing: Theme.spacing.s
+
+                                Text {
+                                    text: "Status icons"
+                                    color: Colors.m3onSurface
+                                    font.family: Theme.font.sans
+                                    font.pixelSize: Theme.font.normal
+                                    font.weight: Font.Medium
+                                }
+
+                                Flow {
+                                    width: parent.width
+                                    spacing: Theme.spacing.s
+
+                                    Repeater {
+                                        model: [
+                                            { key: "wifi", icon: "wifi", label: "Wi-Fi" },
+                                            { key: "bluetooth", icon: "bluetooth", label: "Bluetooth" },
+                                            { key: "vpn", icon: "vpn_key", label: "VPN" },
+                                            { key: "airplane", icon: "flight", label: "Airplane" },
+                                            { key: "timer", icon: "timer", label: "Timer" },
+                                            { key: "updates", icon: "download", label: "Updates" },
+                                            { key: "muted", icon: "volume_off", label: "Muted" },
+                                            { key: "battery", icon: "battery_full", label: "Battery" }
+                                        ]
+
+                                        Rectangle {
+                                            id: chip
+
+                                            required property var modelData
+                                            readonly property var hidden: Array.from(Settings.values.hiddenStatusIcons ?? [])
+                                            readonly property bool shown: !hidden.includes(modelData.key)
+
+                                            function toggle(): void {
+                                                Settings.values.hiddenStatusIcons = shown ? [...hidden, modelData.key]
+                                                                                          : hidden.filter(k => k !== modelData.key);
+                                            }
+
+                                            width: chipRow.width + Theme.spacing.m * 2
+                                            height: Theme.island.height
+                                            radius: Theme.radius.full
+                                            color: shown ? Colors.m3primaryContainer : "transparent"
+                                            border.width: shown ? 0 : 1
+                                            border.color: Colors.m3outlineVariant
+
+                                            Accessible.role: Accessible.CheckBox
+                                            Accessible.name: modelData.label
+                                            Accessible.checked: shown
+                                            Accessible.onToggleAction: toggle()
+                                            activeFocusOnTab: true
+                                            Keys.onReturnPressed: toggle()
+                                            Keys.onSpacePressed: toggle()
+
+                                            Row {
+                                                id: chipRow
+                                                anchors.centerIn: parent
+                                                spacing: Theme.spacing.xs
+
+                                                MaterialIcon {
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                    icon: chip.modelData.icon
+                                                    color: chip.shown ? Colors.m3onPrimaryContainer : Colors.m3onSurfaceVariant
+                                                    font.pixelSize: Theme.icon.small
+                                                }
+
+                                                Text {
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                    text: chip.modelData.label
+                                                    color: chip.shown ? Colors.m3onPrimaryContainer : Colors.m3onSurfaceVariant
+                                                    font.family: Theme.font.sans
+                                                    font.pixelSize: Theme.font.small
+                                                }
+                                            }
+
+                                            StateLayer {
+                                                radius: chip.radius
+                                                color: Colors.m3onSurface
+                                                hovered: chipMouse.containsMouse
+                                            }
+
+                                            FocusRing {
+                                                radius: chip.radius
+                                            }
+
+                                            MouseArea {
+                                                id: chipMouse
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: chip.toggle()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                     }
                 }
 
                 // Dock: when it shows, its icons' size.
-                Column {
-                    width: parent.width
+                Row {
                     visible: chrome.tab === "dock"
+                    width: parent.width
 
-                    SettingRow {
-                        title: "Show the dock"
-                        subtitle: ({ hide: "When the pointer touches the bottom edge", always: "All the time; windows tile above it",
-                                     off: "Never" })[Settings.values.dockMode] ?? ""
+                    Column {
+                        width: parent.width / 2
 
-                        Segmented {
-                            options: [{ value: "hide", label: "At the edge" }, { value: "always", label: "Always" }, { value: "off", label: "Off" }]
-                            current: Settings.values.dockMode
-                            onPicked: v => Settings.values.dockMode = v
-                        }
+                            SettingRow {
+                                title: "Show the dock"
+                                subtitle: ({ hide: "When the pointer touches the bottom edge", always: "All the time; windows tile above it",
+                                             off: "Never" })[Settings.values.dockMode] ?? ""
+
+                                Segmented {
+                                    options: [{ value: "hide", label: "At the edge" }, { value: "always", label: "Always" }, { value: "off", label: "Off" }]
+                                    current: Settings.values.dockMode
+                                    onPicked: v => Settings.values.dockMode = v
+                                }
+                            }
                     }
 
-                    SettingRow {
-                        title: "Icon size"
+                    Column {
+                        width: parent.width / 2
 
-                        Segmented {
-                            options: ThemeScale.dockIcons.map(v => ({ value: v, label: ({ 36: "Small", 44: "Normal", 52: "Large", 60: "Larger" })[v] }))
-                            current: ThemeScale.pick(Settings.values.dockIconSize, ThemeScale.dockIcons, 44)
-                            onPicked: v => Settings.values.dockIconSize = v
-                        }
-                    }
+                            SettingRow {
+                                title: "Icon size"
 
-                    Text {
-                        x: Theme.spacing.l
-                        width: parent.width - Theme.spacing.l * 2
-                        bottomPadding: Theme.spacing.m
-                        text: "Right-click an app in the dock to pin it, unpin it or move it left or right."
-                        color: Colors.m3onSurfaceVariant
-                        font.family: Theme.font.sans
-                        font.pixelSize: Theme.font.small
-                        wrapMode: Text.Wrap
+                                Segmented {
+                                    options: ThemeScale.dockIcons.map(v => ({ value: v, label: ({ 36: "Small", 44: "Normal", 52: "Large", 60: "Larger" })[v] }))
+                                    current: ThemeScale.pick(Settings.values.dockIconSize, ThemeScale.dockIcons, 44)
+                                    onPicked: v => Settings.values.dockIconSize = v
+                                }
+                            }
+
+                            Text {
+                                x: Theme.spacing.l
+                                width: parent.width - Theme.spacing.l * 2
+                                bottomPadding: Theme.spacing.m
+                                text: "Right-click an app in the dock to pin it, unpin it or move it left or right."
+                                color: Colors.m3onSurfaceVariant
+                                font.family: Theme.font.sans
+                                font.pixelSize: Theme.font.small
+                                wrapMode: Text.Wrap
+                            }
                     }
                 }
             }

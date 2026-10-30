@@ -129,15 +129,11 @@ Scope {
 
             mask: Region {
                 item: chrome.sheet
-                Region { item: chrome.cancelPill }
-                Region { item: chrome.donePill }
             }
 
             BackgroundEffect.blurRegion: Region {
                 item: chrome.sheet
                 radius: chrome.sheet.radius
-                Region { item: chrome.cancelPill; radius: Theme.radius.full }
-                Region { item: chrome.donePill; radius: Theme.radius.full }
             }
 
             EditorChrome {
@@ -148,146 +144,170 @@ Scope {
                 onFinished: root.close()
 
                 // Borders: width, corners and the extras.
-                Column {
-                    width: parent.width
+                Row {
                     visible: chrome.tab === "borders"
+                    width: parent.width
 
-                    SettingRow {
-                        title: "Border"
-                        subtitle: "In your wallpaper's colors"
+                    Column {
+                        width: parent.width / 2
 
-                        Segmented {
-                            options: root.withCurrent([0, 1, 2, 3, 4], Settings.values.borderSize).map(v => ({ value: v, label: v === 0 ? "None" : v + " px" }))
-                            current: Settings.values.borderSize
-                            onPicked: v => Settings.values.borderSize = v
-                        }
-                    }
+                            SettingRow {
+                                title: "Border"
+                                subtitle: "In your wallpaper's colors"
 
-                    SettingRow {
-                        title: "Corners"
-
-                        Segmented {
-                            options: root.withCurrent([0, 6, 10, 14, 20], Settings.values.rounding).map(v => ({ value: v, label: ({ 0: "Square", 6: "Less", 10: "Round", 14: "More", 20: "Most" })[v] ?? v + " px" }))
-                            current: Settings.values.rounding
-                            onPicked: v => Settings.values.rounding = v
-                        }
-                    }
-
-                    Repeater {
-                        model: [
-                            { key: "borderSpin", title: "Turning border", subtitle: "Its colors go round; redraws all the time, so it costs battery" },
-                            { key: "windowGlow", title: "Glow", subtitle: "A soft glow in your accent inside the focused window's edge" },
-                            { key: "windowKindBorders", title: "Floating and pinned windows stand out", subtitle: "Their borders in other colors of yours" }
-                        ]
-
-                        SettingRow {
-                            id: extraRow
-                            required property var modelData
-                            title: modelData.title
-                            subtitle: modelData.subtitle
-
-                            Switch {
-                                label: extraRow.modelData.title
-                                checked: Settings.values[extraRow.modelData.key]
-                                onToggled: Settings.values[extraRow.modelData.key] = !checked
+                                Segmented {
+                                    options: root.withCurrent([0, 1, 2, 3, 4], Settings.values.borderSize).map(v => ({ value: v, label: v === 0 ? "None" : v + " px" }))
+                                    current: Settings.values.borderSize
+                                    onPicked: v => Settings.values.borderSize = v
+                                }
                             }
-                        }
+
+                            SettingRow {
+                                title: "Corners"
+
+                                Segmented {
+                                    options: root.withCurrent([0, 6, 10, 14, 20], Settings.values.rounding).map(v => ({ value: v, label: ({ 0: "Square", 6: "Less", 10: "Round", 14: "More", 20: "Most" })[v] ?? v + " px" }))
+                                    current: Settings.values.rounding
+                                    onPicked: v => Settings.values.rounding = v
+                                }
+                            }
+                    }
+
+                    Column {
+                        width: parent.width / 2
+
+                            Repeater {
+                                model: [
+                                    { key: "borderSpin", title: "Turning border", subtitle: "Its colors go round; redraws all the time, so it costs battery" },
+                                    { key: "windowGlow", title: "Glow", subtitle: "A soft glow in your accent inside the focused window's edge" },
+                                    { key: "windowKindBorders", title: "Floating and pinned windows stand out", subtitle: "Their borders in other colors of yours" }
+                                ]
+
+                                SettingRow {
+                                    id: extraRow
+                                    required property var modelData
+                                    title: modelData.title
+                                    subtitle: modelData.subtitle
+
+                                    Switch {
+                                        label: extraRow.modelData.title
+                                        checked: Settings.values[extraRow.modelData.key]
+                                        onToggled: Settings.values[extraRow.modelData.key] = !checked
+                                    }
+                                }
+                            }
                     }
                 }
 
                 // Space: the gaps between tiled windows and at the screen's edges.
-                Column {
-                    width: parent.width
+                Row {
                     visible: chrome.tab === "space"
+                    width: parent.width
 
-                    SettingRow {
-                        title: "Between windows"
+                    Column {
+                        width: parent.width / 2
 
-                        Segmented {
-                            options: root.withCurrent([0, 3, 5, 8, 12], Settings.values.gapsIn).map(v => ({ value: v, label: v === 0 ? "None" : v + " px" }))
-                            current: Settings.values.gapsIn
-                            onPicked: v => Settings.values.gapsIn = v
-                        }
+                            SettingRow {
+                                title: "Between windows"
+
+                                Segmented {
+                                    options: root.withCurrent([0, 3, 5, 8, 12], Settings.values.gapsIn).map(v => ({ value: v, label: v === 0 ? "None" : v + " px" }))
+                                    current: Settings.values.gapsIn
+                                    onPicked: v => Settings.values.gapsIn = v
+                                }
+                            }
                     }
 
-                    SettingRow {
-                        title: "At the screen's edges"
+                    Column {
+                        width: parent.width / 2
 
-                        Segmented {
-                            options: root.withCurrent([0, 8, 14, 20, 30], Settings.values.gapsOut).map(v => ({ value: v, label: v === 0 ? "None" : v + " px" }))
-                            current: Settings.values.gapsOut
-                            onPicked: v => Settings.values.gapsOut = v
-                        }
+                            SettingRow {
+                                title: "At the screen's edges"
+
+                                Segmented {
+                                    options: root.withCurrent([0, 8, 14, 20, 30], Settings.values.gapsOut).map(v => ({ value: v, label: v === 0 ? "None" : v + " px" }))
+                                    current: Settings.values.gapsOut
+                                    onPicked: v => Settings.values.gapsOut = v
+                                }
+                            }
                     }
                 }
 
                 // Motion: speed and styles, each with Play; wobbly windows.
-                Column {
-                    width: parent.width
+                Row {
                     visible: chrome.tab === "motion"
+                    width: parent.width
 
-                    SettingRow {
-                        title: "Speed"
-                        subtitle: "The shell's and the windows' together"
+                    Column {
+                        width: parent.width / 2
 
-                        Segmented {
-                            options: HyprlandConfig.animationSpeeds.map(v => ({ value: v, label: v === 0 ? "Off" : v === 1 ? "Normal" : v + "×" }))
-                            current: HyprlandConfig.animationSpeed(Settings.values.animationSpeed)
-                            onPicked: v => Settings.values.animationSpeed = v
-                        }
+                            SettingRow {
+                                title: "Speed"
+                                subtitle: "The shell's and the windows' together"
+
+                                Segmented {
+                                    options: HyprlandConfig.animationSpeeds.map(v => ({ value: v, label: v === 0 ? "Off" : v === 1 ? "Normal" : v + "×" }))
+                                    current: HyprlandConfig.animationSpeed(Settings.values.animationSpeed)
+                                    onPicked: v => Settings.values.animationSpeed = v
+                                }
+                            }
+
+                            SettingRow {
+                                title: "Opening and closing"
+
+                                Row {
+                                    spacing: Theme.spacing.s
+
+                                    Segmented {
+                                        options: Object.keys(HyprlandConfig.windowStyles).map(v => ({ value: v, label: ({ popin: "Pop in", slide: "Slide", gnomed: "Grow" })[v] }))
+                                        current: HyprlandConfig.style(Settings.values.windowAnimation, HyprlandConfig.windowStyles)
+                                        onPicked: v => Settings.values.windowAnimation = v
+                                    }
+
+                                    IconButton {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        icon: "play_arrow"
+                                        label: "Play: open and close a window"
+                                        onClicked: root.playWindow()
+                                    }
+                                }
+                            }
                     }
 
-                    SettingRow {
-                        title: "Opening and closing"
+                    Column {
+                        width: parent.width / 2
 
-                        Row {
-                            spacing: Theme.spacing.s
+                            SettingRow {
+                                title: "Switching workspaces"
 
-                            Segmented {
-                                options: Object.keys(HyprlandConfig.windowStyles).map(v => ({ value: v, label: ({ popin: "Pop in", slide: "Slide", gnomed: "Grow" })[v] }))
-                                current: HyprlandConfig.style(Settings.values.windowAnimation, HyprlandConfig.windowStyles)
-                                onPicked: v => Settings.values.windowAnimation = v
+                                Row {
+                                    spacing: Theme.spacing.s
+
+                                    Segmented {
+                                        options: Object.keys(HyprlandConfig.workspaceStyles).map(v => ({ value: v, label: ({ fade: "Fade", slide: "Slide", slidevert: "Up", slidefade: "Slide fade" })[v] }))
+                                        current: HyprlandConfig.style(Settings.values.workspaceAnimation, HyprlandConfig.workspaceStyles)
+                                        onPicked: v => Settings.values.workspaceAnimation = v
+                                    }
+
+                                    IconButton {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        icon: "play_arrow"
+                                        label: "Play: switch away and back"
+                                        onClicked: root.playWorkspace()
+                                    }
+                                }
                             }
 
-                            IconButton {
-                                anchors.verticalCenter: parent.verticalCenter
-                                icon: "play_arrow"
-                                label: "Play: open and close a window"
-                                onClicked: root.playWindow()
+                            SettingRow {
+                                title: "Wobbly windows"
+                                subtitle: "They wobble like jelly while you move or resize them"
+
+                                Switch {
+                                    label: "Wobbly windows"
+                                    checked: Settings.values.wobble
+                                    onToggled: Settings.values.wobble = !checked
+                                }
                             }
-                        }
-                    }
-
-                    SettingRow {
-                        title: "Switching workspaces"
-
-                        Row {
-                            spacing: Theme.spacing.s
-
-                            Segmented {
-                                options: Object.keys(HyprlandConfig.workspaceStyles).map(v => ({ value: v, label: ({ fade: "Fade", slide: "Slide", slidevert: "Up", slidefade: "Slide fade" })[v] }))
-                                current: HyprlandConfig.style(Settings.values.workspaceAnimation, HyprlandConfig.workspaceStyles)
-                                onPicked: v => Settings.values.workspaceAnimation = v
-                            }
-
-                            IconButton {
-                                anchors.verticalCenter: parent.verticalCenter
-                                icon: "play_arrow"
-                                label: "Play: switch away and back"
-                                onClicked: root.playWorkspace()
-                            }
-                        }
-                    }
-
-                    SettingRow {
-                        title: "Wobbly windows"
-                        subtitle: "They wobble like jelly while you move or resize them"
-
-                        Switch {
-                            label: "Wobbly windows"
-                            checked: Settings.values.wobble
-                            onToggled: Settings.values.wobble = !checked
-                        }
                     }
                 }
             }
