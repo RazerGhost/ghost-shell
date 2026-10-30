@@ -5,7 +5,7 @@ import qs.widgets
 // A setting picked by sight, like macOS's Appearance thumbnails or the iOS lock screen
 // gallery: a row of small pictures with a name under each; the current one has an accent
 // outline. `art` draws a card's picture; it's given the option as `option` on its parent
-// (`parent.option`). The on-screen editors' (customize/) bottom sheets use it.
+// (`parent.option`). The on-screen editors' (customize/) sheets line them up (SheetGrid).
 Column {
     id: root
 
@@ -20,26 +20,16 @@ Column {
 
     signal picked(var value)
 
-    // Up to six in a row: smaller cards rather than one left alone on a second row. A
-    // scrolling row keeps them full size. Set it to match another row's cards.
-    property real cardWidth: {
-        if (scrolls)
-            return Theme.settings.card;
-        const n = Math.min(Math.max(options.length, 1), 6);
-        return Math.min(Theme.settings.card, Math.floor((area.width - Theme.spacing.m * (n - 1)) / n));
-    }
+    property real cardWidth: Theme.settings.card
 
-    // In an editor's SheetGrid two cells, a scrolling row the whole row; elsewhere the parent's
-    // width.
-    property int span: scrolls ? 99 : 2
-    width: parent?.cellWidth ? parent.cellWidth * Math.min(span, parent.columns) : (parent?.width ?? 0)
-    topPadding: Theme.spacing.m
-    bottomPadding: Theme.spacing.m
-    spacing: Theme.spacing.m
+    // As wide as its cards in one row; a scrolling row takes the whole row of its sheet (the
+    // editor's SheetGrid, less its padding).
+    width: scrolls ? (parent ? parent.width - (parent.leftPadding ?? 0) - (parent.rightPadding ?? 0) : 0)
+                   : options.length * cardWidth + Math.max(options.length - 1, 0) * Theme.spacing.m
+    spacing: Theme.spacing.s
 
     Column {
-        x: Theme.spacing.l
-        width: parent.width - Theme.spacing.l * 2
+        width: parent.width
         visible: root.title !== ""
         spacing: 2
 
@@ -65,8 +55,7 @@ Column {
 
     Item {
         id: area
-        x: Theme.spacing.l
-        width: parent.width - Theme.spacing.l * 2
+        width: parent.width
         height: root.scrolls ? row.height : flow.height
 
         Flow {

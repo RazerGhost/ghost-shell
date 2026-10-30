@@ -271,7 +271,7 @@ Singleton {
 
     // The on-screen editors (customize/).
     readonly property QtObject editor: QtObject {
-        readonly property int cell:  root.px(420)  // a setting's cell in the sheet (SheetGrid.qml)
+        readonly property int subtitle: root.px(220) // a setting's subtitle wraps at least this wide (SheetItem.qml)
         readonly property int sample: root.px(360) // the windows editor's sample window
     }
 

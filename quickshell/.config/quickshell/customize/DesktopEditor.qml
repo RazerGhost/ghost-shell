@@ -131,18 +131,21 @@ Scope {
                 onFinished: root.close()
 
                 // Wallpaper: yours and the built-in ones, videos as their still frame.
-                ChoiceCards {
+                SheetGrid {
                     visible: chrome.tab === "wallpaper"
-                    scrolls: true
-                    options: Wallpaper.pictures.map(p => ({ value: p.filePath, label: p.fileName, thumb: p.video ? p.thumb : p.filePath }))
-                    current: Wallpaper.path
-                    onPicked: v => Wallpaper.set(v)
-                    art: Component {
-                        Image {
-                            source: "file://" + parent.option.thumb
-                            fillMode: Image.PreserveAspectCrop
-                            sourceSize.width: width * 2
-                            asynchronous: true
+
+                    ChoiceCards {
+                        scrolls: true
+                        options: Wallpaper.pictures.map(p => ({ value: p.filePath, label: p.fileName, thumb: p.video ? p.thumb : p.filePath }))
+                        current: Wallpaper.path
+                        onPicked: v => Wallpaper.set(v)
+                        art: Component {
+                            Image {
+                                source: "file://" + parent.option.thumb
+                                fillMode: Image.PreserveAspectCrop
+                                sourceSize.width: width * 2
+                                asynchronous: true
+                            }
                         }
                     }
                 }
@@ -151,7 +154,7 @@ Scope {
                 SheetGrid {
                     visible: chrome.tab === "colors"
 
-                    SettingRow {
+                    SheetItem {
                         title: "Light or dark"
                         subtitle: Settings.values.colorScheme === "auto" ? "Dark from sunset to sunrise" : ""
 
@@ -162,7 +165,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Accent"
                         subtitle: Settings.values.accentColor ? "Instead of the wallpaper's" : "From the wallpaper"
 
@@ -221,7 +224,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Color style"
                         subtitle: "How the colors are drawn from the wallpaper"
 
@@ -241,7 +244,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Contrast"
 
                         Segmented {
@@ -264,7 +267,7 @@ Scope {
                             { key: "desktopMedia", title: "Media", subtitle: "While something plays" }
                         ]
 
-                        SettingRow {
+                        SheetItem {
                             id: widgetRow
                             required property var modelData
                             title: modelData.title
@@ -278,7 +281,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Places"
                         subtitle: "Drag a widget by the handle in its corner to move it"
 
@@ -294,7 +297,7 @@ Scope {
                 SheetGrid {
                     visible: chrome.tab === "style"
 
-                    SettingRow {
+                    SheetItem {
                         title: "Glass"
                         subtitle: "See-through panels with a thin light edge"
 
@@ -305,7 +308,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         visible: Settings.values.glass
                         title: "See-through"
 
@@ -318,7 +321,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Blur"
                         subtitle: "Behind the glass, menus and see-through windows"
 
@@ -333,7 +336,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Corners"
                         subtitle: "The shell's own"
 
@@ -349,7 +352,7 @@ Scope {
                 SheetGrid {
                     visible: chrome.tab === "text"
 
-                    SettingRow {
+                    SheetItem {
                         title: "Shell size"
 
                         Segmented {
@@ -359,7 +362,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Text size"
 
                         Segmented {
@@ -371,7 +374,6 @@ Scope {
 
                     ChoiceCards {
                         title: "Font"
-                        scrolls: true
                         options: ["Inter", "Adwaita Sans", "Cantarell", "Noto Sans", "Open Sans", "Roboto",
                                   "IBM Plex Sans", "Fira Sans", "Ubuntu", "DejaVu Sans"]
                             .filter(f => Qt.fontFamilies().includes(f)).map(f => ({ value: f, label: f }))
@@ -392,7 +394,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Icons"
                         subtitle: "Apps' icons; the shell's own (dock, launcher) after it restarts"
 
@@ -407,7 +409,7 @@ Scope {
                     }
 
                     // The shell reads the icon theme when it starts (QS_ICON_THEME, hypr/shell.sh).
-                    SettingRow {
+                    SheetItem {
                         visible: Settings.values.iconTheme !== root.startIconTheme
                         title: "Restart the shell for its own icons"
                         subtitle: "Keeps these changes; clears the notification list"

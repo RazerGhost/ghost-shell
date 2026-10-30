@@ -81,9 +81,7 @@ Scope {
                 SheetGrid {
                     visible: chrome.tab === "island"
 
-                    // Seven choices: two cells.
-                    SettingRow {
-                        span: 2
+                    SheetItem {
                         title: "Workspace dots"
                         subtitle: Settings.values.workspaceDots === 0 ? "Only the ones in use; scrolling steps between them" : "Always this many, more when in use"
 
@@ -101,7 +99,7 @@ Scope {
                             { key: "islandMedia", title: "Music takes the clock's place", subtitle: "Its cover while it plays; hover it for the time" }
                         ]
 
-                        SettingRow {
+                        SheetItem {
                             id: clockRow
                             required property var modelData
                             title: modelData.title
@@ -117,24 +115,10 @@ Scope {
 
                     // Status icons as chips, filled while shown (the privacy ones always show:
                     // recording, microphone, camera, screen sharing).
-                    Column {
-                        width: parent.width
-                        leftPadding: Theme.spacing.l
-                        rightPadding: Theme.spacing.l
-                        topPadding: Theme.spacing.s
-                        bottomPadding: Theme.spacing.m
-                        spacing: Theme.spacing.s
+                    SheetItem {
+                        title: "Status icons"
 
-                        Text {
-                            text: "Status icons"
-                            color: Colors.m3onSurface
-                            font.family: Theme.font.sans
-                            font.pixelSize: Theme.font.normal
-                            font.weight: Font.Medium
-                        }
-
-                        Flow {
-                            width: parent.width - parent.leftPadding - parent.rightPadding
+                        Row {
                             spacing: Theme.spacing.s
 
                             Repeater {
@@ -224,7 +208,7 @@ Scope {
                 SheetGrid {
                     visible: chrome.tab === "dock"
 
-                    SettingRow {
+                    SheetItem {
                         title: "Show the dock"
                         subtitle: ({ hide: "When the pointer touches the bottom edge", always: "All the time; windows tile above it",
                                      off: "Never" })[Settings.values.dockMode] ?? ""
@@ -236,7 +220,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Icon size"
 
                         Segmented {
@@ -247,11 +231,7 @@ Scope {
                     }
 
                     Text {
-                        width: parent.cellWidth
-                        leftPadding: Theme.spacing.l
-                        rightPadding: Theme.spacing.l
-                        topPadding: Theme.spacing.m
-                        bottomPadding: Theme.spacing.m
+                        width: Theme.editor.subtitle * 1.5
                         text: "Right-click an app in the dock to pin it, unpin it or move it left or right."
                         color: Colors.m3onSurfaceVariant
                         font.family: Theme.font.sans

@@ -219,7 +219,7 @@ Scope {
                 SheetGrid {
                     visible: chrome.tab === "borders"
 
-                    SettingRow {
+                    SheetItem {
                         title: "Border"
                         subtitle: "In your wallpaper's colors"
 
@@ -230,7 +230,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Corners"
 
                         Segmented {
@@ -247,7 +247,7 @@ Scope {
                             { key: "windowKindBorders", title: "Floating and pinned windows stand out", subtitle: "Their borders in other colors of yours" }
                         ]
 
-                        SettingRow {
+                        SheetItem {
                             id: extraRow
                             required property var modelData
                             title: modelData.title
@@ -266,7 +266,7 @@ Scope {
                 SheetGrid {
                     visible: chrome.tab === "space"
 
-                    SettingRow {
+                    SheetItem {
                         title: "Between windows"
 
                         Segmented {
@@ -276,7 +276,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "At the screen's edges"
 
                         Segmented {
@@ -291,7 +291,7 @@ Scope {
                 SheetGrid {
                     visible: chrome.tab === "motion"
 
-                    SettingRow {
+                    SheetItem {
                         title: "Speed"
 
                         Segmented {
@@ -301,7 +301,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Opening and closing"
 
                         Row {
@@ -322,7 +322,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Switching workspaces"
 
                         Row {
@@ -343,7 +343,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Wobbly windows"
                         subtitle: "They wobble like jelly while you move or resize them"
 

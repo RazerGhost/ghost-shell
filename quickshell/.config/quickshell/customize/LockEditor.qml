@@ -130,45 +130,48 @@ Scope {
 
                 // Looks: your picture with each preset's clock on it, and first your own look
                 // while it matches none of them ("" is yours).
-                ChoiceCards {
+                SheetGrid {
                     visible: chrome.tab === "looks"
-                    options: (Presets.current(Settings.values, Presets.lock) === "" ? [{ value: "", label: "Yours" }] : [])
-                        .concat(Presets.lock.map(p => ({ value: p.name, label: p.name })))
-                    current: Presets.current(Settings.values, Presets.lock)
-                    onPicked: v => {
-                        if (v !== "")
-                            Presets.apply(Settings.values, Presets.lock, v);
-                    }
-                    art: Component {
-                        Item {
-                            id: look
-                            readonly property var values: parent.option.value === "" ? Settings.values
-                                : Presets.lock.find(p => p.name === parent.option.value).values
 
-                            Image {
-                                anchors.fill: parent
-                                source: Wallpaper.lockPath ? "file://" + Wallpaper.lockPath : ""
-                                fillMode: Image.PreserveAspectCrop
-                                sourceSize.width: width * 2
-                                asynchronous: true
-                            }
+                    ChoiceCards {
+                        options: (Presets.current(Settings.values, Presets.lock) === "" ? [{ value: "", label: "Yours" }] : [])
+                            .concat(Presets.lock.map(p => ({ value: p.name, label: p.name })))
+                        current: Presets.current(Settings.values, Presets.lock)
+                        onPicked: v => {
+                            if (v !== "")
+                                Presets.apply(Settings.values, Presets.lock, v);
+                        }
+                        art: Component {
+                            Item {
+                                id: look
+                                readonly property var values: parent.option.value === "" ? Settings.values
+                                    : Presets.lock.find(p => p.name === parent.option.value).values
 
-                            Rectangle {
-                                anchors.fill: parent
-                                color: "black"
-                                opacity: look.values.lockDim / 100 + 0.1
-                            }
+                                Image {
+                                    anchors.fill: parent
+                                    source: Wallpaper.lockPath ? "file://" + Wallpaper.lockPath : ""
+                                    fillMode: Image.PreserveAspectCrop
+                                    sourceSize.width: width * 2
+                                    asynchronous: true
+                                }
 
-                            MiniClock {
-                                box: look
-                                style: look.values.lockClockStyle
-                                family: look.values.lockClockFont || Theme.font.sans
-                                fill: 0.5
-                                // Placed by its shrunk size, like the look's place on the screen.
-                                transformOrigin: Item.TopLeft
-                                x: look.values.lockLayout === "left" ? look.width * 0.08 : (look.width - width * scale) / 2
-                                y: look.values.lockLayout === "top" ? look.height * 0.12
-                                   : look.values.lockLayout === "center" ? (look.height - height * scale) / 2 : look.height * 0.88 - height * scale
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: "black"
+                                    opacity: look.values.lockDim / 100 + 0.1
+                                }
+
+                                MiniClock {
+                                    box: look
+                                    style: look.values.lockClockStyle
+                                    family: look.values.lockClockFont || Theme.font.sans
+                                    fill: 0.5
+                                    // Placed by its shrunk size, like the look's place on the screen.
+                                    transformOrigin: Item.TopLeft
+                                    x: look.values.lockLayout === "left" ? look.width * 0.08 : (look.width - width * scale) / 2
+                                    y: look.values.lockLayout === "top" ? look.height * 0.12
+                                       : look.values.lockLayout === "center" ? (look.height - height * scale) / 2 : look.height * 0.88 - height * scale
+                                }
                             }
                         }
                     }
@@ -181,7 +184,6 @@ Scope {
 
                     // The same card size as the fonts beside it, so the two rows line up.
                     ChoiceCards {
-                        cardWidth: fontCards.cardWidth
                         title: "Style"
                         options: LockClockJs.styles.map(v => ({ value: v, label: ({ big: "Big", stacked: "Stacked", thin: "Thin", analog: "Analog" })[v] }))
                         current: LockClockJs.pick(Settings.values.lockClockStyle, LockClockJs.styles)
@@ -223,7 +225,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Place"
 
                         Segmented {
@@ -233,7 +235,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Size"
 
                         Segmented {
@@ -243,7 +245,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Show"
 
                         Row {
@@ -299,7 +301,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Blur"
 
                         Stepper {
@@ -311,7 +313,7 @@ Scope {
                         }
                     }
 
-                    SettingRow {
+                    SheetItem {
                         title: "Darken"
 
                         Stepper {

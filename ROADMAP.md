@@ -994,10 +994,12 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   sizes and glass show on it) and hide the dock (`Editing.hideDock`: its sheet is where the
   dock would be, and the bottom edge doesn't reveal it); the dock and island editor shows both
   at their edges, no card.
-- Full-width sheets (user's review): the sheet spans the screen (less its margins) and each tab
-  is a `customize/SheetGrid.qml`, its settings side by side in as many ~420 px cells as fit,
-  wrapping only when they don't (SettingRow takes one cell, picture cards two, a scrolling row
-  the whole row; `span` overrides), so most tabs are one row and the card is larger.
+- Full-width sheets (user's review): the sheet spans the screen (less its margins); each tab is a
+  `customize/SheetGrid.qml` lining its settings up side by side at their own widths, evenly
+  spaced, wrapping only when a row is full. A setting is a `customize/SheetItem.qml` (its name
+  on top, the control under it, macOS/iOS-sheet style), picture cards keep their size, a
+  scrolling row takes the whole row. (First tried: equal cells stretched to the sheet's width;
+  labels ended up far from their controls with gaps between, user: "horrible".)
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
