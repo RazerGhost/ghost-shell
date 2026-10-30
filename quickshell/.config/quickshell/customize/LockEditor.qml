@@ -44,30 +44,6 @@ Scope {
             root.done();
     }
 
-    // The clock and date ("clock") or the player and widgets ("widgets") moved `by` px of the lock
-    // screen: a drag let go (`dragged`: the part already shows there, through LockContent's drag
-    // shift) or an arrow key's step (glided to). Saved as where it ends up, clamped by
-    // LockContent, as fractions of the screen. A drag of a few px is a click with a wobble, not a
-    // move: the place stays (and with it a look's match).
-    function movePart(part: string, by: point, dragged: bool): void {
-        const lock = editor.item?.lockContent;
-        if (!lock)
-            return;
-        const clock = part === "clock";
-        const now = clock ? lock.clockShift : lock.widgetsShift;
-        const small = dragged && Math.hypot(by.x, by.y) < Theme.spacing.s;
-        const shift = dragged ? now : clock ? lock.clockShiftFor(now.x + by.x, now.y + by.y)
-                                            : lock.widgetsShiftFor(now.x + by.x, now.y + by.y);
-        // After a drag the part stays where it was let go: no glide while the drag is put away
-        // and the new place saved (both at once would count the drag twice for a moment).
-        lock.settling = dragged;
-        lock.dragShift = Qt.point(0, 0);
-        lock.widgetsDragShift = Qt.point(0, 0);
-        if (!small)
-            Settings.values[clock ? "lockClockOffset" : "lockWidgetsOffset"] = { x: shift.x / lock.width, y: shift.y / lock.height };
-        Qt.callLater(() => lock.settling = false);
-    }
-
     // Closed first: its Looks gallery would save the restored settings into a look of yours.
     function cancel(): void {
         editor.active = false;
@@ -112,55 +88,22 @@ Scope {
                         id: lock
                         anchors.fill: parent
                         wallpaper: Wallpaper.lockPath
-                        enabled: false
+                        // Each part outlined to drag (PartOutline.qml); nothing else takes input.
+                        editor: chrome
                         takesKeyboard: false
 
                         LockStatus {
-                            id: status
+                            lock: lock
                             width: parent.width
                         }
                     }
 
-                    // The clock and the widgets under it, outlined like an iOS lock screen being
-                    // edited; click one for its tab.
-                    EditOutline {
-                        readonly property Item clock: lock.clockItem
-                        readonly property Item column: clock?.parent ?? null
-
-                        sheet: chrome
-                        tab: "clock"
-                        name: "The clock's options"
-                        shown: (clock?.visible ?? false) || chrome.tab === "clock"
-                        area: Qt.rect((column?.x ?? 0) + lock.clockShift.x + (clock?.x ?? 0),
-                                      (column?.y ?? 0) + lock.clockShift.y + (clock?.y ?? 0),
-                                      clock?.width ?? 0, clock?.height ?? 0)
-                        onMoving: by => lock.dragShift = by
-                        onMoved: by => root.movePart("clock", by, true)
-                        onStepped: by => root.movePart("clock", by, false)
-                    }
-
-                    EditOutline {
-                        // LockStatus in the clock's column (through LockContent's slot under the date).
-                        readonly property Item slot: status.parent
-                        readonly property Item column: slot?.parent ?? null
-
-                        sheet: chrome
-                        tab: "widgets"
-                        name: "The widgets' options"
-                        shown: status.height > 0 || chrome.tab === "widgets"
-                        area: Qt.rect((column?.x ?? 0) + lock.widgetsShift.x + (slot?.x ?? 0) + status.contentX,
-                                      (column?.y ?? 0) + lock.widgetsShift.y + (slot?.y ?? 0) + (slot?.topPadding ?? 0),
-                                      status.contentWidth, Math.max(status.height, Theme.lock.widget))
-                        onMoving: by => lock.widgetsDragShift = by
-                        onMoved: by => root.movePart("widgets", by, true)
-                        onStepped: by => root.movePart("widgets", by, false)
-                    }
                 }
             }
 
             EditorChrome {
                 id: chrome
-                extraHints: [{ keys: ["Shift", "←↑↓→"], label: "Move the clock or widgets" }]
+                extraHints: [{ keys: ["Shift", "←↑↓→"], label: "Move the part" }]
                 tabs: [
                     { value: "looks", label: "Looks" },
                     { value: "clock", label: "Clock" },
@@ -203,25 +146,37 @@ Scope {
                                     fill: 0.5
                                     // Placed by its shrunk size, like the look's place on the screen.
                                     transformOrigin: Item.TopLeft
-                                    x: look.values.lockLayout === "left" ? look.width * 0.08 : (look.width - width * scale) / 2
-                                    y: look.values.lockLayout === "top" ? look.height * 0.12
-                                       : look.values.lockLayout === "center" ? (look.height - height * scale) / 2 : look.height * 0.88 - height * scale
+                                    // And moved where the look drags it.
+                                    readonly property var place: LockClockJs.placeOf(look.values.lockPlaces, "clock", look.values)
+                                    x: (look.values.lockLayout === "left" ? look.width * 0.08 : (look.width - width * scale) / 2) + place.x * look.width
+                                    y: (look.values.lockLayout === "top" ? look.height * 0.12
+                                       : look.values.lockLayout === "center" ? (look.height - height * scale) / 2 : look.height * 0.88 - height * scale)
+                                       + place.y * look.height
                                 }
 
-                                // The look's widgets as small circles under the clock, moved like
-                                // the look moves them.
-                                Row {
-                                    readonly property var offset: look.values.lockWidgetsOffset ?? { x: 0, y: 0 }
+                                // The look's widgets as small circles under the clock (where the
+                                // clock's layout puts them), each moved where the look drags it.
+                                Item {
+                                    id: dots
                                     readonly property real dot: look.height * 0.07
-                                    x: (look.values.lockLayout === "left" ? mini.x : (look.width - width) / 2) + offset.x * look.width
-                                    y: Math.min(mini.y + mini.height * mini.scale + dot * 0.6 + offset.y * look.height, look.height - dot * 1.4)
-                                    spacing: dot * 0.4
+                                    readonly property var kinds: Array.from(look.values.lockWidgets ?? [])
+                                    readonly property real rowWidth: kinds.length * dot * 1.4 - dot * 0.4
+                                    readonly property real baseX: look.values.lockLayout === "left" ? look.width * 0.08 : (look.width - rowWidth) / 2
+                                    readonly property real baseY: Math.min((look.values.lockLayout === "top" ? look.height * 0.12
+                                        : look.values.lockLayout === "center" ? (look.height - mini.height * mini.scale) / 2
+                                        : look.height * 0.88 - mini.height * mini.scale) + mini.height * mini.scale + dot * 0.6, look.height - dot * 1.4)
+                                    anchors.fill: parent
 
                                     Repeater {
-                                        model: Array.from(look.values.lockWidgets ?? [])
+                                        model: dots.kinds
 
                                         Rectangle {
-                                            width: parent.dot
+                                            required property string modelData
+                                            required property int index
+                                            readonly property var place: LockClockJs.placeOf(look.values.lockPlaces, modelData, look.values)
+                                            x: dots.baseX + index * dots.dot * 1.4 + place.x * look.width
+                                            y: dots.baseY + place.y * look.height
+                                            width: dots.dot
                                             height: width
                                             radius: width / 2
                                             color: Colors.sketch
@@ -319,8 +274,7 @@ Scope {
                                     // A place starts without a move of its own.
                                     onPicked: v => {
                                         Settings.values.lockLayout = v;
-                                        Settings.values.lockClockOffset = null;
-                                        Settings.values.lockWidgetsOffset = null;
+                                        Settings.values.lockPlaces = null;
                                     }
                                 }
                         }

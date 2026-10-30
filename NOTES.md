@@ -442,6 +442,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   start; nothing else of the running shell is touched. One that uses `Notifications` logs that
   it couldn't register the notification server (the running shell has it): harmless, and its
   history is empty. Don't change `Settings.values` in it: the copy writes the real settings.json.
+- To try settings in a scratch copy without writing the real settings.json, set Settings'
+  `writable` to false in the copy (both places it's set in `onLoaded`/`onLoadFailed`), then
+  change `Settings.values` freely (verified 2026-10-30: the lock looks rendered one by one).
 - Measuring memory without touching the running shell: a scratch copy (`qs -p <copy>`, see
   above) with just the part to weigh, its proportional memory from
   `/proc/<pid>/smaps_rollup` (Pss) after a few seconds; compare against the same copy without

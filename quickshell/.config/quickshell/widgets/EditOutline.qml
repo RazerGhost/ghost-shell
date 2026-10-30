@@ -1,9 +1,10 @@
 import QtQuick
 import qs.theme
 
-// An outline around a part of the lock screen in the lock screen editor's card (`area`, in the
-// lock screen's own units), like an iOS lock screen being edited; its line is scaled back to the
-// usual width, and clicking it (or Enter) opens that part's tab (customize/LockEditor.qml).
+// An outline around a part of the lock screen in the lock screen editor's card (`area`, in its
+// parent's units: the part itself), like an iOS lock screen being edited; its line is scaled
+// back to the usual width, and clicking it (or Enter) opens that part's tab, if it has one
+// (customize/LockEditor.qml). Shown only while `sheet` (the editor's frame) is set.
 // Dragging it moves that part: `moving` while the pointer is down, then `moved` once let go, both
 // in the lock screen's own units; Shift + an arrow key steps it (`stepped`). The plain arrow
 // keys move on to the next control and Escape cancels, as everywhere in the editor: the card
@@ -15,8 +16,9 @@ Rectangle {
     property string name
     property bool shown
     property rect area
-    // The editor's frame, whose tab it shows and opens.
-    required property EditorChrome sheet
+    // The editor's frame (customize/EditorChrome.qml), whose tab it shows and opens; null
+    // outside the editor.
+    property var sheet: null
 
     // How far it's dragged from where the press began, in the lock screen's units.
     signal moving(point by)
@@ -25,7 +27,7 @@ Rectangle {
     // An arrow key's step (`by`): glided to, not dragged.
     signal stepped(point by)
 
-    visible: shown
+    visible: shown && sheet !== null
     x: area.x - Theme.spacing.m
     y: area.y - Theme.spacing.m
     width: area.width + Theme.spacing.m * 2
@@ -33,18 +35,23 @@ Rectangle {
     radius: Theme.radius.l
     color: hover.hovered || drag.active ? Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, Theme.state.hover)
                                       : "transparent"
-    border.width: Theme.outline.normal / sheet.cardScale
-    border.color: sheet.tab === tab || activeFocus ? Colors.m3primary
+    border.width: Theme.outline.normal / (sheet?.cardScale ?? 1)
+    border.color: (tab !== "" && sheet?.tab === tab) || activeFocus ? Colors.m3primary
                 : Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, 0.5)
 
     Accessible.role: Accessible.Button
     Accessible.name: name
     Accessible.description: "Drag it, or Shift and the arrow keys, to move it"
-    Accessible.onPressAction: sheet.tab = tab
+    Accessible.onPressAction: openTab()
     activeFocusOnTab: true
-    Keys.onSpacePressed: sheet.tab = tab
-    Keys.onReturnPressed: sheet.tab = tab
-    Keys.onEnterPressed: sheet.tab = tab
+    Keys.onSpacePressed: openTab()
+    Keys.onReturnPressed: openTab()
+    Keys.onEnterPressed: openTab()
+
+    function openTab(): void {
+        if (tab !== "")
+            sheet.tab = tab;
+    }
     Keys.onEscapePressed: sheet.cancelled()
     Keys.onPressed: event => {
         const arrows = [Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down];
@@ -66,7 +73,7 @@ Rectangle {
     }
 
     TapHandler {
-        onTapped: outline.sheet.tab = outline.tab
+        onTapped: outline.openTab()
     }
 
     // The pointer's move on the screen in the lock screen's units: the card shows it scaled.

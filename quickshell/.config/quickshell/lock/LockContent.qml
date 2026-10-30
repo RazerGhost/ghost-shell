@@ -6,6 +6,7 @@ import qs.services
 import qs.theme
 import qs.widgets
 import "LockClock.js" as LockClockJs
+import "LockWidgets.js" as LockWidgets
 
 // What the lock screen shows on each monitor: the wallpaper blurred and darkened, a big clock
 // (LockClock.qml) and the date, and the password field. Lock.qml checks the password. The login
@@ -30,9 +31,6 @@ Item {
     property string face
     // Suspend, restart and shut down in the bottom right corner (the login screen).
     property bool powerButtons
-
-    // The clock, for the lock screen editor's outline around it (customize/LockEditor.qml).
-    readonly property Item clockItem: bigClock
 
     signal submitted(string password)
     // A key or a real pointer move: Lock.qml unlocks during the idle lock's grace period.
@@ -111,40 +109,69 @@ Item {
     // (the default), both together in the middle, or the clock in the bottom-left corner.
     readonly property string layout: LockClockJs.pick(Settings.values.lockLayout, LockClockJs.layouts)
 
-    // Moved from there by dragging in the lock screen editor, each on its own: the clock with
-    // its date (Settings' lockClockOffset) and the player and widgets under them
-    // (lockWidgetsOffset), as fractions of the screen, plus the drag going on (`dragShift`,
-    // `widgetsDragShift`, px, until it's let go). Each kept on the screen and off the password
-    // field with its hints (LockClock.clamped).
-    property point dragShift: Qt.point(0, 0)
-    property point widgetsDragShift: Qt.point(0, 0)
-    // A drag just let go is being saved (customize/LockEditor.qml): no glide meanwhile.
+    // The lock screen editor's frame (customize/EditorChrome.qml) while editing: each part shows
+    // an outline to drag (PartOutline.qml), and nothing here takes input; null on the real lock
+    // and login screens.
+    property var editor: null
+
+    // Every part has its own place, dragged in the editor (Settings' lockPlaces, fractions of the
+    // screen; LockClock.placeOf): the clock, the date, the player, each widget, the password
+    // field. `drags` holds a drag going on ({ part: point px }) until it's let go.
+    readonly property var parts: ["clock", "date", "player"].concat(LockWidgets.known).concat(["field"])
+    property var drags: ({})
+    // A drag just let go is being saved: no glide meanwhile.
     property bool settling: false
-    readonly property bool dragging: dragShift.x !== 0 || dragShift.y !== 0 || widgetsDragShift.x !== 0 || widgetsDragShift.y !== 0
-    readonly property var fieldArea: ({ x: fieldColumn.x + fieldShift, y: fieldColumn.y, width: fieldColumn.width,
-                                        height: fieldColumn.height + belowReserve })
-    readonly property var clockOffset: LockClockJs.offset(Settings.values.lockClockOffset)
-    readonly property var clockShift: clockShiftFor(clockOffset.x * width + dragShift.x, clockOffset.y * height + dragShift.y)
-    readonly property var widgetsOffset: LockClockJs.offset(Settings.values.lockWidgetsOffset)
-    readonly property var widgetsShift: widgetsShiftFor(widgetsOffset.x * width + widgetsDragShift.x,
-                                                        widgetsOffset.y * height + widgetsDragShift.y)
+    readonly property bool dragging: Object.keys(drags).length > 0
 
-    // What a moved part keeps clear of: the field with its hints, and the login screen's power
-    // buttons and the message line at the bottom when they show.
-    readonly property var keepClear: [fieldArea]
-        .concat(powerRow.visible ? [{ x: powerRow.x, y: powerRow.y, width: powerRow.width, height: powerRow.height }] : [])
+    // The field's own move, and where it ends up with its hints: what the other parts keep
+    // clear of, besides the login screen's power buttons and the message line at the bottom.
+    readonly property var fieldMove: shiftOf("field", fieldColumn)
+    readonly property var fieldArea: ({ x: fieldColumn.x + fieldShift + fieldMove.x, y: fieldColumn.y + fieldMove.y,
+                                        width: fieldColumn.width, height: fieldColumn.height + belowReserve })
+    readonly property var bottomRow: (powerRow.visible ? [{ x: powerRow.x, y: powerRow.y, width: powerRow.width, height: powerRow.height }] : [])
         .concat(messageLine.visible ? [{ x: messageLine.x, y: messageLine.y, width: messageLine.width, height: messageLine.height }] : [])
+    readonly property var keepClear: [fieldArea].concat(bottomRow)
 
-    // Where each ends up moved (dx, dy) px from its layout's place, clamped.
-    function clockShiftFor(dx: real, dy: real): var {
-        return LockClockJs.clamped({ x: clockColumn.x, y: clockColumn.y, width: clockColumn.width, height: statusSlot.y },
-                                   dx, dy, width, height, keepClear, Theme.spacing.l * 2, Theme.spacing.l);
+    // How far `item` (the part `name`) is moved from where the layout puts it: its saved place,
+    // plus `by` px (the drag going on unless given), kept on the screen and clear of the rest.
+    function shiftOf(name, item, by) {
+        // Read so a change around it is followed (mapToItem alone isn't).
+        for (let p = item; p && p !== root; p = p.parent)
+            void (p.x + p.y + p.width + p.height);
+        const field = name === "field";
+        const at = field ? Qt.point(fieldColumn.x + fieldShift, fieldColumn.y) : item.parent.mapToItem(root, item.x, item.y);
+        const place = LockClockJs.placeOf(Settings.values.lockPlaces, name, Settings.values);
+        const extra = by ?? drags[name] ?? Qt.point(0, 0);
+        return LockClockJs.clamped({ x: at.x, y: at.y, width: item.width, height: field ? item.height + belowReserve : item.height },
+                                   place.x * width + extra.x, place.y * height + extra.y, width, height,
+                                   field ? bottomRow : keepClear, Theme.spacing.l * 2, Theme.spacing.l);
     }
 
-    function widgetsShiftFor(dx: real, dy: real): var {
-        return LockClockJs.clamped({ x: clockColumn.x + statusSlot.x, y: clockColumn.y + statusSlot.y,
-                                     width: statusSlot.width, height: statusSlot.height },
-                                   dx, dy, width, height, keepClear, Theme.spacing.l * 2, Theme.spacing.l);
+    // The editor's drag of a part, followed until it's let go.
+    function dragPart(name: string, by: point): void {
+        const next = Object.assign({}, drags);
+        next[name] = by;
+        drags = next;
+    }
+
+    // A part moved `by` px: a drag let go (`dragged`: it already shows there) or an arrow key's
+    // step from its place (glided to). Saved where it ends up, as fractions of the screen. A drag
+    // of a few px is a click with a wobble, not a move.
+    function movePart(name: string, item: Item, by: point, dragged: bool): void {
+        const small = dragged && Math.hypot(by.x, by.y) < Theme.spacing.s;
+        // A step goes on from where it shows now (its saved place may be clamped further in).
+        const place = LockClockJs.placeOf(Settings.values.lockPlaces, name, Settings.values);
+        const now = shiftOf(name, item, Qt.point(0, 0));
+        const shift = shiftOf(name, item, dragged ? by
+                                                  : Qt.point(now.x - place.x * width + by.x, now.y - place.y * height + by.y));
+        settling = dragged;
+        const next = Object.assign({}, drags);
+        delete next[name];
+        drags = next;
+        if (!small)
+            Settings.values.lockPlaces = LockClockJs.withPlace(Settings.values.lockPlaces, name,
+                                                               { x: shift.x / width, y: shift.y / height }, Settings.values, parts);
+        Qt.callLater(() => settling = false);
     }
 
     states: [
@@ -187,13 +214,6 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.topMargin: parent.height * 0.18
-        // Glides to a new place (a look, the arrow keys); follows a drag at once.
-        transform: Translate {
-            x: root.clockShift.x
-            y: root.clockShift.y
-            Behavior on x { enabled: !root.dragging && !root.settling; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
-            Behavior on y { enabled: !root.dragging && !root.settling; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
-        }
         spacing: Theme.spacing.xs
 
         LockClock {
@@ -201,6 +221,9 @@ Item {
             x: clockColumn.place(this)
             visible: Settings.values.lockClock
             date: clock.date
+            transform: PartShift { content: root; name: "clock"; target: bigClock }
+
+            PartOutline { content: root; part: "clock"; target: bigClock; tab: "clock"; name: "The clock" }
         }
 
         Text {
@@ -213,18 +236,14 @@ Item {
             color: Colors.m3onSurfaceVariant
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.title
+            transform: PartShift { content: root; name: "date"; target: dateLine }
+
+            PartOutline { content: root; part: "date"; target: dateLine; tab: "clock"; name: "The date" }
         }
 
         Column {
             id: statusSlot
             x: clockColumn.place(this)
-            // Its own move, less the clock's (which moves the whole column).
-            transform: Translate {
-                x: root.widgetsShift.x - root.clockShift.x
-                y: root.widgetsShift.y - root.clockShift.y
-                Behavior on x { enabled: !root.dragging && !root.settling; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
-                Behavior on y { enabled: !root.dragging && !root.settling; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
-            }
             width: Theme.lock.fieldWidth
             topPadding: Theme.spacing.l * 2
         }
@@ -241,8 +260,15 @@ Item {
         anchors.bottomMargin: root.layout !== "top" ? parent.height * 0.2
             : Math.max(root.belowReserve, Math.min(parent.height * 0.2,
                        parent.height - clockColumn.y - clockColumn.height - Theme.spacing.l * 2 - height))
-        // In the bottom-left layout, moved right when a large clock reaches under it.
-        transform: Translate { x: root.fieldShift }
+        // In the bottom-left layout, moved right when a large clock reaches under it; and where
+        // it was dragged in the editor (glides there). No input while editing.
+        enabled: root.editor === null
+        transform: Translate {
+            x: root.fieldShift + root.fieldMove.x
+            y: root.fieldMove.y
+            Behavior on x { enabled: !root.dragging && !root.settling; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+            Behavior on y { enabled: !root.dragging && !root.settling; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+        }
         spacing: Theme.spacing.m
 
         // A wrong password shakes the field side to side, like most lock screens.
@@ -375,7 +401,7 @@ Item {
     // Under the field, hanging from it: the hints and "Wrong password" appear and go without
     // moving the field (in its column they pushed it up into the lines under the clock).
     Column {
-        transform: Translate { x: root.fieldShift }
+        transform: Translate { x: root.fieldShift + root.fieldMove.x; y: root.fieldMove.y }
         anchors.top: fieldColumn.bottom
         anchors.topMargin: Theme.spacing.m
         anchors.horizontalCenter: fieldColumn.horizontalCenter
@@ -442,8 +468,19 @@ Item {
         wrapMode: Text.Wrap
     }
 
+    // The field's outline in the editor: beside it (the field's column would lay it out).
+    PartOutline {
+        content: root
+        part: "field"
+        target: fieldColumn
+        tab: ""
+        name: "The password field"
+        area: Qt.rect(root.fieldArea.x, root.fieldArea.y, fieldColumn.width, fieldColumn.height)
+    }
+
     Row {
         id: powerRow
+        enabled: root.editor === null
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.margins: Theme.spacing.l * 2

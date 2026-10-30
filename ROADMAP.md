@@ -1377,6 +1377,30 @@ User's pick, measured on the laptop:
   drawing), so mostly shared. The layer only exists while a widget is on.
 - Nothing trimmed: no part costs more than what it shows.
 
+### Lock screen: every part on its own, the field too, a battery gauge (built 2026-10-30)
+User's requests:
+- Every part has its own place (user's picks: each widget, the player, the date apart from the
+  clock): the clock, the date, the player, each widget and the password field are dragged (or
+  moved with Shift + arrows) by their own outline in the lock screen editor, each kept on the
+  screen and clear of the field with its hints, the power buttons and the message line (the
+  field only of the bottom row). One setting, `lockPlaces` ({ part: { x, y } }, fractions);
+  until it's set the old two moves count (the clock's for the clock and date, the widgets' for
+  the player and widgets) and the first drag keeps them (`LockClock.placeOf`, `withPlace`,
+  tested). Picking a Place starts every part from it again.
+- How: a part moves itself (`lock/PartShift.qml`, a Translate that glides to a new place and
+  follows a drag) and draws its own outline as a child (`lock/PartOutline.qml` around
+  `widgets/EditOutline.qml`, moved there from customize/ since the lock module can't import
+  the editors'), only while `LockContent.editor` is set; the lock screen then takes no other
+  input. `LockStatus` gets the LockContent it's in (`lock`). The two outlines the editor drew
+  over the card, and its move functions, are gone.
+- The battery widget on the lock screen is a gauge like iOS's (user's choice): a thin ring
+  open at the bottom (`ProgressRing.span`), the percentage in the middle, the battery or a
+  bolt in the gap.
+- Looks: two new ones that use the parts' places, Corner (a thin clock and the date top left,
+  the widgets top right with the player under them) and Flanked (a bold clock with the weather
+  and battery on either side), and Split moves its player and each widget. Each look was
+  checked on the real lock screen (a scratch copy whose settings aren't written).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

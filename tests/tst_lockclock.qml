@@ -54,4 +54,20 @@ TestCase {
         // At the bottom left, beside them: down to the bottom margin (1080 - 32 - 200 = 848).
         compare(LockClock.clamped(rect, -700, 800, 1920, 1080, [field, buttons], 32, 24), { x: -700, y: 648 });
     }
+
+    function test_places() {
+        const old = { lockClockOffset: { x: 0.1, y: 0 }, lockWidgetsOffset: { x: 0.5, y: 0.2 } };
+        // Before lockPlaces: the clock's move for the clock and date, the widgets' for the rest.
+        compare(LockClock.placeOf(null, "date", old), { x: 0.1, y: 0 });
+        compare(LockClock.placeOf(null, "weather", old), { x: 0.5, y: 0.2 });
+        compare(LockClock.placeOf(null, "field", old), { x: 0, y: 0 });
+        // Once set, each part on its own; one never moved stays put.
+        compare(LockClock.placeOf({ clock: { x: 0.2, y: 0.1 } }, "clock", old), { x: 0.2, y: 0.1 });
+        compare(LockClock.placeOf({ clock: { x: 0.2, y: 0.1 } }, "date", old), { x: 0, y: 0 });
+        // The first move keeps the others where the old moves had them.
+        const places = LockClock.withPlace(null, "weather", { x: 0.3, y: 0.3 }, old, ["clock", "date", "player", "weather", "field"]);
+        compare(places, { clock: { x: 0.1, y: 0 }, date: { x: 0.1, y: 0 }, player: { x: 0.5, y: 0.2 }, weather: { x: 0.3, y: 0.3 } });
+        compare(LockClock.withPlace(places, "field", { x: 0, y: -0.1 }, old, ["clock", "field"]),
+                { clock: { x: 0.1, y: 0 }, field: { x: 0, y: -0.1 } });
+    }
 }

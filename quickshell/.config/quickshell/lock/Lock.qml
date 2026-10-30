@@ -51,6 +51,7 @@ Scope {
                 }
 
                 LockStatus {
+                    lock: content
                     width: parent.width
                 }
 
@@ -163,12 +164,14 @@ Scope {
             }
 
             LockContent {
+                id: previewContent
                 anchors.fill: parent
                 wallpaper: root.wallpaper
                 message: "Preview: nothing is locked"
                 onSubmitted: preview.active = false
 
                 LockStatus {
+                    lock: previewContent
                     width: parent.width
                 }
             }

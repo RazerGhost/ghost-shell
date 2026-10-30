@@ -53,34 +53,34 @@ Surface {
         }
     }
 
+    // The battery as a gauge, like iOS's: a thin ring open at the bottom filling with the charge,
+    // the percentage in the middle, the battery (or a bolt while charging) in the gap.
     ProgressRing {
         anchors.fill: parent
         anchors.margins: Theme.spacing.s
         visible: root.kind === "battery"
         value: Battery.level
+        span: 270
         color: Battery.low ? Colors.m3error : Colors.m3onSurface
-        lineWidth: Theme.lock.ringWidth
+        lineWidth: Theme.lock.gaugeWidth
 
-        Column {
+        Text {
             anchors.centerIn: parent
+            text: Math.round(Battery.level * 100)
+            color: Colors.m3onSurface
+            font.family: Theme.font.sans
+            font.pixelSize: Theme.font.large
+            font.weight: Font.DemiBold
+            font.features: { "tnum": 1 }
+        }
 
-            MaterialIcon {
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: Battery.charging
-                icon: "bolt"
-                color: Colors.m3onSurfaceVariant
-                font.pixelSize: Theme.icon.small
-            }
-
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: Math.round(Battery.level * 100)
-                color: Colors.m3onSurface
-                font.family: Theme.font.sans
-                font.pixelSize: Theme.font.large
-                font.weight: Font.DemiBold
-                font.features: { "tnum": 1 }
-            }
+        MaterialIcon {
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: -Theme.spacing.xs
+            icon: Battery.charging ? "bolt" : "battery_android_full"
+            color: Battery.low ? Colors.m3error : Colors.m3onSurfaceVariant
+            font.pixelSize: Theme.icon.small
         }
     }
 

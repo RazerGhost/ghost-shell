@@ -7,24 +7,27 @@ import "LockWidgets.js" as LockWidgets
 
 // Under the clock on the lock screen (not the login screen): the media player, like the
 // island's small one, and a row of round widgets, like iOS's (LockWidget.qml: weather, battery,
-// notifications, to-dos, the next event), both picked in the lock screen editor.
+// notifications, to-dos, the timer, the next event), picked in the lock screen editor. The
+// player and each widget have their own place there, dragged like the clock (PartShift.qml).
 Column {
     id: root
+
+    // The LockContent it's under (its places and the editor's outlines).
+    required property Item lock
 
     // Not the battery on a machine without one.
     readonly property var widgets: LockWidgets.shown(Settings.values.lockWidgets, Settings.values)
         .filter(id => id !== "battery" || Battery.present)
-    // What it covers across (the lock screen editor outlines it): the row of widgets can be wider
-    // than the column, or narrower without the player.
-    readonly property real contentX: media.visible ? Math.min(0, row.x) : row.x
-    readonly property real contentWidth: media.visible ? Math.max(width, row.width) : row.width
-
     spacing: Theme.spacing.l
 
     MediaCard {
         id: media
         width: parent.width
         visible: Settings.values.lockMedia && player !== null
+        enabled: root.lock.editor === null
+        transform: PartShift { content: root.lock; name: "player"; target: media }
+
+        PartOutline { content: root.lock; part: "player"; target: media; tab: "widgets"; name: "The player" }
     }
 
     Row {
@@ -37,8 +40,19 @@ Column {
             model: root.widgets
 
             LockWidget {
+                id: widget
                 required property string modelData
                 kind: modelData
+                transform: PartShift { content: root.lock; name: widget.modelData; target: widget }
+
+                PartOutline {
+                    content: root.lock
+                    part: widget.modelData
+                    target: widget
+                    tab: "widgets"
+                    name: "The " + widget.modelData + " widget"
+                    radius: height / 2
+                }
             }
         }
     }

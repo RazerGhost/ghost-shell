@@ -52,3 +52,29 @@ function clamped(rect, dx, dy, sw, sh, fields, margin, gap) {
     }
     return { x: x - rect.x, y: y - rect.y };
 }
+
+// Where each part of the lock screen was dragged (Settings' lockPlaces: { clock: { x, y }, date,
+// player, weather, ..., field }, fractions of the screen), each on its own. Before lockPlaces
+// there were two moves: the clock's (lockClockOffset, for the clock and the date) and the
+// widgets' (lockWidgetsOffset, for the player and each widget); `values` (the settings) gives
+// those while lockPlaces isn't set.
+function placeOf(places, name, values) {
+    if (places !== null && typeof places === "object" && !Array.isArray(places))
+        return offset(places[name]);
+    if (name === "field")
+        return offset(null);
+    return offset(name === "clock" || name === "date" ? values?.lockClockOffset : values?.lockWidgetsOffset);
+}
+
+// The places with `name` at `place`: a new object (so the setting's change is seen). The first
+// time, every part in `names` keeps where the old two moves had it.
+function withPlace(places, name, place, values, names) {
+    const out = {};
+    for (const part of names) {
+        const at = placeOf(places, part, values);
+        if (at.x !== 0 || at.y !== 0)
+            out[part] = at;
+    }
+    out[name] = { x: place.x, y: place.y };
+    return out;
+}

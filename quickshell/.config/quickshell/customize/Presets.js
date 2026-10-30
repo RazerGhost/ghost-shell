@@ -10,19 +10,30 @@ const clockLook = (style, layout, size, font, blur, dim) => ({ lockClockStyle: s
                                                               lockClockFont: font, lockBlur: blur, lockDim: dim });
 const lock = [
     { name: "Classic", values: Object.assign(clockLook("big", "top", 100, "", 100, 25),
-        { lockWidgets: ["weather", "battery", "notifications"], lockClockOffset: null, lockWidgetsOffset: null }) },
+        { lockWidgets: ["weather", "battery", "notifications"], lockPlaces: null }) },
     { name: "Minimal", values: Object.assign(clockLook("thin", "center", 100, "", 100, 40),
-        { lockWidgets: [], lockClockOffset: null, lockWidgetsOffset: null }) },
+        { lockWidgets: [], lockPlaces: null }) },
     { name: "Analog", values: Object.assign(clockLook("analog", "left", 100, "", 60, 30),
-        { lockWidgets: ["weather", "notifications"], lockClockOffset: null, lockWidgetsOffset: null }) },
+        { lockWidgets: ["weather", "notifications"], lockPlaces: null }) },
     { name: "Bold", values: Object.assign(clockLook("stacked", "top", 125, "Inter Display", 100, 25),
-        { lockWidgets: ["weather", "battery", "notifications", "todo"], lockClockOffset: null, lockWidgetsOffset: null }) },
+        { lockWidgets: ["weather", "battery", "notifications", "todo"], lockPlaces: null }) },
     { name: "Editorial", values: Object.assign(clockLook("big", "center", 125, "C059", 80, 35),
-        { lockWidgets: ["weather"], lockClockOffset: null, lockWidgetsOffset: null }) },
+        { lockWidgets: ["weather"], lockPlaces: null }) },
     // The clock in the bottom-left corner, the widgets apart from it to the right.
     { name: "Split", values: Object.assign(clockLook("big", "left", 100, "", 100, 30),
-        { lockWidgets: ["weather", "battery", "notifications", "timer"], lockClockOffset: null,
-          lockWidgetsOffset: { x: 0.6, y: 0 } }) }
+        { lockWidgets: ["weather", "battery", "notifications", "timer"],
+          lockPlaces: { player: { x: 0.6, y: 0 }, weather: { x: 0.6, y: 0 }, battery: { x: 0.6, y: 0 },
+                        notifications: { x: 0.6, y: 0 }, timer: { x: 0.6, y: 0 } } }) },
+    // A thin clock and the date in the top-left corner, the widgets across from them on the right.
+    { name: "Corner", values: Object.assign(clockLook("thin", "top", 100, "", 100, 35),
+        { lockWidgets: ["weather", "battery", "notifications"],
+          lockPlaces: { clock: { x: -0.36, y: -0.08 }, date: { x: -0.36, y: -0.08 },
+                        player: { x: 0.33, y: -0.16 }, weather: { x: 0.36, y: -0.39 }, battery: { x: 0.36, y: -0.39 },
+                        notifications: { x: 0.36, y: -0.39 } } }) },
+    // A bold clock in the middle, the weather and the battery on either side of it.
+    { name: "Flanked", values: Object.assign(clockLook("big", "top", 125, "Inter Display", 100, 30),
+        { lockWidgets: ["weather", "battery"],
+          lockPlaces: { weather: { x: -0.17, y: -0.24 }, battery: { x: 0.17, y: -0.24 } } }) }
 ];
 
 // The desktop's style, over your wallpaper, accent and widgets: the glass, blur, corners and how
@@ -85,7 +96,7 @@ const windows = [
 ];
 
 // Every setting the lock screen editor changes, for its Cancel.
-const lockKeys = ["lockClockStyle", "lockLayout", "lockClockOffset", "lockWidgetsOffset", "lockClockSize", "lockClockFont", "lockBlur", "lockDim",
+const lockKeys = ["lockClockStyle", "lockLayout", "lockPlaces", "lockClockSize", "lockClockFont", "lockBlur", "lockDim",
                   "lockWallpaper", "lockClock", "lockDate", "lockWidgets", "lockMedia", "lockLooks"];
 
 // Every setting the desktop editor changes, for its Cancel (the wallpaper is put back apart:
