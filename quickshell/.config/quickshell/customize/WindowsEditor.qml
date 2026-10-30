@@ -242,9 +242,9 @@ Scope {
 
                     Repeater {
                         model: [
-                            { key: "borderSpin", title: "Turning border", subtitle: "Its colors go round; redraws all the time, so it costs battery" },
-                            { key: "windowGlow", title: "Glow", subtitle: "A soft glow in your accent inside the focused window's edge" },
-                            { key: "windowKindBorders", title: "Floating and pinned windows stand out", subtitle: "Their borders in other colors of yours" }
+                            { key: "borderSpin", title: "Turning border", subtitle: "Costs battery: redraws all the time" },
+                            { key: "windowGlow", title: "Glow", subtitle: "In your accent, on the focused window" },
+                            { key: "windowKindBorders", title: "Floating and pinned windows stand out", subtitle: "Their borders in other colors" }
                         ]
 
                         SheetItem {
@@ -345,7 +345,7 @@ Scope {
 
                     SheetItem {
                         title: "Wobbly windows"
-                        subtitle: "They wobble like jelly while you move or resize them"
+                        subtitle: "While moving or resizing"
 
                         Switch {
                             label: "Wobbly windows"

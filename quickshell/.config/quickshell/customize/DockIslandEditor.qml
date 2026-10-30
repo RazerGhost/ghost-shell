@@ -96,7 +96,7 @@ Scope {
                         model: [
                             { key: "clockDate", title: "The day next to the time", subtitle: "Thu 29  14:32" },
                             { key: "clockSeconds", title: "Seconds", subtitle: "" },
-                            { key: "islandMedia", title: "Music takes the clock's place", subtitle: "Its cover while it plays; hover it for the time" }
+                            { key: "islandMedia", title: "Music takes the clock's place", subtitle: "Its cover while playing" }
                         ]
 
                         SheetItem {
@@ -230,13 +230,9 @@ Scope {
                         }
                     }
 
-                    Text {
-                        width: Theme.editor.subtitle * 1.5
-                        text: "Right-click an app in the dock to pin it, unpin it or move it left or right."
-                        color: Colors.m3onSurfaceVariant
-                        font.family: Theme.font.sans
-                        font.pixelSize: Theme.font.small
-                        wrapMode: Text.Wrap
+                    SheetItem {
+                        title: "Pinned apps"
+                        subtitle: "Right-click an app in the dock to pin, unpin or move it"
                     }
                 }
             }
