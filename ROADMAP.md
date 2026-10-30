@@ -1021,6 +1021,11 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   (`OptionChip.qml`; the sheet itself shows the blur), a corner sample; Size and text: sample
   text with the two sizes, the fonts as "Aa" chips, the icon theme. Equal heights also keep
   the card above from jumping between these tabs.
+- Lock screen fix (user's find): a wrong password's message, in the field's column (anchored
+  at its bottom), pushed the field up into the lines under the clock. The hints and messages
+  now hang below the field in their own column, and in the top layout the field keeps a gap
+  below the clock's column, moving down when a large clock with media and status lines reaches
+  that far.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

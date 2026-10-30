@@ -177,7 +177,11 @@ Item {
         id: fieldColumn
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: parent.height * 0.2
+        // A fifth of the way up; lower when the clock and the lines under it (a large clock,
+        // media, weather, battery) reach down that far, so they never overlap.
+        anchors.bottomMargin: root.layout !== "top" ? parent.height * 0.2
+            : Math.max(Theme.spacing.l * 2, Math.min(parent.height * 0.2,
+                       parent.height - clockColumn.y - clockColumn.height - Theme.spacing.l * 2 - height))
         spacing: Theme.spacing.m
 
         // A wrong password shakes the field side to side, like most lock screens.
@@ -296,6 +300,15 @@ Item {
                 }
             }
         }
+    }
+
+    // Under the field, hanging from it: the hints and "Wrong password" appear and go without
+    // moving the field (in its column they pushed it up into the lines under the clock).
+    Column {
+        anchors.top: fieldColumn.bottom
+        anchors.topMargin: Theme.spacing.m
+        anchors.horizontalCenter: fieldColumn.horizontalCenter
+        spacing: Theme.spacing.m
 
         // Hints while typing: caps lock, and the layout when there's more than one to switch to.
         Row {
