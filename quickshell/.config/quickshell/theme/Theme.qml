@@ -275,6 +275,9 @@ Singleton {
         readonly property int clockCard: root.px(132) // the lock screen editor's clock style and font cards
         readonly property int slider: root.px(240)    // a slider's width in a sheet
         readonly property int pictureCard: root.px(160) // the lock screen editor's pictures
+        readonly property int tile: root.px(200)      // an editor tile's height (SheetTile.qml)
+        readonly property int fontChip: root.px(56)   // a font's chip, "Aa" over its name
+        readonly property int label: root.px(40)      // a short label before a control in a tile
         readonly property int sample: root.px(360) // the windows editor's sample window
     }
 

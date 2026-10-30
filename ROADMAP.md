@@ -1011,6 +1011,16 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   review of all tabs): every setting's header keeps a line for its subtitle (one line, cut
   short), so the controls in a row start at the same height; a row that fits is centered in
   the sheet; glass's switch and solidity are one setting; the widget cards are larger.
+- Tiles (user: "really look into how the UI should be designed"): the desktop editor's Widgets,
+  Style, and Size and text tabs are rows of equal-height tiles filling the sheet
+  (`customize/SheetTiles.qml`, `SheetTile.qml`; widths by weight), like Android's
+  "Wallpaper & style" and macOS's Control Center modules: each tile has its title, a short
+  note and an optional switch at the top, and a live preview with its control below. Widgets:
+  a small copy of each widget (dimmed while off, click toggles) and a Places tile; Style: a
+  panel at the glass setting over your wallpaper with its slider, the blur styles as chips
+  (`OptionChip.qml`; the sheet itself shows the blur), a corner sample; Size and text: sample
+  text with the two sizes, the fonts as "Aa" chips, the icon theme. Equal heights also keep
+  the card above from jumping between these tabs.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

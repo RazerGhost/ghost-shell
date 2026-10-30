@@ -256,47 +256,72 @@ Scope {
                     }
                 }
 
-                // Widgets: on or off; while this editor is open their handles show.
-                SheetGrid {
+                // Widgets: a tile per widget with a look at it and its switch, and their places.
+                SheetTiles {
                     visible: chrome.tab === "widgets"
 
-                    // On/off cards with a small look at each, like the iOS widget gallery.
-                    ChoiceCards {
-                        title: "Widgets"
-                        subtitle: "Click to show or hide; drag one on the desktop by its handle"
-                        cardWidth: Theme.editor.pictureCard
-                        options: [
-                            { value: "desktopClock", label: "Clock" },
-                            { value: "desktopWeather", label: "Weather" },
-                            { value: "desktopMedia", label: "Media, while playing" }
+                    Repeater {
+                        model: [
+                            { key: "desktopClock", title: "Clock", subtitle: "The time and date" },
+                            { key: "desktopWeather", title: "Weather", subtitle: "Today's, for your town" },
+                            { key: "desktopMedia", title: "Media", subtitle: "While something plays" }
                         ]
-                        chosenValues: ["desktopClock", "desktopWeather", "desktopMedia"].filter(k => Settings.values[k])
-                        onPicked: v => Settings.values[v] = !Settings.values[v]
-                        art: Component {
-                            Rectangle {
-                                readonly property string kind: parent.option.value
-                                color: Colors.m3surfaceContainerHighest
 
-                                Text {
+                        SheetTile {
+                            id: widgetTile
+
+                            required property var modelData
+                            readonly property bool on: Settings.values[modelData.key]
+
+                            title: modelData.title
+                            subtitle: modelData.subtitle
+                            action: Switch {
+                                label: widgetTile.modelData.title + " on the desktop"
+                                checked: widgetTile.on
+                                onToggled: Settings.values[widgetTile.modelData.key] = !checked
+                            }
+
+                            // A small copy of the widget, dimmed while it's off; clicking toggles.
+                            Surface {
+                                anchors.centerIn: parent
+                                width: Math.min(parent.width, Theme.desktop.width * 0.7)
+                                height: parent.height
+                                radius: Theme.radius.l
+                                opacity: widgetTile.on ? 1 : Theme.state.disabled
+                                Behavior on opacity { NumberAnimation { duration: Theme.anim.fast } }
+
+                                Column {
                                     anchors.centerIn: parent
-                                    visible: parent.kind === "desktopClock"
-                                    text: "10:09"
-                                    color: Colors.m3onSurface
-                                    font.family: Theme.font.sans
-                                    font.pixelSize: parent.height * 0.32
-                                    font.weight: Font.Bold
+                                    visible: widgetTile.modelData.key === "desktopClock"
+
+                                    Text {
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        text: "10:09"
+                                        color: Colors.m3onSurface
+                                        font.family: Theme.font.sans
+                                        font.pixelSize: Theme.font.title * 1.6
+                                        font.weight: Font.Bold
+                                    }
+
+                                    Text {
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        text: "Thursday, 29 October"
+                                        color: Colors.m3onSurfaceVariant
+                                        font.family: Theme.font.sans
+                                        font.pixelSize: Theme.font.small
+                                    }
                                 }
 
                                 Row {
                                     anchors.centerIn: parent
-                                    visible: parent.kind === "desktopWeather"
-                                    spacing: Theme.spacing.xs
+                                    visible: widgetTile.modelData.key === "desktopWeather"
+                                    spacing: Theme.spacing.s
 
                                     MaterialIcon {
                                         anchors.verticalCenter: parent.verticalCenter
                                         icon: Weather.current?.icon ?? "partly_cloudy_day"
                                         color: Colors.m3primary
-                                        font.pixelSize: Theme.icon.normal * 1.4
+                                        font.pixelSize: Theme.font.title * 1.6
                                     }
 
                                     Text {
@@ -304,83 +329,188 @@ Scope {
                                         text: (Weather.current?.temperature ?? 18) + "°"
                                         color: Colors.m3onSurface
                                         font.family: Theme.font.sans
-                                        font.pixelSize: Theme.font.title
+                                        font.pixelSize: Theme.font.title * 1.4
                                         font.weight: Font.DemiBold
                                     }
                                 }
 
-                                MaterialIcon {
+                                Row {
                                     anchors.centerIn: parent
-                                    visible: parent.kind === "desktopMedia"
-                                    icon: "music_note"
-                                    color: Colors.m3primary
-                                    font.pixelSize: Theme.icon.normal * 1.6
+                                    visible: widgetTile.modelData.key === "desktopMedia"
+                                    spacing: Theme.spacing.m
+
+                                    Rectangle {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: Theme.icon.normal * 2
+                                        height: width
+                                        radius: Theme.radius.s
+                                        color: Colors.m3primaryContainer
+
+                                        MaterialIcon {
+                                            anchors.centerIn: parent
+                                            icon: "music_note"
+                                            color: Colors.m3onPrimaryContainer
+                                        }
+                                    }
+
+                                    Row {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: Theme.spacing.xs
+
+                                        Repeater {
+                                            model: ["skip_previous", "play_arrow", "skip_next"]
+
+                                            MaterialIcon {
+                                                required property string modelData
+                                                icon: modelData
+                                                color: Colors.m3onSurfaceVariant
+                                            }
+                                        }
+                                    }
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: Settings.values[widgetTile.modelData.key] = !widgetTile.on
                                 }
                             }
                         }
                     }
 
-                    SheetItem {
+                    SheetTile {
                         title: "Places"
-                        subtitle: "Where you dragged them"
+                        subtitle: "Drag a widget by its handle"
 
-                        TextButton {
-                            text: "Back to the start"
-                            enabled: Object.keys(Settings.values.desktopWidgets ?? {}).length > 0
-                            onClicked: Settings.values.desktopWidgets = ({})
+                        Column {
+                            anchors.centerIn: parent
+                            spacing: Theme.spacing.m
+
+                            MaterialIcon {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                icon: "drag_pan"
+                                color: Colors.m3onSurfaceVariant
+                                font.pixelSize: Theme.font.title * 1.6
+                            }
+
+                            TextButton {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "Put them back"
+                                enabled: Object.keys(Settings.values.desktopWidgets ?? {}).length > 0
+                                onClicked: Settings.values.desktopWidgets = ({})
+                            }
                         }
                     }
                 }
 
-                // Style: the shell's panels (glass and its blur) and corners.
-                SheetGrid {
+                // Style: the glass (a panel over your wallpaper shows it), the blur styles (this
+                // sheet shows them) and the corners (a sample shows them).
+                SheetTiles {
                     visible: chrome.tab === "style"
 
-                    // Glass on or off, and how solid it is, as one.
-                    SheetItem {
-                        title: "Glass  ·  " + (Settings.values.glass ? Settings.values.glassOpacity + " % solid" : "Off")
-                        subtitle: "See-through panels with a thin light edge"
+                    SheetTile {
+                        title: "Glass"
+                        subtitle: Settings.values.glass ? Settings.values.glassOpacity + " % solid" : "Off: panels nearly solid"
+                        weight: 1.2
+                        action: Switch {
+                            label: "Glass panels"
+                            checked: Settings.values.glass
+                            onToggled: Settings.values.glass = !checked
+                        }
 
-                        Row {
-                            spacing: Theme.spacing.m
+                        ClippingRectangle {
+                            anchors.top: parent.top
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.bottom: glassSlider.top
+                            anchors.bottomMargin: Theme.spacing.s
+                            radius: Theme.radius.m
+                            color: Colors.m3surfaceContainerHighest
 
-                            Switch {
-                                anchors.verticalCenter: parent.verticalCenter
-                                label: "Glass panels"
-                                checked: Settings.values.glass
-                                onToggled: Settings.values.glass = !checked
+                            Image {
+                                anchors.fill: parent
+                                source: Wallpaper.stillPath ? "file://" + Wallpaper.stillPath : ""
+                                fillMode: Image.PreserveAspectCrop
+                                sourceSize.width: width * 2
+                                asynchronous: true
                             }
 
-                            LevelSlider {
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: Theme.editor.slider
-                                enabled: Settings.values.glass
-                                opacity: enabled ? 1 : Theme.state.disabled
-                                icon: "opacity"
-                                label: "How solid the glass is"
-                                value: (Settings.values.glassOpacity - 20) / 65
-                                onMoved: v => Settings.values.glassOpacity = 20 + Math.round(v * 13) * 5
+                            // A panel like the island's menus, at the glass setting.
+                            Surface {
+                                anchors.centerIn: parent
+                                width: parent.width * 0.6
+                                height: parent.height * 0.6
+                                radius: Theme.radius.m
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "Panel"
+                                    color: Colors.m3onSurface
+                                    font.family: Theme.font.sans
+                                    font.pixelSize: Theme.font.normal
+                                }
                             }
+                        }
+
+                        LevelSlider {
+                            id: glassSlider
+                            anchors.bottom: parent.bottom
+                            width: parent.width
+                            enabled: Settings.values.glass
+                            opacity: enabled ? 1 : Theme.state.disabled
+                            icon: "opacity"
+                            label: "How solid the glass is"
+                            value: (Settings.values.glassOpacity - 20) / 65
+                            onMoved: v => Settings.values.glassOpacity = 20 + Math.round(v * 13) * 5
                         }
                     }
 
-                    SheetItem {
+                    SheetTile {
                         title: "Blur"
-                        subtitle: "Behind the glass, menus and see-through windows"
+                        subtitle: "Behind glass and menus: this sheet shows it"
+                        weight: 1.2
 
-                        Segmented {
-                            options: HyprlandConfig.blurStyles.map(v => ({ value: v, label: ({ kawase: "Classic", frost: "Frost", acrylic: "Acrylic", prism: "Prism",
-                                                                                                aurora: "Aurora", haze: "Haze" })[v] ?? v }))
-                            current: HyprlandConfig.blurStyle(Settings.values.blurStyle)
-                            onPicked: v => Settings.values.blurStyle = v
+                        Grid {
+                            anchors.centerIn: parent
+                            width: parent.width
+                            columns: 3
+                            spacing: Theme.spacing.s
+
+                            Repeater {
+                                model: HyprlandConfig.blurStyles
+
+                                OptionChip {
+                                    required property string modelData
+                                    width: (parent.width - parent.spacing * 2) / 3
+                                    text: ({ kawase: "Classic", frost: "Frost", acrylic: "Acrylic", prism: "Prism",
+                                             aurora: "Aurora", haze: "Haze" })[modelData] ?? modelData
+                                    chosen: HyprlandConfig.blurStyle(Settings.values.blurStyle) === modelData
+                                    onClicked: Settings.values.blurStyle = modelData
+                                }
+                            }
                         }
                     }
 
-                    SheetItem {
+                    SheetTile {
                         title: "Corners"
-                        subtitle: "The shell's own"
+                        subtitle: "The shell's panels and buttons"
+
+                        // A panel's corner at the setting.
+                        Rectangle {
+                            anchors.top: parent.top
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.bottom: cornerChoice.top
+                            anchors.bottomMargin: Theme.spacing.s
+                            width: parent.width * 0.55
+                            radius: Theme.radius.l * 1.5
+                            color: Colors.m3primaryContainer
+                            Behavior on radius { NumberAnimation { duration: Theme.anim.normal } }
+                        }
 
                         Segmented {
+                            id: cornerChoice
+                            anchors.bottom: parent.bottom
+                            anchors.horizontalCenter: parent.horizontalCenter
                             options: ThemeScale.corners.map(v => ({ value: v, label: ({ 0: "Square", 0.5: "Less", 1: "Round", 1.5: "More" })[v] }))
                             current: Theme.cornerScale
                             onPicked: v => Settings.values.cornerScale = v
@@ -388,66 +518,101 @@ Scope {
                     }
                 }
 
-                // Size and text: the shell's size, its text, the fonts and the icons.
-                SheetGrid {
+                // Size and text: the shell's size and its text (a sample shows them), the font
+                // (each in itself) and the icon theme.
+                SheetTiles {
                     visible: chrome.tab === "text"
 
-                    // The shell's size and its text, stacked.
-                    Column {
-                        spacing: Theme.spacing.m
+                    SheetTile {
+                        title: "Size"
+                        subtitle: "The shell, and its text on top"
+                        weight: 1.3
 
-                        SheetItem {
-                            title: "Shell size"
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width
+                            spacing: Theme.spacing.s
 
-                            Segmented {
-                                options: ThemeScale.sizes.map(v => ({ value: v, label: Math.round(v * 100) + " %" }))
-                                current: Theme.scale
-                                onPicked: v => Settings.values.uiScale = v
+                            Text {
+                                width: parent.width
+                                text: "The island, menus and dock"
+                                color: Colors.m3onSurface
+                                font.family: Theme.font.sans
+                                font.pixelSize: Theme.font.large
+                                elide: Text.ElideRight
                             }
-                        }
 
-                        SheetItem {
-                            title: "Text size"
+                            Repeater {
+                                model: [
+                                    { label: "Shell", values: ThemeScale.sizes, current: Theme.scale, key: "uiScale" },
+                                    { label: "Text", values: ThemeScale.textSizes, current: Theme.textScale, key: "textScale" }
+                                ]
 
-                            Segmented {
-                                options: ThemeScale.textSizes.map(v => ({ value: v, label: Math.round(v * 100) + " %" }))
-                                current: Theme.textScale
-                                onPicked: v => Settings.values.textScale = v
-                            }
-                        }
-                    }
+                                Row {
+                                    id: sizeRow
+                                    required property var modelData
+                                    spacing: Theme.spacing.m
 
-                    ChoiceCards {
-                        title: "Font"
-                        options: ["Inter", "Adwaita Sans", "Cantarell", "Noto Sans", "Open Sans", "Roboto",
-                                  "IBM Plex Sans", "Fira Sans", "Ubuntu", "DejaVu Sans"]
-                            .filter(f => Qt.fontFamilies().includes(f)).map(f => ({ value: f, label: f }))
-                        current: Theme.font.sans
-                        onPicked: v => Settings.values.fontSans = v === "Inter" ? "" : v
-                        art: Component {
-                            Rectangle {
-                                color: Colors.m3surfaceContainerHighest
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        width: Theme.editor.label
+                                        text: sizeRow.modelData.label
+                                        color: Colors.m3onSurfaceVariant
+                                        font.family: Theme.font.sans
+                                        font.pixelSize: Theme.font.small
+                                    }
 
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "Aa"
-                                    color: Colors.m3onSurface
-                                    font.family: parent.parent.option.value
-                                    font.pixelSize: parent.height * 0.45
+                                    Segmented {
+                                        options: sizeRow.modelData.values.map(v => ({ value: v, label: Math.round(v * 100) + " %" }))
+                                        current: sizeRow.modelData.current
+                                        onPicked: v => Settings.values[sizeRow.modelData.key] = v
+                                    }
                                 }
                             }
                         }
                     }
 
-                    // The icon theme, and restarting for the shell's own icons, stacked.
-                    Column {
-                        spacing: Theme.spacing.m
+                    SheetTile {
+                        title: "Font"
+                        subtitle: "The shell's menus, island and Settings"
+                        weight: 2
 
-                        SheetItem {
-                            title: "Icons"
-                            subtitle: "Apps' icons; the shell's own (dock, launcher) after it restarts"
+                        Grid {
+                            id: fontGrid
+                            readonly property var fonts: ["Inter", "Adwaita Sans", "Cantarell", "Noto Sans", "Open Sans", "Roboto",
+                                                          "IBM Plex Sans", "Fira Sans", "Ubuntu", "DejaVu Sans"]
+                                                         .filter(f => Qt.fontFamilies().includes(f))
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width
+                            columns: Math.max(3, Math.ceil(fonts.length / 2))
+                            spacing: Theme.spacing.s
+
+                            Repeater {
+                                model: fontGrid.fonts
+
+                                OptionChip {
+                                    required property string modelData
+                                    width: (fontGrid.width - fontGrid.spacing * (fontGrid.columns - 1)) / fontGrid.columns
+                                    sample: true
+                                    sampleFont: modelData
+                                    text: modelData
+                                    chosen: Theme.font.sans === modelData
+                                    onClicked: Settings.values.fontSans = modelData === "Inter" ? "" : modelData
+                                }
+                            }
+                        }
+                    }
+
+                    SheetTile {
+                        title: "Icons"
+                        subtitle: "Apps' icons; the dock's after a restart"
+
+                        Column {
+                            anchors.centerIn: parent
+                            spacing: Theme.spacing.m
 
                             Stepper {
+                                anchors.horizontalCenter: parent.horizontalCenter
                                 label: "Icon theme"
                                 values: root.iconThemes
                                 valueWidth: Theme.settings.stepperWide
@@ -455,16 +620,13 @@ Scope {
                                 format: v => v.replace(/^Colloid-?/, "Colloid ").trim()
                                 onPicked: v => Settings.values.iconTheme = v
                             }
-                        }
 
-                        // The shell reads the icon theme when it starts (QS_ICON_THEME, hypr/shell.sh).
-                        SheetItem {
-                            visible: Settings.values.iconTheme !== root.startIconTheme
-                            title: "Restart the shell for its own icons"
-                            subtitle: "Keeps these changes; clears the notification list"
-
+                            // The shell reads the icon theme when it starts (QS_ICON_THEME, hypr/shell.sh).
                             TextButton {
-                                text: "Restart"
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                visible: Settings.values.iconTheme !== root.startIconTheme
+                                text: "Restart the shell"
+                                filled: true
                                 onClicked: {
                                     root.close();
                                     Quickshell.execDetached(["sh", "-c", "pkill -x qs; sleep 1; exec \"$HOME\"/.config/hypr/shell.sh"]);
