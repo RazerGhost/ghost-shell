@@ -279,6 +279,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   unscaled ones would be. Give the region `x`, `y`, `width`, `height` computed with the scale
   (desktop/WidgetRegion.qml). An inline `component` must be at a file's top level (inside a
   window: "is not a type").
+- Anything set with `hyprctl eval` (a workspace rule, a monitor) is dropped by the next
+  `hyprctl reload`, which the shell runs whenever a setting written to shell-settings.lua
+  changes. What must last through those goes in that file (services/HyprlandRuntime.qml).
 - An IPC function named `show` can't be called with arguments: `qs ipc call settings show lock`
   fails with "The following argument was not expected: lock" (the CLI's own `show` subcommand
   takes it). Named `page` instead.

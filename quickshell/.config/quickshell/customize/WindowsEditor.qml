@@ -56,8 +56,8 @@ Scope {
         examples.active = false;
         Editing.hideDock = false;
         Editing.back();
-        // Drops the examples' workspace rule (made with hyprctl eval, not in any file).
-        Quickshell.execDetached(["hyprctl", "reload"]);
+        // Drops the examples' workspace rule from shell-settings.lua.
+        HyprlandRuntime.lua = "";
     }
 
     function cancel(): void {
@@ -86,7 +86,8 @@ Scope {
     }
 
     // The examples tile inside the card: their workspace's gaps at the screen's edges are the
-    // space around the card plus your own gaps (a workspace rule, applied live; reload drops it).
+    // space around the card plus your own gaps (a workspace rule in shell-settings.lua while the
+    // editor is open, so reloads for the settings changed here keep it).
     function tileInto(card: rect, width: real, height: real): void {
         const id = Editing.emptyWorkspace;
         if (id <= 0 || card.width <= 0)
@@ -95,7 +96,7 @@ Scope {
         const side = (space, bar) => Math.max(0, Math.round(space - bar + own));
         const gaps = `{ top = ${side(card.y, reserved[1])}, right = ${side(width - card.x - card.width, reserved[2])}, `
                    + `bottom = ${side(height - card.y - card.height, reserved[3])}, left = ${side(card.x, reserved[0])} }`;
-        Quickshell.execDetached(["hyprctl", "eval", `hl.workspace_rule({ workspace = "${id}", gaps_out = ${gaps} })`]);
+        HyprlandRuntime.lua = `hl.workspace_rule({ workspace = "${id}", gaps_out = ${gaps} })`;
     }
 
     // Long enough for the slowest animation to finish (at half speed).

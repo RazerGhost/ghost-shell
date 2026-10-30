@@ -12,6 +12,7 @@ Scope {
     id: root
 
     readonly property string text: HyprlandConfig.lua(Settings.values, GameMode.on)
+        + (HyprlandRuntime.lua ? "\n-- While the windows editor is open (services/HyprlandRuntime.qml).\n" + HyprlandRuntime.lua + "\n" : "")
 
     onTextChanged: {
         if (Settings.loaded)

@@ -984,10 +984,13 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   widgets' layer scales them into it; dragging divides the pointer's move by the scale, and
   their input and blur regions are computed with it (`desktop/WidgetRegion.qml`).
 - The windows editor shows the same card, and its example windows tile inside it: their
-  workspace gets a `gaps_out` workspace rule (`hyprctl eval`, a table `{ top, right, bottom,
-  left }`; a string is refused) of the space around the card minus what bars reserve plus your
-  own gaps, so borders, corners and gaps stay Hyprland's own; closing reloads Hyprland, which
-  drops the rule. Chosen over `hl.monitor`'s `reserved_area`, which would set the screen's
+  workspace gets a `gaps_out` workspace rule (a table `{ top, right, bottom, left }`; a string
+  is refused) of the space around the card minus what bars reserve plus your own gaps, so
+  borders, corners and gaps stay Hyprland's own. The rule is appended to shell-settings.lua
+  while the editor is open (`services/HyprlandRuntime.qml`; the login screen's copy leaves it
+  out) and left out when it closes: made with `hyprctl eval` at first, it was dropped by the
+  reload every changed setting does, and the examples jumped out of the card (user's find in
+  the Motion tab). Chosen over `hl.monitor`'s `reserved_area`, which would set the screen's
   mode again on every resize. The card's geometry moved into `EditorChrome` (three editors).
 - The island and dock in the other editors (user's question): the lock screen editor covers
   both; the desktop and windows editors keep the island (like Android's status bar: colors,

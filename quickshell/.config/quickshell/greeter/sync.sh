@@ -35,9 +35,10 @@ fi
 # The keyboard layout and touchpad settings (written by the shell's settings window); the login
 # screen's Hyprland loads this copy (system/etc/greetd/hypr/hyprland.lua). Without game mode's
 # block (settings/HyprlandConfig.js): logging out with game mode on mustn't leave the login
-# screen without animations.
+# screen without animations; nor the windows editor's rule at the end (HyprlandRuntime.qml).
 if [ -f "$HOME/.config/hypr/shell-settings.lua" ]; then
-    sed '/^-- Game mode is on/,/^})$/d' "$HOME/.config/hypr/shell-settings.lua" >"$shared/shell-settings.lua.tmp"
+    sed -e '/^-- Game mode is on/,/^})$/d' -e '/^-- While the windows editor is open/,$d' \
+        "$HOME/.config/hypr/shell-settings.lua" >"$shared/shell-settings.lua.tmp"
     mv -f "$shared/shell-settings.lua.tmp" "$shared/shell-settings.lua"
 fi
 
