@@ -9,7 +9,7 @@ machine can take what it needs.
 | | |
 |:---:|:---:|
 | ![Quick settings](docs/screenshots/quick-settings.png) **Quick settings** | ![Launcher](docs/screenshots/launcher.png) **Launcher** |
-| ![Settings](docs/screenshots/settings.png) **Settings** | |
+| ![Settings](docs/screenshots/settings.png) **Settings** | ![The desktop editor](docs/screenshots/customize.png) **Customizing the desktop** |
 
 ## What's in it
 
@@ -24,6 +24,13 @@ machine can take what it needs.
   volume and brightness, lock and login screen, idle and night light, screenshots and screen
   recording, a password prompt for apps (polkit), an equalizer, screen time, web apps
   (`ghost webapp`), an update count, wallpapers, and a welcome tour on the first start.
+- **Editors on the screen itself** for how it looks, like Android's "Wallpaper & style" with iOS's
+  lock screen editing: the lock screen (clock styles, fonts, looks, picture), the desktop
+  (wallpaper, colors, desktop widgets, glass, sizes, fonts), the dock and island, and how
+  windows look (borders, gaps, animations, on example windows). Each shows the screen as a card
+  with live previews; type "customize" in the launcher.
+- **Desktop widgets**: a clock, the weather and the media player on the wallpaper, dragged into
+  place.
 - **A settings app** for what would otherwise be config files: displays, sound, keyboard and
   touchpad, power, default apps, keybinds, Btrfs snapshots and more.
 - **Glass**: see-through panels with Hyprland's blur behind exactly their shape.
@@ -99,7 +106,7 @@ leave it out elsewhere.
 
 ## Your own changes
 
-Settings made in the shell's settings window live outside the repo
+Settings made in the shell's settings window and its editors live outside the repo
 (`~/.local/state/quickshell/`). For things the settings window doesn't cover, these files are
 loaded last and aren't in git, so `ghost update` never conflicts with them:
 

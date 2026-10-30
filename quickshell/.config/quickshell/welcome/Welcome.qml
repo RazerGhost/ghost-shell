@@ -36,8 +36,11 @@ Scope {
         { icon: "terminal", title: "A terminal that drops down",
           text: "Super + ` brings a terminal down over everything and hides it again. Super + Shift + ` tucks any window away there, and brings it back.",
           keys: [["Super", "`"], ["Super", "Shift", "`"]] },
+        { icon: "palette", title: "Make it yours",
+          text: "Type \"customize\" in the launcher for the lock screen, the desktop (wallpaper, colors, widgets), the dock and island, or how windows look. You change them on the screen itself and see each change at once.",
+          keys: [["Super"]] },
         { icon: "settings", title: "Everything else is in Settings",
-          text: "Wallpaper, light or dark, display, sound, notifications per app, every keybind, and this tour again (under Keybinds).",
+          text: "Display, sound, notifications per app, power and sleep, every keybind, and this tour again (under Keybinds). Each Customize button opens its editor.",
           keys: [["Super", "I"]] }
     ]
     readonly property var current: steps[step]
