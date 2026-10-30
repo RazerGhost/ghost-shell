@@ -25,3 +25,25 @@ function hands(date) {
     const m = date.getMinutes();
     return { hour: (date.getHours() % 12) * 30 + m / 2, minute: m * 6 };
 }
+
+// Where the clock and what's under it were dragged from their layout's place (Settings'
+// lockClockOffset, the lock screen editor): { x, y } as fractions of the screen; nothing moved
+// for anything else.
+function offset(saved) {
+    const ok = v => typeof v === "number" && v >= -1 && v <= 1;
+    return saved && ok(saved.x) && ok(saved.y) ? { x: saved.x, y: saved.y } : { x: 0, y: 0 };
+}
+
+// The move (dx, dy, px) of the clock's column (`rect`: { x, y, width, height } at its layout's
+// place) kept on the screen (sw x sh, `margin` from the edges) and off the password field
+// (`field`'s rect, `gap` around it): where it would cover the field, it stops just above it.
+function clamped(rect, dx, dy, sw, sh, field, margin, gap) {
+    const within = (v, low, high) => Math.min(Math.max(v, low), Math.max(low, high));
+    const x = within(rect.x + dx, margin, sw - margin - rect.width);
+    let y = within(rect.y + dy, margin, sh - margin - rect.height);
+    const across = x < field.x + field.width + gap && x + rect.width > field.x - gap;
+    const below = y + rect.height > field.y - gap && y < field.y + field.height + gap;
+    if (across && below)
+        y = Math.max(margin, field.y - gap - rect.height);
+    return { x: x - rect.x, y: y - rect.y };
+}

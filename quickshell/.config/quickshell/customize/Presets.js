@@ -6,15 +6,15 @@
 // The lock and login screens: the clock's style, place, size and font, and the picture's blur
 // and darkening.
 const lock = [
-    { name: "Classic", values: { lockClockStyle: "big", lockLayout: "top", lockClockSize: 100, lockClockFont: "", lockBlur: 100, lockDim: 25 } },
-    { name: "Minimal", values: { lockClockStyle: "thin", lockLayout: "center", lockClockSize: 100, lockClockFont: "", lockBlur: 100, lockDim: 40 } },
-    { name: "Analog", values: { lockClockStyle: "analog", lockLayout: "left", lockClockSize: 100, lockClockFont: "", lockBlur: 60, lockDim: 30 } },
-    { name: "Bold", values: { lockClockStyle: "stacked", lockLayout: "top", lockClockSize: 125, lockClockFont: "Inter Display", lockBlur: 100, lockDim: 25 } },
-    { name: "Editorial", values: { lockClockStyle: "big", lockLayout: "center", lockClockSize: 125, lockClockFont: "C059", lockBlur: 80, lockDim: 35 } }
+    { name: "Classic", values: { lockClockStyle: "big", lockLayout: "top", lockClockSize: 100, lockClockFont: "", lockBlur: 100, lockDim: 25, lockClockOffset: null } },
+    { name: "Minimal", values: { lockClockStyle: "thin", lockLayout: "center", lockClockSize: 100, lockClockFont: "", lockBlur: 100, lockDim: 40, lockClockOffset: null } },
+    { name: "Analog", values: { lockClockStyle: "analog", lockLayout: "left", lockClockSize: 100, lockClockFont: "", lockBlur: 60, lockDim: 30, lockClockOffset: null } },
+    { name: "Bold", values: { lockClockStyle: "stacked", lockLayout: "top", lockClockSize: 125, lockClockFont: "Inter Display", lockBlur: 100, lockDim: 25, lockClockOffset: null } },
+    { name: "Editorial", values: { lockClockStyle: "big", lockLayout: "center", lockClockSize: 125, lockClockFont: "C059", lockBlur: 80, lockDim: 35, lockClockOffset: null } }
 ];
 
 // Every setting the lock screen editor changes, for its Cancel.
-const lockKeys = ["lockClockStyle", "lockLayout", "lockClockSize", "lockClockFont", "lockBlur", "lockDim",
+const lockKeys = ["lockClockStyle", "lockLayout", "lockClockOffset", "lockClockSize", "lockClockFont", "lockBlur", "lockDim",
                   "lockWallpaper", "lockClock", "lockDate", "lockWidgets", "lockMedia"];
 
 // Every setting the desktop editor changes, for its Cancel (the wallpaper is put back apart:

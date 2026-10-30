@@ -1192,6 +1192,15 @@ fixed:
   (the name field beside the gallery while one is current; `Themes.renamed`, tested: an empty
   or taken name is ignored).
 
+### Lock screen: drag the clock and widgets (built 2026-10-30)
+User's pick. In the lock screen editor the clock's and the widgets' outlines can be dragged (or
+moved with the arrow keys while one has the keyboard): the clock, date, player and widgets move
+together from their place (`lockClockOffset`, fractions of the screen, so the login screen
+follows and a resolution change keeps it). They stay on the screen and never cover the
+password field with its hints: where they would, they stop just above it, and beside it they
+may go lower (`LockClock.offset`, `clamped`, tested). Picking a Place or a look starts again
+from that place; Cancel puts the old one back.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

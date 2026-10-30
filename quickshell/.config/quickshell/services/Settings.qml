@@ -112,6 +112,7 @@ Singleton {
             property int lockClockSize: 100       // percent
             property string lockClockFont: ""     // "" = the shell's text font
             property string lockLayout: "top"     // top, center, left (the bottom-left corner)
+            property var lockClockOffset: null    // { x, y }: dragged from there, fractions of the screen
             property string lockMessage: ""       // a line at the bottom, "If found, call ..."
             property bool greeterShowName: true     // your user name above the password field
             property bool greeterPowerButtons: true // suspend, restart and shut down

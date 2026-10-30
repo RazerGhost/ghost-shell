@@ -44,6 +44,19 @@ Scope {
             root.done();
     }
 
+    // The clock, date and widgets moved `by` (px of the lock screen) from where they are now:
+    // saved as where they ended up (clamped by LockContent), as fractions of the screen.
+    function moveClock(by: point): void {
+        const lock = editor.item?.lockContent;
+        if (!lock)
+            return;
+        lock.dragShift = by;
+        // clockShift holds the saved offset and the move together, clamped.
+        const shift = lock.clockShift;
+        Settings.values.lockClockOffset = { x: shift.x / lock.width, y: shift.y / lock.height };
+        lock.dragShift = Qt.point(0, 0);
+    }
+
     function cancel(): void {
         Presets.restore(Settings.values, saved);
         editor.active = false;
@@ -54,6 +67,8 @@ Scope {
 
         PanelWindow {
             id: window
+
+            readonly property Item lockContent: lock
 
             screen: Quickshell.screens.find(s => s.name === root.screenName) ?? null
             anchors { top: true; bottom: true; left: true; right: true }
@@ -104,8 +119,11 @@ Scope {
                         tab: "clock"
                         name: "The clock's options"
                         shown: (clock?.visible ?? false) || chrome.tab === "clock"
-                        area: Qt.rect((column?.x ?? 0) + (clock?.x ?? 0), (column?.y ?? 0) + (clock?.y ?? 0),
+                        area: Qt.rect((column?.x ?? 0) + lock.clockShift.x + (clock?.x ?? 0),
+                                      (column?.y ?? 0) + lock.clockShift.y + (clock?.y ?? 0),
                                       clock?.width ?? 0, clock?.height ?? 0)
+                        onMoving: by => lock.dragShift = by
+                        onMoved: by => root.moveClock(by)
                     }
 
                     EditOutline {
@@ -117,9 +135,11 @@ Scope {
                         tab: "widgets"
                         name: "The widgets' options"
                         shown: status.height > 0 || chrome.tab === "widgets"
-                        area: Qt.rect((column?.x ?? 0) + (slot?.x ?? 0) + status.contentX,
-                                      (column?.y ?? 0) + (slot?.y ?? 0) + (slot?.topPadding ?? 0),
+                        area: Qt.rect((column?.x ?? 0) + lock.clockShift.x + (slot?.x ?? 0) + status.contentX,
+                                      (column?.y ?? 0) + lock.clockShift.y + (slot?.y ?? 0) + (slot?.topPadding ?? 0),
                                       status.contentWidth, Math.max(status.height, Theme.lock.widget))
+                        onMoving: by => lock.dragShift = by
+                        onMoved: by => root.moveClock(by)
                     }
                 }
             }
@@ -273,7 +293,11 @@ Scope {
                                 Segmented {
                                     options: LockClockJs.layouts.map(v => ({ value: v, label: ({ top: "Top", center: "Middle", left: "Bottom left" })[v] }))
                                     current: LockClockJs.pick(Settings.values.lockLayout, LockClockJs.layouts)
-                                    onPicked: v => Settings.values.lockLayout = v
+                                    // A place starts without a move of its own.
+                                    onPicked: v => {
+                                        Settings.values.lockLayout = v;
+                                        Settings.values.lockClockOffset = null;
+                                    }
                                 }
                         }
 

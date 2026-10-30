@@ -111,6 +111,18 @@ Item {
     // (the default), both together in the middle, or the clock in the bottom-left corner.
     readonly property string layout: LockClockJs.pick(Settings.values.lockLayout, LockClockJs.layouts)
 
+    // Moved from there by dragging in the lock screen editor (Settings' lockClockOffset, as
+    // fractions of the screen), plus the drag going on (`dragShift`, px, until it's let go):
+    // the clock, date and widgets together, kept on the screen and off the password field with
+    // its hints (LockClock.clamped).
+    property point dragShift: Qt.point(0, 0)
+    readonly property var clockOffset: LockClockJs.offset(Settings.values.lockClockOffset)
+    readonly property var clockShift: LockClockJs.clamped(
+        { x: clockColumn.x, y: clockColumn.y, width: clockColumn.width, height: clockColumn.height },
+        clockOffset.x * width + dragShift.x, clockOffset.y * height + dragShift.y, width, height,
+        { x: fieldColumn.x + fieldShift, y: fieldColumn.y, width: fieldColumn.width, height: fieldColumn.height + belowReserve },
+        Theme.spacing.l * 2, Theme.spacing.l)
+
     states: [
         State {
             when: root.layout === "center"
@@ -151,6 +163,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.topMargin: parent.height * 0.18
+        transform: Translate { x: root.clockShift.x; y: root.clockShift.y }
         spacing: Theme.spacing.xs
 
         LockClock {
