@@ -26,7 +26,7 @@ machine can take what it needs.
   (`ghost webapp`), an update count, wallpapers, and a welcome tour on the first start.
 - **Editors on the screen itself** for how it looks, like Android's "Wallpaper & style" with iOS's
   lock screen editing: the lock screen (clock styles, fonts, looks, picture, widgets), the desktop
-  (wallpaper, colors, desktop widgets, glass, sizes, fonts), the dock and island, and how
+  (saved themes, wallpaper, colors, desktop widgets, glass, sizes, fonts), the dock and island, and how
   windows look (borders, gaps, animations, on example windows). Each shows the screen as a card
   with live previews; type "customize" in the launcher.
 - **Desktop widgets**: a clock, the weather, the media player, the calendar's next events, the

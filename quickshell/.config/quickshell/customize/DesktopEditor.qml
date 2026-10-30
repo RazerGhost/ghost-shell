@@ -13,6 +13,7 @@ import "../services/ColorScheme.js" as ColorSchemeJs
 import "../settings/HyprlandConfig.js" as HyprlandConfig
 import "../theme/ThemeScale.js" as ThemeScale
 import "Presets.js" as Presets
+import "Themes.js" as Themes
 
 // The desktop editor, like Android's "Wallpaper & style": the real desktop, drawn as a card. Opening
 // it goes to an empty workspace (windows would cover the desktop) and Done or Cancel go back;
@@ -125,6 +126,7 @@ Scope {
             EditorChrome {
                 id: chrome
                 tabs: [
+                    { value: "themes", label: "Themes" },
                     { value: "wallpaper", label: "Wallpaper" },
                     { value: "colors", label: "Colors" },
                     { value: "widgets", label: "Widgets" },
@@ -137,6 +139,137 @@ Scope {
                 status: Wallpaper.busy || ColorScheme.busy ? "Making the colors…" : ""
                 onCancelled: root.cancel()
                 onFinished: root.close()
+
+                // Themes: your saved looks, like Android's (Themes.js): the wallpaper with the
+                // accent and font on it; click one to switch to it. Saving and deleting beside.
+                SheetTiles {
+                    id: themesTab
+
+                    readonly property var themes: Themes.valid(Settings.values.themes)
+                    readonly property string current: Themes.current(themes, Settings.values, Wallpaper.path)
+
+                    // Its settings, then its wallpaper (which remakes the colors with them).
+                    function use(name: string): void {
+                        const theme = themes.find(t => t.name === name);
+                        if (!theme)
+                            return;
+                        Presets.restore(Settings.values, theme.values);
+                        if (theme.wallpaper !== Wallpaper.path) {
+                            if (theme.wallpaper !== "")
+                                Wallpaper.set(theme.wallpaper);
+                            else
+                                Wallpaper.clear();
+                        }
+                    }
+
+                    visible: chrome.tab === "themes"
+
+                    SheetTile {
+                        title: "Themes"
+                        subtitle: "Wallpaper, colors, style, fonts and widgets in one click"
+                        weight: 3
+
+                        Text {
+                            anchors.centerIn: parent
+                            visible: themesTab.themes.length === 0
+                            text: "No themes yet. Make the desktop look the way you like, then save it."
+                            color: Colors.m3onSurfaceVariant
+                            font.family: Theme.font.sans
+                            font.pixelSize: Theme.font.normal
+                        }
+
+                        ChoiceCards {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width
+                            visible: themesTab.themes.length > 0
+                            fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)
+                            scrolls: true
+                            cardWidth: Theme.editor.pictureCard
+                            options: themesTab.themes.map(t => ({ value: t.name, label: t.name, theme: t }))
+                            current: themesTab.current
+                            onPicked: v => themesTab.use(v)
+                            art: Component {
+                                Item {
+                                    id: look
+                                    readonly property var theme: parent.option.theme
+
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        color: look.theme.primary || Colors.m3surfaceContainerHighest
+                                    }
+
+                                    Image {
+                                        anchors.fill: parent
+                                        readonly property var picture: Wallpaper.pictures.find(p => p.filePath === look.theme.wallpaper)
+                                        source: look.theme.wallpaper ? "file://" + (picture?.video ? picture.thumb : look.theme.wallpaper) : ""
+                                        fillMode: Image.PreserveAspectCrop
+                                        sourceSize.width: width * 2
+                                        asynchronous: true
+                                    }
+
+                                    // The accent and the font, on a chip like the shell's panels.
+                                    Rectangle {
+                                        anchors.left: parent.left
+                                        anchors.bottom: parent.bottom
+                                        anchors.margins: Theme.spacing.s
+                                        width: sampleRow.width + Theme.spacing.s * 2
+                                        height: sampleRow.height + Theme.spacing.xs * 2
+                                        radius: height / 2
+                                        color: Colors.m3surfaceContainerHighest
+
+                                        Row {
+                                            id: sampleRow
+                                            anchors.centerIn: parent
+                                            spacing: Theme.spacing.xs
+
+                                            Rectangle {
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                width: Theme.font.normal
+                                                height: width
+                                                radius: width / 2
+                                                color: look.theme.primary || Colors.m3primary
+                                            }
+
+                                            Text {
+                                                text: "Aa"
+                                                color: Colors.m3onSurface
+                                                font.family: look.theme.values.fontSans || "Inter" // the default, as in Theme.font
+                                                font.pixelSize: Theme.font.normal
+                                                font.weight: Font.DemiBold
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    SheetTile {
+                        title: themesTab.current || "This look"
+                        subtitle: themesTab.current ? "Saved as a theme" : "Not saved yet"
+
+                        Column {
+                            anchors.centerIn: parent
+                            spacing: Theme.spacing.m
+
+                            TextButton {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "Save as a theme"
+                                filled: true
+                                enabled: themesTab.current === ""
+                                onClicked: Settings.values.themes = themesTab.themes.concat(
+                                    [Themes.made(themesTab.themes, Settings.values, Wallpaper.path, Colors.m3primary.toString())])
+                            }
+
+                            TextButton {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "Delete " + themesTab.current
+                                visible: themesTab.current !== ""
+                                onClicked: Settings.values.themes = Themes.removed(themesTab.themes, themesTab.current)
+                            }
+                        }
+                    }
+                }
 
                 // Wallpaper: yours and the built-in ones, videos as their still frame.
                 SheetTiles {

@@ -1132,6 +1132,18 @@ User's pick: an iOS-like row of small widgets under the clock, picked in the loc
   outlined like the clock, and clicking them opens the Widgets tab (one `Outline` component
   for both). Verified on the laptop, with the desktop editor's Cancel fix.
 
+### Themes (built 2026-10-30)
+User's pick: saved looks for the whole desktop, like Android's themes.
+- The desktop editor's first tab, Themes: your saved looks as picture cards (the wallpaper with
+  a chip showing the accent color and "Aa" in the theme's font); clicking one sets its settings,
+  then its wallpaper (which remakes the colors with them). Beside it, "Save as a theme" (named
+  Theme 1, 2, ...; off while the look already is a saved theme) and "Delete" for the current one.
+- A theme is the wallpaper (or none) and the colors (light or dark, style, contrast, accent),
+  the glass, blur style, corners, fonts, icon theme and the desktop widgets with their places;
+  not the shell's and text's sizes (`customize/Themes.js`, tested: saved lists made safe, names,
+  which theme the desktop matches now). Saved in `themes` in settings.json; the editor's Cancel
+  doesn't undo saving or deleting one, only the look.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
