@@ -1549,6 +1549,14 @@ User's finds:
   read the old file, so a change sometimes applied only at the next one (`blockWrites`).
 Needs `ghost install system` (greetd's config and the kernel line; sudo) and `ghost greeter`.
 
+### The media widget stays (built 2026-10-31)
+User's find: the desktop's media widget vanished whenever no music app was running. It stays
+now: "Nothing playing", and play (or a click on it) opens the music app last heard
+(`Media.lastApp`, Settings' `lastMediaApp`, remembered when a player whose desktop entry is in
+the Music category starts playing; before that the first installed music app, Spotify here).
+Checked in a scratch window with no player. Also: tooltips no longer warn while their window
+doesn't exist yet (a null parent instead of undefined).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

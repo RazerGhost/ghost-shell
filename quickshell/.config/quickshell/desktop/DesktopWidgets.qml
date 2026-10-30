@@ -7,7 +7,7 @@ import qs.widgets
 import "DesktopWidgets.js" as DesktopWidgetsJs
 
 // Widgets on the wallpaper (the desktop editor's Widgets tab): a clock, the weather, the
-// media player while something plays, the calendar's next events, the battery, the to-do list
+// media player (with nothing playing, it offers the music app last heard), the calendar's next events, the battery, the to-do list
 // and the timer (ClockWidget, WeatherWidget, MediaWidget, CalendarWidget, BatteryWidget,
 // TodoWidget, TimerWidget: one family of sizes; the list of them is DesktopWidgets.js's
 // `kinds`). On the first screen, on the layer just above the wallpaper, so windows cover them.
@@ -136,7 +136,7 @@ Scope {
                 DesktopCard {
                     id: mediaCard
                     name: "media"
-                    shown: Settings.values.desktopMedia && Media.player !== null
+                    shown: Settings.values.desktopMedia
 
                     MediaWidget {}
                 }

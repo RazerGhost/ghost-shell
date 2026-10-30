@@ -218,6 +218,9 @@ Singleton {
             property bool desktopBattery: false
             property bool desktopTodo: false
             property bool desktopTimer: false
+            // The music app last heard (its desktop entry id), which the media widget offers to
+            // open while nothing plays (services/Media.qml).
+            property string lastMediaApp: ""
             // The grid widgets line up with when dropped (desktop/DesktopWidgets.js), and its
             // spacing in px at 100 %.
             property bool desktopGrid: false

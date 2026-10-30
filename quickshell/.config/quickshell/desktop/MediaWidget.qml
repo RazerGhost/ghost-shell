@@ -1,23 +1,30 @@
 import QtQuick
+import Quickshell
 import Quickshell.Services.Mpris
 import qs.services
 import qs.theme
 import qs.widgets
 
 // The media widget (medium): the cover, the track and artist, and previous, play and next.
-// Clicking outside the buttons brings up the player's window. Without a player (the desktop
-// editor's preview) it says nothing plays.
+// Clicking outside the buttons brings up the player's window. Without a player it says nothing
+// plays, and play opens the music app last heard (Media.lastApp), when there is one.
 WidgetSurface {
     id: widget
 
     readonly property MprisPlayer player: Media.player
+    readonly property DesktopEntry app: player ? null : Media.lastApp
+
+    function open(): void {
+        if (app)
+            Apps.launch(app);
+    }
 
     medium: true
 
     MouseArea {
         anchors.fill: parent
-        cursorShape: widget.player ? Qt.PointingHandCursor : Qt.ArrowCursor
-        onClicked: Media.show()
+        cursorShape: widget.player || widget.app ? Qt.PointingHandCursor : Qt.ArrowCursor
+        onClicked: widget.player ? Media.show() : widget.open()
     }
 
     AlbumArt {
@@ -51,7 +58,7 @@ WidgetSurface {
 
         Text {
             width: parent.width
-            text: widget.player?.trackArtist ?? ""
+            text: widget.player ? (widget.player.trackArtist ?? "") : widget.app ? "Play opens " + widget.app.name : ""
             color: Colors.m3onSurfaceVariant
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.normal
@@ -83,9 +90,9 @@ WidgetSurface {
                 anchors.centerIn: parent
                 icon: widget.player?.isPlaying ? "pause" : "play_arrow"
                 color: Colors.m3onPrimary
-                label: widget.player?.isPlaying ? "Pause" : "Play"
-                enabled: widget.player?.canTogglePlaying ?? false
-                onClicked: widget.player.togglePlaying()
+                label: widget.player ? (widget.player.isPlaying ? "Pause" : "Play") : widget.app ? "Open " + widget.app.name : "Play"
+                enabled: widget.player ? widget.player.canTogglePlaying : widget.app !== null
+                onClicked: widget.player ? widget.player.togglePlaying() : widget.open()
             }
         }
 

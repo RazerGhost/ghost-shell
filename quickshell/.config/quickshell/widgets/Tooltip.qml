@@ -23,7 +23,9 @@ Rectangle {
         y = below + height <= parent.height ? below : at.y - height - Theme.tooltip.gap;
     }
 
-    parent: target?.Window?.contentItem ?? null
+    // Until its window exists (a hidden window's items, a Repeater's new delegate) there's no
+    // content item: null, not undefined, which QML refuses for an Item (a warning per tooltip).
+    parent: (target && target.Window.contentItem) || null
     z: 1000
     width: label.implicitWidth + Theme.spacing.m * 2
     height: label.implicitHeight + Theme.spacing.xs * 2

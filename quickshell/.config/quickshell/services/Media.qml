@@ -16,6 +16,24 @@ Singleton {
                                           ?? Mpris.players.values[0] ?? null
     readonly property bool playing: player?.isPlaying ?? false
 
+    // The music app last heard (Settings' lastMediaApp), for the desktop's media widget to open
+    // while no player is running; before one has been heard, the first installed music app
+    // (Spotify here). Only music players: a video in the browser isn't one to come back to. The
+    // app list is read so it's found once it has filled in (NOTES).
+    readonly property DesktopEntry lastApp: {
+        const apps = DesktopEntries.applications.values;
+        const id = Settings.values.lastMediaApp;
+        return (id ? DesktopEntries.byId(id) : null) ?? apps.find(isMusic) ?? null;
+    }
+    function isMusic(entry: DesktopEntry): bool {
+        return entry.categories.includes("Music"); // not every audio tool (a mixer, a video player)
+    }
+    onPlayingChanged: {
+        const entry = playing ? DesktopEntries.heuristicLookup(player.desktopEntry || player.identity || "") : null;
+        if (entry && isMusic(entry) && Settings.values.lastMediaApp !== entry.id)
+            Settings.values.lastMediaApp = entry.id;
+    }
+
     // The player's window, matched by its .desktop name (Spotify's is "spotify"); null when it
     // has none (a browser tab plays in the browser's window, which this can't tell apart).
     readonly property HyprlandToplevel window: Windows.forApp(player?.desktopEntry ?? "")
