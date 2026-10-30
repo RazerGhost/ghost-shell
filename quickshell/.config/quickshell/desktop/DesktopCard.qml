@@ -67,9 +67,15 @@ Item {
         DragHandler {
             id: drag
             target: null
-            onActiveTranslationChanged: {
-                if (active)
-                    root.dragged = Qt.point(activeTranslation.x, activeTranslation.y);
+            // The pointer's move on the screen, in the widgets' own units: while the desktop
+            // editor shows them scaled into its card, a move of 10 px is 10 / scale of theirs, so
+            // the handle stays under the pointer.
+            onCentroidChanged: {
+                if (!active)
+                    return;
+                const scale = root.parent?.scale ?? 1;
+                root.dragged = Qt.point((centroid.scenePosition.x - centroid.scenePressPosition.x) / scale,
+                                        (centroid.scenePosition.y - centroid.scenePressPosition.y) / scale);
             }
             onActiveChanged: {
                 if (active) {

@@ -13,7 +13,7 @@ import "../settings/HyprlandConfig.js" as HyprlandConfig
 import "../theme/ThemeScale.js" as ThemeScale
 import "Presets.js" as Presets
 
-// The desktop editor, like Android's "Wallpaper & style": edited on the real desktop. Opening
+// The desktop editor, like Android's "Wallpaper & style": the real desktop, drawn as a card. Opening
 // it goes to an empty workspace (windows would cover the desktop) and Done or Cancel go back;
 // the island and dock stay, so new colors and sizes show on them at once. The sheet has the
 // wallpaper, the colors, the desktop widgets (their handles show, drag them), the panels'
@@ -84,6 +84,24 @@ Scope {
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.namespace: "qs-customize"
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+
+            // The desktop as a card between the island and the sheet (like GNOME's workspaces):
+            // the wallpaper and the widgets draw themselves into it (customize/Editing.qml), the
+            // background color around it. It follows the sheet's height as tabs change.
+            readonly property real cardTop: Theme.island.height + Theme.spacing.l * 2
+            readonly property real cardBottom: chrome.sheet.y - Theme.spacing.l * 1.5
+            readonly property real cardScale: Math.min((width - Theme.spacing.l * 4) / width,
+                                                       Math.max(cardBottom - cardTop, 1) / height)
+            readonly property rect card: Qt.rect((width - width * cardScale) / 2,
+                                                 cardTop + (cardBottom - cardTop - height * cardScale) / 2,
+                                                 width * cardScale, height * cardScale)
+
+            onCardChanged: Editing.card = card
+            Component.onCompleted: {
+                Editing.card = card;
+                Editing.cardScreen = screen?.name ?? "";
+            }
+            Component.onDestruction: Editing.cardScreen = ""
 
             // Input only on the sheet: the desktop widgets underneath can be dragged.
             mask: Region {

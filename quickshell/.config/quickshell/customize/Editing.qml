@@ -13,6 +13,13 @@ Singleton {
     property bool desktop: false
     property bool dock: false
 
+    // The desktop drawn as a card while an editor is open (like GNOME's workspaces): on this
+    // screen ("" while not), in this rectangle of it. The wallpaper (wallpaper/WallpaperLayer.qml)
+    // and the desktop widgets (desktop/DesktopWidgets.qml) draw themselves into it, the
+    // background color around it.
+    property string cardScreen: ""
+    property rect card: Qt.rect(0, 0, 0, 0)
+
     // The workspace to come back to; 0 while not away.
     property int awayFrom: 0
 
