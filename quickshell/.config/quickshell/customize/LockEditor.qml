@@ -180,113 +180,120 @@ Scope {
                     }
                 }
 
-                // Clock: style and font by sight; place and size as segments; the time
-                // and date on or off.
-                Row {
-                    visible: chrome.tab === "clock"
+                // Clock: style and font by sight side by side; place, size and the time and
+                // date in a row under them.
+                Column {
                     width: parent.width
+                    visible: chrome.tab === "clock"
 
-                    Column {
-                        width: parent.width / 2
+                    Row {
+                        width: parent.width
 
-                            ChoiceCards {
-                                title: "Style"
-                                options: LockClockJs.styles.map(v => ({ value: v, label: ({ big: "Big", stacked: "Stacked", thin: "Thin", analog: "Analog" })[v] }))
-                                current: LockClockJs.pick(Settings.values.lockClockStyle, LockClockJs.styles)
-                                onPicked: v => Settings.values.lockClockStyle = v
-                                art: Component {
-                                    Rectangle {
-                                        color: Colors.m3surfaceContainerHighest
+                        // The same card size as the fonts beside it, so the two rows line up.
+                        ChoiceCards {
+                            width: parent.width / 2
+                            cardWidth: fontCards.cardWidth
+                            title: "Style"
+                            options: LockClockJs.styles.map(v => ({ value: v, label: ({ big: "Big", stacked: "Stacked", thin: "Thin", analog: "Analog" })[v] }))
+                            current: LockClockJs.pick(Settings.values.lockClockStyle, LockClockJs.styles)
+                            onPicked: v => Settings.values.lockClockStyle = v
+                            art: Component {
+                                Rectangle {
+                                    color: Colors.m3surfaceContainerHighest
 
-                                        MiniClock {
-                                            anchors.centerIn: parent
-                                            box: parent
-                                            style: parent.parent.option.value
-                                        }
+                                    MiniClock {
+                                        anchors.centerIn: parent
+                                        box: parent
+                                        style: parent.parent.option.value
                                     }
                                 }
                             }
+                        }
 
-                            ChoiceCards {
-                                title: "Font"
-                                scrolls: true
-                                options: ["", "Inter Display", "Noto Serif", "C059", "Nimbus Sans Narrow", "MesloLGS Nerd Font"]
-                                    .filter(f => f === "" || Qt.fontFamilies().includes(f))
-                                    .map(f => ({ value: f, label: f === "" ? "Same as text" : f === "MesloLGS Nerd Font" ? "Monospaced" : f }))
-                                current: Settings.values.lockClockFont
-                                onPicked: v => Settings.values.lockClockFont = v
-                                art: Component {
-                                    Rectangle {
-                                        color: Colors.m3surfaceContainerHighest
+                        ChoiceCards {
+                            id: fontCards
+                            width: parent.width / 2
+                            title: "Font"
+                            options: ["", "Inter Display", "Noto Serif", "C059", "Nimbus Sans Narrow", "MesloLGS Nerd Font"]
+                                .filter(f => f === "" || Qt.fontFamilies().includes(f))
+                                .map(f => ({ value: f, label: f === "" ? "Same as text" : f === "MesloLGS Nerd Font" ? "Monospaced" : f }))
+                            current: Settings.values.lockClockFont
+                            onPicked: v => Settings.values.lockClockFont = v
+                            art: Component {
+                                Rectangle {
+                                    color: Colors.m3surfaceContainerHighest
 
-                                        Text {
-                                            anchors.centerIn: parent
-                                            text: "10:09"
-                                            color: Colors.m3onSurface
-                                            font.family: parent.parent.option.value || Theme.font.sans
-                                            font.pixelSize: parent.height * 0.42
-                                            font.weight: Font.Bold
-                                        }
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "10:09"
+                                        color: Colors.m3onSurface
+                                        font.family: parent.parent.option.value || Theme.font.sans
+                                        font.pixelSize: parent.height * 0.36
+                                        font.weight: Font.Bold
                                     }
                                 }
                             }
+                        }
                     }
 
-                    Column {
-                        width: parent.width / 2
+                    Row {
+                        width: parent.width
 
-                            SettingRow {
-                                title: "Place"
+                        SettingRow {
+                            width: parent.width / 3
+                            title: "Place"
 
-                                Segmented {
-                                    options: LockClockJs.layouts.map(v => ({ value: v, label: ({ top: "Top", center: "Middle", left: "Bottom left" })[v] }))
-                                    current: LockClockJs.pick(Settings.values.lockLayout, LockClockJs.layouts)
-                                    onPicked: v => Settings.values.lockLayout = v
-                                }
+                            Segmented {
+                                options: LockClockJs.layouts.map(v => ({ value: v, label: ({ top: "Top", center: "Middle", left: "Bottom left" })[v] }))
+                                current: LockClockJs.pick(Settings.values.lockLayout, LockClockJs.layouts)
+                                onPicked: v => Settings.values.lockLayout = v
                             }
+                        }
 
-                            SettingRow {
-                                title: "Size"
+                        SettingRow {
+                            width: parent.width / 3
+                            title: "Size"
 
-                                Segmented {
-                                    options: LockClockJs.sizes.map(v => ({ value: v, label: v + " %" }))
-                                    current: LockClockJs.pick(Settings.values.lockClockSize, LockClockJs.sizes)
-                                    onPicked: v => Settings.values.lockClockSize = v
-                                }
+                            Segmented {
+                                options: LockClockJs.sizes.map(v => ({ value: v, label: v + " %" }))
+                                current: LockClockJs.pick(Settings.values.lockClockSize, LockClockJs.sizes)
+                                onPicked: v => Settings.values.lockClockSize = v
                             }
+                        }
 
-                            SettingRow {
-                                title: "Show"
+                        SettingRow {
+                            width: parent.width / 3
+                            title: "Show"
 
-                                Row {
-                                    spacing: Theme.spacing.m
+                            Row {
+                                spacing: Theme.spacing.m
 
-                                    Repeater {
-                                        model: [{ key: "lockClock", label: "Time" }, { key: "lockDate", label: "Date" }]
+                                Repeater {
+                                    model: [{ key: "lockClock", label: "Time" }, { key: "lockDate", label: "Date" }]
 
-                                        Row {
-                                            id: shown
-                                            required property var modelData
-                                            spacing: Theme.spacing.s
+                                    Row {
+                                        id: shown
+                                        required property var modelData
+                                        spacing: Theme.spacing.s
 
-                                            Text {
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                text: shown.modelData.label
-                                                color: Colors.m3onSurface
-                                                font.family: Theme.font.sans
-                                                font.pixelSize: Theme.font.normal
-                                            }
+                                        Text {
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text: shown.modelData.label
+                                            color: Colors.m3onSurface
+                                            font.family: Theme.font.sans
+                                            font.pixelSize: Theme.font.normal
+                                        }
 
-                                            Switch {
-                                                anchors.verticalCenter: parent.verticalCenter
-                                                label: "Show the " + shown.modelData.label.toLowerCase()
-                                                checked: Settings.values[shown.modelData.key]
-                                                onToggled: Settings.values[shown.modelData.key] = !checked
-                                            }
+                                        Switch {
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            label: "Show the " + shown.modelData.label.toLowerCase()
+                                            checked: Settings.values[shown.modelData.key]
+                                            onToggled: Settings.values[shown.modelData.key] = !checked
                                         }
                                     }
                                 }
                             }
+                        }
                     }
                 }
 

@@ -21,8 +21,8 @@ Column {
     signal picked(var value)
 
     // Up to six in a row: smaller cards rather than one left alone on a second row. A
-    // scrolling row keeps them full size.
-    readonly property real cardWidth: {
+    // scrolling row keeps them full size. Set it to match another row's cards.
+    property real cardWidth: {
         if (scrolls)
             return Theme.settings.card;
         const n = Math.min(Math.max(options.length, 1), 6);
