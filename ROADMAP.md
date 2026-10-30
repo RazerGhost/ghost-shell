@@ -1110,7 +1110,7 @@ User's pick after the quick settings editor: more of the same family.
   off; a check under the ones that are on), beside the Places tile: six tiles with switches
   would have been too narrow.
 
-### Lock screen widgets (built 2026-10-30)
+### Lock screen widgets (done, verified on the laptop 2026-10-30)
 User's pick: an iOS-like row of small widgets under the clock, picked in the lock screen editor.
 - `lock/LockWidget.qml`: round widgets on a translucent circle with the glass edge: weather (sky
   icon and temperature), battery (a ring with the percentage, a bolt while charging, the error
