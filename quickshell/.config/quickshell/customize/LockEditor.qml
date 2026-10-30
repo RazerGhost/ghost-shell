@@ -48,45 +48,6 @@ Scope {
         editor.active = false;
     }
 
-    // An outline around a part of the lock screen in the card (`area`, in the lock screen's own
-    // units), its line scaled back to the usual width; clicking it opens that part's tab.
-    component Outline: Rectangle {
-        id: outline
-
-        property string tab
-        property string name
-        property bool shown
-        property rect area
-        // The editor's frame (an inline component can't see the file's ids).
-        required property EditorChrome sheet
-
-        visible: shown
-        x: area.x - Theme.spacing.m
-        y: area.y - Theme.spacing.m
-        width: area.width + Theme.spacing.m * 2
-        height: area.height + Theme.spacing.m * 2
-        radius: Theme.radius.l
-        color: outlineMouse.containsMouse ? Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, Theme.state.hover)
-                                          : "transparent"
-        border.width: Theme.outline.normal / sheet.cardScale
-        border.color: sheet.tab === tab || activeFocus ? Colors.m3primary
-                    : Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, 0.5)
-
-        Accessible.role: Accessible.Button
-        Accessible.name: name
-        Accessible.onPressAction: sheet.tab = tab
-        activeFocusOnTab: true
-        Keys.onSpacePressed: sheet.tab = tab
-
-        MouseArea {
-            id: outlineMouse
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: sheet.tab = outline.tab
-        }
-    }
-
     LazyLoader {
         id: editor
 
@@ -134,7 +95,7 @@ Scope {
 
                     // The clock and the widgets under it, outlined like an iOS lock screen being
                     // edited; click one for its tab.
-                    Outline {
+                    EditOutline {
                         readonly property Item clock: lock.clockItem
                         readonly property Item column: clock?.parent ?? null
 
@@ -146,7 +107,7 @@ Scope {
                                       clock?.width ?? 0, clock?.height ?? 0)
                     }
 
-                    Outline {
+                    EditOutline {
                         // LockStatus in the clock's column (through LockContent's slot under the date).
                         readonly property Item slot: status.parent
                         readonly property Item column: slot?.parent ?? null

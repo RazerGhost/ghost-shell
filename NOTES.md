@@ -438,8 +438,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   fixing the file didn't trigger another one: restart qs. The island reports both
   (`Quickshell.reloadCompleted` / `reloadFailed`, then `inhibitReloadPopup()`).
 - An inline component (`component Outline: ...`) added to a file the running shell already
-  loaded failed the reload with "Outline is not a type", while a fresh `qs` loaded the same
-  file fine (2026-10-30, LockEditor.qml): restart qs after adding one.
+  loaded failed every reload with "Outline is not a type", while a fresh `qs` loaded the same
+  file fine (2026-10-30, LockEditor.qml); the old shell kept running meanwhile. Moved into its
+  own file (`customize/EditOutline.qml`), the next reload worked: prefer a file.
 - A window inside a singleton (the settings window) can survive a reload with its old code:
   after editing `settings/SettingsWindow.qml`, restart qs before testing.
 - `hyprctl reload` after editing a required Lua file; `hyprctl layers` shows layer namespaces;
