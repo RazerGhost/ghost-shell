@@ -1265,6 +1265,17 @@ the keyboard built into the editors' design.
 - The key caps are one widget (`widgets/KeyCap.qml`) for Settings -> Keybinds, the welcome
   tour, the editors and the menu. The welcome tour's "Make it yours" card names Super+U.
 
+### Smooth changes (built 2026-10-30)
+User's pick. Picking a preset, a theme or a layout glides instead of jumping:
+- the panels' glass (how see-through, the edge) eases to its new value (`Colors.panelAlpha`,
+  `edgeAlpha`, under the recolor fade the colors already had);
+- desktop widgets glide to new places (a widget layout, "Put them back", lining up after a
+  drop), while a drag still follows the pointer;
+- the lock screen's clock and widgets glide when a look or the arrow keys move them
+  (`EditOutline.stepped`; the clamping is `LockContent.clockShiftFor`/`widgetsShiftFor`).
+Corner radii and sizes still change at once: easing them would lay the whole shell out again
+every frame.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

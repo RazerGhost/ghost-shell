@@ -18,8 +18,10 @@ Rectangle {
 
     // How far it's dragged from where the press began, in the lock screen's units.
     signal moving(point by)
-    // Let go after `moving`, or an arrow key's step (`by`).
+    // Let go after `moving`.
     signal moved(point by)
+    // An arrow key's step (`by`): glided to, not dragged.
+    signal stepped(point by)
 
     visible: shown
     x: area.x - Theme.spacing.m
@@ -43,7 +45,7 @@ Rectangle {
         const by = event.key === Qt.Key_Left ? Qt.point(-step, 0) : event.key === Qt.Key_Right ? Qt.point(step, 0)
                  : event.key === Qt.Key_Up ? Qt.point(0, -step) : event.key === Qt.Key_Down ? Qt.point(0, step) : null;
         if (by) {
-            moved(by);
+            stepped(by);
             event.accepted = true;
         }
     }

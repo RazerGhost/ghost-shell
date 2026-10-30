@@ -35,10 +35,15 @@ Singleton {
     // Background of the shell's panels (widgets/Surface.qml): translucent so Hyprland's blur shows
     // through; more so with the glass setting, which also gives them a thin light edge.
     readonly property bool glass: Settings.values.glass
-    readonly property color surfaceTranslucent: Qt.rgba(m3surfaceContainer.r, m3surfaceContainer.g, m3surfaceContainer.b,
-                                                         glass ? Settings.values.glassOpacity / 100 : Theme.surfaceOpacity)
-    readonly property color glassEdge: glass ? Qt.rgba(m3onSurface.r, m3onSurface.g, m3onSurface.b, Theme.glass.edgeAlpha)
-                                             : "transparent"
+    // How see-through the panels are and how bright their edge, eased to a new value (a style
+    // preset or theme fades the glass in rather than switching it). Not readonly only for the
+    // Behaviors.
+    property real panelAlpha: glass ? Settings.values.glassOpacity / 100 : Theme.surfaceOpacity
+    property real edgeAlpha: glass ? Theme.glass.edgeAlpha : 0
+    Behavior on panelAlpha { NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing } }
+    Behavior on edgeAlpha { NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing } }
+    readonly property color surfaceTranslucent: Qt.rgba(m3surfaceContainer.r, m3surfaceContainer.g, m3surfaceContainer.b, panelAlpha)
+    readonly property color glassEdge: Qt.rgba(m3onSurface.r, m3onSurface.g, m3onSurface.b, edgeAlpha)
 
     // A faint shade over a panel: the editors' tiles and chips, and the fades into them.
     readonly property color tint: Qt.rgba(m3onSurface.r, m3onSurface.g, m3onSurface.b, 0.05)

@@ -118,18 +118,26 @@ Item {
     // field with its hints (LockClock.clamped).
     property point dragShift: Qt.point(0, 0)
     property point widgetsDragShift: Qt.point(0, 0)
+    readonly property bool dragging: dragShift.x !== 0 || dragShift.y !== 0 || widgetsDragShift.x !== 0 || widgetsDragShift.y !== 0
     readonly property var fieldArea: ({ x: fieldColumn.x + fieldShift, y: fieldColumn.y, width: fieldColumn.width,
                                         height: fieldColumn.height + belowReserve })
     readonly property var clockOffset: LockClockJs.offset(Settings.values.lockClockOffset)
-    readonly property var clockShift: LockClockJs.clamped(
-        { x: clockColumn.x, y: clockColumn.y, width: clockColumn.width, height: statusSlot.y },
-        clockOffset.x * width + dragShift.x, clockOffset.y * height + dragShift.y, width, height,
-        fieldArea, Theme.spacing.l * 2, Theme.spacing.l)
+    readonly property var clockShift: clockShiftFor(clockOffset.x * width + dragShift.x, clockOffset.y * height + dragShift.y)
     readonly property var widgetsOffset: LockClockJs.offset(Settings.values.lockWidgetsOffset)
-    readonly property var widgetsShift: LockClockJs.clamped(
-        { x: clockColumn.x + statusSlot.x, y: clockColumn.y + statusSlot.y, width: statusSlot.width, height: statusSlot.height },
-        widgetsOffset.x * width + widgetsDragShift.x, widgetsOffset.y * height + widgetsDragShift.y, width, height,
-        fieldArea, Theme.spacing.l * 2, Theme.spacing.l)
+    readonly property var widgetsShift: widgetsShiftFor(widgetsOffset.x * width + widgetsDragShift.x,
+                                                        widgetsOffset.y * height + widgetsDragShift.y)
+
+    // Where each ends up moved (dx, dy) px from its layout's place, clamped.
+    function clockShiftFor(dx: real, dy: real): var {
+        return LockClockJs.clamped({ x: clockColumn.x, y: clockColumn.y, width: clockColumn.width, height: statusSlot.y },
+                                   dx, dy, width, height, fieldArea, Theme.spacing.l * 2, Theme.spacing.l);
+    }
+
+    function widgetsShiftFor(dx: real, dy: real): var {
+        return LockClockJs.clamped({ x: clockColumn.x + statusSlot.x, y: clockColumn.y + statusSlot.y,
+                                     width: statusSlot.width, height: statusSlot.height },
+                                   dx, dy, width, height, fieldArea, Theme.spacing.l * 2, Theme.spacing.l);
+    }
 
     states: [
         State {
@@ -171,7 +179,13 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.topMargin: parent.height * 0.18
-        transform: Translate { x: root.clockShift.x; y: root.clockShift.y }
+        // Glides to a new place (a look, the arrow keys); follows a drag at once.
+        transform: Translate {
+            x: root.clockShift.x
+            y: root.clockShift.y
+            Behavior on x { enabled: !root.dragging; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+            Behavior on y { enabled: !root.dragging; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+        }
         spacing: Theme.spacing.xs
 
         LockClock {
@@ -197,7 +211,12 @@ Item {
             id: statusSlot
             x: clockColumn.place(this)
             // Its own move, less the clock's (which moves the whole column).
-            transform: Translate { x: root.widgetsShift.x - root.clockShift.x; y: root.widgetsShift.y - root.clockShift.y }
+            transform: Translate {
+                x: root.widgetsShift.x - root.clockShift.x
+                y: root.widgetsShift.y - root.clockShift.y
+                Behavior on x { enabled: !root.dragging; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+                Behavior on y { enabled: !root.dragging; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+            }
             width: Theme.lock.fieldWidth
             topPadding: Theme.spacing.l * 2
         }

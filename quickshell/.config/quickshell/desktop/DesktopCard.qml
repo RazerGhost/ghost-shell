@@ -28,6 +28,10 @@ Item {
 
     x: spot.x * parent.width + (moving ? dragged.x : 0)
     y: spot.y * parent.height + (moving ? dragged.y : 0)
+    // A new place (a widget layout, "Put them back", a drop lining up) is glided to; the drag
+    // itself follows the pointer.
+    Behavior on x { enabled: !root.moving; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+    Behavior on y { enabled: !root.moving; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
     width: body.childrenRect.width
     height: body.childrenRect.height
 

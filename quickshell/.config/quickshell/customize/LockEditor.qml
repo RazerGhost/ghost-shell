@@ -57,6 +57,24 @@ Scope {
         lock.dragShift = Qt.point(0, 0);
     }
 
+    // An arrow key's step: saved straight from where it is, so the move glides (a drag's sets
+    // dragShift, which follows the pointer at once).
+    function stepClock(by: point): void {
+        const lock = editor.item?.lockContent;
+        if (!lock)
+            return;
+        const shift = lock.clockShiftFor(lock.clockShift.x + by.x, lock.clockShift.y + by.y);
+        Settings.values.lockClockOffset = { x: shift.x / lock.width, y: shift.y / lock.height };
+    }
+
+    function stepWidgets(by: point): void {
+        const lock = editor.item?.lockContent;
+        if (!lock)
+            return;
+        const shift = lock.widgetsShiftFor(lock.widgetsShift.x + by.x, lock.widgetsShift.y + by.y);
+        Settings.values.lockWidgetsOffset = { x: shift.x / lock.width, y: shift.y / lock.height };
+    }
+
     // The same for the player and widgets under the clock.
     function moveWidgets(by: point): void {
         const lock = editor.item?.lockContent;
@@ -135,6 +153,7 @@ Scope {
                                       clock?.width ?? 0, clock?.height ?? 0)
                         onMoving: by => lock.dragShift = by
                         onMoved: by => root.moveClock(by)
+                        onStepped: by => root.stepClock(by)
                     }
 
                     EditOutline {
@@ -151,6 +170,7 @@ Scope {
                                       status.contentWidth, Math.max(status.height, Theme.lock.widget))
                         onMoving: by => lock.widgetsDragShift = by
                         onMoved: by => root.moveWidgets(by)
+                        onStepped: by => root.stepWidgets(by)
                     }
                 }
             }
