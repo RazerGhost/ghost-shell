@@ -323,6 +323,17 @@ Scope {
                                 }
                             }
                         }
+
+                        // The editor shows the places as saved; the lock and login screens mirror them.
+                        TileRow {
+                            label: "Quiet side"
+
+                            Switch {
+                                label: "Move to the picture's quieter side"
+                                checked: Settings.values.lockQuietSide
+                                onToggled: Settings.values.lockQuietSide = !checked
+                            }
+                        }
                         }
                     }
                 }

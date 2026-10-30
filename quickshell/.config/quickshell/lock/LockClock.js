@@ -69,6 +69,52 @@ function placeOf(places, name, values) {
     return offset(name === "clock" || name === "date" ? values?.lockClockOffset : values?.lockWidgetsOffset);
 }
 
+// The picture's quieter side (Settings' lockQuietSide): `text` its grey levels (0-255) as `od`
+// prints them, `w` x `h` pixels row by row (LockContent has ffmpeg make that small copy). How
+// busy each outer third is: the mean difference between a pixel and its right and lower
+// neighbours (Ryoku's wallpaper tone map measures the same). "left" or "right" when one third is
+// clearly calmer (the other at least 1.5 times as busy, and by more than a trace), else "" (a
+// calm or evenly busy picture, or output that isn't the picture: nothing moves then).
+function quietSide(text, w, h) {
+    const greys = String(text).trim().split(/\s+/).map(Number);
+    if (!(w >= 3 && h >= 2) || greys.length !== w * h || greys.some(v => !(v >= 0 && v <= 255)))
+        return "";
+    const third = Math.floor(w / 3);
+    const busy = (from, to) => {
+        let sum = 0, count = 0;
+        for (let y = 0; y < h - 1; y++)
+            for (let x = from; x < to && x < w - 1; x++) {
+                const v = greys[y * w + x];
+                sum += Math.abs(v - greys[y * w + x + 1]) + Math.abs(v - greys[(y + 1) * w + x]);
+                count++;
+            }
+        return count > 0 ? sum / count : 0;
+    };
+    const left = busy(0, third);
+    const right = busy(w - third, w);
+    if (right >= left * 1.5 && right - left > 2)
+        return "left";
+    if (left >= right * 1.5 && left - right > 2)
+        return "right";
+    return "";
+}
+
+// Which side of a screen `width` px wide a part centred at `center` px is on: "" in the middle
+// fifth.
+function sideOf(center, width) {
+    if (center < width * 0.4)
+        return "left";
+    if (center > width * 0.6)
+        return "right";
+    return "";
+}
+
+// The move that mirrors a part across the screen's middle: laid out at `x` px, `width` wide,
+// moved `dx` px, on a screen `screenWidth` wide; it ends up as far from the other edge.
+function mirroredMove(x, width, dx, screenWidth) {
+    return screenWidth - 2 * x - width - dx;
+}
+
 // The places with `name` at `place`: a new object (so the setting's change is seen). The first
 // time, every part in `names` keeps where the old two moves had it.
 function withPlace(places, name, place, values, names) {

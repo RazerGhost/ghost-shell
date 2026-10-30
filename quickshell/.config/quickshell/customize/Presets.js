@@ -96,7 +96,7 @@ const windows = [
 ];
 
 // Every setting the lock screen editor changes, for its Cancel.
-const lockKeys = ["lockClockStyle", "lockLayout", "lockPlaces", "lockClockOffset", "lockWidgetsOffset", "lockClockSize", "lockClockFont", "lockBlur", "lockDim",
+const lockKeys = ["lockClockStyle", "lockLayout", "lockPlaces", "lockQuietSide", "lockClockOffset", "lockWidgetsOffset", "lockClockSize", "lockClockFont", "lockBlur", "lockDim",
                   "lockWallpaper", "lockClock", "lockDate", "lockWidgets", "lockMedia", "lockLooks"];
 
 // Every setting the desktop editor changes, for its Cancel (the wallpaper is put back apart:

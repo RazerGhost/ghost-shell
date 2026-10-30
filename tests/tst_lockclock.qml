@@ -73,4 +73,50 @@ TestCase {
         compare(LockClock.withPlace(places, "field", { x: 0, y: -0.1 }, old, ["clock", "field"]),
                 { clock: { x: 0.1, y: 0 }, field: { x: 0, y: -0.1 } });
     }
+
+    // A w x h picture as od prints it: `busyLeft` gives the left third a checkerboard (very
+    // busy), the rest a flat grey; else the other way round.
+    function picture(w, h, busyLeft) {
+        const rows = [];
+        for (let y = 0; y < h; y++) {
+            const row = [];
+            for (let x = 0; x < w; x++) {
+                const busy = busyLeft ? x < w / 3 : x >= w - w / 3;
+                row.push(busy ? ((x + y) % 2 ? 230 : 20) : 120);
+            }
+            rows.push(" " + row.join("  "));
+        }
+        return rows.join("\n") + "\n";
+    }
+
+    function test_quietSide() {
+        compare(LockClock.quietSide(picture(12, 6, true), 12, 6), "right");
+        compare(LockClock.quietSide(picture(12, 6, false), 12, 6), "left");
+        // Evenly flat, or both sides alike: neither.
+        compare(LockClock.quietSide(Array(72).fill(120).join(" "), 12, 6), "");
+        // Busy only by a trace: neither.
+        const faint = Array(72).fill(120);
+        faint[0] = 121;
+        compare(LockClock.quietSide(faint.join(" "), 12, 6), "");
+        // Not the picture: too short, not numbers, out of range, nothing.
+        compare(LockClock.quietSide("1 2 3", 12, 6), "");
+        compare(LockClock.quietSide(picture(12, 6, true).replace("230", "x"), 12, 6), "");
+        compare(LockClock.quietSide(picture(12, 6, true).replace("230", "300"), 12, 6), "");
+        compare(LockClock.quietSide("", 12, 6), "");
+    }
+
+    function test_sideOf() {
+        compare(LockClock.sideOf(300, 1920), "left");
+        compare(LockClock.sideOf(960, 1920), "");
+        compare(LockClock.sideOf(1100, 1920), "");
+        compare(LockClock.sideOf(1700, 1920), "right");
+    }
+
+    function test_mirroredMove() {
+        // A 400 px part laid out at 760 (centred) and moved 500 right ends up 500 left of the middle.
+        compare(LockClock.mirroredMove(760, 400, 500, 1920), -500);
+        // A part in the bottom-left corner (laid out at 115) ends up as far from the right edge.
+        const dx = LockClock.mirroredMove(115, 300, 0, 1920);
+        compare(115 + dx, 1920 - 115 - 300);
+    }
 }

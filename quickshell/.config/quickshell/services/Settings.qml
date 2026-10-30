@@ -130,6 +130,9 @@ Singleton {
             // Where each part was dragged in the lock screen editor: { clock: { x, y }, date, player,
             // weather, ..., field } as fractions of the screen (lock/LockClock.js placeOf).
             property var lockPlaces: null
+            // The parts mirrored to the picture's quieter side when the clock sits on its busier
+            // one (lock/LockContent.qml); not in the editor, which shows the places as saved.
+            property bool lockQuietSide: false
             // Before lockPlaces, two moves (the clock with its date, the player with the widgets):
             // only read while lockPlaces isn't set.
             property var lockClockOffset: null

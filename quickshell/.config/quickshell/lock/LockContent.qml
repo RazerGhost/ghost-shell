@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Effects
 import Quickshell
+import Quickshell.Io
 import Quickshell.Widgets
 import qs.services
 import qs.theme
@@ -51,6 +52,7 @@ Item {
     Component.onCompleted: {
         if (takesKeyboard)
             password.forceActiveFocus();
+        Qt.callLater(measureQuiet);
     }
 
     // Fades in from black when it appears (Hyprland shows nothing behind a lock screen).
@@ -136,7 +138,8 @@ Item {
     readonly property var keepClear: [fieldArea].concat(bottomRow)
 
     // How far `item` (the part `name`) is moved from where the layout puts it: its saved place,
-    // plus `by` px (the drag going on unless given), kept on the screen and clear of the rest.
+    // plus `by` px (the drag going on unless given), mirrored while `mirrored`, kept on the screen
+    // and clear of the rest.
     function shiftOf(name, item, by) {
         // Read so a change around it is followed (mapToItem alone isn't).
         for (let p = item; p && p !== root; p = p.parent)
@@ -145,9 +148,56 @@ Item {
         const at = field ? Qt.point(fieldX + fieldShift, fieldColumn.y) : item.parent.mapToItem(root, item.x, item.y);
         const place = LockClockJs.placeOf(Settings.values.lockPlaces, name, Settings.values);
         const extra = by ?? drags[name] ?? Qt.point(0, 0);
+        const dx = place.x * width + extra.x;
         return LockClockJs.clamped({ x: at.x, y: at.y, width: item.width, height: field ? item.height + belowReserve : item.height },
-                                   place.x * width + extra.x, place.y * height + extra.y, width, height,
+                                   mirrored ? LockClockJs.mirroredMove(at.x, item.width, dx, width) : dx,
+                                   place.y * height + extra.y, width, height,
                                    field ? bottomRow : keepClear, Theme.spacing.l * 2, Theme.spacing.l);
+    }
+
+    // The parts move to the picture's quieter side (Settings' lockQuietSide): when the clock (or
+    // the date without it) sits on the busier side, every part is mirrored across the middle. Not
+    // in the editor, which shows and drags the places as saved. The side is measured once per
+    // picture: ffmpeg makes a small grey copy, cropped to the screen's shape like the picture
+    // (LockClock.quietSide).
+    readonly property bool followsQuiet: Settings.values.lockQuietSide === true && editor === null && wallpaper !== ""
+    property string quietSide: ""
+    readonly property Item anchorPart: Settings.values.lockClock ? bigClock : Settings.values.lockDate ? dateLine : null
+    // Its saved place without the clamp: the clamp keeps clear of the field, whose place depends
+    // on `mirrored` (a loop), and only keeps the part on the screen, not on another side.
+    readonly property string anchorSide: {
+        if (!anchorPart)
+            return "";
+        void (clockColumn.x + anchorPart.x + anchorPart.width);
+        const place = LockClockJs.placeOf(Settings.values.lockPlaces, anchorPart === bigClock ? "clock" : "date", Settings.values);
+        const at = anchorPart.parent.mapToItem(root, anchorPart.x, anchorPart.y);
+        return LockClockJs.sideOf(at.x + place.x * width + anchorPart.width / 2, width);
+    }
+    readonly property bool mirrored: followsQuiet && quietSide !== "" && anchorSide !== "" && anchorSide !== quietSide
+
+    readonly property int toneWidth: 48
+    readonly property int toneHeight: Math.max(2, Math.round(toneWidth * height / Math.max(width, 1)))
+
+    function measureQuiet(): void {
+        quietSide = "";
+        if (!followsQuiet || width <= 0)
+            return;
+        tone.start(["sh", "-c", "ffmpeg -nostdin -v error -i \"$1\" -frames:v 1 -vf \"scale=$2:$3:force_original_aspect_ratio=increase:flags=area,crop=$2:$3\" -f rawvideo -pix_fmt gray - | od -An -v -tu1",
+                    "sh", wallpaper, String(toneWidth), String(toneHeight)]);
+    }
+    onFollowsQuietChanged: Qt.callLater(measureQuiet)
+    onWallpaperChanged: Qt.callLater(measureQuiet)
+    onToneHeightChanged: Qt.callLater(measureQuiet)
+
+    LatestProcess {
+        id: tone
+        stdout: StdioCollector {
+            onStreamFinished: {
+                // An older picture's run can finish after a newer one was asked for.
+                if (tone.command[4] === root.wallpaper && tone.command[6] === String(root.toneHeight))
+                    root.quietSide = LockClockJs.quietSide(text, root.toneWidth, root.toneHeight);
+            }
+        }
     }
 
     // The editor's drag of a part, followed until it's let go.

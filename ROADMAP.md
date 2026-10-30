@@ -1447,6 +1447,20 @@ Two read-only reviews of everything since the presets review, findings checked, 
 - Not done: the lock looks' preview cards draw wide widgets as dots and don't show a moved date
   or player.
 
+### Lock screen: the quiet side of the picture (built 2026-10-30; untested on the laptop)
+User's pick, after looking at how Ryoku handles wallpapers (its wallpaper tone map measures where
+a picture is calm for the widgets floating on it). The lock screen editor's Clock tab, Place and
+size: "Quiet side" (`lockQuietSide`, off by default; looks and Cancel keep it). While it's on,
+the lock and login screens measure their picture once: ffmpeg makes a 48 px wide grey copy
+cropped to the screen's shape, `od` prints it, and `LockClock.quietSide` compares how busy the
+outer thirds are (the mean difference between neighbouring pixels; one side must be at least
+1.5 times as calm). When the clock (or the date without it) sits on the busier side, every part
+is mirrored across the middle (`LockClock.mirroredMove`, then the usual clamp), so the art's
+subject stays clear; a centred clock or an evenly busy picture moves nothing. The editor shows
+and drags the places as saved, never mirrored. Tested: `quietSide`, `sideOf`, `mirroredMove`
+(the QML tests' logic run under bun on Windows; qmltestrunner not run), and the ffmpeg + od
+pipeline on a picture busy on the left (quiet: right).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
