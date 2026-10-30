@@ -1221,6 +1221,20 @@ only its editor's settings, with values its controls offer, none twice).
   look's gaps, corners and border.
 - `Presets.current` compares lists by their contents (the hidden status icons), and `apply`
   copies them, so editing your settings after never changes a preset.
+- Widget combinations and places too (user's request: presets are also which widgets and
+  where). The desktop editor's Looks tab has Style beside Widget layouts: Clean (none), Glance
+  (time and weather, top left), Focus (time, timer and to-do along the top), Music (player
+  bottom left, time above, weather beside), Workday (a column on the right: time, events,
+  tasks, battery), Everything (all seven, two columns). Places are laid out in px on a
+  1920 x 1080 screen and kept as fractions (`Presets.widgetLayout`; tested: on the screen,
+  clear of the island and the dock, none over another). Their cards draw the widgets at their
+  places. `DesktopWidgets.kinds` now says which widgets are medium.
+- The lock screen's looks bring their widgets: Classic (weather, battery, notifications),
+  Minimal (none), Analog (weather, notifications), Bold (four), Editorial (weather), and a new
+  Split (the clock in the bottom-left corner, weather, battery, notifications and the timer
+  apart to the right, through `lockWidgetsOffset`). Never the next event: its title would
+  show to anyone at the screen (tested). The cards show each look's widgets as dots under its
+  clock.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

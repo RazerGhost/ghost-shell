@@ -3,6 +3,8 @@ import QtTest
 import "../quickshell/.config/quickshell/customize/Presets.js" as Presets
 import "../quickshell/.config/quickshell/settings/HyprlandConfig.js" as HyprlandConfig
 import "../quickshell/.config/quickshell/theme/ThemeScale.js" as ThemeScale
+import "../quickshell/.config/quickshell/desktop/DesktopWidgets.js" as DesktopWidgets
+import "../quickshell/.config/quickshell/lock/LockWidgets.js" as LockWidgets
 
 TestCase {
     name: "Presets"
@@ -30,6 +32,7 @@ TestCase {
     // offer, and no two are the same.
     function test_editorPresets() {
         const sets = [[Presets.lock, Presets.lockKeys], [Presets.desktop, Presets.desktopKeys],
+                      [Presets.desktopWidgets, Presets.desktopKeys],
                       [Presets.dockIsland, Presets.dockIslandKeys], [Presets.windows, Presets.windowsKeys]];
         for (const [presets, keys] of sets) {
             for (const p of presets)
@@ -50,6 +53,44 @@ TestCase {
         // The first of each is how a fresh install looks.
         compare(Presets.current({ dockMode: "hide", dockIconSize: 44, workspaceDots: 5, hiddenStatusIcons: [],
                                   clockDate: false, clockSeconds: false, islandMedia: true }, Presets.dockIsland), "Ghost");
+    }
+
+    // Each widget layout's widgets on a 1920 x 1080 screen: on the screen, below the island and
+    // above the dock, none over another; every widget that's on has a place, and only those.
+    function test_widgetLayouts() {
+        for (const preset of Presets.desktopWidgets) {
+            const rects = [];
+            for (const kind of DesktopWidgets.kinds) {
+                const place = preset.values.desktopWidgets[kind.name];
+                compare(preset.values[kind.key], place !== undefined, preset.name + " " + kind.name);
+                if (!place)
+                    continue;
+                const r = { n: kind.name, x: place.x * 1920, y: place.y * 1080, w: kind.medium ? 352 : 168, h: 168 };
+                verify(r.x >= 32 && r.x + r.w <= 1920 - 32, preset.name + " " + r.n);
+                verify(r.y >= 80 && r.y + r.h <= 1080 - 100, preset.name + " " + r.n);
+                rects.push(r);
+            }
+            for (const a of rects)
+                for (const b of rects)
+                    if (a !== b)
+                        verify(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y,
+                               preset.name + ": " + a.n + " over " + b.n);
+        }
+        // A fresh install (every widget off, none moved) is Clean.
+        const fresh = { desktopWidgets: {} };
+        for (const kind of DesktopWidgets.kinds)
+            fresh[kind.key] = false;
+        compare(Presets.current(fresh, Presets.desktopWidgets), "Clean");
+    }
+
+    // The lock looks' widgets: known ones, at most the row's limit, never the next event (its
+    // title would show to anyone at the screen).
+    function test_lockLooksWidgets() {
+        for (const preset of Presets.lock) {
+            const list = preset.values.lockWidgets;
+            compare(LockWidgets.shown(list, {}), list, preset.name);
+            verify(!list.includes("event"), preset.name);
+        }
     }
 
     function test_applyCopies() {

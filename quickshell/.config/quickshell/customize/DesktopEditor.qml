@@ -12,6 +12,7 @@ import qs.widgets
 import "../services/ColorScheme.js" as ColorSchemeJs
 import "../settings/HyprlandConfig.js" as HyprlandConfig
 import "../theme/ThemeScale.js" as ThemeScale
+import "../desktop/DesktopWidgets.js" as DesktopWidgetsJs
 import "Presets.js" as Presets
 import "Themes.js" as Themes
 
@@ -141,13 +142,15 @@ Scope {
                 onCancelled: root.cancel()
                 onFinished: root.close()
 
-                // Looks: the style presets over your wallpaper: a panel in each look's glass and
-                // corners (how it draws the colors shows once picked).
+                // Looks: the style presets over your wallpaper (a panel in each look's glass and
+                // corners; how it draws the colors shows once picked), and the widget layouts (a
+                // fitting set of widgets, each at its place).
                 SheetTiles {
                     visible: chrome.tab === "looks"
 
                     LooksTile {
-                        subtitle: "Glass, blur, corners and color style, over your wallpaper and widgets"
+                        title: "Style"
+                        subtitle: "Glass, blur, corners and color style, over your wallpaper"
                         presets: Presets.desktop
                         fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)
                         art: Component {
@@ -198,6 +201,54 @@ Scope {
                                             }
                                         }
                                     }
+                                }
+                            }
+                        }
+                    }
+
+                    LooksTile {
+                        title: "Widget layouts"
+                        subtitle: "Which widgets, and where"
+                        presets: Presets.desktopWidgets
+                        fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)
+                        art: Component {
+                            Item {
+                                id: layout
+                                readonly property var values: parent.option.values
+
+                                Image {
+                                    anchors.fill: parent
+                                    source: Wallpaper.stillPath ? "file://" + Wallpaper.stillPath : ""
+                                    fillMode: Image.PreserveAspectCrop
+                                    sourceSize.width: width * 2
+                                    asynchronous: true
+                                }
+
+                                // Each widget that's on, at its place and size on the screen, shrunk.
+                                Repeater {
+                                    model: DesktopWidgetsJs.kinds.filter(k => layout.values[k.key])
+
+                                    Rectangle {
+                                        required property var modelData
+                                        readonly property var place: DesktopWidgetsJs.place(layout.values.desktopWidgets, modelData.name)
+                                        readonly property real unit: layout.width / Math.max(Screen.width, 1)
+
+                                        x: place.x * layout.width
+                                        y: place.y * layout.height
+                                        width: (modelData.medium ? Theme.desktop.medium : Theme.desktop.size) * unit
+                                        height: Theme.desktop.size * unit
+                                        radius: Theme.desktop.radius * unit
+                                        color: Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, 0.45)
+                                    }
+                                }
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    visible: DesktopWidgetsJs.kinds.every(k => !layout.values[k.key])
+                                    text: "No widgets"
+                                    color: Colors.m3onSurface
+                                    font.family: Theme.font.sans
+                                    font.pixelSize: Theme.font.small
                                 }
                             }
                         }

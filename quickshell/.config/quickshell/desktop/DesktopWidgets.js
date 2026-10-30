@@ -3,17 +3,18 @@
 // so it can be tested on its own (tests/tst_desktopwidgets.qml).
 .pragma library
 
-// Every widget: its name (its key in desktopWidgets, DesktopCard's `name`) and the setting that
-// turns it on. The desktop editor's Cancel and themes take their keys from here; adding a widget
-// also means its card in DesktopWidgets.qml, its setting and the editor's gallery.
+// Every widget: its name (its key in desktopWidgets, DesktopCard's `name`), the setting that
+// turns it on, and whether it's medium (twice as wide) or small. The desktop editor's Cancel,
+// themes and widget layouts take their keys from here; adding a widget also means its card in
+// DesktopWidgets.qml, its setting and the editor's gallery.
 const kinds = [
-    { name: "clock",    key: "desktopClock" },
-    { name: "weather",  key: "desktopWeather" },
-    { name: "media",    key: "desktopMedia" },
-    { name: "calendar", key: "desktopCalendar" },
-    { name: "battery",  key: "desktopBattery" },
-    { name: "todo",     key: "desktopTodo" },
-    { name: "timer",    key: "desktopTimer" }
+    { name: "clock",    key: "desktopClock",    medium: true },
+    { name: "weather",  key: "desktopWeather",  medium: false },
+    { name: "media",    key: "desktopMedia",    medium: true },
+    { name: "calendar", key: "desktopCalendar", medium: true },
+    { name: "battery",  key: "desktopBattery",  medium: false },
+    { name: "todo",     key: "desktopTodo",     medium: true },
+    { name: "timer",    key: "desktopTimer",    medium: false }
 ];
 const keys = kinds.map(k => k.key);
 

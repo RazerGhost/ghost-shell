@@ -3,14 +3,26 @@
 .pragma library
 .import "../desktop/DesktopWidgets.js" as DesktopWidgets
 
-// The lock and login screens: the clock's style, place, size and font, and the picture's blur
-// and darkening.
+// The lock and login screens: the clock's style, place, size and font, the picture's blur and
+// darkening, and the widgets under the clock and where they sit (never the next event: its
+// title would show to anyone at the screen).
+const clockLook = (style, layout, size, font, blur, dim) => ({ lockClockStyle: style, lockLayout: layout, lockClockSize: size,
+                                                              lockClockFont: font, lockBlur: blur, lockDim: dim });
 const lock = [
-    { name: "Classic", values: { lockClockStyle: "big", lockLayout: "top", lockClockSize: 100, lockClockFont: "", lockBlur: 100, lockDim: 25, lockClockOffset: null, lockWidgetsOffset: null } },
-    { name: "Minimal", values: { lockClockStyle: "thin", lockLayout: "center", lockClockSize: 100, lockClockFont: "", lockBlur: 100, lockDim: 40, lockClockOffset: null, lockWidgetsOffset: null } },
-    { name: "Analog", values: { lockClockStyle: "analog", lockLayout: "left", lockClockSize: 100, lockClockFont: "", lockBlur: 60, lockDim: 30, lockClockOffset: null, lockWidgetsOffset: null } },
-    { name: "Bold", values: { lockClockStyle: "stacked", lockLayout: "top", lockClockSize: 125, lockClockFont: "Inter Display", lockBlur: 100, lockDim: 25, lockClockOffset: null, lockWidgetsOffset: null } },
-    { name: "Editorial", values: { lockClockStyle: "big", lockLayout: "center", lockClockSize: 125, lockClockFont: "C059", lockBlur: 80, lockDim: 35, lockClockOffset: null, lockWidgetsOffset: null } }
+    { name: "Classic", values: Object.assign(clockLook("big", "top", 100, "", 100, 25),
+        { lockWidgets: ["weather", "battery", "notifications"], lockClockOffset: null, lockWidgetsOffset: null }) },
+    { name: "Minimal", values: Object.assign(clockLook("thin", "center", 100, "", 100, 40),
+        { lockWidgets: [], lockClockOffset: null, lockWidgetsOffset: null }) },
+    { name: "Analog", values: Object.assign(clockLook("analog", "left", 100, "", 60, 30),
+        { lockWidgets: ["weather", "notifications"], lockClockOffset: null, lockWidgetsOffset: null }) },
+    { name: "Bold", values: Object.assign(clockLook("stacked", "top", 125, "Inter Display", 100, 25),
+        { lockWidgets: ["weather", "battery", "notifications", "todo"], lockClockOffset: null, lockWidgetsOffset: null }) },
+    { name: "Editorial", values: Object.assign(clockLook("big", "center", 125, "C059", 80, 35),
+        { lockWidgets: ["weather"], lockClockOffset: null, lockWidgetsOffset: null }) },
+    // The clock in the bottom-left corner, the widgets apart from it to the right.
+    { name: "Split", values: Object.assign(clockLook("big", "left", 100, "", 100, 30),
+        { lockWidgets: ["weather", "battery", "notifications", "timer"], lockClockOffset: null,
+          lockWidgetsOffset: { x: 0.6, y: 0 } }) }
 ];
 
 // The desktop's style, over your wallpaper, accent and widgets: the glass, blur, corners and how
@@ -22,6 +34,37 @@ const desktop = [
     { name: "Calm", values: { glass: true, glassOpacity: 60, blurStyle: "haze", cornerScale: 1.5, colorStyle: "scheme-neutral", colorContrast: -0.5 } },
     { name: "Solid", values: { glass: false, glassOpacity: 85, blurStyle: "kawase", cornerScale: 0.5, colorStyle: "scheme-tonal-spot", colorContrast: 0.5 } },
     { name: "Sharp", values: { glass: false, glassOpacity: 85, blurStyle: "kawase", cornerScale: 0, colorStyle: "scheme-monochrome", colorContrast: 0.5 } }
+];
+
+// Desktop widget layouts: a fitting set of widgets, each at its place. Places are laid out in px
+// on a 1920 x 1080 screen (widgets 168 px high, small ones 168 wide, medium 352, 16 apart, clear
+// of the island and the dock) and kept as fractions, like a dragged widget's.
+function widgetLayout(places) {
+    const values = {};
+    const saved = {};
+    for (const kind of DesktopWidgets.kinds) {
+        values[kind.key] = kind.name in places;
+        if (kind.name in places)
+            saved[kind.name] = { x: Math.round(places[kind.name][0] / 1920 * 10000) / 10000,
+                                 y: Math.round(places[kind.name][1] / 1080 * 10000) / 10000 };
+    }
+    values.desktopWidgets = saved;
+    return values;
+}
+
+const desktopWidgets = [
+    { name: "Clean", values: widgetLayout({}) },
+    // The time and sky, top left.
+    { name: "Glance", values: widgetLayout({ clock: [64, 96], weather: [432, 96] }) },
+    // A row along the top: the time, a timer and what to do.
+    { name: "Focus", values: widgetLayout({ clock: [64, 96], timer: [432, 96], todo: [616, 96] }) },
+    // The player at the bottom left, the time above it, the sky beside it.
+    { name: "Music", values: widgetLayout({ clock: [64, 608], media: [64, 792], weather: [432, 792] }) },
+    // A column on the right: the time, the day's events, tasks, the battery.
+    { name: "Workday", values: widgetLayout({ clock: [1504, 96], calendar: [1504, 280], todo: [1504, 464], battery: [1504, 648] }) },
+    // All of them, two columns on the left.
+    { name: "Everything", values: widgetLayout({ clock: [64, 96], calendar: [64, 280], media: [64, 464], todo: [64, 648],
+                                                weather: [432, 96], battery: [432, 280], timer: [432, 464] }) }
 ];
 
 // The island and dock: how much the island shows and when and how large the dock is.

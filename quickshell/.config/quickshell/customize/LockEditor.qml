@@ -195,6 +195,7 @@ Scope {
                                 }
 
                                 MiniClock {
+                                    id: mini
                                     box: look
                                     style: look.values.lockClockStyle
                                     family: look.values.lockClockFont || Theme.font.sans
@@ -204,6 +205,27 @@ Scope {
                                     x: look.values.lockLayout === "left" ? look.width * 0.08 : (look.width - width * scale) / 2
                                     y: look.values.lockLayout === "top" ? look.height * 0.12
                                        : look.values.lockLayout === "center" ? (look.height - height * scale) / 2 : look.height * 0.88 - height * scale
+                                }
+
+                                // The look's widgets as small circles under the clock, moved like
+                                // the look moves them.
+                                Row {
+                                    readonly property var offset: look.values.lockWidgetsOffset ?? { x: 0, y: 0 }
+                                    readonly property real dot: look.height * 0.07
+                                    x: (look.values.lockLayout === "left" ? mini.x : (look.width - width) / 2) + offset.x * look.width
+                                    y: Math.min(mini.y + mini.height * mini.scale + dot * 0.6 + offset.y * look.height, look.height - dot * 1.4)
+                                    spacing: dot * 0.4
+
+                                    Repeater {
+                                        model: Array.from(look.values.lockWidgets ?? [])
+
+                                        Rectangle {
+                                            width: parent.dot
+                                            height: width
+                                            radius: width / 2
+                                            color: Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, 0.45)
+                                        }
+                                    }
                                 }
                             }
                         }
