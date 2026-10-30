@@ -1473,7 +1473,7 @@ two-word tags like "-anime girls" return nothing). The desktop editor's More art
 styles as chips (Top, the month's best, as before; Sky, Lofi, Painterly, Minimal) beside the
 search field. Konachan was looked at and dropped (user: not the kind of anime they want).
 
-### The Wallpapers window (built 2026-10-30)
+### The Wallpapers window (done, verified on the laptop 2026-10-30)
 User's choice: finding art belongs in its own window like Settings, not in the desktop editor.
 `wallpaper/WallpaperBrowser.qml` (a `FloatingWindow`, "Wallpapers"): a search field and the
 styles as chips (Top, Sky, Lofi, Painterly, Minimal), wallhaven's results as pictures in a grid,
