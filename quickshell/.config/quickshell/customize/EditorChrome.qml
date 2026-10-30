@@ -61,7 +61,7 @@ Item {
 
         anchors.horizontalCenter: parent.horizontalCenter
         y: root.centered ? (parent.height - height) / 2 : parent.height - height - Theme.spacing.l * 2
-        width: Math.min(parent.width - Theme.spacing.l * 4, Theme.editor.sheet)
+        width: parent.width - Theme.spacing.l * 4
         height: tabsColumn.height + Theme.spacing.l
         Behavior on height { NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing } }
 

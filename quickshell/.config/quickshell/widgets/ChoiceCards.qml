@@ -29,7 +29,10 @@ Column {
         return Math.min(Theme.settings.card, Math.floor((area.width - Theme.spacing.m * (n - 1)) / n));
     }
 
-    width: parent?.width ?? 0
+    // In an editor's SheetGrid two cells, a scrolling row the whole row; elsewhere the parent's
+    // width.
+    property int span: scrolls ? 99 : 2
+    width: parent?.cellWidth ? parent.cellWidth * Math.min(span, parent.columns) : (parent?.width ?? 0)
     topPadding: Theme.spacing.m
     bottomPadding: Theme.spacing.m
     spacing: Theme.spacing.m

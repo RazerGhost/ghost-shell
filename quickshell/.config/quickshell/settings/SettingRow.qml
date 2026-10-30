@@ -10,7 +10,9 @@ Item {
     property string subtitle
     default property alias control: slot.data
 
-    width: parent?.width ?? 0
+    // In an editor's SheetGrid one cell (or `span` cells); elsewhere the parent's width.
+    property int span: 1
+    width: parent?.cellWidth ? parent.cellWidth * Math.min(span, parent.columns) : (parent?.width ?? 0)
     implicitHeight: Math.max(Theme.settings.rowHeight, texts.implicitHeight + Theme.spacing.m * 2)
     // A disabled row (a schedule's times while there's no schedule) is dimmed.
     opacity: enabled ? 1 : 0.5

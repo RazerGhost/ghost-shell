@@ -994,6 +994,10 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   sizes and glass show on it) and hide the dock (`Editing.hideDock`: its sheet is where the
   dock would be, and the bottom edge doesn't reveal it); the dock and island editor shows both
   at their edges, no card.
+- Full-width sheets (user's review): the sheet spans the screen (less its margins) and each tab
+  is a `customize/SheetGrid.qml`, its settings side by side in as many ~420 px cells as fit,
+  wrapping only when they don't (SettingRow takes one cell, picture cards two, a scrolling row
+  the whole row; `span` overrides), so most tabs are one row and the card is larger.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
