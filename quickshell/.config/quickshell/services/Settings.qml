@@ -214,6 +214,11 @@ Singleton {
             property var desktopWidgets: ({})
             // Your saved looks (customize/Themes.js): [{ name, wallpaper, primary, values }].
             property var themes: []
+            // Your own looks in the editors' Looks galleries (customize/SavedLooks.js): [{ name, values }].
+            property var lockLooks: []
+            property var dockLooks: []
+            property var windowLooks: []
+            property var widgetLooks: []
             property string cursorTheme: ""        // "" = Adwaita
             property int cursorSize: 24
             // Settings -> Appearance -> Size (theme/ThemeScale.js lists the steps).

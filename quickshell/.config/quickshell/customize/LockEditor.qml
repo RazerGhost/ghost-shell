@@ -193,6 +193,8 @@ Scope {
 
                     LooksTile {
                         yours: root.saved
+                        savedKey: "lockLooks"
+                        savedKeys: Presets.lockKeys.filter(k => k !== "lockLooks")
                         subtitle: "Your picture with each look's clock"
                         presets: Presets.lock
                         fadeColor: Qt.tint(chrome.solid, Colors.tint)

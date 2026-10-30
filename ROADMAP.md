@@ -1276,6 +1276,18 @@ User's pick. Picking a preset, a theme or a layout glides instead of jumping:
 Corner radii and sizes still change at once: easing them would lay the whole shell out again
 every frame.
 
+### Your own looks (built 2026-10-30)
+User's pick. The Looks galleries of the lock screen, dock and island, and windows editors, and
+the desktop's widget layouts, keep looks of your own after their presets
+(`customize/SavedLooks.js`, tested; `lockLooks`, `dockLooks`, `windowLooks`, `widgetLooks`):
+the last card, "Save this look", keeps the settings now as "My look N" ("My layout N");
+picking one sets it like a preset; while one is chosen the gallery's header has its name to
+change (Enter; a taken or empty name is ignored, a preset's too) and a delete button. A lock
+look keeps everything about the lock screen (clock, picture, blur and darkening, widgets and
+their places, media controls), a dock look all of the dock and island editor's settings, a
+window look all of the windows editor's. Cancel puts the saved looks back too. The desktop's
+own style keeps using themes (with the wallpaper).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

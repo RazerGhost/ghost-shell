@@ -87,6 +87,8 @@ Scope {
 
                     LooksTile {
                         yours: root.saved
+                        savedKey: "dockLooks"
+                        savedKeys: Presets.dockIslandKeys.filter(k => k !== "dockLooks")
                         subtitle: "How much the island shows, and the dock"
                         presets: Presets.dockIsland
                         fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)

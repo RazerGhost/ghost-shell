@@ -210,6 +210,8 @@ Scope {
                     LooksTile {
                         yours: root.saved
                         title: "Widget layouts"
+                        savedKey: "widgetLooks"
+                        savedPrefix: "My layout"
                         subtitle: "Which widgets, and where"
                         presets: Presets.desktopWidgets
                         fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)

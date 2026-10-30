@@ -234,6 +234,8 @@ Scope {
 
                     LooksTile {
                         yours: root.saved
+                        savedKey: "windowLooks"
+                        savedKeys: Presets.windowsKeys.filter(k => k !== "windowLooks")
                         subtitle: "Borders, corners, gaps and motion"
                         presets: Presets.windows
                         fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)
