@@ -1206,7 +1206,7 @@ from that place; Cancel puts the old one back.
 ### Presets in every editor (done, verified on the laptop 2026-10-30)
 User's request. Each on-screen editor opens on a Looks tab: its presets as picture cards drawn
 on your wallpaper (`customize/LooksTile.qml`, shared with the lock screen's looks; "Yours"
-first while your settings match none). Picking one sets its settings at once; each can still
+first, see the fix below). Picking one sets its settings at once; each can still
 be changed after, and Cancel puts the old ones back (`customize/Presets.js`, tested: each sets
 only its editor's settings, with values its controls offer, none twice).
 - Desktop (style over your wallpaper, accent and widgets: glass, blur, corners, color style
@@ -1287,6 +1287,37 @@ look keeps everything about the lock screen (clock, picture, blur and darkening,
 their places, media controls), a dock look all of the dock and island editor's settings, a
 window look all of the windows editor's. Cancel puts the saved looks back too. The desktop's
 own style keeps using themes (with the wallpaper).
+
+### Review of the presets, menu and keyboard work (2026-10-30)
+Two read-only reviews of everything since the last review, findings checked, then fixed:
+- Keys: Enter in the editors' name fields (themes, your looks) also pressed Done, and Escape
+  cancelled the whole editor; `TextField` now keeps Enter, and with `keepsEscape` Escape only
+  puts the name back. A rejected name (empty, taken) shows the old one again. The lock screen's
+  outlines, outside the editor's frame, swallowed Escape and Enter and kept the arrow keys:
+  now the plain arrows move on (`EditorChrome.navigate`), Shift + arrows move the part (in the
+  hints), Enter opens its tab, Escape cancels; their instructions are an accessible description.
+- Looks: "Save this look" made a copy that could never be chosen when the look already matched
+  one; it's only offered while none matches. "Yours" put back only what the presets set, not
+  all a saved lock look sets (the picture, media controls). The Save card is a button to screen
+  readers.
+- Moves: letting go of a drag counted it twice for a moment and glided back from there, on the
+  lock screen and the desktop (a `settling` flag keeps the glide off while it's saved); a click
+  with a wobble on an outline is no longer saved as a move (which broke a look's match). The
+  lock editor's four move functions are one (`movePart`).
+- Quick settings from the customize menu: it closes an open editor first; the edit flag is
+  set after the screen (on two screens the other one's quick settings took it) and watched,
+  so it also works while quick settings is open and never lingers for the next Super+N.
+  Super+U closes the menu again.
+- Structure: the cards' picture is drawn once by `LooksTile` (`picture`), not by each editor's
+  art; the key hint rows are `widgets/KeyHints.qml` (`EditorChrome.extraHints` for an editor's
+  own keys); themes rename and delete through `SavedLooks`; `Presets.plain` turns a list read
+  back from settings.json into an Array for both; `Colors.sketch` for the cards' small widgets;
+  the glass look's card shows its own edge and solidity (`Theme.surfaceOpacity`); the dock and
+  island look's clock follows 12/24 hours.
+- Also: launcher entries "Customize" and "Edit quick settings", search words, and the login
+  screen's copy of the settings leaves out your saved lock looks.
+- Not done: a clock or widgets dragged to the very bottom of the login screen can sit over its
+  power buttons and message line (they stay on top and clickable).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

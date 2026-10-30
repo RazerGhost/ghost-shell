@@ -3,13 +3,15 @@
 // Desktop themes (Themes.js) are the same idea with a wallpaper. Plain JavaScript, so it can be
 // tested on its own (tests/tst_savedlooks.qml).
 .pragma library
+.import "Presets.js" as Presets
 
 // The saved list made safe (a hand-edited file can't break the gallery): named, with only
 // `keys`, and at least one of them.
 function valid(saved, keys) {
-    if (saved === null || typeof saved !== "object" || typeof saved.length !== "number")
+    const list = Presets.plain(saved);
+    if (!Array.isArray(list))
         return [];
-    return Array.from(saved)
+    return list
         .filter(l => typeof l?.name === "string" && l.name !== "" && typeof l.values === "object" && l.values !== null)
         .map(l => {
             const values = {};
@@ -29,10 +31,8 @@ function made(taken, values, keys, prefix) {
         n++;
     const saved = {};
     for (const key of keys) {
-        const value = values[key];
         // A list read back from settings.json is array-like: kept as a real list.
-        const plain = value !== null && typeof value === "object" && typeof value.length === "number" ? Array.from(value) : value;
-        saved[key] = JSON.parse(JSON.stringify(plain ?? null));
+        saved[key] = JSON.parse(JSON.stringify(Presets.plain(values[key]) ?? null));
     }
     return { name: prefix + " " + n, values: saved };
 }

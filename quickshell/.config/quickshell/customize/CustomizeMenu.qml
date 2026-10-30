@@ -222,44 +222,14 @@ Scope {
                 }
 
                 // The keys.
-                Row {
+                KeyHints {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: Theme.spacing.l
-                    opacity: 0.8
-
-                    Repeater {
-                        model: [
-                            { keys: ["←", "→"], label: "Move" },
-                            { keys: ["Enter"], label: "Open" },
-                            { keys: ["1–5"], label: "Jump to one" },
-                            { keys: ["Esc"], label: "Close" }
-                        ]
-
-                        Row {
-                            id: hint
-                            required property var modelData
-                            spacing: Theme.spacing.xs
-
-                            Repeater {
-                                model: hint.modelData.keys
-
-                                KeyCap {
-                                    required property string modelData
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: modelData
-                                }
-                            }
-
-                            Text {
-                                anchors.verticalCenter: parent.verticalCenter
-                                leftPadding: Theme.spacing.xs
-                                text: hint.modelData.label
-                                color: Colors.m3onSurfaceVariant
-                                font.family: Theme.font.sans
-                                font.pixelSize: Theme.font.small
-                            }
-                        }
-                    }
+                    hints: [
+                        { keys: ["←", "→"], label: "Move" },
+                        { keys: ["Enter"], label: "Open" },
+                        { keys: ["1–5"], label: "Jump to one" },
+                        { keys: ["Esc"], label: "Close" }
+                    ]
                 }
             }
         }

@@ -29,6 +29,8 @@ Item {
     property bool centered: false
     // A short note under the tabs while something takes a moment ("Making the colors…").
     property string status
+    // Keys of its own for the hints at the sheet's foot: [{ keys, label }].
+    property var extraHints: []
     default property alias content: sheetColumn.data
     readonly property Item sheet: sheet
 
@@ -166,47 +168,18 @@ Item {
                 width: parent.width
             }
 
-            // The keys, at the sheet's foot.
-            Row {
+            // The keys, at the sheet's foot (and the editor's own, `extraHints`).
+            KeyHints {
                 anchors.horizontalCenter: parent.horizontalCenter
                 bottomPadding: Theme.spacing.xs
-                spacing: Theme.spacing.l
-                opacity: 0.8
-
-                Repeater {
-                    model: [
-                        { keys: ["←", "↑", "↓", "→"], label: "Move" },
-                        { keys: ["Enter"], label: "Choose" },
-                        { keys: ["Ctrl", "Tab"], label: "Next tab" },
-                        { keys: ["Ctrl", "Enter"], label: "Done" },
-                        { keys: ["Esc"], label: "Cancel" }
-                    ].filter(h => h.label !== "Next tab" || root.tabs.length > 1)
-
-                    Row {
-                        id: hint
-                        required property var modelData
-                        spacing: Theme.spacing.xs
-
-                        Repeater {
-                            model: hint.modelData.keys
-
-                            KeyCap {
-                                required property string modelData
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: modelData
-                            }
-                        }
-
-                        Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            leftPadding: Theme.spacing.xs
-                            text: hint.modelData.label
-                            color: Colors.m3onSurfaceVariant
-                            font.family: Theme.font.sans
-                            font.pixelSize: Theme.font.small
-                        }
-                    }
-                }
+                hints: [
+                    { keys: ["←", "↑", "↓", "→"], label: "Move" },
+                    { keys: ["Enter"], label: "Choose" }
+                ].concat(root.extraHints).concat([
+                    { keys: ["Ctrl", "Tab"], label: "Next tab" },
+                    { keys: ["Ctrl", "Enter"], label: "Done" },
+                    { keys: ["Esc"], label: "Cancel" }
+                ].filter(h => h.label !== "Next tab" || root.tabs.length > 1))
             }
         }
     }

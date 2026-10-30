@@ -45,6 +45,10 @@ Singleton {
     readonly property color surfaceTranslucent: Qt.rgba(m3surfaceContainer.r, m3surfaceContainer.g, m3surfaceContainer.b, panelAlpha)
     readonly property color glassEdge: Qt.rgba(m3onSurface.r, m3onSurface.g, m3onSurface.b, edgeAlpha)
 
+    // The editors' small drawings of widgets on their preview cards (lock screen looks, widget
+    // layouts): a light shape over any picture.
+    readonly property color sketch: Qt.rgba(m3onSurface.r, m3onSurface.g, m3onSurface.b, 0.45)
+
     // A faint shade over a panel: the editors' tiles and chips, and the fades into them.
     readonly property color tint: Qt.rgba(m3onSurface.r, m3onSurface.g, m3onSurface.b, 0.05)
 

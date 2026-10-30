@@ -5,6 +5,7 @@
 .pragma library
 .import "../desktop/DesktopWidgets.js" as DesktopWidgets
 .import "Presets.js" as Presets
+.import "SavedLooks.js" as SavedLooks
 
 const keys = ["colorScheme", "colorStyle", "colorContrast", "accentColor",
               "glass", "glassOpacity", "blurStyle", "cornerScale", "fontSans", "fontMono", "iconTheme",
@@ -59,14 +60,11 @@ function current(themes, values, wallpaper) {
 }
 
 // `themes` with the one named `from` called `to` (trimmed); the same list when the new name is
-// empty or another theme has it.
+// empty or another theme has it (SavedLooks', like the editors' own looks).
 function renamed(themes, from, to) {
-    const name = String(to).trim();
-    if (name === "" || themes.some(t => t.name === name && t.name !== from))
-        return themes.slice();
-    return themes.map(t => t.name === from ? Object.assign({}, t, { name }) : t);
+    return SavedLooks.renamed(themes, from, to, []);
 }
 
 function removed(themes, name) {
-    return themes.filter(t => t.name !== name);
+    return SavedLooks.removed(themes, name);
 }

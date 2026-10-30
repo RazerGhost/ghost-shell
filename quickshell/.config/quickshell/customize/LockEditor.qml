@@ -98,7 +98,7 @@ Scope {
                 width: chrome.card.width
                 height: chrome.card.height
                 radius: Theme.radius.l * 1.5
-                color: "black"
+                color: Colors.m3scrim
 
                 Item {
                     width: window.width
@@ -159,6 +159,7 @@ Scope {
 
             EditorChrome {
                 id: chrome
+                extraHints: [{ keys: ["Shift", "←↑↓→"], label: "Move the clock or widgets" }]
                 tabs: [
                     { value: "looks", label: "Looks" },
                     { value: "clock", label: "Clock" },
@@ -189,7 +190,7 @@ Scope {
 
                                 Rectangle {
                                     anchors.fill: parent
-                                    color: "black"
+                                    color: Colors.m3scrim
                                     opacity: look.values.lockDim / 100 + 0.1
                                 }
 
@@ -222,7 +223,7 @@ Scope {
                                             width: parent.dot
                                             height: width
                                             radius: width / 2
-                                            color: Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, 0.45)
+                                            color: Colors.sketch
                                         }
                                     }
                                 }

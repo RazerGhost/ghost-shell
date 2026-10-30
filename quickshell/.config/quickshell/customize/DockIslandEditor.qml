@@ -131,7 +131,11 @@ Scope {
 
                                         Text {
                                             anchors.verticalCenter: parent.verticalCenter
-                                            text: (look.values.clockDate ? "Fri 30  " : "") + (look.values.clockSeconds ? "14:32:05" : "14:32")
+                                            // A sample afternoon, as your clock would read it (12 or 24 hours).
+                                            text: (look.values.clockDate ? "Fri 30  " : "")
+                                                  + Qt.formatTime(new Date(2026, 0, 30, 14, 32, 5),
+                                                                  (Settings.values.clock24Hour ? "HH:mm" : "h:mm") + (look.values.clockSeconds ? ":ss" : "")
+                                                                  + (Settings.values.clock24Hour ? "" : " AP"))
                                             color: Colors.m3onSurface
                                             font.family: Theme.font.sans
                                             font.pixelSize: look.unit * 1.6

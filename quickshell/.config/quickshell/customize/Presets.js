@@ -122,9 +122,14 @@ function restore(values, saved) {
 // Whether two settings' values are the same: lists and objects by their contents, whatever the
 // order of an object's keys (settings.json is written with them sorted, so the widgets' places
 // come back in another order than a preset gave them), and unset counting as null.
+// A list read back from settings.json isn't a JavaScript Array (NOTES): as one; anything else
+// as it is.
+function plain(value) {
+    return value !== null && typeof value === "object" && typeof value.length === "number" && !Array.isArray(value)
+        ? Array.from(value) : value;
+}
+
 function same(a, b) {
-    // A list read back from settings.json isn't a JavaScript Array (NOTES): compare it as one.
-    const plain = v => v !== null && typeof v === "object" && typeof v.length === "number" && !Array.isArray(v) ? Array.from(v) : v;
     a = plain(a ?? null);
     b = plain(b ?? null);
     if (a === b)

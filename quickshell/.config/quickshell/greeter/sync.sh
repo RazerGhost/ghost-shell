@@ -31,7 +31,7 @@ if [ -f "$state/settings.json" ]; then
         const all = JSON.parse(require("fs").readFileSync(process.env.SETTINGS, "utf8"));
         const keep = ["uiScale", "textScale", "cornerScale", "animationSpeed", "glass", "glassOpacity", "clock24Hour"];
         const shown = Object.fromEntries(Object.entries(all).filter(([key]) =>
-            keep.includes(key) || /^(lock|greeter|font)/.test(key)));
+            (keep.includes(key) || /^(lock|greeter|font)/.test(key)) && key !== "lockLooks"));
         process.stdout.write(JSON.stringify(shown, null, 4) + "\n");
     ' >"$shared/settings.json.tmp"
     mv -f "$shared/settings.json.tmp" "$shared/settings.json"

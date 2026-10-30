@@ -168,9 +168,10 @@ Scope {
                                     height: parent.height * 0.5
                                     radius: Theme.radius.m * look.values.cornerScale
                                     color: Qt.rgba(Colors.m3surfaceContainer.r, Colors.m3surfaceContainer.g, Colors.m3surfaceContainer.b,
-                                                   look.values.glass ? look.values.glassOpacity / 100 : 0.85)
+                                                   look.values.glass ? look.values.glassOpacity / 100 : Theme.surfaceOpacity)
                                     border.width: look.values.glass ? Theme.glass.edge : 0
-                                    border.color: Colors.glassEdge
+                                    // The look's edge, not the one you have now.
+                                    border.color: Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, Theme.glass.edgeAlpha)
 
                                     Column {
                                         anchors.centerIn: parent
@@ -230,7 +231,7 @@ Scope {
                                         width: (modelData.medium ? Theme.desktop.medium : Theme.desktop.size) * unit
                                         height: Theme.desktop.size * unit
                                         radius: Theme.desktop.radius * unit
-                                        color: Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, 0.45)
+                                        color: Colors.sketch
                                     }
                                 }
 
@@ -387,7 +388,13 @@ Scope {
                                         themeName.text = themesTab.current;
                                     }
                                 }
-                                onAccepted: Settings.values.themes = Themes.renamed(themesTab.themes, themesTab.current, text)
+                                keepsEscape: true
+                                // An empty or taken name isn't kept: the field shows the name again.
+                                onAccepted: {
+                                    Settings.values.themes = Themes.renamed(themesTab.themes, themesTab.current, text);
+                                    text = themesTab.current;
+                                }
+                                onEscaped: text = themesTab.current
                                 Accessible.name: "The theme's name"
                             }
 
