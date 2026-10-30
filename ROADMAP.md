@@ -1401,6 +1401,18 @@ User's requests:
   and battery on either side), and Split moves its player and each widget. Each look was
   checked on the real lock screen (a scratch copy whose settings aren't written).
 
+### More wallpapers (built 2026-10-30)
+User's pick, for the art they like (anime and illustrations, not photos): `ghost wallpapers get
+[search words] [--count N] [--general]` (`modules/core/wallpapers.sh`) fetches from wallhaven.cc's
+public search API (no account): the month's best anime, or the best matching the words, at
+least 1920x1080 in 16:9, never anything but its safe-for-work purity (the filter is fixed, and
+each result is checked again: SFW, a JPEG or PNG, wallhaven's own file host), N new ones (12 by
+default, 1-48; ones already there are skipped, files named wallhaven-<id>) into your wallpaper
+folder (Settings' wallpaperFolder), never the repo. --general adds illustrations and scenery.
+The desktop editor's Wallpaper tab has a "More art" tile: search words (optional) and Get 12,
+then the gallery has them and a notification says how many came. Tried into a scratch folder:
+downloads, skips what's there, searches.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

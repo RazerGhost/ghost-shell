@@ -488,7 +488,61 @@ Scope {
                                 }
                             }
                         }
+    
+                    // More art from wallhaven.cc into your folder (ghost wallpapers get): the month's
+                    // best anime, or what the words find; safe for work only.
+                    SheetTile {
+                        title: "More art"
+                        subtitle: "From wallhaven.cc, into your folder"
+                        natural: Theme.editor.slider
+
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width
+                            spacing: Theme.spacing.m
+
+                            TextField {
+                                id: artWords
+                                width: parent.width
+                                placeholder: "Search (or the month's best)"
+                                keepsEscape: true
+                                onAccepted: fetchArt.get()
+                                onEscaped: text = ""
+                            }
+
+                            TextButton {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: fetchArt.running ? "Getting them…" : "Get 12"
+                                filled: true
+                                enabled: !fetchArt.running
+                                onClicked: fetchArt.get()
+                            }
+                        }
+
+                        Process {
+                            id: fetchArt
+
+                            function get(): void {
+                                if (running)
+                                    return;
+                                const words = artWords.text.trim().split(/\s+/).filter(w => w !== "");
+                                command = [Quickshell.env("HOME") + "/.local/bin/ghost", "wallpapers", "get"].concat(words).concat(["--count", "12"]);
+                                running = true;
+                            }
+
+                            stdout: StdioCollector { id: artOut }
+                            stderr: StdioCollector { id: artErr }
+                            onExited: code => {
+                                Wallpaper.rescan();
+                                const lines = artOut.text.trim().split("\n");
+                                Notifications.send("Wallpapers", code === 0 ? "preferences-desktop-wallpaper" : "dialog-warning",
+                                                   code === 0 ? "More art" : "Couldn't get more art",
+                                                   code === 0 ? lines[lines.length - 1] : (artErr.text.trim() || "ghost wallpapers exited with " + code),
+                                                   false, []);
+                            }
+                        }
                     }
+                }
                 }
 
                 // Colors: light or dark, the accent as swatches, how the colors are drawn, contrast.
