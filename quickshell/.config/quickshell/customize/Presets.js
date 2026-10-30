@@ -19,7 +19,8 @@ const lockKeys = ["lockClockStyle", "lockLayout", "lockClockSize", "lockClockFon
 // Every setting the desktop editor changes, for its Cancel (the wallpaper is put back apart:
 // it isn't a setting).
 const desktopKeys = ["colorScheme", "colorStyle", "colorContrast", "accentColor",
-                     "desktopClock", "desktopWeather", "desktopMedia", "desktopWidgets",
+                     "desktopClock", "desktopWeather", "desktopMedia", "desktopCalendar",
+                     "desktopBattery", "desktopTodo", "desktopWidgets",
                      "glass", "glassOpacity", "blurStyle", "uiScale", "textScale", "cornerScale",
                      "fontSans", "fontMono", "iconTheme"];
 

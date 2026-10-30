@@ -190,6 +190,9 @@ Singleton {
             property bool desktopClock: false
             property bool desktopWeather: false
             property bool desktopMedia: false
+            property bool desktopCalendar: false
+            property bool desktopBattery: false
+            property bool desktopTodo: false
             property var desktopWidgets: ({})
             property string cursorTheme: ""        // "" = Adwaita
             property int cursorSize: 24

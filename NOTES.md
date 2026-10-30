@@ -421,6 +421,12 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   wrapper restarts qs only after a crash; `pkill` ends it too, so start it again). `qs log` prints the running instance's log; panels can be
   opened with `qs ipc call ...` and checked with `grim -g "x,y wxh" out.png`. Run `pkill qs; qs` in a terminal to watch its log (also saved
   under `/run/user/1000/quickshell/`). `qs ipc show` lists IPC targets.
+- A component can be looked at without opening what holds it (an editor that switches the
+  workspace, a widget that's off): copy the shell's folder to a scratch folder, replace its
+  `shell.qml` with a `ShellRoot` holding an Overlay-layer `PanelWindow` that shows the component
+  (the `qs.*` imports resolve against the copy), run `timeout 10 qs -p <copy>` in the
+  background, `grim -g` the window's area, and delete the copy. Only the singletons it uses
+  start; nothing else of the running shell is touched.
 - `xdg-mime default` calls running side by side overwrite each other's `mimeapps.list`: run them one
   after another.
 - Qt's JavaScript `Array.prototype.sort` isn't stable: break ties explicitly (an index) when the

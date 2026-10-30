@@ -5,15 +5,17 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// Widgets on the wallpaper (the desktop editor's Widgets tab): a clock, the weather, and the
-// media player while something plays (ClockWidget, WeatherWidget, MediaWidget: one family of
-// sizes). On the first screen, on the layer just above the wallpaper, so windows cover them.
+// Widgets on the wallpaper (the desktop editor's Widgets tab): a clock, the weather, the
+// media player while something plays, the calendar's next events, the battery and the to-do
+// list (ClockWidget, WeatherWidget, MediaWidget, CalendarWidget, BatteryWidget, TodoWidget: one
+// family of sizes). On the first screen, on the layer just above the wallpaper, so windows cover them.
 // Each can be dragged by its handle (DesktopCard.qml).
 Scope {
     id: root
 
     readonly property bool any: Settings.values.desktopClock || Settings.values.desktopWeather
-                                || Settings.values.desktopMedia
+                                || Settings.values.desktopMedia || Settings.values.desktopCalendar
+                                || Settings.values.desktopBattery || Settings.values.desktopTodo
 
     LazyLoader {
         active: root.any
@@ -34,12 +36,18 @@ Scope {
                 WidgetRegion { stage: widgetStage; widget: clockCard }
                 WidgetRegion { stage: widgetStage; widget: weatherCard }
                 WidgetRegion { stage: widgetStage; widget: mediaCard }
+                WidgetRegion { stage: widgetStage; widget: calendarCard }
+                WidgetRegion { stage: widgetStage; widget: batteryCard }
+                WidgetRegion { stage: widgetStage; widget: todoCard }
             }
 
             BackgroundEffect.blurRegion: Region {
                 WidgetRegion { stage: widgetStage; widget: clockCard; corner: Theme.desktop.radius }
                 WidgetRegion { stage: widgetStage; widget: weatherCard; corner: Theme.desktop.radius }
                 WidgetRegion { stage: widgetStage; widget: mediaCard; corner: Theme.desktop.radius }
+                WidgetRegion { stage: widgetStage; widget: calendarCard; corner: Theme.desktop.radius }
+                WidgetRegion { stage: widgetStage; widget: batteryCard; corner: Theme.desktop.radius }
+                WidgetRegion { stage: widgetStage; widget: todoCard; corner: Theme.desktop.radius }
                 // Never empty: Hyprland 0.57 blurs the whole surface for an empty region (NOTES).
                 Region { width: 1; height: 1 }
             }
@@ -84,6 +92,30 @@ Scope {
                     shown: Settings.values.desktopMedia && Media.player !== null
 
                     MediaWidget {}
+                }
+
+                DesktopCard {
+                    id: calendarCard
+                    name: "calendar"
+                    shown: Settings.values.desktopCalendar
+
+                    CalendarWidget {}
+                }
+
+                DesktopCard {
+                    id: batteryCard
+                    name: "battery"
+                    shown: Settings.values.desktopBattery && Battery.present
+
+                    BatteryWidget {}
+                }
+
+                DesktopCard {
+                    id: todoCard
+                    name: "todo"
+                    shown: Settings.values.desktopTodo
+
+                    TodoWidget {}
                 }
             }
         }

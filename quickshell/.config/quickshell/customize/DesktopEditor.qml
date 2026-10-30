@@ -295,54 +295,121 @@ Scope {
                     }
                 }
 
-                // Widgets: a tile per widget with a look at it and its switch, and their places.
+                // Widgets: a gallery of the widgets themselves (click one to put it on the desktop
+                // or take it off, like iOS's), and their places.
                 SheetTiles {
                     visible: chrome.tab === "widgets"
 
-                    Repeater {
-                        model: [
-                            { key: "desktopClock", title: "Clock", subtitle: "The time and date" },
-                            { key: "desktopWeather", title: "Weather", subtitle: "Today's, for your town" },
-                            { key: "desktopMedia", title: "Media", subtitle: "While something plays" }
-                        ]
+                    SheetTile {
+                        id: galleryTile
+                        title: "Widgets"
+                        subtitle: "Click one to put it on your desktop or take it off"
+                        weight: 5
 
-                        SheetTile {
-                            id: widgetTile
+                        ListView {
+                            id: gallery
+                            anchors.fill: parent
+                            orientation: ListView.Horizontal
+                            spacing: Theme.spacing.l
+                            clip: true
+                            boundsBehavior: Flickable.StopAtBounds
+                            model: [
+                                { key: "desktopClock", title: "Clock", widget: clockWidget },
+                                { key: "desktopWeather", title: "Weather", widget: weatherWidget },
+                                { key: "desktopCalendar", title: "Calendar", widget: calendarWidget },
+                                { key: "desktopTodo", title: "To-do", widget: todoWidget },
+                                { key: "desktopBattery", title: "Battery", widget: batteryWidget },
+                                { key: "desktopMedia", title: "Media", widget: mediaWidget }
+                            ].filter(w => w.key !== "desktopBattery" || Battery.present)
 
-                            required property var modelData
-                            readonly property bool on: Settings.values[modelData.key]
+                            delegate: Item {
+                                id: entry
 
-                            title: modelData.title
-                            subtitle: modelData.subtitle
-                            action: Switch {
-                                label: widgetTile.modelData.title + " on the desktop"
-                                checked: widgetTile.on
-                                onToggled: Settings.values[widgetTile.modelData.key] = !checked
-                            }
+                                required property var modelData
+                                readonly property bool on: Settings.values[modelData.key]
+                                // The widget scaled to the gallery's height, less its name.
+                                readonly property real zoom: preview.item ? (gallery.height - name.height - Theme.spacing.s) / Math.max(preview.item.height, 1) : 1
 
-                            // The widget itself, scaled to fit, dimmed while it's off; clicking toggles.
-                            Item {
-                                anchors.fill: parent
-                                opacity: widgetTile.on ? 1 : Theme.state.disabled
-                                Behavior on opacity { NumberAnimation { duration: Theme.anim.fast } }
-
-                                Loader {
-                                    anchors.centerIn: parent
-                                    enabled: false
-                                    sourceComponent: ({ desktopClock: clockWidget, desktopWeather: weatherWidget,
-                                                        desktopMedia: mediaWidget })[widgetTile.modelData.key]
-                                    scale: item ? Math.min(parent.width / item.width, parent.height / item.height, 1) : 1
+                                function toggle(): void {
+                                    Settings.values[modelData.key] = !on;
                                 }
 
-                                Component { id: clockWidget; ClockWidget {} }
-                                Component { id: weatherWidget; WeatherWidget {} }
-                                Component { id: mediaWidget; MediaWidget {} }
+                                width: (preview.item?.width ?? 0) * zoom
+                                height: gallery.height
+
+                                Accessible.role: Accessible.CheckBox
+                                Accessible.name: modelData.title + " on the desktop"
+                                Accessible.checkable: true
+                                Accessible.checked: on
+                                Accessible.onPressAction: toggle()
+                                activeFocusOnTab: true
+                                Keys.onReturnPressed: toggle()
+                                Keys.onEnterPressed: toggle()
+                                Keys.onSpacePressed: toggle()
+
+                                Loader {
+                                    id: preview
+                                    enabled: false
+                                    sourceComponent: entry.modelData.widget
+                                    scale: entry.zoom
+                                    transformOrigin: Item.TopLeft
+                                    opacity: entry.on ? 1 : Theme.state.disabled
+                                    Behavior on opacity { NumberAnimation { duration: Theme.anim.fast } }
+                                }
+
+                                // Its name, with a check while it's on.
+                                Row {
+                                    id: name
+                                    anchors.bottom: parent.bottom
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    spacing: Theme.spacing.xs
+
+                                    MaterialIcon {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        icon: entry.on ? "check_circle" : "add_circle"
+                                        color: entry.on ? Colors.m3primary : Colors.m3onSurfaceVariant
+                                        font.pixelSize: Theme.icon.small
+                                    }
+
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: entry.modelData.title
+                                        color: entry.on ? Colors.m3onSurface : Colors.m3onSurfaceVariant
+                                        font.family: Theme.font.sans
+                                        font.pixelSize: Theme.font.small
+                                        font.weight: Font.Medium
+                                    }
+                                }
 
                                 MouseArea {
                                     anchors.fill: parent
                                     cursorShape: Qt.PointingHandCursor
-                                    onClicked: Settings.values[widgetTile.modelData.key] = !widgetTile.on
+                                    onClicked: entry.toggle()
                                 }
+
+                                FocusRing {
+                                    radius: Theme.desktop.radius * entry.zoom
+                                }
+                            }
+                        }
+
+                        Component { id: clockWidget; ClockWidget {} }
+                        Component { id: weatherWidget; WeatherWidget {} }
+                        Component { id: calendarWidget; CalendarWidget {} }
+                        Component { id: todoWidget; TodoWidget {} }
+                        Component { id: batteryWidget; BatteryWidget {} }
+                        Component { id: mediaWidget; MediaWidget {} }
+
+                        // More to the right: it fades out there (the tile's shade over the sheet).
+                        Rectangle {
+                            anchors.right: gallery.right
+                            width: Theme.spacing.l * 3
+                            height: gallery.height
+                            visible: !gallery.atXEnd
+                            gradient: Gradient {
+                                orientation: Gradient.Horizontal
+                                GradientStop { position: 0; color: "transparent" }
+                                GradientStop { position: 1; color: Qt.tint(Colors.surfaceTranslucent, Colors.tint) }
                             }
                         }
                     }

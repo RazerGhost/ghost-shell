@@ -3,11 +3,15 @@
 // so it can be tested on its own (tests/tst_desktopwidgets.qml).
 .pragma library
 
-// Down the left side, under the island's height, until moved.
+// Two columns down the left side, under the island's height, until moved (the second one
+// clear of a medium widget in the first on a 1920 px screen).
 const defaults = {
-    clock:   { x: 0.04, y: 0.08 },
-    weather: { x: 0.04, y: 0.26 },
-    media:   { x: 0.04, y: 0.44 }
+    clock:    { x: 0.04, y: 0.08 },
+    weather:  { x: 0.04, y: 0.26 },
+    media:    { x: 0.04, y: 0.44 },
+    calendar: { x: 0.24, y: 0.08 },
+    battery:  { x: 0.24, y: 0.26 },
+    todo:     { x: 0.24, y: 0.44 }
 };
 
 function fraction(value, fallback) {

@@ -1078,7 +1078,7 @@ from the idle lock; every other lock ends it).
 - Not done: Cancel in the desktop editor can't go back to Hyprland's default wallpaper when
   none was chosen before (the wallpaper service has no "none" to set).
 
-### Quick settings editor (built 2026-10-30)
+### Quick settings editor (done, verified on the laptop 2026-10-30)
 User's pick after the review: Android's edit mode, on the panel itself.
 - Quick settings' wide tiles and round buttons come from two lists in your settings
   (`quickTiles`, `quickToggles`; until edited, what it showed before), made safe and edited by
@@ -1093,6 +1093,22 @@ User's pick after the review: Android's edit mode, on the panel itself.
   (stops a recording, or opens the screenshot tool on Record), screenshot, wallpaper.
 - The battery line in the bottom row ends in "…" before the buttons (the pencil made it run
   under them).
+
+### More desktop widgets (built 2026-10-30)
+User's pick after the quick settings editor: more of the same family.
+- Calendar (medium, like iOS's): the month in the accent, the day large and the weekday on the
+  left, the next three events on the right (`Agenda.upcoming`, "Today 14:00" from
+  `Agenda.when`); without a calendar, how to add one. Clicking it opens the today menu.
+- Battery (small, like iOS's batteries widget): a ring filling with the charge around the
+  battery icon, the percentage and the time left or until full; the error color when low. Only
+  on a machine with a battery.
+- To-do (medium, like Reminders): the today menu's tasks not done yet, three at most and
+  "+N more"; clicking one ticks it off, the heading opens the today menu (where tasks are added).
+- Their default places are a second column beside the first three (tested: none of the six
+  overlap on a 1920 x 1080 screen). The desktop editor's Widgets tab is now a gallery of the
+  real widgets, scaled, in one row that scrolls (click one to put it on the desktop or take it
+  off; a check under the ones that are on), beside the Places tile: six tiles with switches
+  would have been too narrow.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

@@ -191,6 +191,8 @@ Singleton {
         readonly property int clock:   root.text(64) // the time
         readonly property int weather: root.text(44) // the temperature
         readonly property int cover:   size - padding * 2 // the media widget's cover
+        readonly property int ring:    root.text(80) // the battery widget's ring
+        readonly property int ringWidth: root.px(8)
     }
 
     readonly property QtObject dock: QtObject {
