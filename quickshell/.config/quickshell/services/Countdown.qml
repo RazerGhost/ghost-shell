@@ -20,6 +20,8 @@ Singleton {
     readonly property real progress: active && saved.total > 0 ? Math.max(0, Math.min(left / saved.total, 1)) : 0
     // The last length started (5 minutes at first): quick settings' button starts it again.
     readonly property int lastMinutes: saved.minutes
+    // The lengths offered to start (the today menu, the desktop widget), in minutes.
+    readonly property var lengths: [1, 5, 15, 25]
 
     function start(minutes: int): void {
         saved.minutes = minutes;

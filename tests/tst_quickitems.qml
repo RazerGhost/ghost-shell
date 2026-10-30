@@ -20,13 +20,6 @@ TestCase {
         compare(QuickItems.available(QuickItems.tiles, QuickItems.tiles), []);
     }
 
-    function test_moved() {
-        compare(QuickItems.moved(["a", "b", "c", "d"], 0, 2), ["b", "c", "a", "d"]);
-        compare(QuickItems.moved(["a", "b", "c", "d"], 3, 0), ["d", "a", "b", "c"]);
-        compare(QuickItems.moved(["a", "b", "c"], 1, 9), ["a", "c", "b"]);
-        compare(QuickItems.moved(["a", "b"], 5, 0), ["a", "b"]);
-    }
-
     function test_addedRemoved() {
         compare(QuickItems.added(["mic"], "dark"), ["mic", "dark"]);
         compare(QuickItems.added(["mic"], "mic"), ["mic"]);

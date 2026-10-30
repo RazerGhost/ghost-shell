@@ -28,16 +28,6 @@ function available(list, known) {
     return known.filter(id => !list.includes(id));
 }
 
-// `list` with the item at `from` moved to `to` (both clamped into the list).
-function moved(list, from, to) {
-    const out = list.slice();
-    if (from < 0 || from >= out.length)
-        return out;
-    const [item] = out.splice(from, 1);
-    out.splice(Math.max(0, Math.min(to, out.length)), 0, item);
-    return out;
-}
-
 function removed(list, id) {
     return list.filter(x => x !== id);
 }

@@ -222,8 +222,10 @@ Singleton {
             // Under the clock on the lock screen (lock/LockStatus.qml); never on the login screen.
             property bool lockMedia: true
             // The round widgets in your order (lock/LockWidgets.js); null until picked in the
-            // lock screen editor: then the four switches below, which it replaced, still count.
+            // lock screen editor. "event" shows the next event's title to anyone at the locked
+            // screen (the editor says so).
             property var lockWidgets: null
+            // The switches lockWidgets replaced: only read while it's null (lock/LockWidgets.js).
             property bool lockNotificationCount: true
             property bool lockWeather: true
             property bool lockBattery: true

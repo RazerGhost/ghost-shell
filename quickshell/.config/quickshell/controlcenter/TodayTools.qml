@@ -201,7 +201,7 @@ Column {
             spacing: Theme.spacing.xs
 
             Repeater {
-                model: [1, 5, 15, 25]
+                model: Countdown.lengths
 
                 TextButton {
                     required property int modelData

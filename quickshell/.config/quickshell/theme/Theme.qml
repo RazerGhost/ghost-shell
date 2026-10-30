@@ -43,7 +43,8 @@ Singleton {
 
     readonly property QtObject font: QtObject {
         // Settings -> Appearance -> Fonts; Inter and MesloLGS by default.
-        readonly property string sans: Settings.values.fontSans || "Inter"
+        readonly property string defaultSans: "Inter" // also a theme card's font when it kept the default
+        readonly property string sans: Settings.values.fontSans || defaultSans
         readonly property string mono: Settings.values.fontMono || "MesloLGS Nerd Font" // error messages
         readonly property string emoji: "Noto Color Emoji"
         readonly property string icon: "Material Symbols Rounded"
@@ -191,8 +192,10 @@ Singleton {
         readonly property int clock:   root.text(64) // the time
         readonly property int weather: root.text(44) // the temperature
         readonly property int cover:   size - padding * 2 // the media widget's cover
-        readonly property int ring:    root.text(80) // the battery widget's ring
+        readonly property int ring:    root.text(80) // the battery and timer widgets' ring
         readonly property int ringWidth: root.px(8)
+        readonly property int icon:    root.px(28)  // the weather's sky and the battery's icon
+        readonly property int eventBar: root.px(3)  // the accent bar beside a calendar event
     }
 
     readonly property QtObject dock: QtObject {
@@ -243,6 +246,8 @@ Singleton {
         readonly property int moved:      24  // px the pointer must move to end the grace period
         readonly property int widget:     root.text(72) // a round widget under the clock (LockWidget.qml)
         readonly property int widgetGap:  root.px(12)
+        readonly property int ringWidth:  root.px(6)  // the battery's and timer's rings in them
+        readonly property int widgetInset: root.px(20) // the wide event widget's text from its ends
     }
 
     readonly property QtObject wallpaper: QtObject {

@@ -21,7 +21,15 @@ WidgetSurface {
     MouseArea {
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
-        onClicked: Quickshell.execDetached(["qs", "ipc", "call", "island", "toggle", "today"])
+        onClicked: openToday()
+
+        function openToday(): void {
+            Quickshell.execDetached(["qs", "ipc", "call", "island", "toggle", "today"]);
+        }
+
+        Accessible.role: Accessible.Button
+        Accessible.name: "Calendar: open the today menu"
+        Accessible.onPressAction: openToday()
     }
 
     Column {
@@ -79,14 +87,14 @@ WidgetSurface {
 
                 // A bar in the accent beside each, like a calendar's event.
                 Rectangle {
-                    width: 3
+                    width: Theme.desktop.eventBar
                     height: parent.height
-                    radius: 1.5
+                    radius: width / 2
                     color: Colors.m3primary
                 }
 
                 Column {
-                    width: parent.width - Theme.spacing.s - 3
+                    width: parent.width - Theme.spacing.s - Theme.desktop.eventBar
 
                     Text {
                         width: parent.width

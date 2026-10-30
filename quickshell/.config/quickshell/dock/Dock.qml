@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 import qs.services
 import "DockApps.js" as DockApps
+import "../widgets/OrderedList.js" as OrderedList
 
 // The dock: an island along the bottom edge with your pinned apps and the other running ones
 // (dock/DockBar.qml draws it on each monitor). Hidden until the pointer touches the bottom edge
@@ -27,7 +28,7 @@ Scope {
     }
 
     function placePin(id: string, index: int): void {
-        state.pinned = DockApps.placePin(pinned, id, index);
+        state.pinned = OrderedList.placed(pinned, id, index);
         file.writeAdapter();
     }
 

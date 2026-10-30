@@ -3,7 +3,8 @@
 // be tested on its own (tests/tst_lockwidgets.qml).
 .pragma library
 
-// Every one there is, in the order the editor offers them; the event is wide (two places).
+// Every one there is, in the order the editor offers them. The event is twice as wide as the
+// others but counts as one of the `most`.
 const known = ["weather", "battery", "notifications", "todo", "timer", "event"];
 const most = 4;
 
@@ -19,16 +20,6 @@ function shown(saved, values) {
     for (const id of saved)
         if (known.includes(id) && !out.includes(id) && out.length < most)
             out.push(id);
-    return out;
-}
-
-// `list` with the widget at `from` moved to `to` (clamped into the list).
-function moved(list, from, to) {
-    const out = list.slice();
-    if (from < 0 || from >= out.length)
-        return out;
-    const [id] = out.splice(from, 1);
-    out.splice(Math.max(0, Math.min(to, out.length)), 0, id);
     return out;
 }
 

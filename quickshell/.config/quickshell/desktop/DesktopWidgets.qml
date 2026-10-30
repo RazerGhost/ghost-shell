@@ -4,19 +4,18 @@ import Quickshell.Wayland
 import qs.services
 import qs.theme
 import qs.widgets
+import "DesktopWidgets.js" as DesktopWidgetsJs
 
 // Widgets on the wallpaper (the desktop editor's Widgets tab): a clock, the weather, the
-// media player while something plays, the calendar's next events, the battery and the to-do
-// list and the timer (ClockWidget, WeatherWidget, MediaWidget, CalendarWidget, BatteryWidget,
-// TodoWidget, TimerWidget: one family of sizes). On the first screen, on the layer just above the wallpaper, so windows cover them.
+// media player while something plays, the calendar's next events, the battery, the to-do list
+// and the timer (ClockWidget, WeatherWidget, MediaWidget, CalendarWidget, BatteryWidget,
+// TodoWidget, TimerWidget: one family of sizes; the list of them is DesktopWidgets.js's
+// `kinds`). On the first screen, on the layer just above the wallpaper, so windows cover them.
 // Each can be dragged by its handle (DesktopCard.qml).
 Scope {
     id: root
 
-    readonly property bool any: Settings.values.desktopClock || Settings.values.desktopWeather
-                                || Settings.values.desktopMedia || Settings.values.desktopCalendar
-                                || Settings.values.desktopBattery || Settings.values.desktopTodo
-                                || Settings.values.desktopTimer
+    readonly property bool any: DesktopWidgetsJs.keys.some(key => Settings.values[key])
 
     LazyLoader {
         active: root.any

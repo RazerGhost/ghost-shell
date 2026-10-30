@@ -30,7 +30,7 @@ WidgetSurface {
         visible: widget.now !== null
         icon: widget.now?.icon ?? ""
         color: Colors.m3primary
-        font.pixelSize: Theme.icon.normal * 1.4
+        font.pixelSize: Theme.desktop.icon
     }
 
     Column {

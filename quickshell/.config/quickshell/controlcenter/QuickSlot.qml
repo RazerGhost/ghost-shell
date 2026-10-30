@@ -14,6 +14,8 @@ Item {
     required property string title
     property Component control
     property bool editing: false
+    // The control's corners, for the keyboard's ring (the round buttons are circles).
+    property real radius: Theme.radius.l
 
     signal removeRequested()
     // Dropped onto the slot at `to` (or moved there with the keyboard).
@@ -80,7 +82,7 @@ Item {
     }
 
     FocusRing {
-        radius: Theme.radius.l
+        radius: slot.radius
     }
 
     // The badge that removes it.

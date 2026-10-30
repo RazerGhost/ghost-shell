@@ -545,7 +545,8 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
 - `lock/LockStatus.qml` under the date on the lock screen (not the login screen: `LockContent`
   only has a slot for it, so the greeter never starts the notification server): the island's
   `MediaCard` (play, pause, skip without unlocking) and the number of notifications, never
-  their content. Settings -> Lock screen: "Media controls" and "Notification count", both on.
+  their content. Settings -> Lock screen: "Media controls" and "Notification count", both on
+  (since 2026-10-30 in the lock screen editor's Widgets tab, see "Lock screen widgets").
 
 ### Game mode (done, verified on the laptop 2026-10-29)
 - A round button in quick settings (`services/GameMode.qml`; not saved, like Keep awake): while
@@ -737,7 +738,8 @@ shell's cost, features and customization), checked before acting. Done so far:
   clock's place (on by default, as before).
 - Settings -> Lock screen: weather and battery under the date (on), and the next calendar event
   (off by default: its title would show to anyone at the locked screen); `LockLine.qml`, and
-  the "Today 14:00" wording moved into `Agenda.when` (shared with the today menu).
+  the "Today 14:00" wording moved into `Agenda.when` (shared with the today menu). Since
+  2026-10-30 these lines are the lock screen widgets, picked in the lock screen editor.
 - Wallpapers: the picker's pictures come from `services/wallpapers.sh` (your folder, Hyprland's,
   everything under /usr/share/wallpapers and /usr/share/backgrounds; JPEG XL/AVIF/HEIC only with
   kimageformats) grouped by `Wallpapers.js` (tested): a KDE Plasma picture is one entry at the
@@ -1128,9 +1130,8 @@ User's pick: an iOS-like row of small widgets under the clock, picked in the loc
 - The ring is shared with the desktop's battery widget (`widgets/ProgressRing.qml`).
 - Follow-ups (user's request): in the tab the ones that are on come first, in the row's
   order, and dragging one onto another moves it there (Shift + Left / Right with the keyboard;
-  `LockWidgets.moved`, tested); on the lock screen in the card, the player and widgets are
-  outlined like the clock, and clicking them opens the Widgets tab (one `Outline` component
-  for both). Verified on the laptop, with the desktop editor's Cancel fix.
+  tested); on the lock screen in the card, the player and widgets are outlined like the
+  clock, and clicking them opens the Widgets tab (`customize/EditOutline.qml` for both). Verified on the laptop, with the desktop editor's Cancel fix.
 
 ### Themes (done, verified on the laptop 2026-10-30)
 User's pick: saved looks for the whole desktop, like Android's themes.
@@ -1150,7 +1151,7 @@ pinned apps (its middle decides; `DockApps.placePin`, tested); a running app tha
 dropped among them is pinned there; dragged up more than the dock's height, a pinned app fades
 and says "Remove <app>", and letting go unpins it. A drag never counts as a click, the
 previews stay away meanwhile, and the dock stays shown while the pointer is above it. The
-right-click menu's Move left / right stay (and the editor's note that pins are moved there).
+right-click menu's Move left / right stay; the dock and island editor's note now says to drag.
 
 ### Timer everywhere (done, verified on the laptop 2026-10-30)
 User's pick: the today menu's timer (`services/Countdown.qml`, which now keeps the length it
@@ -1162,6 +1163,33 @@ started with for a ring, and the last length used) in more places:
   around the time left, with pause or resume and cancel. In the editor's gallery and themes.
 - Lock screen: a round timer widget (its icon, or a ring around the time left), picked in the
   lock screen editor's Widgets tab like the others.
+
+### Review of the day's later work (2026-10-30)
+Two read-only reviews of everything since the editors' review (quick settings editor, more
+desktop widgets, lock screen widgets, themes, dock dragging, the timer), findings checked, then
+fixed:
+- Bugs: the lock screen showed a battery at 0 % on a machine without one (the old switch was
+  on by default); applying a theme, or Cancel, ran wallpaper.sh twice side by side (the
+  wallpaper's run read the old color settings), now the wallpaper waits for the color run
+  (`Wallpaper.run`), and Cancel and themes compare with the wallpaper asked for while it's on
+  its way (`Wallpaper.target`; a video's frame takes a moment); a dock drag cut short (a window
+  of the app opening) left the dock shown for good; quick settings without a Bluetooth adapter
+  kept an empty place; a theme's values are applied only where they fit the setting
+  (`Themes.applicable`, tested) and a theme with none of its own is dropped; video themes'
+  cards use their thumbnail.
+- Structure: one list of desktop widgets (`DesktopWidgets.js` `kinds`) that the editor's
+  Cancel, themes and the widgets' layer take their keys from; moving items in an ordered list
+  is `widgets/OrderedList.js` (quick settings, lock screen widgets, dock pins; tested); the
+  dock's drop rule is `DockApps.dropIndex` (tested); quick settings' items are one table (name,
+  icon, control); the timer's lengths are `Countdown.lengths`; sizes that were numbers in the
+  widgets are Theme tokens and the lock screen widget is a `Surface`.
+- Accessibility: round buttons' keyboard ring is round in edit mode, the widget gallery
+  scrolls to the one Tab reaches, the calendar and to-do widgets' links are buttons to screen
+  readers, "1 notification" and "1 to-do" read right.
+- Not done: a theme saved during the 0.8 s recolor fade stores its card color mid-fade
+  (cosmetic); a theme whose wallpaper file was deleted applies its settings and then says the
+  wallpaper couldn't be set; saving or deleting a theme isn't undone by Cancel (it's its own
+  action, like pinning).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

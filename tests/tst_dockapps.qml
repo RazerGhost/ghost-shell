@@ -51,13 +51,16 @@ TestCase {
         compare(DockApps.notificationCount([], "zen", "Zen Browser"), 0);
     }
 
-    function test_placePin() {
-        compare(DockApps.placePin(["zen", "ghostty", "files"], "zen", 2), ["ghostty", "files", "zen"]);
-        compare(DockApps.placePin(["zen", "ghostty", "files"], "files", 0), ["files", "zen", "ghostty"]);
-        // Not pinned yet: pinned at that place.
-        compare(DockApps.placePin(["zen", "ghostty"], "steam", 1), ["zen", "steam", "ghostty"]);
-        compare(DockApps.placePin(["zen"], "steam", 9), ["zen", "steam"]);
-        compare(DockApps.placePin(["zen"], "steam", -2), ["steam", "zen"]);
+    function test_dropIndex() {
+        // Three other pins, 52 px each from x 0; icons 52 px wide.
+        const slots = [{ x: 0, width: 52 }, { x: 52, width: 52 }, { x: 104, width: 52 }];
+        compare(DockApps.dropIndex(slots, 10, 52, true), 0);
+        compare(DockApps.dropIndex(slots, 80, 52, true), 2);
+        compare(DockApps.dropIndex(slots, 400, 52, true), 3);
+        // Not pinned: pinned at the end when dropped next to the last pin, not further along.
+        compare(DockApps.dropIndex(slots, 170, 52, false), 3);
+        compare(DockApps.dropIndex(slots, 300, 52, false), -1);
+        compare(DockApps.dropIndex([], 300, 52, true), 0);
     }
 
     function test_movePin() {

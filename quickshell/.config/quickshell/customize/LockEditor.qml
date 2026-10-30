@@ -10,6 +10,7 @@ import qs.theme
 import qs.widgets
 import "../lock/LockClock.js" as LockClockJs
 import "../lock/LockWidgets.js" as LockWidgets
+import "../widgets/OrderedList.js" as OrderedList
 import "Presets.js" as Presets
 
 // The lock screen editor, like long-pressing the iOS lock screen: the real lock screen, live,
@@ -411,7 +412,7 @@ Scope {
                                                         todo: "To-do", timer: "Timer", event: "Next event" })
 
                         title: "Under the clock"
-                        subtitle: "Up to four · drag to change their order · an event's title shows to anyone"
+                        subtitle: "Up to " + LockWidgets.most + " · drag to change their order · an event's title shows to anyone"
                         weight: 3
 
                         Row {
@@ -436,7 +437,7 @@ Scope {
                                     }
 
                                     function moveTo(to: int): void {
-                                        Settings.values.lockWidgets = LockWidgets.moved(widgetsTile.list, place, to);
+                                        Settings.values.lockWidgets = OrderedList.moved(widgetsTile.list, place, to);
                                     }
 
                                     spacing: Theme.spacing.s

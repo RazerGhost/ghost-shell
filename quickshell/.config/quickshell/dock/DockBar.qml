@@ -5,6 +5,7 @@ import Quickshell.Wayland
 import qs.services
 import qs.theme
 import qs.widgets
+import "DockApps.js" as DockApps
 
 // The dock on one monitor, macOS style (user's choice): a rounded bar floating a little above the
 // bottom edge. It stays out of sight until the pointer touches the bottom edge (user's choice,
@@ -209,12 +210,12 @@ PanelWindow {
                                 }
                                 if (Math.abs(dy) > Theme.dock.height)
                                     return;
-                                const middle = slot.x + x + width / 2 + dx;
                                 const pinnedSlots = Array.from(row.children)
-                                    .filter(c => c.modelData?.pinned && c.modelData.id !== id);
-                                const index = pinnedSlots.filter(c => c.x + c.width - width / 2 < middle).length;
-                                const lastEnd = pinnedSlots.reduce((end, c) => Math.max(end, c.x + c.width), 0);
-                                if (slot.modelData.pinned || middle < lastEnd + width / 2)
+                                    .filter(c => c.modelData?.pinned && c.modelData.id !== id)
+                                    .map(c => ({ x: c.x, width: c.width }));
+                                const index = DockApps.dropIndex(pinnedSlots, slot.x + x + width / 2 + dx, width,
+                                                                 slot.modelData.pinned);
+                                if (index >= 0)
                                     window.dock.placePin(id, index);
                             }
                             previewing: previews.item === slot.modelData && previews.visible

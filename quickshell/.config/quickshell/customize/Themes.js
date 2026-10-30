@@ -3,11 +3,11 @@
 // one click. Not the shell's and text's sizes: those are how you read, not a look. Plain
 // JavaScript, so it can be tested on its own (tests/tst_themes.qml).
 .pragma library
+.import "../desktop/DesktopWidgets.js" as DesktopWidgets
 
 const keys = ["colorScheme", "colorStyle", "colorContrast", "accentColor",
               "glass", "glassOpacity", "blurStyle", "cornerScale", "fontSans", "fontMono", "iconTheme",
-              "desktopClock", "desktopWeather", "desktopMedia", "desktopCalendar", "desktopBattery",
-              "desktopTodo", "desktopTimer", "desktopWidgets"];
+              ...DesktopWidgets.keys, "desktopWidgets"];
 
 // The saved list made safe (a hand-edited file can't break the tab): each with a name, a
 // wallpaper path ("" for none), its accent color for the card, and only known keys.

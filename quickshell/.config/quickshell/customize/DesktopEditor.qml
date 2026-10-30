@@ -236,7 +236,7 @@ Scope {
                                             Text {
                                                 text: "Aa"
                                                 color: Colors.m3onSurface
-                                                font.family: look.theme.values.fontSans || "Inter" // the default, as in Theme.font
+                                                font.family: look.theme.values.fontSans || Theme.font.defaultSans
                                                 font.pixelSize: Theme.font.normal
                                                 font.weight: Font.DemiBold
                                             }
@@ -467,6 +467,7 @@ Scope {
                                 id: entry
 
                                 required property var modelData
+                                required property int index
                                 readonly property bool on: Settings.values[modelData.key]
                                 // The widget scaled to the gallery's height, less its name.
                                 readonly property real zoom: preview.item ? (gallery.height - name.height - Theme.spacing.s) / Math.max(preview.item.height, 1) : 1
@@ -487,6 +488,11 @@ Scope {
                                 Keys.onReturnPressed: toggle()
                                 Keys.onEnterPressed: toggle()
                                 Keys.onSpacePressed: toggle()
+                                // Tab to one further along: the row scrolls to show it.
+                                onActiveFocusChanged: {
+                                    if (activeFocus)
+                                        gallery.positionViewAtIndex(index, ListView.Contain);
+                                }
 
                                 Loader {
                                     id: preview

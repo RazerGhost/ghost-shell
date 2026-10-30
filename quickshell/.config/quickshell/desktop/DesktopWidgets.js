@@ -3,6 +3,20 @@
 // so it can be tested on its own (tests/tst_desktopwidgets.qml).
 .pragma library
 
+// Every widget: its name (its key in desktopWidgets, DesktopCard's `name`) and the setting that
+// turns it on. The desktop editor's Cancel and themes take their keys from here; adding a widget
+// also means its card in DesktopWidgets.qml, its setting and the editor's gallery.
+const kinds = [
+    { name: "clock",    key: "desktopClock" },
+    { name: "weather",  key: "desktopWeather" },
+    { name: "media",    key: "desktopMedia" },
+    { name: "calendar", key: "desktopCalendar" },
+    { name: "battery",  key: "desktopBattery" },
+    { name: "todo",     key: "desktopTodo" },
+    { name: "timer",    key: "desktopTimer" }
+];
+const keys = kinds.map(k => k.key);
+
 // Two columns down the left side, under the island's height, until moved (the second one
 // clear of a medium widget in the first on a 1920 px screen).
 const defaults = {

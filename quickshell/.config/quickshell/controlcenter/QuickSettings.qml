@@ -6,6 +6,7 @@ import qs.settings
 import qs.theme
 import qs.widgets
 import "QuickItems.js" as QuickItems
+import "../widgets/OrderedList.js" as OrderedList
 
 // The quick settings menu: tiles, volume and brightness sliders and the battery.
 // The Wi-Fi, Bluetooth and Sound tiles slide in a page of their own, like Android.
@@ -23,23 +24,24 @@ Item {
     property bool editing: false
     readonly property var tileList: QuickItems.shown(Settings.values.quickTiles, QuickItems.tiles, QuickItems.defaultTiles)
     readonly property var toggleList: QuickItems.shown(Settings.values.quickToggles, QuickItems.toggles, QuickItems.defaultToggles)
-    // Each one's name and icon, for edit mode's labels and its "Available" chips.
+    // Each one's name, icon and control (a component below), for its slot, edit mode's labels and
+    // its "Available" chips.
     readonly property var info: ({
-        wifi: { icon: "wifi", title: "Wi-Fi" },
-        bluetooth: { icon: "bluetooth", title: "Bluetooth" },
-        sound: { icon: "volume_up", title: "Sound" },
-        power: { icon: "balance", title: "Power mode" },
-        mic: { icon: "mic", title: "Microphone" },
-        dnd: { icon: "do_not_disturb_on", title: "Do Not Disturb" },
-        nightlight: { icon: "nightlight", title: "Night light" },
-        awake: { icon: "coffee", title: "Keep awake" },
-        game: { icon: "sports_esports", title: "Game mode" },
-        airplane: { icon: "flight", title: "Airplane mode" },
-        dark: { icon: "dark_mode", title: "Dark mode" },
-        record: { icon: "radio_button_checked", title: "Record the screen" },
-        screenshot: { icon: "screenshot_region", title: "Screenshot" },
-        wallpaper: { icon: "wallpaper", title: "Wallpaper" },
-        timer: { icon: "timer", title: "Timer" }
+        wifi: { icon: "wifi", title: "Wi-Fi", control: wifiTile },
+        bluetooth: { icon: "bluetooth", title: "Bluetooth", control: bluetoothTile },
+        sound: { icon: "volume_up", title: "Sound", control: soundTile },
+        power: { icon: "balance", title: "Power mode", control: powerTile },
+        mic: { icon: "mic", title: "Microphone", control: micToggle },
+        dnd: { icon: "do_not_disturb_on", title: "Do Not Disturb", control: dndToggle },
+        nightlight: { icon: "nightlight", title: "Night light", control: nightToggle },
+        awake: { icon: "coffee", title: "Keep awake", control: awakeToggle },
+        game: { icon: "sports_esports", title: "Game mode", control: gameToggle },
+        airplane: { icon: "flight", title: "Airplane mode", control: airplaneToggle },
+        dark: { icon: "dark_mode", title: "Dark mode", control: darkToggle },
+        record: { icon: "radio_button_checked", title: "Record the screen", control: recordToggle },
+        screenshot: { icon: "screenshot_region", title: "Screenshot", control: screenshotToggle },
+        wallpaper: { icon: "wallpaper", title: "Wallpaper", control: wallpaperToggle },
+        timer: { icon: "timer", title: "Timer", control: timerToggle }
     })
 
     // The island grows and shrinks to fit the current page.
@@ -347,12 +349,12 @@ Item {
                     required property string modelData
                     itemId: modelData
                     title: root.info[modelData].title
-                    control: ({ wifi: wifiTile, bluetooth: bluetoothTile, sound: soundTile, power: powerTile })[modelData]
+                    control: root.info[modelData].control
                     // No Bluetooth adapter: no tile, and no empty place for it in the grid.
                     visible: modelData !== "bluetooth" || BluetoothStatus.adapter !== null
                     editing: root.editing
                     onRemoveRequested: Settings.values.quickTiles = QuickItems.removed(root.tileList, itemId)
-                    onMoveRequested: to => Settings.values.quickTiles = QuickItems.moved(root.tileList, index, to)
+                    onMoveRequested: to => Settings.values.quickTiles = OrderedList.moved(root.tileList, index, to)
                 }
             }
         }
@@ -378,12 +380,11 @@ Item {
                     required property string modelData
                     itemId: modelData
                     title: root.info[modelData].title
-                    control: ({ mic: micToggle, dnd: dndToggle, nightlight: nightToggle, awake: awakeToggle, game: gameToggle,
-                                airplane: airplaneToggle, dark: darkToggle, record: recordToggle,
-                                screenshot: screenshotToggle, wallpaper: wallpaperToggle, timer: timerToggle })[modelData]
+                    control: root.info[modelData].control
+                    radius: Theme.radius.full
                     editing: root.editing
                     onRemoveRequested: Settings.values.quickToggles = QuickItems.removed(root.toggleList, itemId)
-                    onMoveRequested: to => Settings.values.quickToggles = QuickItems.moved(root.toggleList, index, to)
+                    onMoveRequested: to => Settings.values.quickToggles = OrderedList.moved(root.toggleList, index, to)
                 }
             }
         }

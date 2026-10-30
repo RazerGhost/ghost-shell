@@ -1,6 +1,7 @@
 // Named looks for the on-screen editors (a gallery of picture cards, like the iOS lock screen
 // gallery): picking one sets several settings at once; each can still be changed after. Plain JavaScript, so it can be tested on its own (tests/tst_presets.qml).
 .pragma library
+.import "../desktop/DesktopWidgets.js" as DesktopWidgets
 
 // The lock and login screens: the clock's style, place, size and font, and the picture's blur
 // and darkening.
@@ -19,8 +20,7 @@ const lockKeys = ["lockClockStyle", "lockLayout", "lockClockSize", "lockClockFon
 // Every setting the desktop editor changes, for its Cancel (the wallpaper is put back apart:
 // it isn't a setting).
 const desktopKeys = ["colorScheme", "colorStyle", "colorContrast", "accentColor",
-                     "desktopClock", "desktopWeather", "desktopMedia", "desktopCalendar",
-                     "desktopBattery", "desktopTodo", "desktopTimer", "desktopWidgets",
+                     ...DesktopWidgets.keys, "desktopWidgets",
                      "glass", "glassOpacity", "blurStyle", "uiScale", "textScale", "cornerScale",
                      "fontSans", "fontMono", "iconTheme"];
 

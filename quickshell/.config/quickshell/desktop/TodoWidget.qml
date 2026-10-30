@@ -21,7 +21,15 @@ WidgetSurface {
         width: parent.width
         height: title.height
         cursorShape: Qt.PointingHandCursor
-        onClicked: Quickshell.execDetached(["qs", "ipc", "call", "island", "toggle", "today"])
+        onClicked: openToday()
+
+        function openToday(): void {
+            Quickshell.execDetached(["qs", "ipc", "call", "island", "toggle", "today"]);
+        }
+
+        Accessible.role: Accessible.Button
+        Accessible.name: "To-do, " + widget.open.length + " open: open the today menu"
+        Accessible.onPressAction: openToday()
 
         Text {
             id: title

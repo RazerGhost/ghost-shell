@@ -24,7 +24,7 @@ WidgetSurface {
             anchors.centerIn: parent
             icon: Battery.icon
             color: widget.tone
-            font.pixelSize: Theme.icon.normal * 1.4
+            font.pixelSize: Theme.desktop.icon
         }
     }
 

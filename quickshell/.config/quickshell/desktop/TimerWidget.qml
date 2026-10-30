@@ -28,7 +28,7 @@ WidgetSurface {
         spacing: Theme.spacing.s
 
         Repeater {
-            model: [1, 5, 15, 25]
+            model: Countdown.lengths
 
             TextButton {
                 required property int modelData

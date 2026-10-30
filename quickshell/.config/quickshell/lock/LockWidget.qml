@@ -8,7 +8,7 @@ import qs.widgets
 // notifications came in (never what they say) and to-dos are open, the timer (a ring emptying
 // around the time left); the next event is wide, its
 // time over its title. Picked in the lock screen editor (lock/LockWidgets.js).
-Rectangle {
+Surface {
     id: root
 
     // "weather", "battery", "notifications", "todo", "timer" or "event"
@@ -18,15 +18,12 @@ Rectangle {
     width: kind === "event" ? Theme.lock.widget * 2 + Theme.lock.widgetGap : Theme.lock.widget
     height: Theme.lock.widget
     radius: height / 2
-    color: Colors.surfaceTranslucent
-    border.width: 1
-    border.color: Colors.glassEdge
 
     Accessible.role: Accessible.StaticText
     Accessible.name: kind === "weather" ? (Weather.current ? `${Weather.current.temperature}° ${Weather.current.label}` : "No weather yet")
                    : kind === "battery" ? "Battery " + Math.round(Battery.level * 100) + "%"
-                   : kind === "notifications" ? Notifications.history.length + " notifications"
-                   : kind === "todo" ? Planner.open + " to-dos open"
+                   : kind === "notifications" ? Notifications.history.length + (Notifications.history.length === 1 ? " notification" : " notifications")
+                   : kind === "todo" ? Planner.open + (Planner.open === 1 ? " to-do open" : " to-dos open")
                    : kind === "timer" ? (Countdown.active ? "Timer, " + Countdown.label + " left" : "No timer")
                    : next ? Agenda.when(next) + ", " + next.title : "No events"
 
@@ -62,7 +59,7 @@ Rectangle {
         visible: root.kind === "battery"
         value: Battery.level
         color: Battery.low ? Colors.m3error : Colors.m3onSurface
-        lineWidth: Theme.desktop.ringWidth * 0.75
+        lineWidth: Theme.lock.ringWidth
 
         Column {
             anchors.centerIn: parent
@@ -102,7 +99,7 @@ Rectangle {
         visible: root.kind === "timer" && Countdown.active
         value: Countdown.progress
         color: Countdown.paused ? Colors.m3onSurfaceVariant : Colors.m3onSurface
-        lineWidth: Theme.desktop.ringWidth * 0.75
+        lineWidth: Theme.lock.ringWidth
 
         Text {
             anchors.centerIn: parent
@@ -125,8 +122,8 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.leftMargin: root.radius * 0.6
-        anchors.rightMargin: root.radius * 0.6
+        anchors.leftMargin: Theme.lock.widgetInset
+        anchors.rightMargin: Theme.lock.widgetInset
 
         Text {
             width: parent.width

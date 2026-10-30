@@ -48,12 +48,14 @@ function notificationCount(notifications, id, name) {
         || (n.appName && (lower(n.appName) === lower(id) || lower(n.appName) === lower(name)))).length;
 }
 
-// The pins with `id` (pinned already or not) put at `index` among the others: where it was
-// dropped on the dock. The index is clamped into the list.
-function placePin(pinned, id, index) {
-    const list = Array.from(pinned).filter(p => p !== id);
-    list.splice(Math.max(0, Math.min(index, list.length)), 0, id);
-    return list;
+// Where an app dragged along the dock lands (DockBar): its index among the other pinned apps,
+// from where its middle is (`middle`, px in the dock's row) against theirs (`slots`, each
+// { x, width } in the row, in order; an icon is `iconWidth` wide, at its slot's end). -1 when an
+// app that isn't pinned is let go past the pinned ones: it stays unpinned.
+function dropIndex(slots, middle, iconWidth, pinned) {
+    const index = slots.filter(s => s.x + s.width - iconWidth / 2 < middle).length;
+    const end = slots.reduce((last, s) => Math.max(last, s.x + s.width), 0);
+    return pinned || middle < end + iconWidth / 2 ? index : -1;
 }
 
 // The pins with `id` moved `by` places (-1 left, 1 right); the same list when it can't move.

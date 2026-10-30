@@ -19,12 +19,6 @@ TestCase {
         compare(LockWidgets.shown([], { lockWeather: true }), []);
     }
 
-    function test_moved() {
-        compare(LockWidgets.moved(["weather", "battery", "todo"], 2, 0), ["todo", "weather", "battery"]);
-        compare(LockWidgets.moved(["weather", "battery"], 0, 5), ["battery", "weather"]);
-        compare(LockWidgets.moved(["weather", "battery"], -1, 0), ["weather", "battery"]);
-    }
-
     function test_toggled() {
         compare(LockWidgets.toggled(["weather"], "todo"), ["weather", "todo"]);
         compare(LockWidgets.toggled(["weather", "todo"], "weather"), ["todo"]);
