@@ -42,4 +42,12 @@ TestCase {
         compare(Themes.current([theme], Object.assign({}, values, { glass: false }), "/a.png"), "");
         compare(Themes.removed([theme], "Theme 1"), []);
     }
+
+    function test_renamed() {
+        const themes = [{ name: "Theme 1", values: {} }, { name: "Theme 2", values: {} }];
+        compare(Themes.renamed(themes, "Theme 1", "  Evening ").map(t => t.name), ["Evening", "Theme 2"]);
+        // Empty or taken: unchanged.
+        compare(Themes.renamed(themes, "Theme 1", " ").map(t => t.name), ["Theme 1", "Theme 2"]);
+        compare(Themes.renamed(themes, "Theme 1", "Theme 2").map(t => t.name), ["Theme 1", "Theme 2"]);
+    }
 }

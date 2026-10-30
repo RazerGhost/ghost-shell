@@ -18,11 +18,11 @@ const lockKeys = ["lockClockStyle", "lockLayout", "lockClockSize", "lockClockFon
                   "lockWallpaper", "lockClock", "lockDate", "lockWidgets", "lockMedia"];
 
 // Every setting the desktop editor changes, for its Cancel (the wallpaper is put back apart:
-// it isn't a setting).
+// it isn't a setting). Themes saved, renamed or deleted in it are put back too.
 const desktopKeys = ["colorScheme", "colorStyle", "colorContrast", "accentColor",
                      ...DesktopWidgets.keys, "desktopWidgets",
                      "glass", "glassOpacity", "blurStyle", "uiScale", "textScale", "cornerScale",
-                     "fontSans", "fontMono", "iconTheme"];
+                     "fontSans", "fontMono", "iconTheme", "themes"];
 
 // Every setting the dock and island editor changes, for its Cancel.
 const dockIslandKeys = ["dockMode", "dockIconSize", "workspaceDots", "hiddenStatusIcons",

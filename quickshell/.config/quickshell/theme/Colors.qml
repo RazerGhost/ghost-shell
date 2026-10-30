@@ -15,6 +15,8 @@ Singleton {
     // Not readonly only because a Behavior can't sit on a readonly property: set them through
     // matugen's colors.json, never from QML.
     property color m3primary:                          json.primary
+    // The accent as made, without the fade to it (a saved theme's card keeps this one).
+    readonly property color primaryTarget:             json.primary
     property color m3onPrimary:                        json.on_primary
     property color m3primaryContainer:                 json.primary_container
     property color m3onPrimaryContainer:               json.on_primary_container

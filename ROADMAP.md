@@ -1186,10 +1186,11 @@ fixed:
 - Accessibility: round buttons' keyboard ring is round in edit mode, the widget gallery
   scrolls to the one Tab reaches, the calendar and to-do widgets' links are buttons to screen
   readers, "1 notification" and "1 to-do" read right.
-- Not done: a theme saved during the 0.8 s recolor fade stores its card color mid-fade
-  (cosmetic); a theme whose wallpaper file was deleted applies its settings and then says the
-  wallpaper couldn't be set; saving or deleting a theme isn't undone by Cancel (it's its own
-  action, like pinning).
+- Fixed after (user's request): a theme's card color is the accent as made, not mid-fade
+  (`Colors.primaryTarget`); a theme whose picture is gone shows dimmed with "picture gone" and
+  isn't applied; Cancel puts saved, renamed and deleted themes back too. Themes can be renamed
+  (the name field beside the gallery while one is current; `Themes.renamed`, tested: an empty
+  or taken name is ignored).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

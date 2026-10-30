@@ -57,6 +57,15 @@ function current(themes, values, wallpaper) {
     return match ? match.name : "";
 }
 
+// `themes` with the one named `from` called `to` (trimmed); the same list when the new name is
+// empty or another theme has it.
+function renamed(themes, from, to) {
+    const name = String(to).trim();
+    if (name === "" || themes.some(t => t.name === name && t.name !== from))
+        return themes.slice();
+    return themes.map(t => t.name === from ? Object.assign({}, t, { name }) : t);
+}
+
 function removed(themes, name) {
     return themes.filter(t => t.name !== name);
 }

@@ -148,10 +148,17 @@ Scope {
                     readonly property var themes: Themes.valid(Settings.values.themes)
                     readonly property string current: Themes.current(themes, Settings.values, Wallpaper.path)
 
+                    // Whether a theme's picture is still there (none counts as there): a deleted one
+                    // can't be set, so its theme isn't applied halfway.
+                    function hasPicture(theme: var): bool {
+                        return theme.wallpaper === "" || theme.wallpaper === Wallpaper.path
+                            || Wallpaper.pictures.some(p => p.filePath === theme.wallpaper || p.darkPath === theme.wallpaper);
+                    }
+
                     // Its settings, then its wallpaper (which remakes the colors with them).
                     function use(name: string): void {
                         const theme = themes.find(t => t.name === name);
-                        if (!theme)
+                        if (!theme || !hasPicture(theme))
                             return;
                         Presets.restore(Settings.values, Themes.applicable(theme.values, Settings.values));
                         if (theme.wallpaper !== Wallpaper.target) {
@@ -185,13 +192,15 @@ Scope {
                             fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)
                             scrolls: true
                             cardWidth: Theme.editor.pictureCard
-                            options: themesTab.themes.map(t => ({ value: t.name, label: t.name, theme: t }))
+                            options: themesTab.themes.map(t => ({ value: t.name, theme: t,
+                                                                  label: themesTab.hasPicture(t) ? t.name : t.name + " · picture gone" }))
                             current: themesTab.current
                             onPicked: v => themesTab.use(v)
                             art: Component {
                                 Item {
                                     id: look
                                     readonly property var theme: parent.option.theme
+                                    opacity: themesTab.hasPicture(theme) ? 1 : Theme.state.disabled
 
                                     Rectangle {
                                         anchors.fill: parent
@@ -249,19 +258,39 @@ Scope {
 
                     SheetTile {
                         title: themesTab.current || "This look"
-                        subtitle: themesTab.current ? "Saved as a theme" : "Not saved yet"
+                        subtitle: themesTab.current ? "Saved as a theme; type to rename it" : "Not saved yet"
 
                         Column {
                             anchors.centerIn: parent
+                            width: parent.width
                             spacing: Theme.spacing.m
+
+                            // The current theme's name, to change: Enter keeps it (an empty or
+                            // taken name is ignored).
+                            TextField {
+                                id: themeName
+                                width: parent.width
+                                visible: themesTab.current !== ""
+                                placeholder: "Name"
+                                // Set, not bound: typing would end a binding.
+                                Component.onCompleted: text = themesTab.current
+                                Connections {
+                                    target: themesTab
+                                    function onCurrentChanged(): void {
+                                        themeName.text = themesTab.current;
+                                    }
+                                }
+                                onAccepted: Settings.values.themes = Themes.renamed(themesTab.themes, themesTab.current, text)
+                                Accessible.name: "The theme's name"
+                            }
 
                             TextButton {
                                 anchors.horizontalCenter: parent.horizontalCenter
+                                visible: themesTab.current === ""
                                 text: "Save as a theme"
                                 filled: true
-                                enabled: themesTab.current === ""
                                 onClicked: Settings.values.themes = themesTab.themes.concat(
-                                    [Themes.made(themesTab.themes, Settings.values, Wallpaper.path, Colors.m3primary.toString())])
+                                    [Themes.made(themesTab.themes, Settings.values, Wallpaper.path, Colors.primaryTarget.toString())])
                             }
 
                             TextButton {
