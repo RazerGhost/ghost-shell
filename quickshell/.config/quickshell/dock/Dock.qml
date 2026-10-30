@@ -17,10 +17,13 @@ Scope {
     readonly property list<string> pinned: state.pinned
 
     // { id, pinned, windows } per app, windows most recently used first; see DockApps.items.
-    readonly property var items: DockApps.items(
-        Windows.recent.map(t => ({ appId: t.wayland.appId, window: t })),
-        pinned,
-        appId => DesktopEntries.heuristicLookup(appId)?.id ?? "")
+    // The app list is read so windows open at start find their pin once it has filled in.
+    readonly property var items: {
+        void DesktopEntries.applications.values;
+        return DockApps.items(Windows.recent.map(t => ({ appId: t.wayland.appId, window: t })),
+                              pinned,
+                              appId => DesktopEntries.heuristicLookup(appId)?.id ?? "");
+    }
 
     function movePin(id: string, by: int): void {
         state.pinned = DockApps.movePin(pinned, id, by);

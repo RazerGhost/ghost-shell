@@ -102,9 +102,17 @@ const gameModeLua = [
     ""
 ];
 
-// The Lua file Hyprland loads last (hyprland.lua), from the settings' values and whether game
-// mode is on.
-function lua(v, gameMode) {
+// With a wallpaper chosen, Hyprland draws only its background color (the theme's, from
+// matugen's colors.lua) until the shell's wallpaper is up, instead of flashing its own picture
+// at every login. Without one, its default picture is the wallpaper, so it stays.
+const ownWallpaperLua = [
+    "hl.config({ misc = { disable_hyprland_logo = true, force_default_wallpaper = 0 } })",
+    ""
+];
+
+// The Lua file Hyprland loads last (hyprland.lua), from the settings' values, whether game mode
+// is on and whether a wallpaper is chosen.
+function lua(v, gameMode, wallpaperChosen) {
     return [
         "-- Written by Quickshell's settings window (settings/HyprlandSettings.qml); don't edit:",
         "-- it's overwritten. Loaded last by hyprland.lua, so it overrides input.lua and look.lua.",
@@ -133,6 +141,7 @@ function lua(v, gameMode) {
         ...borderLua(v),
         ...cursorLua(v),
         ...(gameMode === true ? gameModeLua : []),
+        ...(wallpaperChosen === true ? ownWallpaperLua : []),
         // Screens set up in the Display page, by output name (the rest keep monitors.lua's
         // "preferred"); one that isn't safe to write is left out.
         ...Object.entries(v.monitors || {}).map(([output, setup]) => DisplayModes.lua(output, setup)).filter(l => l !== ""),

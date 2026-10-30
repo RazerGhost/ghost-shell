@@ -8,7 +8,8 @@
 vt = 1
 
 [default_session]
-command = "env HOME=/var/lib/qs-greeter start-hyprland -- --config /etc/greetd/hypr/hyprland.lua"
+# Its Hyprland's output goes to the journal (journalctl -t greeter-hyprland), not onto tty1.
+command = "env HOME=/var/lib/qs-greeter systemd-cat --identifier=greeter-hyprland start-hyprland -- --config /etc/greetd/hypr/hyprland.lua"
 # Fallback text greeter, if the Quickshell one ever breaks (see "Login screen recovery" in
 # ROADMAP.md): swap the comment on these two lines, then sudo systemctl restart greetd.
 # command = "tuigreet --time --remember --asterisks --cmd start-hyprland"

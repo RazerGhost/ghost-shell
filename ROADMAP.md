@@ -1530,6 +1530,25 @@ far from the clock. Changed (`customize/Presets.js`; tests pass, qmltestrunner o
   and battery, player in a left column, centred top to bottom), the lock screen's Side on the
   desktop. Clean and Music as before (Music moved 16 px in to the same margin).
 
+### Seamless login, logout and shutdown; dock icons at start (built 2026-10-30)
+User's finds:
+- Pinned apps in the dock showed the generic icon until they ran: the app list fills in a moment
+  after the shell starts, and a binding on `DesktopEntries.byId(id)` alone never looked again;
+  the dock's lookups now read the list too (verified with a throwaway `qs -p`, NOTES).
+- Between the login screen and the desktop, and at logout and shutdown, tty1 showed Hyprland's
+  log text and a cursor. Both Hyprlands' output now goes to the journal (`systemd-cat`:
+  `journalctl -t hyprland`, `-t greeter-hyprland`; the greeter's launch and greetd's
+  config.toml), and the kernel line gets `loglevel=3 rd.udev.log_level=3
+  systemd.show_status=auto vt.global_cursor_default=0` (the system module, like
+  `plymouth.enable=0`; a recovery login on Ctrl+Alt+F2 then has no blinking cursor either).
+- At login Hyprland flashed its own default picture before the shell's wallpaper: with a
+  wallpaper chosen, shell-settings.lua turns it off (`HyprlandConfig.lua`'s third argument,
+  tested; written only once the wallpaper's file is read, so a start doesn't flip it), and
+  matugen's colors.lua sets `misc.background_color` to the theme's surface color.
+- Found on the way: shell-settings.lua was written in the background and `hyprctl reload` could
+  read the old file, so a change sometimes applied only at the next one (`blockWrites`).
+Needs `ghost install system` (greetd's config and the kernel line; sudo) and `ghost greeter`.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

@@ -18,6 +18,8 @@ Singleton {
                                                            Quickshell.env("HOME") + "/Pictures/Wallpapers")
     // The current wallpaper's path; "" until one is chosen (Hyprland's default shows then).
     readonly property string path: state.path
+    // Its file has been read (or isn't there): until then `path` is "" whatever was chosen.
+    property bool loaded: false
     // A live wallpaper (a video), and the still picture for it: a frame that matugen's
     // wallpaper.sh made (the colors come from it; the lock and login screens show it).
     readonly property bool isVideo: WallpapersJs.isVideo(path)
@@ -150,6 +152,8 @@ Singleton {
         printErrors: false
         watchChanges: true
         onFileChanged: reload()
+        onLoaded: root.loaded = true
+        onLoadFailed: root.loaded = true
 
         adapter: JsonAdapter {
             id: state

@@ -18,7 +18,13 @@ MouseArea {
 
     // { id, pinned, windows: [{ appId, window }] } from DockApps.items.
     required property var item
-    readonly property DesktopEntry entry: item.id.startsWith("app:") ? null : DesktopEntries.byId(item.id)
+    // Reading the app list makes this look again once it has filled in (it does so a moment after
+    // the shell starts, NOTES): byId alone was asked once, and pinned apps kept the generic icon
+    // until they ran.
+    readonly property DesktopEntry entry: {
+        void DesktopEntries.applications.values;
+        return item.id.startsWith("app:") ? null : DesktopEntries.byId(item.id);
+    }
     readonly property list<HyprlandToplevel> windows: item.windows.map(w => w.window)
     readonly property bool focused: windows.includes(Windows.active)
     readonly property string name: entry?.name ?? windows[0]?.title ?? item.id

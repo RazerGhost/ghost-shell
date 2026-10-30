@@ -87,8 +87,10 @@ Scope {
 
         // Start the session. true: Quickshell quits once greetd has it, and the greeter's
         // Hyprland exits after it (system/etc/greetd/hyprland.lua), so greetd can switch over.
+        // Hyprland's output goes to the journal (journalctl -t hyprland), not onto tty1, where it
+        // showed between the login screen and the desktop, and again at logout and shutdown.
         function onReadyToLaunch(): void {
-            Greetd.launch(["start-hyprland"], [], true);
+            Greetd.launch(["systemd-cat", "--identifier=hyprland", "start-hyprland"], [], true);
         }
 
         function onError(error: string): void {

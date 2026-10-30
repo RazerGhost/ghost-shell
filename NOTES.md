@@ -104,7 +104,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - `Quickshell.Services.Greetd` exists: `createSession`, `respond`, `launch`, `cancelSession`; signals
   `authMessage`, `readyToLaunch`, `launched`, `authFailure`, `error`.
 - Services load lazily: `UPower`, `Bluetooth`, `Networking`, `SystemTray`, `DesktopEntries` are empty
-  until first accessed, then fill in asynchronously. Bindings are fine; a one-off read is not.
+  until first accessed, then fill in asynchronously. Bindings are fine; a one-off read is not, and
+  neither is a binding on `DesktopEntries.byId(id)` alone: it never looks again (the dock's pinned
+  icons stayed generic). Read `DesktopEntries.applications.values` in it too (verified 2026-10-30).
 - `Quickshell.Services.Pipewire`: `Pipewire.defaultAudioSink/Source` (`PwNode`), `node.audio.volume`
   (0-1, writable), `.muted` (writable). Needs `PwObjectTracker { objects: [...] }` to fill `audio`.
   Don't filter a tracker's list on `node.properties`: tracking fills them in, so the list

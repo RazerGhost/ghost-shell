@@ -8,6 +8,11 @@ GhostColors = {
 }
 
 hl.config({
+    -- Behind everything: shows at login until the shell's wallpaper is up (shell-settings.lua
+    -- turns Hyprland's own picture off once you've chosen one).
+    misc = {
+        background_color = "rgb({{colors.surface.default.hex_stripped}})",
+    },
     general = {
         col = {
             active_border   = { colors = { "rgba({{colors.primary.default.hex_stripped}}ee)", "rgba({{colors.tertiary.default.hex_stripped}}ee)" }, angle = 45 },

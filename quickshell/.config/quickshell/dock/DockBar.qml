@@ -244,7 +244,10 @@ PanelWindow {
 
         property var item: null
         property real anchorX
-        readonly property DesktopEntry entry: item && !item.id.startsWith("app:") ? DesktopEntries.byId(item.id) : null
+        readonly property DesktopEntry entry: {
+            void DesktopEntries.applications.values; // filled in after start (DockItem)
+            return item && !item.id.startsWith("app:") ? DesktopEntries.byId(item.id) : null;
+        }
 
         function run(action: var): void {
             action();

@@ -53,6 +53,16 @@ if ! grep -qxF "$no_splash" /etc/default/limine; then
     rebuild_boot=true
 fi
 
+# A quiet console: tty1 shows between the login screen and the desktop, and at logout and
+# shutdown, so no kernel or boot messages below errors, no systemd status unless something is
+# slow or fails, and no blinking text cursor (a recovery login on Ctrl+Alt+F2 has none either;
+# `setterm --cursor on` brings it back there).
+quiet_console='KERNEL_CMDLINE[default]+=" loglevel=3 rd.udev.log_level=3 systemd.show_status=auto vt.global_cursor_default=0"'
+if ! grep -qxF "$quiet_console" /etc/default/limine; then
+    echo "$quiet_console" | sudo tee -a /etc/default/limine >/dev/null
+    rebuild_boot=true
+fi
+
 # Plymouth is off, so its packages and initramfs hook go too.
 noplymouth=system/etc/mkinitcpio.conf.d/30-no-plymouth.conf
 if ! cmp -s "$noplymouth" "/etc/mkinitcpio.conf.d/$(basename "$noplymouth")"; then

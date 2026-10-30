@@ -54,6 +54,9 @@ TestCase {
     }
 
     function test_gameMode() {
+        // A chosen wallpaper turns Hyprland's own picture off; without one it stays.
+        verify(HyprlandConfig.lua(defaults, false, true).includes("disable_hyprland_logo = true"));
+        verify(!HyprlandConfig.lua(defaults, false, false).includes("disable_hyprland_logo"));
         const off = HyprlandConfig.lua(defaults, false);
         verify(!off.includes("animations"));
         const on = HyprlandConfig.lua(defaults, true);

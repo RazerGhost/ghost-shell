@@ -11,11 +11,13 @@ import "HyprlandConfig.js" as HyprlandConfig
 Scope {
     id: root
 
-    readonly property string text: HyprlandConfig.lua(Settings.values, GameMode.on)
+    readonly property string text: HyprlandConfig.lua(Settings.values, GameMode.on, Wallpaper.path !== "")
         + (HyprlandRuntime.lua ? "\n-- While the windows editor is open (services/HyprlandRuntime.qml).\n" + HyprlandRuntime.lua + "\n" : "")
 
+    // Not before the wallpaper's file is read either: a moment without it would write Hyprland's
+    // own picture back on, and reload Hyprland, at every start.
     onTextChanged: {
-        if (Settings.loaded)
+        if (Settings.loaded && Wallpaper.loaded)
             writeLater.restart();
     }
 
@@ -25,9 +27,25 @@ Scope {
         // Also the pointer: its value may have arrived with the file, before `loaded`.
         function onLoadedChanged(): void {
             if (Settings.loaded) {
-                writeLater.restart();
+                if (Wallpaper.loaded)
+                    writeLater.restart();
                 setCursor.restart();
             }
+        }
+    }
+
+    // Both may be read before this exists (a reload).
+    Component.onCompleted: {
+        if (Settings.loaded && Wallpaper.loaded)
+            writeLater.restart();
+    }
+
+    Connections {
+        target: Wallpaper
+
+        function onLoadedChanged(): void {
+            if (Settings.loaded && Wallpaper.loaded)
+                writeLater.restart();
         }
     }
 
@@ -62,6 +80,9 @@ Scope {
         id: file
         path: Quickshell.env("HOME") + "/.config/hypr/shell-settings.lua"
         blockLoading: true // compared with right away
+        // Written before `hyprctl reload` runs: in the background the reload could read the old
+        // file, and the change only applied at the next one.
+        blockWrites: true
         printErrors: false // missing until the first write
     }
 }
