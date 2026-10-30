@@ -72,6 +72,49 @@ Scope {
                 Behavior on y { NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
                 Behavior on scale { NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
 
+                // The grid, while it's on and the widgets are being placed (the desktop editor, a
+                // drag): faint lines out from the middle, the middle ones stronger.
+                Item {
+                    id: grid
+
+                    readonly property real cell: Theme.px(DesktopWidgetsJs.gridSize(Settings.values.desktopGridSize))
+                    readonly property bool placing: Editing.desktop || [clockCard, weatherCard, mediaCard, calendarCard,
+                                                                        batteryCard, todoCard, timerCard].some(c => c.moving)
+
+                    anchors.fill: parent
+                    opacity: Settings.values.desktopGrid && placing ? 1 : 0
+                    visible: opacity > 0
+                    Behavior on opacity { NumberAnimation { duration: Theme.anim.normal } }
+
+                    Repeater {
+                        model: grid.visible ? DesktopWidgetsJs.gridLines(widgetStage.width, grid.cell) : []
+
+                        Rectangle {
+                            required property real modelData
+                            readonly property bool middle: Math.abs(modelData - widgetStage.width / 2) < 0.5
+                            x: modelData - width / 2
+                            width: middle ? 2 : 1
+                            height: grid.height
+                            color: Colors.sketch
+                            opacity: middle ? 0.8 : 0.3
+                        }
+                    }
+
+                    Repeater {
+                        model: grid.visible ? DesktopWidgetsJs.gridLines(widgetStage.height, grid.cell) : []
+
+                        Rectangle {
+                            required property real modelData
+                            readonly property bool middle: Math.abs(modelData - widgetStage.height / 2) < 0.5
+                            y: modelData - height / 2
+                            width: grid.width
+                            height: middle ? 2 : 1
+                            color: Colors.sketch
+                            opacity: middle ? 0.8 : 0.3
+                        }
+                    }
+                }
+
                 DesktopCard {
                     id: clockCard
                     name: "clock"

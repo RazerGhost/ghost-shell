@@ -705,19 +705,39 @@ Scope {
                         }
                     }
 
+                    // Places: dragging, and the grid widgets line up with (lines out from the
+                    // screen's middle, so placements can mirror each other).
                     SheetTile {
                         title: "Places"
-                        subtitle: "Drag a widget by its handle"
+                        subtitle: Settings.values.desktopGrid ? "Drag a widget: it lines up with the grid (px apart)"
+                                                               : "Drag a widget by its handle"
+                        weight: 1.8
 
                         Column {
-                            anchors.centerIn: parent
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width
                             spacing: Theme.spacing.m
 
-                            MaterialIcon {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                icon: "drag_pan"
-                                color: Colors.m3onSurfaceVariant
-                                font.pixelSize: Theme.font.title * 1.6
+                            TileRow {
+                                label: "Grid"
+
+                                Switch {
+                                    label: "Line widgets up with a grid"
+                                    checked: Settings.values.desktopGrid
+                                    onToggled: Settings.values.desktopGrid = !checked
+                                }
+                            }
+
+                            TileRow {
+                                label: "Size"
+                                opacity: Settings.values.desktopGrid ? 1 : Theme.state.disabled
+                                enabled: Settings.values.desktopGrid
+
+                                Segmented {
+                                    options: DesktopWidgetsJs.gridSizes.map(v => ({ value: v, label: String(v) }))
+                                    current: DesktopWidgetsJs.gridSize(Settings.values.desktopGridSize)
+                                    onPicked: v => Settings.values.desktopGridSize = v
+                                }
                             }
 
                             TextButton {

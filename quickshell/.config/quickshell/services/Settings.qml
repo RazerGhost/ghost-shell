@@ -211,6 +211,10 @@ Singleton {
             property bool desktopBattery: false
             property bool desktopTodo: false
             property bool desktopTimer: false
+            // The grid widgets line up with when dropped (desktop/DesktopWidgets.js), and its
+            // spacing in px at 100 %.
+            property bool desktopGrid: false
+            property int desktopGridSize: 32
             property var desktopWidgets: ({})
             // Your saved looks (customize/Themes.js): [{ name, wallpaper, primary, values }].
             property var themes: []

@@ -1319,6 +1319,16 @@ Two read-only reviews of everything since the last review, findings checked, the
 - Not done: a clock or widgets dragged to the very bottom of the login screen can sit over its
   power buttons and message line (they stay on top and clickable).
 
+### A grid for the desktop widgets (built 2026-10-30)
+User's request: a grid to place widgets symmetrically. The desktop editor's Widgets tab, Places:
+a Grid switch and its size (16-64 px at 100 %; `desktopGrid`, `desktopGridSize`, put back by
+Cancel). While it's on, faint lines show over the desktop while the editor is open or a widget
+is dragged, running out from the screen's middle (the middle lines stronger), and a dropped
+widget lines up its start, middle or end, whichever is nearest, with a line on each axis
+(instead of the edges and neighbours it lines up with otherwise). Lines out from the middle
+mean a widget and its mirror image land mirrored, and a medium widget can sit centred on the
+screen (`DesktopWidgets.gridLines`, `gridSnapped`, tested).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

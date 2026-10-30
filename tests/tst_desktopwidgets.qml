@@ -53,4 +53,29 @@ TestCase {
         // Beside it: the gap to its right, and its top.
         compare(DesktopWidgets.snapped(520, 190, 100, 50, 1920, 1080, [other], 32, 16, 24), { x: 516, y: 200 });
     }
+
+    function test_gridLines() {
+        // Out from the middle both ways: symmetric.
+        compare(DesktopWidgets.gridLines(100, 20), [10, 30, 50, 70, 90]);
+        compare(DesktopWidgets.gridLines(100, 0), []);
+        const lines = DesktopWidgets.gridLines(1920, 32);
+        for (const line of lines)
+            verify(lines.some(other => Math.abs(other - (1920 - line)) < 0.001), line);
+    }
+
+    function test_gridSnapped() {
+        // A medium widget (352 wide) dropped near the middle centers on it.
+        compare(DesktopWidgets.gridSnapped(790, 500, 352, 168, 1920, 1080, 32).x, 960 - 176);
+        // A small one dropped 5 px off a line: its start moves onto it.
+        compare(DesktopWidgets.gridSnapped(965, 500, 168, 168, 1920, 1080, 32).x, 960);
+        // A widget and its mirror image land mirrored, at any drop along the side.
+        for (const x of [70, 150, 333, 610]) {
+            const left = DesktopWidgets.gridSnapped(x, 100, 352, 168, 1920, 1080, 32);
+            const right = DesktopWidgets.gridSnapped(1920 - x - 352, 100, 352, 168, 1920, 1080, 32);
+            compare(left.x, 1920 - (right.x + 352), x);
+        }
+        // Never off the screen.
+        const edge = DesktopWidgets.gridSnapped(1900, 1070, 168, 168, 1920, 1080, 48);
+        verify(edge.x + 168 <= 1920 && edge.y + 168 <= 1080);
+    }
 }

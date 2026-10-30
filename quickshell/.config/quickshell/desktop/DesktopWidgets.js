@@ -80,3 +80,42 @@ function snapped(x, y, w, h, sw, sh, others, margin, gap, reach) {
     }
     return { x: nearest(x, xs), y: nearest(y, ys) };
 }
+
+// The desktop grid (Settings' desktopGrid, desktopGridSize; the desktop editor's Places tile):
+// lines every `cell` px out from the screen's middle, so whatever lines up on one side has its
+// mirror image on the other. The positions of the lines across a side `size` px long.
+const gridSizes = [16, 24, 32, 48, 64]; // px at 100 %
+
+// The saved grid size if it's one of those, else 32.
+function gridSize(saved) {
+    return gridSizes.includes(saved) ? saved : 32;
+}
+
+function gridLines(size, cell) {
+    if (!(cell > 0) || !(size > 0))
+        return [];
+    const middle = size / 2;
+    const lines = [middle];
+    for (let k = 1; middle - k * cell >= 0; k++)
+        lines.push(middle - k * cell, middle + k * cell);
+    return lines.sort((a, b) => a - b);
+}
+
+// A widget dropped at (x, y), w x h px, on a sw x sh screen, lined up with the grid: on each axis
+// whichever of its start, middle or end is nearest a line moves onto it (so a medium widget can
+// center on the middle line and a small one sit beside it), then it's kept on the screen.
+function gridSnapped(x, y, w, h, sw, sh, cell) {
+    const axis = (start, length, size) => {
+        let best = start, distance = Infinity;
+        for (const line of gridLines(size, cell))
+            for (const offset of [0, length / 2, length]) {
+                const d = Math.abs(start + offset - line);
+                if (d < distance) {
+                    distance = d;
+                    best = line - offset;
+                }
+            }
+        return Math.min(Math.max(best, 0), Math.max(size - length, 0));
+    };
+    return { x: axis(x, w, sw), y: axis(y, h, sh) };
+}

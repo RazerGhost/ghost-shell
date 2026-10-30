@@ -7,7 +7,8 @@ import "DesktopWidgets.js" as DesktopWidgets
 // One desktop widget at its saved place (Settings' desktopWidgets, as fractions of the screen).
 // It fades and grows in when shown, and lifts a little under the pointer. Resting the pointer
 // on it (or the desktop editor being open) shows a handle in its top-right corner; drag that to
-// move it, and a drop near the screen's edges or another widget lines up with them. Only the
+// move it, and a drop near the screen's edges or another widget lines up with them, or with the
+// grid while it's on (Settings' desktopGrid). Only the
 // handle: the media widget's buttons keep their clicks.
 Item {
     id: root
@@ -104,10 +105,13 @@ Item {
                 const others = Array.from(area.children)
                     .filter(c => c !== root && c.name !== undefined && c.visible)
                     .map(c => ({ x: c.x, y: c.y, w: c.width, h: c.height }));
-                const at = DesktopWidgets.snapped(root.spot.x * area.width + root.dragged.x,
-                                                  root.spot.y * area.height + root.dragged.y,
-                                                  root.width, root.height, area.width, area.height, others,
-                                                  Theme.desktop.margin, Theme.desktop.gap, Theme.desktop.reach);
+                const x = root.spot.x * area.width + root.dragged.x;
+                const y = root.spot.y * area.height + root.dragged.y;
+                const at = Settings.values.desktopGrid
+                    ? DesktopWidgets.gridSnapped(x, y, root.width, root.height, area.width, area.height,
+                                                 Theme.px(DesktopWidgets.gridSize(Settings.values.desktopGridSize)))
+                    : DesktopWidgets.snapped(x, y, root.width, root.height, area.width, area.height, others,
+                                             Theme.desktop.margin, Theme.desktop.gap, Theme.desktop.reach);
                 const place = DesktopWidgets.dropped(at.x, at.y, root.width, root.height, area.width, area.height);
                 root.settling = true;
                 Settings.values.desktopWidgets = DesktopWidgets.withPlace(Settings.values.desktopWidgets, root.name, place);
