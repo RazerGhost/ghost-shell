@@ -1164,7 +1164,7 @@ started with for a ring, and the last length used) in more places:
 - Lock screen: a round timer widget (its icon, or a ring around the time left), picked in the
   lock screen editor's Widgets tab like the others.
 
-### Review of the day's later work (2026-10-30)
+### Review of the day's later work (done, verified on the laptop 2026-10-30)
 Two read-only reviews of everything since the editors' review (quick settings editor, more
 desktop widgets, lock screen widgets, themes, dock dragging, the timer), findings checked, then
 fixed:
