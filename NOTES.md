@@ -426,7 +426,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `shell.qml` with a `ShellRoot` holding an Overlay-layer `PanelWindow` that shows the component
   (the `qs.*` imports resolve against the copy), run `timeout 10 qs -p <copy>` in the
   background, `grim -g` the window's area, and delete the copy. Only the singletons it uses
-  start; nothing else of the running shell is touched.
+  start; nothing else of the running shell is touched. One that uses `Notifications` logs that
+  it couldn't register the notification server (the running shell has it): harmless, and its
+  history is empty. Don't change `Settings.values` in it: the copy writes the real settings.json.
 - `xdg-mime default` calls running side by side overwrite each other's `mimeapps.list`: run them one
   after another.
 - Qt's JavaScript `Array.prototype.sort` isn't stable: break ties explicitly (an index) when the

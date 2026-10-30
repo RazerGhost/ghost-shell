@@ -9,6 +9,7 @@ import qs.settings
 import qs.theme
 import qs.widgets
 import "../lock/LockClock.js" as LockClockJs
+import "../lock/LockWidgets.js" as LockWidgets
 import "Presets.js" as Presets
 
 // The lock screen editor, like long-pressing the iOS lock screen: the real lock screen, live,
@@ -131,7 +132,8 @@ Scope {
                 tabs: [
                     { value: "looks", label: "Looks" },
                     { value: "clock", label: "Clock" },
-                    { value: "picture", label: "Picture" }
+                    { value: "picture", label: "Picture" },
+                    { value: "widgets", label: "Widgets" }
                 ]
                 onCancelled: root.cancel()
                 onFinished: root.done()
@@ -395,6 +397,128 @@ Scope {
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+
+                // Widgets: the round ones under the clock, picked like iOS's (in the order
+                // clicked, up to four), and the media controls.
+                SheetTiles {
+                    visible: chrome.tab === "widgets"
+
+                    SheetTile {
+                        id: widgetsTile
+
+                        readonly property var list: LockWidgets.shown(Settings.values.lockWidgets, Settings.values)
+                        readonly property var names: ({ weather: "Weather", battery: "Battery", notifications: "Notifications",
+                                                        todo: "To-do", event: "Next event" })
+
+                        title: "Under the clock"
+                        subtitle: "Up to four, in the order you pick them · an event's title shows to anyone"
+                        weight: 3
+
+                        Row {
+                            anchors.centerIn: parent
+                            spacing: Theme.spacing.l
+
+                            Repeater {
+                                model: LockWidgets.known
+
+                                Column {
+                                    id: pick
+
+                                    required property string modelData
+                                    readonly property int place: widgetsTile.list.indexOf(modelData)
+                                    readonly property bool on: place >= 0
+                                    readonly property bool full: widgetsTile.list.length >= LockWidgets.most
+
+                                    function toggle(): void {
+                                        Settings.values.lockWidgets = LockWidgets.toggled(widgetsTile.list, modelData);
+                                    }
+
+                                    spacing: Theme.spacing.s
+                                    opacity: on ? 1 : full ? Theme.state.disabled / 2 : Theme.state.disabled
+                                    Behavior on opacity { NumberAnimation { duration: Theme.anim.fast } }
+
+                                    Accessible.role: Accessible.CheckBox
+                                    Accessible.name: widgetsTile.names[modelData] + " under the clock"
+                                    Accessible.checkable: true
+                                    Accessible.checked: on
+                                    Accessible.onPressAction: toggle()
+                                    activeFocusOnTab: true
+                                    Keys.onReturnPressed: toggle()
+                                    Keys.onEnterPressed: toggle()
+                                    Keys.onSpacePressed: toggle()
+
+                                    Item {
+                                        width: sample.width
+                                        height: sample.height
+                                        anchors.horizontalCenter: parent.horizontalCenter
+
+                                        LockWidget {
+                                            id: sample
+                                            kind: pick.modelData
+                                        }
+
+                                        // Its place in the row while it's on.
+                                        Rectangle {
+                                            anchors.top: parent.top
+                                            anchors.right: parent.right
+                                            anchors.margins: -Theme.spacing.xs
+                                            visible: pick.on
+                                            width: Theme.icon.small + Theme.spacing.xs
+                                            height: width
+                                            radius: width / 2
+                                            color: Colors.m3primary
+
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: pick.place + 1
+                                                color: Colors.m3onPrimary
+                                                font.family: Theme.font.sans
+                                                font.pixelSize: Theme.font.small
+                                                font.weight: Font.DemiBold
+                                            }
+                                        }
+
+                                        FocusRing {
+                                            control: pick
+                                            radius: height / 2
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: pick.on || !pick.full ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                            onClicked: pick.toggle()
+                                        }
+                                    }
+
+                                    Text {
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        text: widgetsTile.names[pick.modelData]
+                                        color: Colors.m3onSurface
+                                        font.family: Theme.font.sans
+                                        font.pixelSize: Theme.font.small
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    SheetTile {
+                        title: "Media controls"
+                        subtitle: "Play, pause and skip without unlocking"
+                        action: Switch {
+                            label: "Media controls on the lock screen"
+                            checked: Settings.values.lockMedia
+                            onToggled: Settings.values.lockMedia = !checked
+                        }
+
+                        MaterialIcon {
+                            anchors.centerIn: parent
+                            icon: "play_circle"
+                            color: Settings.values.lockMedia ? Colors.m3primary : Colors.m3onSurfaceVariant
+                            font.pixelSize: Theme.font.title * 2
                         }
                     }
                 }

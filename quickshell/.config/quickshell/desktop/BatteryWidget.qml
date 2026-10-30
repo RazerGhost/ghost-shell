@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Shapes
 import qs.services
 import qs.theme
 import qs.widgets
@@ -12,49 +11,14 @@ WidgetSurface {
 
     readonly property color tone: Battery.low ? Colors.m3error : Colors.m3primary
 
-    Item {
+    ProgressRing {
         id: ring
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
         width: Theme.desktop.ring
         height: width
-
-        Shape {
-            anchors.fill: parent
-            preferredRendererType: Shape.CurveRenderer
-
-            // The track, then the charge from the top clockwise.
-            ShapePath {
-                strokeColor: Colors.tint
-                strokeWidth: Theme.desktop.ringWidth
-                fillColor: "transparent"
-                capStyle: ShapePath.RoundCap
-                PathAngleArc {
-                    centerX: ring.width / 2
-                    centerY: ring.height / 2
-                    radiusX: (ring.width - Theme.desktop.ringWidth) / 2
-                    radiusY: radiusX
-                    startAngle: 0
-                    sweepAngle: 360
-                }
-            }
-
-            ShapePath {
-                strokeColor: widget.tone
-                strokeWidth: Theme.desktop.ringWidth
-                fillColor: "transparent"
-                capStyle: ShapePath.RoundCap
-                PathAngleArc {
-                    centerX: ring.width / 2
-                    centerY: ring.height / 2
-                    radiusX: (ring.width - Theme.desktop.ringWidth) / 2
-                    radiusY: radiusX
-                    startAngle: -90
-                    sweepAngle: 360 * Math.max(0, Math.min(Battery.level, 1))
-                    Behavior on sweepAngle { NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing } }
-                }
-            }
-        }
+        value: Battery.level
+        color: widget.tone
 
         MaterialIcon {
             anchors.centerIn: parent

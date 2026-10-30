@@ -47,7 +47,7 @@ Singleton {
         { id: "display", section: "Personalize", icon: "brightness_6", title: "Display",
           words: "night light warm blue light schedule screen monitor resolution refresh rate hz scale rotation rotate vrr adaptive sync" },
         { id: "lock", section: "Personalize", icon: "lock", title: "Lock screen",
-          words: "weather battery calendar event login greeter picture blur darken clock style analog stacked thin font layout date name power buttons media music notifications count privacy" },
+          words: "weather battery calendar event login greeter picture blur darken clock style analog stacked thin font layout date name power buttons media music notifications count privacy widgets to-do" },
         { id: "sound", section: "System", icon: "volume_up", title: "Sound",
           words: "equalizer audio bass treble mids voice speakers headphones preset eq sound events chime notification charger usb plug volume screenshot shutter battery" },
         { id: "windows", section: "System", icon: "select_window", title: "Windows",

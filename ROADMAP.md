@@ -1110,6 +1110,22 @@ User's pick after the quick settings editor: more of the same family.
   off; a check under the ones that are on), beside the Places tile: six tiles with switches
   would have been too narrow.
 
+### Lock screen widgets (built 2026-10-30)
+User's pick: an iOS-like row of small widgets under the clock, picked in the lock screen editor.
+- `lock/LockWidget.qml`: round widgets on a translucent circle with the glass edge: weather (sky
+  icon and temperature), battery (a ring with the percentage, a bolt while charging, the error
+  color when low), notifications (how many, never what they say), to-do (how many are open),
+  and a wide one for the next event (when, then its title). They replace the lines under the
+  date (LockLine, removed); the media player stays above them. In the bottom-left layout the
+  row starts at the left like the clock.
+- `lockWidgets` in settings: your order, up to four (`lock/LockWidgets.js`, tested). Until
+  you pick, the old switches (weather, battery, event, notification count) decide, so nothing
+  changes on its own.
+- The lock screen editor's new Widgets tab: the widgets themselves, click to add or take off,
+  a number on each shows its place in the row; the media controls' switch beside them. Both
+  left Settings -> Lock screen, which keeps the message, the grace period and the login screen.
+- The ring is shared with the desktop's battery widget (`widgets/ProgressRing.qml`).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

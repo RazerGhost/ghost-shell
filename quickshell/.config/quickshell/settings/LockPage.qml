@@ -9,8 +9,8 @@ import qs.widgets
 
 // The lock screen and the login screen share one look: picture, blur, dimming, clock and date,
 // changed on the screen itself in the lock screen editor (customize/LockEditor.qml, the button
-// at the top). This page keeps what isn't seen: the message, what the lock screen shows under
-// the clock, the grace period, and the login screen's name, picture and power buttons. The
+// at the top), with the widgets under the clock. This page keeps what isn't seen: the message,
+// the grace period, and the login screen's name, picture and power buttons. The
 // login screen gets these through greeter/sync.sh, once `ghost greeter` has set it up.
 Column {
     id: root
@@ -31,8 +31,8 @@ Column {
         SettingRow {
             title: "Customize the lock screen"
             subtitle: root.loginScreenReady
-                      ? "Its clock, picture and look, on the screen itself. The login screen follows."
-                      : "Its clock, picture and look, on the screen itself. The login screen follows once you run ghost greeter (it needs sudo)."
+                      ? "Its clock, picture, look and widgets, on the screen itself. The login screen follows."
+                      : "Its clock, picture, look and widgets, on the screen itself. The login screen follows once you run ghost greeter (it needs sudo)."
 
             TextButton {
                 text: "Customize"
@@ -71,59 +71,6 @@ Column {
                 value: Settings.values.lockGrace
                 format: v => v === 0 ? "Off" : v + " s"
                 onPicked: v => Settings.values.lockGrace = v
-            }
-        }
-
-        SettingRow {
-            title: "Media controls"
-            subtitle: "Play, pause and skip without unlocking"
-
-            Switch {
-                label: "Media controls"
-                checked: Settings.values.lockMedia
-                onToggled: Settings.values.lockMedia = !checked
-            }
-        }
-
-        SettingRow {
-            title: "Notification count"
-            subtitle: "How many came in, never what they say"
-
-            Switch {
-                label: "Notification count"
-                checked: Settings.values.lockNotificationCount
-                onToggled: Settings.values.lockNotificationCount = !checked
-            }
-        }
-
-        SettingRow {
-            title: "Weather"
-
-            Switch {
-                label: "Weather on the lock screen"
-                checked: Settings.values.lockWeather
-                onToggled: Settings.values.lockWeather = !checked
-            }
-        }
-
-        SettingRow {
-            title: "Battery"
-
-            Switch {
-                label: "Battery on the lock screen"
-                checked: Settings.values.lockBattery
-                onToggled: Settings.values.lockBattery = !checked
-            }
-        }
-
-        SettingRow {
-            title: "Next calendar event"
-            subtitle: "Its title shows to anyone at the locked screen"
-
-            Switch {
-                label: "Next calendar event on the lock screen"
-                checked: Settings.values.lockEvent
-                onToggled: Settings.values.lockEvent = !checked
             }
         }
     }

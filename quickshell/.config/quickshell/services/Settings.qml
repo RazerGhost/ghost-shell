@@ -218,10 +218,13 @@ Singleton {
             property bool soundBattery: true    // low battery
             // Under the clock on the lock screen (lock/LockStatus.qml); never on the login screen.
             property bool lockMedia: true
+            // The round widgets in your order (lock/LockWidgets.js); null until picked in the
+            // lock screen editor: then the four switches below, which it replaced, still count.
+            property var lockWidgets: null
             property bool lockNotificationCount: true
             property bool lockWeather: true
             property bool lockBattery: true
-            property bool lockEvent: false // its title shows to anyone at the locked screen
+            property bool lockEvent: false
             // Seconds after the idle lock in which a touch unlocks without the password; 0 = off.
             property int lockGrace: 0
             property bool welcomeSeen: false // the welcome tour (welcome/Welcome.qml) has been shown

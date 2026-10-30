@@ -14,7 +14,7 @@ const lock = [
 
 // Every setting the lock screen editor changes, for its Cancel.
 const lockKeys = ["lockClockStyle", "lockLayout", "lockClockSize", "lockClockFont", "lockBlur", "lockDim",
-                  "lockWallpaper", "lockClock", "lockDate"];
+                  "lockWallpaper", "lockClock", "lockDate", "lockWidgets", "lockMedia"];
 
 // Every setting the desktop editor changes, for its Cancel (the wallpaper is put back apart:
 // it isn't a setting).
