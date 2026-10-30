@@ -1152,7 +1152,7 @@ and says "Remove <app>", and letting go unpins it. A drag never counts as a clic
 previews stay away meanwhile, and the dock stays shown while the pointer is above it. The
 right-click menu's Move left / right stay (and the editor's note that pins are moved there).
 
-### Timer everywhere (built 2026-10-30)
+### Timer everywhere (done, verified on the laptop 2026-10-30)
 User's pick: the today menu's timer (`services/Countdown.qml`, which now keeps the length it
 started with for a ring, and the last length used) in more places:
 - Quick settings: a "Timer" round button to add in edit mode; it starts the last length (5
