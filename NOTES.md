@@ -442,6 +442,13 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   start; nothing else of the running shell is touched. One that uses `Notifications` logs that
   it couldn't register the notification server (the running shell has it): harmless, and its
   history is empty. Don't change `Settings.values` in it: the copy writes the real settings.json.
+- Measuring memory without touching the running shell: a scratch copy (`qs -p <copy>`, see
+  above) with just the part to weigh, its proportional memory from
+  `/proc/<pid>/smaps_rollup` (Pss) after a few seconds; compare against the same copy without
+  that part. A layer surface costs ~11 MB whatever its size; the first one also starts the
+  graphics (~30 MB more). For a leak, open and close the part on a Timer and read Pss every
+  few cycles: up and down is the JavaScript heap, steadily up is a leak. Put an overlay on
+  `WlrLayer.Background` in the copy so it stays under the windows.
 - `xdg-mime default` calls running side by side overwrite each other's `mimeapps.list`: run them one
   after another.
 - Qt's JavaScript `Array.prototype.sort` isn't stable: break ties explicitly (an index) when the

@@ -1362,6 +1362,21 @@ the file. The desktop editor's Themes tab has Export and Import buttons for the 
 notification saying what happened. A look whose picture isn't on the other machine shows as
 "picture gone" until it is.
 
+### Performance check after the editors (done 2026-10-30)
+User's pick, measured on the laptop:
+- Idle CPU: about 0.3 % of one core (6 ticks in 20 s), with four desktop widgets on.
+- The running shell after 15 minutes with editors opened and closed: 559 MB resident, 432 MB
+  proportional (a fresh one was 393 / 289 after the optimization round; restarting it to
+  compare like for like wasn't possible from here).
+- No leak in the editors: a scratch lock screen editor opened and closed 50 times went up and
+  down between 222 and 290 MB proportional (the JavaScript heap and the allocator), not up
+  and up.
+- The desktop widgets' layer is the one always-on addition: a second surface costs ~11 MB
+  whatever its size; your four widgets (clock, calendar, battery, to-do) ~35 MB more with the
+  services already loaded, ~12 MB for the first one alone (the cards' and big text's first
+  drawing), so mostly shared. The layer only exists while a widget is on.
+- Nothing trimmed: no part costs more than what it shows.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
