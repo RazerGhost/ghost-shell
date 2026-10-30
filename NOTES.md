@@ -71,6 +71,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - `ColorQuantizer { source; depth; rescaleSize }` only reads local files given as a `file://` URL:
   an https URL (Spotify's `trackArtUrl`), a plain path, or a path with `?query` gives 0 colors.
   Download first (Media.qml does, with curl into $XDG_RUNTIME_DIR).
+- `Image` does load https URLs itself (the Wallpapers window's wallhaven thumbnails, verified
+  2026-10-30), and `XMLHttpRequest` works for JSON APIs (Weather.qml, WallpaperBrowser.qml).
+- A required property named like an id in scope binds to itself: `WindowTitleBar { window: window }`
+  with a `window` property reads its own (null) value. Name it differently (`appWindow`).
 - An `id` wins over a same-named property in unqualified lookups: in a file with
   `Column { id: pages }` and `readonly property var pages`, a binding saying `pages.filter(...)`
   got the Column (TypeError, an empty list). Qualify (`root.pages`) when an id and a property share a name.

@@ -6,16 +6,15 @@ import qs.theme
 import qs.widgets
 
 // The wallpaper picker's contents (WallpaperPicker.qml is the strip): one row of
-// pictures, scrolling sideways (the mouse wheel too). Your pictures from ~/Pictures/Wallpapers
-// come first, then the built-in ones that come with Hyprland and CachyOS (from their packages,
-// so they're not copied anywhere). Click one to use it; the colors follow the picture.
+// pictures, scrolling sideways (the mouse wheel too): yours, from your wallpaper folder. Click
+// one to use it; the colors follow the picture.
 Column {
     id: root
 
     // The strip is open (WallpaperPicker.qml).
     property bool active
-    // Thumbnails only load once the picker has been opened: the built-in pictures are large
-    // (up to 5K), and decoding them all at login would keep the CPU busy for nothing.
+    // Thumbnails only load once the picker has been opened: pictures are large (up to 5K), and
+    // decoding them all at login would keep the CPU busy for nothing.
     property bool opened: false
 
     readonly property real contentWidth: width - leftPadding - rightPadding
@@ -112,7 +111,7 @@ Column {
         }
     }
 
-    // Title, with a button to open your folder (to add pictures).
+    // Title, with buttons to find more (the Wallpapers window) and open your folder.
     Item {
         width: root.contentWidth
         height: openFolder.height
@@ -121,18 +120,29 @@ Column {
             anchors.verticalCenter: parent.verticalCenter
             textFormat: Text.StyledText
             text: "Wallpapers" + (Wallpaper.ownCount === 0
-                  ? "<font color='" + Colors.m3onSurfaceVariant + "'>  ·  add your own to ~/Pictures/Wallpapers</font>" : "")
+                  ? "<font color='" + Colors.m3onSurfaceVariant + "'>  ·  none yet: Find more, or add your own to the folder</font>" : "")
             color: Colors.m3onSurface
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.normal
             font.weight: Font.DemiBold
         }
 
-        TextButton {
+        Row {
             id: openFolder
             anchors.right: parent.right
-            text: "Open folder"
-            onClicked: Apps.run(["sh", "-c", 'mkdir -p "$1" && exec xdg-open "$1"', "sh", Wallpaper.folder], "xdg-open", "")
+
+            TextButton {
+                text: "Find more"
+                onClicked: {
+                    Wallpaper.pickerOpen = false;
+                    WallpaperBrowser.open = true;
+                }
+            }
+
+            TextButton {
+                text: "Open folder"
+                onClicked: Apps.run(["sh", "-c", 'mkdir -p "$1" && exec xdg-open "$1"', "sh", Wallpaper.folder], "xdg-open", "")
+            }
         }
     }
 

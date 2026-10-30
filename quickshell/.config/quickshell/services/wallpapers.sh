@@ -1,8 +1,8 @@
 #!/bin/sh
 # Every picture the wallpaper picker offers, one path per line (grouped and paired by
-# services/Wallpapers.js): yours first ($1, the folder from Settings), then Hyprland's, then the
-# installed collections (/usr/share/wallpapers: CachyOS's and KDE Plasma's; /usr/share/backgrounds:
-# nwg-shell's, Ubuntu's, ...). JPEG XL, AVIF and HEIC only when Qt can show them
+# services/Wallpapers.js): the ones in your folder ($1, from Settings). Not the system's
+# collections (Hyprland's, CachyOS's, nwg-shell's; user's choice 2026-10-30: they weren't the art
+# they want); the Wallpapers window finds more. JPEG XL, AVIF and HEIC only when Qt can show them
 # (kimageformats). Videos (live wallpapers) come as "<video><tab><thumbnail>": a frame made once
 # with ffmpeg into ~/.cache/quickshell/wallpaper-thumbs, for the picker.
 formats='png|jpe?g|webp'
@@ -14,8 +14,6 @@ thumbs="${XDG_CACHE_HOME:-$HOME/.cache}/quickshell/wallpaper-thumbs"
 
 {
     [ -n "${1-}" ] && find "$1" -maxdepth 3 -type f 2>/dev/null | sort
-    find /usr/share/hypr -maxdepth 1 -name 'wall*.png' 2>/dev/null | sort
-    find /usr/share/wallpapers /usr/share/backgrounds -type f 2>/dev/null | sort
 } | grep -iE "\.($formats|mp4|webm|mkv|mov)$" | while IFS= read -r path; do
     case "$path" in
         *.[mM][pP]4 | *.[wW][eE][bB][mM] | *.[mM][kK][vV] | *.[mM][oO][vV])

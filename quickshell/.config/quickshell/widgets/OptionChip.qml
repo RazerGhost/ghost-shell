@@ -2,8 +2,8 @@ import QtQuick
 import qs.theme
 import qs.widgets
 
-// A choice as a chip in an editor tile (the blur styles, the fonts): filled while chosen. With
-// `sample` it shows "Aa" in `sampleFont` above its name.
+// A choice as a chip (an editor tile's blur styles and fonts, the Wallpapers window's styles):
+// filled while chosen. With `sample` it shows "Aa" in `sampleFont` above its name.
 Rectangle {
     id: root
 

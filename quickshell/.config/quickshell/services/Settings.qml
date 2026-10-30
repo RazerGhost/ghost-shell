@@ -169,11 +169,10 @@ Singleton {
             property string temperatureUnit: "celsius" // or "fahrenheit"
 
             // Wallpapers (Settings -> Appearance): your folder ("" = ~/Pictures/Wallpapers), a
-            // slideshow every so many minutes (0 = off) from yours or from all, and switching a
+            // slideshow every so many minutes (0 = off), and switching a
             // picture with a dark version along with light and dark.
             property string wallpaperFolder: ""
             property int wallpaperMinutes: 0
-            property bool wallpaperSlideshowAll: false
             property bool wallpaperFollowsMode: true
             // "dark", "light" or "auto" (dark from sunset to sunrise; services/ColorScheme.qml).
             property string colorScheme: "dark"

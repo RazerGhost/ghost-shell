@@ -6,7 +6,6 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
 import qs.services
 import qs.theme
 import qs.widgets
@@ -26,24 +25,11 @@ Singleton {
         property string page: "appearance"
     }
 
-    // This window in Hyprland's list, for maximizing. Not FloatingWindow.maximized: Hyprland marks
-    // every window as tiled on all edges (so apps drop their shadows), which Qt reports as
-    // maximized. Hyprland's own state (fullscreen 1 = maximized) stays fresh because the dock
-    // re-reads the window list on every fullscreen change.
-    readonly property HyprlandToplevel toplevel: (Hyprland.toplevels?.values ?? [])
-        .find(t => t.wayland?.appId === "org.quickshell" && t.title === "Settings") ?? null
-    readonly property bool maximized: toplevel?.lastIpcObject?.fullscreen === 1
-
-    function toggleMaximized(): void {
-        if (toplevel)
-            Windows.toggleMaximized(toplevel);
-    }
-
     // The pages in their sidebar sections (user's choice: grouped, with a search field). The
     // search matches a page's title and these words, so it finds the page for any setting on it.
     readonly property var pages: [
         { id: "appearance", section: "Personalize", icon: "palette", title: "Appearance",
-          words: "customize desktop editor wallpaper slideshow folder rotate change every colors theme light dark mode sunset night accent style contrast vibrant monochrome matugen fonts font typeface icon theme colloid folder color status icons island wifi bluetooth battery glass blur style frost acrylic transparent see-through border corners rounding desktop widgets clock weather media glow turning spinning animation opening closing slide workspaces floating pinned" },
+          words: "customize desktop editor wallpaper wallpapers find download wallhaven anime art slideshow folder rotate change every colors theme light dark mode sunset night accent style contrast vibrant monochrome matugen fonts font typeface icon theme colloid folder color status icons island wifi bluetooth battery glass blur style frost acrylic transparent see-through border corners rounding desktop widgets clock weather media glow turning spinning animation opening closing slide workspaces floating pinned" },
         { id: "display", section: "Personalize", icon: "brightness_6", title: "Display",
           words: "night light warm blue light schedule screen monitor resolution refresh rate hz scale rotation rotate vrr adaptive sync" },
         { id: "lock", section: "Personalize", icon: "lock", title: "Lock screen",
@@ -96,34 +82,13 @@ Singleton {
                 searchField.focusInput(); // type to search right away
         }
 
-        // The title bar: drag it to move the window, double-click to maximize.
-        MouseArea {
+        // The title bar (drag to move, double-click to maximize), with the chosen page's name.
+        WindowTitleBar {
             id: titleBar
+            appWindow: window
+            title: "Settings"
+            onCloseRequested: root.open = false
 
-            width: parent.width
-            height: Theme.settings.titleBar
-            // The move starts once the pointer has dragged a little, not on the press itself:
-            // Hyprland takes over the pointer during a move, which swallowed double-clicks.
-            property point pressedAt
-            onPressed: mouse => pressedAt = Qt.point(mouse.x, mouse.y)
-            onPositionChanged: mouse => {
-                if (pressed && Math.hypot(mouse.x - pressedAt.x, mouse.y - pressedAt.y) > Qt.styleHints.startDragDistance)
-                    window.startSystemMove();
-            }
-            onDoubleClicked: root.toggleMaximized()
-
-            Text {
-                anchors.left: parent.left
-                anchors.leftMargin: Theme.spacing.m * 2
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Settings"
-                color: Colors.m3onSurface
-                font.family: Theme.font.sans
-                font.pixelSize: Theme.font.title
-                font.weight: Font.DemiBold
-            }
-
-            // The chosen page's name, above it.
             Text {
                 x: Theme.settings.sidebar + Theme.spacing.l * 2
                 anchors.verticalCenter: parent.verticalCenter
@@ -133,25 +98,6 @@ Singleton {
                 font.pixelSize: Theme.font.large
                 font.weight: Font.DemiBold
                 Accessible.role: Accessible.Heading
-            }
-
-            Row {
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.spacing.m
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacing.xs
-
-                WindowButton {
-                    icon: root.maximized ? "filter_none" : "crop_square"
-                    label: root.maximized ? "Restore" : "Maximize"
-                    onClicked: root.toggleMaximized()
-                }
-
-                WindowButton {
-                    icon: "close"
-                    label: "Close"
-                    onClicked: root.open = false
-                }
             }
         }
 

@@ -1,0 +1,478 @@
+// The Wallpapers window (user's choice: its own window like Settings, not a tile in the desktop
+// editor): finds art on wallhaven.cc, anime by default and only ever safe for work. Search, or
+// pick one of your styles, and the results come as pictures, more as you scroll; click one for a
+// larger look, then Download (into your folder) or Set as wallpaper. Nothing is downloaded until
+// you choose it. The searches and the checks on each result are services/Wallhaven.js (tested);
+// downloading is `ghost wallpapers fetch <id>`, which checks the picture again. Opened from the
+// desktop editor's Wallpaper tab, the picker strip, the launcher or `qs ipc call wallpapers browse`.
+pragma Singleton
+
+import QtQuick
+import Quickshell
+import Quickshell.Io
+import Quickshell.Widgets
+import qs.services
+import qs.theme
+import qs.widgets
+import "../services/Wallhaven.js" as Wallhaven
+
+Singleton {
+    id: root
+
+    property alias open: persist.open
+
+    PersistentProperties {
+        id: persist
+        reloadableId: "wallpaperBrowser"
+
+        property bool open: false
+    }
+
+    // The search: your words and the chosen style ("" = the month's best).
+    property string words: ""
+    property string style: ""
+    // What's found so far, `page` pages of `lastPage`.
+    property var pictures: []
+    property int page: 0
+    property int lastPage: 0
+    property bool loading: false
+    property bool failed: false
+    // A search's key, so an older search's answer arriving late is dropped.
+    property int searchId: 0
+    // The picture shown large (null: the grid).
+    property var chosen: null
+
+    // The files already in your folder (wallhaven-<id>.<ext>), to mark what you have.
+    readonly property var owned: Wallpaper.pictures.map(p => p.fileName)
+
+    function search(): void {
+        searchId++;
+        pictures = [];
+        page = 0;
+        lastPage = 0;
+        failed = false;
+        loading = false;
+        loadMore();
+    }
+
+    function loadMore(): void {
+        if (loading || (page > 0 && page >= lastPage))
+            return;
+        loading = true;
+        failed = false;
+        const asked = searchId;
+        const request = new XMLHttpRequest();
+        request.onreadystatechange = () => {
+            if (request.readyState !== XMLHttpRequest.DONE || asked !== root.searchId)
+                return;
+            root.loading = false;
+            // 429: wallhaven's limit of 45 searches a minute.
+            if (request.status !== 200) {
+                root.failed = true;
+                return;
+            }
+            const found = Wallhaven.results(request.responseText);
+            root.pictures = root.pictures.concat(found.pictures);
+            root.page++;
+            root.lastPage = found.lastPage;
+        };
+        request.open("GET", Wallhaven.searchUrl(words.trim().split(/\s+/), style, page + 1, false));
+        request.send();
+    }
+
+    onOpenChanged: {
+        if (open && pictures.length === 0)
+            search();
+    }
+
+    // Downloads, one at a time in the order asked: { id, set } (set: make it the wallpaper after).
+    property var queue: []
+    property var current: null
+    readonly property var pending: (current ? [current.id] : []).concat(queue.map(d => d.id))
+
+    function download(picture: var, set: bool): void {
+        if (owned.includes(picture.file)) {
+            if (set)
+                Wallpaper.set(Wallpaper.folder + "/" + picture.file);
+            return;
+        }
+        if (pending.includes(picture.id)) {
+            // Already on its way: set it once it's there.
+            if (set)
+                queue = queue.map(d => d.id === picture.id ? { id: d.id, set: true } : d);
+            if (set && current?.id === picture.id)
+                current = { id: current.id, set: true };
+            return;
+        }
+        queue = queue.concat([{ id: picture.id, set: set }]);
+        next();
+    }
+
+    function next(): void {
+        if (current || queue.length === 0)
+            return;
+        current = queue[0];
+        queue = queue.slice(1);
+        fetch.command = [Quickshell.env("HOME") + "/.local/bin/ghost", "wallpapers", "fetch", current.id];
+        fetch.running = true;
+    }
+
+    Process {
+        id: fetch
+        stdout: StdioCollector { id: fetchOut }
+        stderr: StdioCollector { id: fetchErr }
+        onExited: code => {
+            const done = root.current;
+            root.current = null;
+            if (code === 0) {
+                Wallpaper.rescan();
+                if (done.set)
+                    Wallpaper.set(fetchOut.text.trim());
+            } else {
+                Notifications.send("Wallpapers", "dialog-warning", "Couldn't download the picture",
+                                   fetchErr.text.trim().replace(/\x1b\[[0-9;]*m/g, "") || "ghost wallpapers fetch exited with " + code,
+                                   false, []);
+            }
+            root.next();
+        }
+    }
+
+    FloatingWindow {
+        id: window
+
+        visible: root.open
+        title: "Wallpapers"
+        implicitWidth: Theme.wallpaper.browserWidth
+        implicitHeight: Theme.wallpaper.browserHeight
+        minimumSize: Qt.size(Theme.wallpaper.browserThumb * 2, Theme.settings.minContent)
+        color: Colors.m3surface
+
+        // Closing the window (Super+W, Alt+F4) hides it.
+        onVisibleChanged: {
+            if (!visible)
+                root.open = false;
+            else
+                searchField.focusInput();
+        }
+
+        WindowTitleBar {
+            id: titleBar
+            appWindow: window
+            title: "Wallpapers"
+            onCloseRequested: root.open = false
+        }
+
+        // The search and the styles.
+        Row {
+            id: searchRow
+
+            anchors.top: titleBar.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.margins: Theme.spacing.l
+            anchors.topMargin: 0
+            spacing: Theme.spacing.s
+            visible: root.chosen === null
+
+            SearchField {
+                id: searchField
+                width: Math.max(Theme.wallpaper.browserThumb, parent.width - styles.width - parent.spacing)
+                placeholder: root.style ? "Narrow it down (optional)" : "Search wallhaven (or the month's best)"
+                onTextChanged: root.words = text
+                onKeyPressed: event => {
+                    if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                        root.search();
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_Down && grid.count > 0) {
+                        grid.forceActiveFocus();
+                        event.accepted = true;
+                    }
+                }
+            }
+
+            Row {
+                id: styles
+                spacing: Theme.spacing.xs
+
+                Repeater {
+                    model: Wallhaven.styles
+
+                    OptionChip {
+                        required property var modelData
+                        width: Theme.wallpaper.browserThumb / 2.4
+                        text: modelData.label
+                        chosen: root.style === modelData.value
+                        onClicked: {
+                            root.style = modelData.value;
+                            root.search();
+                        }
+                    }
+                }
+            }
+        }
+
+        // The pictures found, more as you scroll to the end.
+        GridView {
+            id: grid
+
+            readonly property int columns: Math.max(2, Math.floor(width / Theme.wallpaper.browserThumb))
+
+            anchors.top: searchRow.bottom
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.margins: Theme.spacing.l - Theme.spacing.xs
+            anchors.topMargin: Theme.spacing.m
+            visible: root.chosen === null
+            clip: true
+            boundsBehavior: Flickable.StopAtBounds
+            cellWidth: Math.floor(width / columns)
+            cellHeight: Math.round((cellWidth - Theme.spacing.s) * 9 / 16) + Theme.spacing.s
+            model: root.pictures
+            keyNavigationEnabled: true
+            onAtYEndChanged: if (atYEnd && count > 0) root.loadMore()
+
+            Keys.onReturnPressed: if (currentIndex >= 0) root.chosen = root.pictures[currentIndex]
+            Keys.onEnterPressed: if (currentIndex >= 0) root.chosen = root.pictures[currentIndex]
+            Keys.onSpacePressed: if (currentIndex >= 0) root.chosen = root.pictures[currentIndex]
+            Keys.onUpPressed: event => {
+                if (currentIndex < columns)
+                    searchField.focusInput();
+                else
+                    event.accepted = false;
+            }
+
+            Accessible.role: Accessible.List
+            Accessible.name: "Wallpapers found"
+
+            delegate: MouseArea {
+                id: cell
+
+                required property var modelData
+                required property int index
+                readonly property bool have: root.owned.includes(modelData.file)
+                readonly property bool coming: root.pending.includes(modelData.id)
+
+                width: grid.cellWidth
+                height: grid.cellHeight
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.chosen = modelData
+
+                Accessible.role: Accessible.Button
+                Accessible.name: "Wallpaper " + (index + 1) + ", " + modelData.resolution
+                                 + (have ? ", downloaded" : coming ? ", downloading" : "")
+                Accessible.onPressAction: root.chosen = modelData
+
+                ClippingRectangle {
+                    id: frame
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacing.xs
+                    radius: Theme.radius.m
+                    color: Colors.m3surfaceContainerHigh
+
+                    Image {
+                        anchors.fill: parent
+                        source: cell.modelData.thumb
+                        fillMode: Image.PreserveAspectCrop
+                        asynchronous: true
+                        sourceSize.width: width
+                        opacity: status === Image.Ready ? 1 : 0
+                        Behavior on opacity {
+                            NumberAnimation { duration: Theme.anim.fast }
+                        }
+                    }
+
+                    StateLayer {
+                        radius: frame.radius
+                        color: Colors.m3onSurface
+                        hovered: cell.containsMouse
+                    }
+                }
+
+                // The keyboard's place in the grid.
+                Rectangle {
+                    anchors.fill: frame
+                    radius: frame.radius
+                    color: "transparent"
+                    visible: cell.GridView.isCurrentItem && grid.activeFocus
+                    border.width: Theme.focus.width
+                    border.color: Colors.m3primary
+                }
+
+                // In your folder already, or on its way.
+                Rectangle {
+                    anchors.right: frame.right
+                    anchors.bottom: frame.bottom
+                    anchors.margins: Theme.spacing.s
+                    width: Theme.icon.normal + Theme.spacing.s
+                    height: width
+                    radius: width / 2
+                    visible: cell.have || cell.coming
+                    color: Colors.m3primaryContainer
+
+                    MaterialIcon {
+                        anchors.centerIn: parent
+                        icon: cell.have ? "check" : "downloading"
+                        color: Colors.m3onPrimaryContainer
+                        font.pixelSize: Theme.icon.small
+                    }
+                }
+            }
+
+            footer: Item {
+                width: grid.width
+                height: Theme.list.rowHeight
+
+                Text {
+                    anchors.centerIn: parent
+                    text: root.failed ? "wallhaven didn't answer. Scroll down or search again to retry."
+                        : root.loading ? "Looking…"
+                        : root.page > 0 && root.pictures.length === 0 ? "Nothing found"
+                        : root.page > 0 && root.page >= root.lastPage ? "That's all of them" : ""
+                    color: Colors.m3onSurfaceVariant
+                    font.family: Theme.font.sans
+                    font.pixelSize: Theme.font.normal
+                }
+
+                // Retrying after a failed page: scrolling to the end again doesn't move atYEnd.
+                MouseArea {
+                    anchors.fill: parent
+                    enabled: root.failed
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.loadMore()
+                }
+            }
+        }
+
+        // One picture large, with what to do with it. Left and Right step through the results,
+        // Escape goes back to them.
+        Item {
+            id: preview
+
+            anchors.top: titleBar.bottom
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.margins: Theme.spacing.l
+            anchors.topMargin: 0
+            visible: root.chosen !== null
+            focus: visible
+            onVisibleChanged: if (visible) forceActiveFocus()
+
+            readonly property int at: root.chosen ? root.pictures.indexOf(root.chosen) : -1
+            readonly property bool have: root.chosen !== null && root.owned.includes(root.chosen.file)
+            readonly property bool coming: root.chosen !== null && root.pending.includes(root.chosen.id)
+
+            function step(by: int): void {
+                const next = at + by;
+                if (next < 0 || next >= root.pictures.length)
+                    return;
+                root.chosen = root.pictures[next];
+                grid.currentIndex = next;
+                if (next >= root.pictures.length - 2)
+                    root.loadMore();
+            }
+
+            function back(): void {
+                root.chosen = null;
+                grid.positionViewAtIndex(grid.currentIndex, GridView.Contain);
+                grid.forceActiveFocus();
+            }
+
+            Keys.onEscapePressed: back()
+            Keys.onLeftPressed: step(-1)
+            Keys.onRightPressed: step(1)
+
+            ClippingRectangle {
+                id: large
+
+                anchors.top: parent.top
+                anchors.bottom: actions.top
+                anchors.bottomMargin: Theme.spacing.m
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: Math.min(parent.width, height * 16 / 9)
+                radius: Theme.radius.l
+                color: Colors.m3surfaceContainerHigh
+
+                // The thumbnail at once, the full picture over it when it's in.
+                Image {
+                    anchors.fill: parent
+                    source: root.chosen?.thumb ?? ""
+                    fillMode: Image.PreserveAspectCrop
+                    asynchronous: true
+                }
+
+                Image {
+                    id: full
+                    anchors.fill: parent
+                    source: root.chosen?.url ?? ""
+                    fillMode: Image.PreserveAspectCrop
+                    asynchronous: true
+                    // Decoded at the size it's shown, not the picture's 4K.
+                    sourceSize.width: width
+                    opacity: status === Image.Ready ? 1 : 0
+                    Behavior on opacity {
+                        NumberAnimation { duration: Theme.anim.fast }
+                    }
+                }
+
+                Text {
+                    anchors.left: parent.left
+                    anchors.bottom: parent.bottom
+                    anchors.margins: Theme.spacing.m
+                    visible: full.status === Image.Loading
+                    text: "Loading the full picture… " + Math.round(full.progress * 100) + " %"
+                    color: "white"
+                    style: Text.Outline
+                    styleColor: "#80000000"
+                    font.family: Theme.font.sans
+                    font.pixelSize: Theme.font.small
+                }
+            }
+
+            Item {
+                id: actions
+
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: Theme.spacing.l
+                width: parent.width
+                height: Theme.island.height
+
+                TextButton {
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "Back"
+                    onClicked: preview.back()
+                }
+
+                Text {
+                    anchors.centerIn: parent
+                    text: (root.chosen?.resolution ?? "") + "  ·  " + (preview.at + 1) + " of " + root.pictures.length
+                    color: Colors.m3onSurfaceVariant
+                    font.family: Theme.font.sans
+                    font.pixelSize: Theme.font.normal
+                }
+
+                Row {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacing.s
+
+                    TextButton {
+                        text: preview.have ? "Downloaded" : preview.coming ? "Downloading…" : "Download"
+                        enabled: !preview.have && !preview.coming
+                        onClicked: root.download(root.chosen, false)
+                    }
+
+                    TextButton {
+                        text: Wallpaper.path === Wallpaper.folder + "/" + (root.chosen?.file ?? "") ? "Your wallpaper" : "Set as wallpaper"
+                        filled: true
+                        enabled: text === "Set as wallpaper"
+                        onClicked: root.download(root.chosen, true)
+                    }
+                }
+            }
+        }
+    }
+}

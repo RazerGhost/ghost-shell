@@ -253,6 +253,9 @@ Singleton {
 
     readonly property QtObject wallpaper: QtObject {
         readonly property int thumbHeight: root.px(120) // thumbnails in the picker (16:9)
+        readonly property int browserWidth: root.px(1040)  // the Wallpapers window when it opens
+        readonly property int browserHeight: root.px(680)
+        readonly property int browserThumb: root.px(240)   // its pictures' smallest width (16:9)
     }
 
     readonly property QtObject emoji: QtObject {

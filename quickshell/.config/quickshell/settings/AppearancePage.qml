@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import qs.services
 import qs.theme
+import qs.wallpaper
 import qs.widgets
 import "../theme/ThemeScale.js" as ThemeScale
 
@@ -59,20 +60,18 @@ Column {
         }
 
         SettingRow {
-            enabled: Settings.values.wallpaperMinutes > 0
-            title: "From all pictures"
-            subtitle: "Off: only from your folder"
+            title: "More wallpapers"
+            subtitle: "Anime art from wallhaven.cc, into your folder"
 
-            Switch {
-                label: "Slideshow from all pictures"
-                checked: Settings.values.wallpaperSlideshowAll
-                onToggled: Settings.values.wallpaperSlideshowAll = !checked
+            TextButton {
+                text: "Find wallpapers"
+                onClicked: WallpaperBrowser.open = true
             }
         }
 
         SettingRow {
             title: "Follow light and dark"
-            subtitle: "A picture that comes with a dark version (some of KDE's) switches with the mode"
+            subtitle: "A picture with a dark version (name-dark.jpg beside name.jpg) switches with the mode"
 
             Switch {
                 label: "Wallpaper follows light and dark"

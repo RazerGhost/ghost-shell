@@ -31,11 +31,10 @@ Singleton {
     // `qs ipc call wallpaper picker`.
     property bool pickerOpen: false
 
-    // Every picture to choose from, as { filePath, fileName, darkPath, own }: yours first, then
-    // Hyprland's and the installed collections (CachyOS, KDE Plasma, nwg-shell, Ubuntu's art
-    // contest; from their packages, not copied anywhere). Found by services/wallpapers.sh and
-    // grouped by Wallpapers.js (tested): a Plasma picture at your screen's size, dark versions
-    // paired with their light ones.
+    // Every picture to choose from, as { filePath, fileName, darkPath, own }: the ones in your
+    // folder (the system's collections aren't offered; the Wallpapers window finds more). Found
+    // by services/wallpapers.sh and grouped by Wallpapers.js (tested): a Plasma picture at your
+    // screen's size, dark versions paired with their light ones.
     property var pictures: []
     readonly property int ownCount: pictures.filter(p => p.own).length
 
@@ -124,8 +123,8 @@ Singleton {
             set(wanted);
     }
 
-    // The slideshow: every wallpaperMinutes minutes (0 = off) a picture picked at random from
-    // yours, or from all of them (wallpaperSlideshowAll). Not while the picker is open.
+    // The slideshow: every wallpaperMinutes minutes (0 = off) a picture of yours picked at
+    // random. Not while the picker is open.
     readonly property int slideshowMinutes: Math.max(0, Number(Settings.values.wallpaperMinutes) || 0)
 
     Timer {
@@ -135,8 +134,7 @@ Singleton {
         onTriggered: {
             if (root.pickerOpen)
                 return;
-            const pool = root.pictures.filter(p => (Settings.values.wallpaperSlideshowAll || p.own)
-                                                   && p.filePath !== root.path && p.darkPath !== root.path);
+            const pool = root.pictures.filter(p => p.filePath !== root.path && p.darkPath !== root.path);
             if (pool.length === 0)
                 return;
             const picture = pool[Math.floor(Math.random() * pool.length)];

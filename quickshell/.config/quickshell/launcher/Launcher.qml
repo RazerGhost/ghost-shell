@@ -16,7 +16,8 @@ import "../settings/Keybinds.js" as Keybinds
 Scope {
     id: root
 
-    // The shell's own entries, found like your commands: the on-screen editors (customize/).
+    // The shell's own entries, found like your commands: the on-screen editors (customize/) and
+    // the Wallpapers window.
     readonly property var shellCommands: [
         { name: "Customize", command: "qs ipc call customize menu",
           icon: "preferences-desktop", subtitle: "Pick what to customize (Super + U)" },
@@ -29,7 +30,9 @@ Scope {
         { name: "Customize the dock and island", command: "qs ipc call customize dock",
           icon: "preferences-desktop-theme", subtitle: "The dock, workspace dots, clock and status icons, in place" },
         { name: "Customize the windows", command: "qs ipc call customize windows",
-          icon: "preferences-system-windows", subtitle: "Borders, corners, gaps and animations, on your windows" }
+          icon: "preferences-system-windows", subtitle: "Borders, corners, gaps and animations, on your windows" },
+        { name: "Wallpapers", command: "qs ipc call wallpapers browse",
+          icon: "preferences-desktop-wallpaper", subtitle: "Find anime art on wallhaven.cc and download it" }
     ]
 
     property bool open: false

@@ -1473,6 +1473,27 @@ two-word tags like "-anime girls" return nothing). The desktop editor's More art
 styles as chips (Top, the month's best, as before; Sky, Lofi, Painterly, Minimal) beside the
 search field. Konachan was looked at and dropped (user: not the kind of anime they want).
 
+### The Wallpapers window (built 2026-10-30)
+User's choice: finding art belongs in its own window like Settings, not in the desktop editor.
+`wallpaper/WallpaperBrowser.qml` (a `FloatingWindow`, "Wallpapers"): a search field and the
+styles as chips (Top, Sky, Lofi, Painterly, Minimal), wallhaven's results as pictures in a grid,
+more pages as you scroll to the end; a check on the ones in your folder already. Click one (or
+arrow keys and Enter) for a larger look: the thumbnail at once, the full picture over it; Left and
+Right step through, Escape goes back; Download, or Set as wallpaper (downloads first). Nothing is
+downloaded until you pick it. Downloads run one at a time through `ghost wallpapers fetch <id>`,
+which asks wallhaven for that picture and checks it again. The searches, the styles and the
+checks on each result are one library, `services/Wallhaven.js` (tested), loaded by the window and
+by `modules/core/wallpapers.sh` (js_with). Opened from the desktop editor's Wallpaper tab ("Find
+wallpapers", which finishes the editor first: windows show under it), the picker strip's "Find
+more", Settings -> Appearance, the launcher ("Wallpapers") and `qs ipc call wallpapers browse`.
+The editor's More art tile with its styles and Get 12 is gone. The title bar is shared with
+Settings now (`widgets/WindowTitleBar.qml`; `WindowButton` and `OptionChip` moved to widgets/).
+- The system's wallpaper collections are no longer offered (user's request: they included
+  pictures the user didn't want, like headsets): the picker, the editors and the slideshow show only your
+  folder (the slideshow's "From all pictures" is gone). `cachyos-wallpapers` and
+  `nwg-shell-wallpapers` left the core module's packages; Hyprland's default still shows while no
+  wallpaper is chosen.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

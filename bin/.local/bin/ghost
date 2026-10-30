@@ -16,6 +16,8 @@
 #   ghost wallpapers get [--style sky|lofi|painterly|minimal] [search words] [--count N] [--general]
 #                     art from wallhaven.cc (anime by default, safe for work only) into your
 #                     wallpaper folder (modules/core/wallpapers.sh)
+#   ghost wallpapers fetch <id>
+#                     one picture by its wallhaven id (the shell's Wallpapers window uses it)
 #   ghost looks export | import
 #                     your themes and looks into the repo's looks.json, or from it into this
 #                     machine's (modules/core/looks.sh)

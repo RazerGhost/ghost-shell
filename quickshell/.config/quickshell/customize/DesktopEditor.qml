@@ -8,6 +8,7 @@ import qs.desktop
 import qs.services
 import qs.settings
 import qs.theme
+import qs.wallpaper
 import qs.widgets
 import "../services/ColorScheme.js" as ColorSchemeJs
 import "../settings/HyprlandConfig.js" as HyprlandConfig
@@ -461,13 +462,13 @@ Scope {
                     }
                 }
 
-                // Wallpaper: yours and the built-in ones, videos as their still frame.
+                // Wallpaper: yours, videos as their still frame; more from the Wallpapers window.
                 SheetTiles {
                     visible: chrome.tab === "wallpaper"
 
                     SheetTile {
                         title: "Wallpaper"
-                        subtitle: "Yours and the built-in ones; the colors come from it"
+                        subtitle: "From your folder; the colors come from it"
 
                         ChoiceCards {
                             anchors.verticalCenter: parent.verticalCenter
@@ -490,88 +491,21 @@ Scope {
                         }
                     }
 
-                    // More art from wallhaven.cc into your folder (ghost wallpapers get): the month's
-                    // best anime, or one of your styles' favourites (--style), or what the words
-                    // find (narrowing a style); safe for work only.
+                    // More art: the Wallpapers window (wallpaper/WallpaperBrowser.qml; user's choice: its
+                    // own window, not this tile). Windows show under the editor, so it finishes
+                    // first, keeping your changes, like Done.
                     SheetTile {
-                        id: artTile
                         title: "More art"
-                        subtitle: "From wallhaven.cc, into your folder"
-                        natural: Theme.editor.slider * 2
+                        subtitle: "Find pictures on wallhaven.cc"
+                        natural: Theme.editor.slider
 
-                        // "" = the month's best.
-                        property string style: ""
-
-                        Column {
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: parent.width
-                            spacing: Theme.spacing.m
-
-                            Row {
-                                width: parent.width
-                                spacing: Theme.spacing.s
-
-                                Repeater {
-                                    model: [{ value: "", label: "Top" }, { value: "sky", label: "Sky" }, { value: "lofi", label: "Lofi" },
-                                            { value: "painterly", label: "Painterly" }, { value: "minimal", label: "Minimal" }]
-
-                                    OptionChip {
-                                        required property var modelData
-                                        width: (parent.width - parent.spacing * 4) / 5
-                                        text: modelData.label
-                                        chosen: artTile.style === modelData.value
-                                        onClicked: artTile.style = modelData.value
-                                    }
-                                }
-                            }
-
-                            Row {
-                                width: parent.width
-                                spacing: Theme.spacing.s
-
-                                TextField {
-                                    id: artWords
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: parent.width - getArt.width - parent.spacing
-                                    placeholder: artTile.style ? "Narrow it (optional)" : "Search (or the month's best)"
-                                    keepsEscape: true
-                                    onAccepted: fetchArt.get()
-                                    onEscaped: text = ""
-                                }
-
-                                TextButton {
-                                    id: getArt
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: fetchArt.running ? "Getting them…" : "Get 12"
-                                    filled: true
-                                    enabled: !fetchArt.running
-                                    onClicked: fetchArt.get()
-                                }
-                            }
-                        }
-
-                        Process {
-                            id: fetchArt
-
-                            function get(): void {
-                                if (running)
-                                    return;
-                                const words = artWords.text.trim().split(/\s+/).filter(w => w !== "");
-                                const style = artTile.style ? ["--style", artTile.style] : [];
-                                command = [Quickshell.env("HOME") + "/.local/bin/ghost", "wallpapers", "get", "--count", "12"]
-                                    .concat(style, ["--"], words);
-                                running = true;
-                            }
-
-                            stdout: StdioCollector { id: artOut }
-                            stderr: StdioCollector { id: artErr }
-                            onExited: code => {
-                                Wallpaper.rescan();
-                                const lines = artOut.text.trim().split("\n");
-                                Notifications.send("Wallpapers", code === 0 ? "preferences-desktop-wallpaper" : "dialog-warning",
-                                                   code === 0 ? "More art" : "Couldn't get more art",
-                                                   code === 0 ? lines[lines.length - 1] : (artErr.text.trim() || "ghost wallpapers exited with " + code),
-                                                   false, []);
+                        TextButton {
+                            anchors.centerIn: parent
+                            text: "Find wallpapers"
+                            filled: true
+                            onClicked: {
+                                root.close();
+                                WallpaperBrowser.open = true;
                             }
                         }
                     }

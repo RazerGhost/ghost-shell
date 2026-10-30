@@ -81,4 +81,13 @@ ShellRoot {
             SettingsWindow.open = true;
         }
     }
+
+    // The Wallpapers window, a singleton like the settings window.
+    IpcHandler {
+        target: "wallpapers"
+
+        function browse(): void {
+            WallpaperBrowser.open = true;
+        }
+    }
 }
