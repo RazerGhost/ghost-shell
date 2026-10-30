@@ -72,7 +72,12 @@ Singleton {
                 return;
             }
             const found = Wallhaven.results(request.responseText);
+            // A new list resets the grid to its start: keep the keyboard's place and the scroll.
+            const at = grid.currentIndex;
+            const y = grid.contentY;
             root.pictures = root.pictures.concat(found.pictures);
+            grid.currentIndex = at;
+            grid.contentY = y;
             root.page++;
             root.lastPage = found.lastPage;
             Qt.callLater(root.fill);
