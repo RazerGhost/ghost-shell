@@ -31,6 +31,9 @@ Scope {
     // After the shell reloads (a file in its folder changed), the island says so instead of
     // Quickshell's own pop-up: briefly when it worked, longer with the error when it didn't (the
     // old shell keeps running then).
+    // Quick settings opens in its edit mode next time it's built (editQuickSettings below).
+    property bool quickEdit: false
+
     property bool reloadShown: false
     property string reloadError: ""
 
@@ -78,6 +81,13 @@ Scope {
 
         function close(): void {
             root.panel = "";
+        }
+
+        // Quick settings in its edit mode (the customize menu's Quick settings).
+        function editQuickSettings(): void {
+            root.quickEdit = true;
+            root.panel = "settings";
+            root.screenName = Hyprland.focusedMonitor?.name ?? "";
         }
     }
 

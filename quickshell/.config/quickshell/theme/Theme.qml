@@ -297,6 +297,7 @@ Singleton {
         readonly property int fontChip: root.px(56)   // a font's chip, "Aa" over its name
         readonly property int label: root.px(40)      // a short label before a control in a tile
         readonly property int sample: root.px(360) // the windows editor's sample window
+        readonly property int menuTile: root.px(176) // a tile in the customize menu (Super+U)
     }
 
     readonly property QtObject settings: QtObject {

@@ -4,9 +4,15 @@ import qs.theme
 import qs.widgets
 
 // What every on-screen editor has around what it edits: a wide sheet at the bottom with Cancel,
-// the tabs and Done along its top (Escape and Enter too). The tabs' contents go inside, each a
-// row of tiles (SheetTiles) showing itself for its `tab`. Fills the editor's window, and works
-// out the card the edited screen is shown as.
+// the tabs and Done along its top. The tabs' contents go inside, each a row of tiles
+// (SheetTiles) showing itself for its `tab`. Fills the editor's window, and works out the card
+// the edited screen is shown as.
+//
+// Made for the keyboard as much as the pointer (user's request), with the keys shown at the
+// sheet's foot: the arrow keys move to the nearest control that way (ArrowNavigation, also
+// onto what the card shows, like the lock screen's outlines), Enter or Space use it, Ctrl+Tab
+// and Ctrl+Shift+Tab switch tabs, Ctrl+Enter is Done and Escape Cancel from anywhere; Enter
+// with no control chosen is Done too.
 //
 // The sheet is a panel like the shell's own: with `glass` Hyprland blurs behind it (the
 // editor's window must ask for that, see DesktopEditor.qml), so the glass settings show on it
@@ -53,6 +59,36 @@ Item {
     Keys.onEscapePressed: root.cancelled()
     Keys.onReturnPressed: root.finished()
     Keys.onEnterPressed: root.finished()
+    // Arrow keys a control didn't use (a slider keeps Left and Right).
+    Keys.onPressed: event => {
+        const keys = [Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down];
+        if (keys.includes(event.key) && !(event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier)))
+            event.accepted = navigation.move(event.key);
+    }
+
+    ArrowNavigation {
+        id: navigation
+        area: root.parent ?? root
+    }
+
+    function switchTab(by: int): void {
+        const i = root.tabs.findIndex(t => t.value === root.tab);
+        root.tab = root.tabs[(i + by + root.tabs.length) % root.tabs.length].value;
+    }
+
+    // Before any control sees them: a focused switch or card would take Enter for itself.
+    Shortcut {
+        sequences: ["Ctrl+Tab", "Ctrl+PgDown"]
+        onActivated: root.switchTab(1)
+    }
+    Shortcut {
+        sequences: ["Ctrl+Shift+Tab", "Ctrl+Backtab", "Ctrl+PgUp"]
+        onActivated: root.switchTab(-1)
+    }
+    Shortcut {
+        sequences: ["Ctrl+Return", "Ctrl+Enter"]
+        onActivated: root.finished()
+    }
 
     Item {
         id: sheet
@@ -123,6 +159,49 @@ Item {
             Column {
                 id: sheetColumn
                 width: parent.width
+            }
+
+            // The keys, at the sheet's foot.
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                bottomPadding: Theme.spacing.xs
+                spacing: Theme.spacing.l
+                opacity: 0.8
+
+                Repeater {
+                    model: [
+                        { keys: ["←", "↑", "↓", "→"], label: "Move" },
+                        { keys: ["Enter"], label: "Choose" },
+                        { keys: ["Ctrl", "Tab"], label: "Next tab" },
+                        { keys: ["Ctrl", "Enter"], label: "Done" },
+                        { keys: ["Esc"], label: "Cancel" }
+                    ].filter(h => h.label !== "Next tab" || root.tabs.length > 1)
+
+                    Row {
+                        id: hint
+                        required property var modelData
+                        spacing: Theme.spacing.xs
+
+                        Repeater {
+                            model: hint.modelData.keys
+
+                            KeyCap {
+                                required property string modelData
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: modelData
+                            }
+                        }
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            leftPadding: Theme.spacing.xs
+                            text: hint.modelData.label
+                            color: Colors.m3onSurfaceVariant
+                            font.family: Theme.font.sans
+                            font.pixelSize: Theme.font.small
+                        }
+                    }
+                }
             }
         }
     }

@@ -1248,6 +1248,23 @@ only its editor's settings, with values its controls offer, none twice).
   a list read back from the file isn't a JavaScript Array, which `Presets.same` now handles
   (the lock and dock presets hold lists).
 
+### Customize menu and keyboard in the editors (built 2026-10-30)
+User's request: a key for choosing what to customize instead of the launcher or Settings, and
+the keyboard built into the editors' design.
+- Super+U (`qs ipc call customize menu`): a card over the dimmed screen with a tile per editor
+  (lock screen, desktop, dock and island, windows) and quick settings (opened in its edit mode:
+  `qs ipc call island editQuickSettings`). The first tile has the keyboard: arrow keys move,
+  1-5 jump straight to one, Enter or Space opens, Escape or a click outside closes; the keys
+  are shown under the tiles as key caps (`customize/CustomizeMenu.qml`).
+- Every editor (`EditorChrome`): the arrow keys move to the nearest control that way, on the
+  sheet and on what the card shows (the lock screen's outlines), like the island's menus;
+  Enter or Space use it; Ctrl+Tab / Ctrl+Shift+Tab (or Ctrl+Page Down / Up) switch tabs;
+  Ctrl+Enter is Done and Escape Cancel from anywhere (shortcuts, so a focused control can't
+  take them); a row of key caps at the sheet's foot says so. A card Tab or an arrow reaches in
+  a sideways row scrolls into view (`ArrowNavigation.reveal` now scrolls sideways too).
+- The key caps are one widget (`widgets/KeyCap.qml`) for Settings -> Keybinds, the welcome
+  tour, the editors and the menu. The welcome tour's "Make it yours" card names Super+U.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
@@ -1298,7 +1315,8 @@ windows).
   Super+Down minimize, Alt+Space or Super+Z window menu (with snap layouts), Alt+Tab switcher,
   Super+Tab overview, Super+Left/Right snap, Super+Alt+arrows resize, Super+Shift+arrows swap,
   Super+Shift+Space float or tile, Super+N quick settings, Super+C calendar,
-  Super+Shift+S screenshot (Print: whole screen), Super+V clipboard, Super+. emoji, Super+L lock
+  Super+Shift+S screenshot (Print: whole screen), Super+V clipboard, Super+. emoji, Super+U
+  customize, Super+L lock
   (Super+Shift+L hyprlock fallback), Ctrl+Alt+Delete power menu, Super+Ctrl+arrows focus, Super+I
   settings, Super+Shift+Z editor. Full list in `hypr/binds.lua` and the settings window.
 - **Window buttons:** Hyprland draws no title bars, so instead of hyprbars: keybinds plus a window

@@ -45,16 +45,25 @@ QtObject {
         return false;
     }
 
-    // Scroll a list or a scrolling page so the control shows.
+    // Scroll a list or a scrolling page so the control shows: down a page, or along a row of
+    // cards that scrolls sideways (the editors' galleries).
     function reveal(item: Item): void {
         for (let p = item.parent; p && p !== area; p = p.parent) {
             if (p.contentItem === undefined || p.contentY === undefined)
                 continue;
-            const y = item.mapToItem(p.contentItem, 0, 0).y;
-            if (y < p.contentY)
-                p.contentY = y;
-            else if (y + item.height > p.contentY + p.height)
-                p.contentY = y + item.height - p.height;
+            const at = item.mapToItem(p.contentItem, 0, 0);
+            if (p.contentWidth > p.width) {
+                if (at.x < p.contentX)
+                    p.contentX = at.x;
+                else if (at.x + item.width > p.contentX + p.width)
+                    p.contentX = at.x + item.width - p.width;
+            }
+            if (p.contentHeight > p.height) {
+                if (at.y < p.contentY)
+                    p.contentY = at.y;
+                else if (at.y + item.height > p.contentY + p.height)
+                    p.contentY = at.y + item.height - p.height;
+            }
             return;
         }
     }

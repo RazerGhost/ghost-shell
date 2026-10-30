@@ -535,6 +535,12 @@ PanelWindow {
                         QuickSettings {
                             width: parent.width
                             onOpenMenu: menu => root.island.panel = menu
+                            Component.onCompleted: {
+                                if (root.island.quickEdit) {
+                                    editing = true;
+                                    root.island.quickEdit = false;
+                                }
+                            }
                         }
                     }
                 }

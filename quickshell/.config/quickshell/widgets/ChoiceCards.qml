@@ -111,6 +111,7 @@ Column {
             id: card
 
             required property var modelData
+            required property int index
             readonly property bool chosen: root.chosenValues ? root.chosenValues.includes(modelData.value)
                                                                  : modelData.value === root.current
 
@@ -123,6 +124,11 @@ Column {
 
             // The keyboard (arrow keys or Tab, then Enter or Space), like a click.
             activeFocusOnTab: true
+            // Tab (or the arrow keys) to a card further along the row: the row scrolls to it.
+            onActiveFocusChanged: {
+                if (activeFocus && root.scrolls)
+                    row.positionViewAtIndex(index, ListView.Contain);
+            }
             Keys.onReturnPressed: root.picked(modelData.value)
             Keys.onEnterPressed: root.picked(modelData.value)
             Keys.onSpacePressed: root.picked(modelData.value)

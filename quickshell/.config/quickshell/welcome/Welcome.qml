@@ -37,8 +37,8 @@ Scope {
           text: "Super + ` brings a terminal down over everything and hides it again. Super + Shift + ` tucks any window away there, and brings it back.",
           keys: [["Super", "`"], ["Super", "Shift", "`"]] },
         { icon: "palette", title: "Make it yours",
-          text: "Type \"customize\" in the launcher for the lock screen, the desktop (wallpaper, colors, widgets), the dock and island, or how windows look. You change them on the screen itself and see each change at once.",
-          keys: [["Super"]] },
+          text: "Super + U picks what to customize: the lock screen, the desktop (wallpaper, colors, widgets, themes), the dock and island, how windows look, or quick settings. You change them on the screen itself and see each change at once; each starts with ready-made looks, and the keyboard works throughout.",
+          keys: [["Super", "U"]] },
         { icon: "settings", title: "Everything else is in Settings",
           text: "Display, sound, notifications per app, power and sleep, every keybind, and this tour again (under Keybinds). Each Customize button opens its editor.",
           keys: [["Super", "I"]] }
@@ -204,26 +204,11 @@ Scope {
                             Repeater {
                                 model: combo.modelData
 
-                                Rectangle {
+                                KeyCap {
                                     required property string modelData
 
                                     anchors.verticalCenter: parent.verticalCenter
-                                    width: Math.max(height, cap.implicitWidth + Theme.spacing.m)
-                                    height: cap.implicitHeight + Theme.spacing.xs * 2
-                                    radius: Theme.radius.s
-                                    color: Colors.m3surfaceContainerHighest
-                                    border.width: 1
-                                    border.color: Colors.m3outlineVariant
-
-                                    Text {
-                                        id: cap
-                                        anchors.centerIn: parent
-                                        text: parent.modelData
-                                        color: Colors.m3onSurface
-                                        font.family: Theme.font.sans
-                                        font.pixelSize: Theme.font.small
-                                        font.weight: Font.Medium
-                                    }
+                                    text: modelData
                                 }
                             }
                         }

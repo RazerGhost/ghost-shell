@@ -37,6 +37,7 @@ hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("qs ipc call island toggle settings")
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("qs ipc call island toggle today"), { description = "Menus: Calendar and notifications" })
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("qs ipc call island toggle clipboard"), { description = "Menus: Clipboard history" })
 hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("qs ipc call island toggle emoji"), { description = "Menus: Emoji" })
+hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("qs ipc call customize menu"), { description = "Menus: Customize (lock screen, desktop, dock and island, windows, quick settings)" })
 
 -- Session
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("qs ipc call lock lock || " .. fallbackLock), { description = "Session: Lock" })

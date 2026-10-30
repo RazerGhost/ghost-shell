@@ -24,6 +24,7 @@ Generated from Hyprland's binds with `ghost keybinds`, by category; every bind i
 | `Super` + `C` | Calendar and notifications |
 | `Super` + `V` | Clipboard history |
 | `Super` + `.` | Emoji |
+| `Super` + `U` | Customize (lock screen, desktop, dock and island, windows, quick settings) |
 
 ## Session
 
