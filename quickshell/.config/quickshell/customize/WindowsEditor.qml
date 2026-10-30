@@ -67,9 +67,10 @@ Scope {
         HyprlandRuntime.lua = "";
     }
 
+    // Closed first: its Looks gallery would save the restored settings into a look of yours.
     function cancel(): void {
-        Presets.restore(Settings.values, saved);
         close();
+        Presets.restore(Settings.values, saved);
     }
 
     // The space bars already reserve on the screen ([left, top, right, bottom]: the island, an
@@ -233,7 +234,7 @@ Scope {
                     visible: chrome.tab === "looks"
 
                     LooksTile {
-                        yours: root.saved
+                        live: editor.active
                         picture: Wallpaper.stillPath
                         savedKey: "windowLooks"
                         savedKeys: Presets.windowsKeys.filter(k => k !== "windowLooks")

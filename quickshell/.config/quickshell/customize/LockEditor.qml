@@ -68,9 +68,10 @@ Scope {
         Qt.callLater(() => lock.settling = false);
     }
 
+    // Closed first: its Looks gallery would save the restored settings into a look of yours.
     function cancel(): void {
-        Presets.restore(Settings.values, saved);
         editor.active = false;
+        Presets.restore(Settings.values, saved);
     }
 
     LazyLoader {
@@ -175,7 +176,7 @@ Scope {
                     visible: chrome.tab === "looks"
 
                     LooksTile {
-                        yours: root.saved
+                        live: editor.active
                         picture: Wallpaper.lockPath
                         savedKey: "lockLooks"
                         savedKeys: Presets.lockKeys.filter(k => k !== "lockLooks")

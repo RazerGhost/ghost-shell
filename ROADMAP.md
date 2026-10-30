@@ -1287,6 +1287,14 @@ look keeps everything about the lock screen (clock, picture, blur and darkening,
 their places, media controls), a dock look all of the dock and island editor's settings, a
 window look all of the windows editor's. Cancel puts the saved looks back too. The desktop's
 own style keeps using themes (with the wallpaper).
+- Changed (user's review): "Yours" is gone; the galleries with looks of your own start with
+  an empty "New look" card, the chosen one while your settings match no look, which saves them
+  as a new look (any number; before, Save only showed while nothing matched, so after one look
+  it seemed limited to one). A look of yours is edited in place, like an iOS lock screen:
+  while it's chosen, a change is saved into it a moment later, so it stays chosen; presets
+  stay fixed. Yours are listed (and matched) before the presets. Each editor closes before
+  Cancel puts its settings back, and the gallery only saves while its editor is open
+  (`LooksTile.live`), so Cancel can't save the old settings into a look.
 
 ### Review of the presets, menu and keyboard work (2026-10-30)
 Two read-only reviews of everything since the last review, findings checked, then fixed:
@@ -1327,7 +1335,9 @@ is dragged, running out from the screen's middle (the middle lines stronger), an
 widget lines up its start, middle or end, whichever is nearest, with a line on each axis
 (instead of the edges and neighbours it lines up with otherwise). Lines out from the middle
 mean a widget and its mirror image land mirrored, and a medium widget can sit centred on the
-screen (`DesktopWidgets.gridLines`, `gridSnapped`, tested).
+screen (`DesktopWidgets.gridLines`, `gridSnapped`, tested). The lines are one screen pixel at
+any scale (in the editor's shrunk card a 1 px line fell below a pixel and some faded out,
+user's find).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

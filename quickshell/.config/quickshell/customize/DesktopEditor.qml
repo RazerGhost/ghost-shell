@@ -52,7 +52,9 @@ Scope {
         Editing.back();
     }
 
+    // Closed first: its widget layouts would save the restored settings into a layout of yours.
     function cancel(): void {
+        close();
         Presets.restore(Settings.values, saved);
         if (Wallpaper.target !== savedWallpaper) {
             if (savedWallpaper !== "")
@@ -60,7 +62,6 @@ Scope {
             else
                 Wallpaper.clear();
         }
-        close();
     }
 
     // Icon themes: the installed ones, their dark and light versions as one (matugen's
@@ -149,7 +150,7 @@ Scope {
                     visible: chrome.tab === "looks"
 
                     LooksTile {
-                        yours: root.saved
+                        live: editor.active
                         picture: Wallpaper.stillPath
                         title: "Style"
                         subtitle: "Glass, blur, corners and color style, over your wallpaper"
@@ -203,7 +204,7 @@ Scope {
                     }
 
                     LooksTile {
-                        yours: root.saved
+                        live: editor.active
                         picture: Wallpaper.stillPath
                         title: "Widget layouts"
                         savedKey: "widgetLooks"

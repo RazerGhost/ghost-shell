@@ -92,8 +92,10 @@ Scope {
                         Rectangle {
                             required property real modelData
                             readonly property bool middle: Math.abs(modelData - widgetStage.width / 2) < 0.5
+                            // One screen pixel (two for the middle) at any scale: in the editor's
+                            // card a 1 px line shrank below a pixel and some faded out.
                             x: modelData - width / 2
-                            width: middle ? 2 : 1
+                            width: (middle ? 2 : 1) / widgetStage.scale
                             height: grid.height
                             color: Colors.sketch
                             opacity: middle ? 0.8 : 0.3
@@ -108,7 +110,7 @@ Scope {
                             readonly property bool middle: Math.abs(modelData - widgetStage.height / 2) < 0.5
                             y: modelData - height / 2
                             width: grid.width
-                            height: middle ? 2 : 1
+                            height: (middle ? 2 : 1) / widgetStage.scale
                             color: Colors.sketch
                             opacity: middle ? 0.8 : 0.3
                         }
