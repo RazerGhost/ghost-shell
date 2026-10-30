@@ -232,6 +232,13 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `onAdapterUpdated: writeAdapter()` saves every change. A `var` holding a JSON list reads back
   as an array-like, not a JavaScript Array: `Array.isArray` is false (verified); copy it with
   `Array.from` before checking it.
+- `onAdapterUpdated: writeAdapter()` with `watchChanges` + `onFileChanged: reload()` loses
+  changes made in a row: each write runs in the background, and the re-read of an early one
+  brings back old values for the later ones (verified 2026-10-30 with a throwaway `qs -p`: of
+  six properties set one after another, three were kept). Save once per burst (a 0 ms `Timer`
+  restarted on `adapterUpdated`), with `blockWrites: true`, and skip the re-read while that
+  timer runs: all six kept, 5 runs of 5 (services/Settings.qml). After a re-read, a `var` list
+  is array-like again (`Array.isArray` false).
 - `FileView.setText()` writes asynchronously unless `blockWrites: true`; called from
   `Component.onDestruction` during a shell reload, nothing was written (verified). Keep state
   that must survive a reload in `PersistentProperties { reloadableId: "..." }` (its `reloaded`

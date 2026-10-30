@@ -18,6 +18,13 @@ Singleton {
     // That file is kept as settings.json.bad and the user is told; changes last until a restart.
     property bool writable: false
 
+    // One save per burst of changes (see the FileView below).
+    Timer {
+        id: save
+        interval: 0
+        onTriggered: file.writeAdapter()
+    }
+
     FileView {
         id: file
         path: Quickshell.env("HOME") + "/.local/state/quickshell/settings.json"
@@ -25,10 +32,18 @@ Singleton {
         // defaults, so read them in bindings, which update once it's loaded.
         printErrors: false // missing until the first change
         watchChanges: true
-        onFileChanged: reload()
+        // Saved once per burst of changes (a preset sets up to a dozen at once), written before
+        // anything reads it, and not read back while a save waits: saving after each change
+        // in the background let the re-read of an early save bring back old values for the
+        // later ones (verified 2026-10-30: of six set in a row, three were kept; NOTES).
+        blockWrites: true
+        onFileChanged: {
+            if (!save.running)
+                reload();
+        }
         onAdapterUpdated: {
             if (root.writable)
-                writeAdapter();
+                save.restart();
         }
         onLoaded: {
             const text = file.text();

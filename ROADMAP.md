@@ -1241,6 +1241,12 @@ only its editor's settings, with values its controls offer, none twice).
   for saved themes; tested), and the "Yours" card coming and going rebuilt the row under the
   pointer. "Yours" now always comes first and means your settings from when the editor opened:
   picking it goes back to them (only what that gallery sets).
+- Fix (user's find: a preset still fell back to "Yours" and wasn't quite the one picked):
+  Settings saved after every change in the background and re-read its file after each save,
+  so of a preset's dozen values, some came back old (reproduced: three of six kept). It now
+  saves once per burst, synchronously, and doesn't re-read while a save waits (all kept). Also
+  a list read back from the file isn't a JavaScript Array, which `Presets.same` now handles
+  (the lock and dock presets hold lists).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

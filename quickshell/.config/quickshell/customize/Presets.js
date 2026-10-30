@@ -122,8 +122,10 @@ function restore(values, saved) {
 // order of an object's keys (settings.json is written with them sorted, so the widgets' places
 // come back in another order than a preset gave them), and unset counting as null.
 function same(a, b) {
-    a = a ?? null;
-    b = b ?? null;
+    // A list read back from settings.json isn't a JavaScript Array (NOTES): compare it as one.
+    const plain = v => v !== null && typeof v === "object" && typeof v.length === "number" && !Array.isArray(v) ? Array.from(v) : v;
+    a = plain(a ?? null);
+    b = plain(b ?? null);
     if (a === b)
         return true;
     if (typeof a !== "object" || typeof b !== "object" || a === null || b === null)

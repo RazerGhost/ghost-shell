@@ -104,6 +104,8 @@ TestCase {
         verify(!Presets.same({ a: null }, { b: null }));
         verify(!Presets.same([], {}));
         verify(!Presets.same(0, null));
+        // A list as settings.json gives it back: array-like, not an Array.
+        verify(Presets.same({ length: 2, 0: "a", 1: "b" }, ["a", "b"]));
         const workday = Presets.desktopWidgets.find(p => p.name === "Workday").values;
         const reread = JSON.parse(JSON.stringify(workday));
         const sorted = {};
