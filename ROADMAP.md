@@ -1194,9 +1194,11 @@ fixed:
 
 ### Lock screen: drag the clock and widgets (built 2026-10-30)
 User's pick. In the lock screen editor the clock's and the widgets' outlines can be dragged (or
-moved with the arrow keys while one has the keyboard): the clock, date, player and widgets move
-together from their place (`lockClockOffset`, fractions of the screen, so the login screen
-follows and a resolution change keeps it). They stay on the screen and never cover the
+moved with the arrow keys while one has the keyboard), each on its own (user's choice after
+trying them as one group): the clock with its date (`lockClockOffset`) and the player with
+the widgets (`lockWidgetsOffset`) move from their place, as fractions of the screen, so the
+login screen follows and a resolution change keeps them. Each stays on the screen and never
+covers the
 password field with its hints: where they would, they stop just above it, and beside it they
 may go lower (`LockClock.offset`, `clamped`, tested). Picking a Place or a look starts again
 from that place; Cancel puts the old one back.

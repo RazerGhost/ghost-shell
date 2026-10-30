@@ -44,8 +44,8 @@ Scope {
             root.done();
     }
 
-    // The clock, date and widgets moved `by` (px of the lock screen) from where they are now:
-    // saved as where they ended up (clamped by LockContent), as fractions of the screen.
+    // The clock and date moved `by` (px of the lock screen) from where they are now: saved as
+    // where they ended up (clamped by LockContent), as fractions of the screen.
     function moveClock(by: point): void {
         const lock = editor.item?.lockContent;
         if (!lock)
@@ -55,6 +55,17 @@ Scope {
         const shift = lock.clockShift;
         Settings.values.lockClockOffset = { x: shift.x / lock.width, y: shift.y / lock.height };
         lock.dragShift = Qt.point(0, 0);
+    }
+
+    // The same for the player and widgets under the clock.
+    function moveWidgets(by: point): void {
+        const lock = editor.item?.lockContent;
+        if (!lock)
+            return;
+        lock.widgetsDragShift = by;
+        const shift = lock.widgetsShift;
+        Settings.values.lockWidgetsOffset = { x: shift.x / lock.width, y: shift.y / lock.height };
+        lock.widgetsDragShift = Qt.point(0, 0);
     }
 
     function cancel(): void {
@@ -135,11 +146,11 @@ Scope {
                         tab: "widgets"
                         name: "The widgets' options"
                         shown: status.height > 0 || chrome.tab === "widgets"
-                        area: Qt.rect((column?.x ?? 0) + lock.clockShift.x + (slot?.x ?? 0) + status.contentX,
-                                      (column?.y ?? 0) + lock.clockShift.y + (slot?.y ?? 0) + (slot?.topPadding ?? 0),
+                        area: Qt.rect((column?.x ?? 0) + lock.widgetsShift.x + (slot?.x ?? 0) + status.contentX,
+                                      (column?.y ?? 0) + lock.widgetsShift.y + (slot?.y ?? 0) + (slot?.topPadding ?? 0),
                                       status.contentWidth, Math.max(status.height, Theme.lock.widget))
-                        onMoving: by => lock.dragShift = by
-                        onMoved: by => root.moveClock(by)
+                        onMoving: by => lock.widgetsDragShift = by
+                        onMoved: by => root.moveWidgets(by)
                     }
                 }
             }
@@ -297,6 +308,7 @@ Scope {
                                     onPicked: v => {
                                         Settings.values.lockLayout = v;
                                         Settings.values.lockClockOffset = null;
+                                        Settings.values.lockWidgetsOffset = null;
                                     }
                                 }
                         }

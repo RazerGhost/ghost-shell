@@ -111,17 +111,25 @@ Item {
     // (the default), both together in the middle, or the clock in the bottom-left corner.
     readonly property string layout: LockClockJs.pick(Settings.values.lockLayout, LockClockJs.layouts)
 
-    // Moved from there by dragging in the lock screen editor (Settings' lockClockOffset, as
-    // fractions of the screen), plus the drag going on (`dragShift`, px, until it's let go):
-    // the clock, date and widgets together, kept on the screen and off the password field with
-    // its hints (LockClock.clamped).
+    // Moved from there by dragging in the lock screen editor, each on its own: the clock with
+    // its date (Settings' lockClockOffset) and the player and widgets under them
+    // (lockWidgetsOffset), as fractions of the screen, plus the drag going on (`dragShift`,
+    // `widgetsDragShift`, px, until it's let go). Each kept on the screen and off the password
+    // field with its hints (LockClock.clamped).
     property point dragShift: Qt.point(0, 0)
+    property point widgetsDragShift: Qt.point(0, 0)
+    readonly property var fieldArea: ({ x: fieldColumn.x + fieldShift, y: fieldColumn.y, width: fieldColumn.width,
+                                        height: fieldColumn.height + belowReserve })
     readonly property var clockOffset: LockClockJs.offset(Settings.values.lockClockOffset)
     readonly property var clockShift: LockClockJs.clamped(
-        { x: clockColumn.x, y: clockColumn.y, width: clockColumn.width, height: clockColumn.height },
+        { x: clockColumn.x, y: clockColumn.y, width: clockColumn.width, height: statusSlot.y },
         clockOffset.x * width + dragShift.x, clockOffset.y * height + dragShift.y, width, height,
-        { x: fieldColumn.x + fieldShift, y: fieldColumn.y, width: fieldColumn.width, height: fieldColumn.height + belowReserve },
-        Theme.spacing.l * 2, Theme.spacing.l)
+        fieldArea, Theme.spacing.l * 2, Theme.spacing.l)
+    readonly property var widgetsOffset: LockClockJs.offset(Settings.values.lockWidgetsOffset)
+    readonly property var widgetsShift: LockClockJs.clamped(
+        { x: clockColumn.x + statusSlot.x, y: clockColumn.y + statusSlot.y, width: statusSlot.width, height: statusSlot.height },
+        widgetsOffset.x * width + widgetsDragShift.x, widgetsOffset.y * height + widgetsDragShift.y, width, height,
+        fieldArea, Theme.spacing.l * 2, Theme.spacing.l)
 
     states: [
         State {
@@ -188,6 +196,8 @@ Item {
         Column {
             id: statusSlot
             x: clockColumn.place(this)
+            // Its own move, less the clock's (which moves the whole column).
+            transform: Translate { x: root.widgetsShift.x - root.clockShift.x; y: root.widgetsShift.y - root.clockShift.y }
             width: Theme.lock.fieldWidth
             topPadding: Theme.spacing.l * 2
         }
