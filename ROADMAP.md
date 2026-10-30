@@ -1265,7 +1265,7 @@ the keyboard built into the editors' design.
 - The key caps are one widget (`widgets/KeyCap.qml`) for Settings -> Keybinds, the welcome
   tour, the editors and the menu. The welcome tour's "Make it yours" card names Super+U.
 
-### Smooth changes (built 2026-10-30)
+### Smooth changes (done, verified on the laptop 2026-10-30)
 User's pick. Picking a preset, a theme or a layout glides instead of jumping:
 - the panels' glass (how see-through, the edge) eases to its new value (`Colors.panelAlpha`,
   `edgeAlpha`, under the recolor fade the colors already had);
@@ -1276,7 +1276,7 @@ User's pick. Picking a preset, a theme or a layout glides instead of jumping:
 Corner radii and sizes still change at once: easing them would lay the whole shell out again
 every frame.
 
-### Your own looks (built 2026-10-30)
+### Your own looks (done, verified on the laptop 2026-10-30)
 User's pick. The Looks galleries of the lock screen, dock and island, and windows editors, and
 the desktop's widget layouts, keep looks of your own after their presets
 (`customize/SavedLooks.js`, tested; `lockLooks`, `dockLooks`, `windowLooks`, `widgetLooks`):
@@ -1296,7 +1296,7 @@ own style keeps using themes (with the wallpaper).
   Cancel puts its settings back, and the gallery only saves while its editor is open
   (`LooksTile.live`), so Cancel can't save the old settings into a look.
 
-### Review of the presets, menu and keyboard work (2026-10-30)
+### Review of the presets, menu and keyboard work (done, verified on the laptop 2026-10-30)
 Two read-only reviews of everything since the last review, findings checked, then fixed:
 - Keys: Enter in the editors' name fields (themes, your looks) also pressed Done, and Escape
   cancelled the whole editor; `TextField` now keeps Enter, and with `keepsEscape` Escape only
@@ -1327,7 +1327,7 @@ Two read-only reviews of everything since the last review, findings checked, the
 - Not done: a clock or widgets dragged to the very bottom of the login screen can sit over its
   power buttons and message line (they stay on top and clickable).
 
-### A grid for the desktop widgets (built 2026-10-30)
+### A grid for the desktop widgets (done, verified on the laptop 2026-10-30)
 User's request: a grid to place widgets symmetrically. The desktop editor's Widgets tab, Places:
 a Grid switch and its size (16-64 px at 100 %; `desktopGrid`, `desktopGridSize`, put back by
 Cancel). While it's on, faint lines show over the desktop while the editor is open or a widget
