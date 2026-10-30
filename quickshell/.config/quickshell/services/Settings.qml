@@ -116,6 +116,11 @@ Singleton {
             property bool greeterShowName: true     // your user name above the password field
             property bool greeterPowerButtons: true // suspend, restart and shut down
 
+            // Quick settings' tiles and round buttons, in order (controlcenter/QuickItems.js);
+            // until edited, its defaults.
+            property var quickTiles: null
+            property var quickToggles: null
+
             property bool hotCorner: true // the pointer in the top-left corner opens the overview
 
             property bool batterySaver: true // power saver from the low battery warning until plugged in

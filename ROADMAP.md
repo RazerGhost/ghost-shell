@@ -1078,6 +1078,22 @@ from the idle lock; every other lock ends it).
 - Not done: Cancel in the desktop editor can't go back to Hyprland's default wallpaper when
   none was chosen before (the wallpaper service has no "none" to set).
 
+### Quick settings editor (built 2026-10-30)
+User's pick after the review: Android's edit mode, on the panel itself.
+- Quick settings' wide tiles and round buttons come from two lists in your settings
+  (`quickTiles`, `quickToggles`; until edited, what it showed before), made safe and edited by
+  `controlcenter/QuickItems.js` (tested: unknown ids and repeats dropped, an empty list kept
+  empty). Each tile and button is a component by id in `QuickSettings.qml`.
+- The pencil in the bottom row turns on edit mode: the items wiggle a little, a badge in each
+  corner removes it, dragging one onto another moves it there (`controlcenter/QuickSlot.qml`;
+  with the keyboard Shift + Left / Right moves it, Delete removes it), and "Available" lists
+  what isn't shown as chips to add. Reset brings the defaults back, Done or Escape ends it; the
+  sliders and the bottom row step aside meanwhile.
+- New round buttons to add: airplane mode, dark mode (light or dark by hand), record the screen
+  (stops a recording, or opens the screenshot tool on Record), screenshot, wallpaper.
+- The battery line in the bottom row ends in "…" before the buttons (the pencil made it run
+  under them).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

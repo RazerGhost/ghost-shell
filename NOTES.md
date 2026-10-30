@@ -289,6 +289,11 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   size: 16384"). The shell's event loop stopped answering (`qs ipc` timed out) and reading its
   `/proc` entries (`ps`, `pgrep`) hung until it was killed. Hit 2026-10-30; a frozen instance's
   log stays in `/run/user/1000/quickshell/by-id/<id>/log.log`.
+- `sed -i` (and other tools that write a new file and rename it over the old one) can leave
+  Quickshell watching the replaced file: the change isn't reloaded, and nor are later edits of
+  that file until something else reloads the shell. `touch` doesn't reload either. Write files
+  in place (an editor, `open(p, "w")`), or change another file to force a reload. Hit
+  2026-10-30 while switching a test setting off: the shell kept running the old code.
 - An IPC function named `show` can't be called with arguments: `qs ipc call settings show lock`
   fails with "The following argument was not expected: lock" (the CLI's own `show` subcommand
   takes it). Named `page` instead.
