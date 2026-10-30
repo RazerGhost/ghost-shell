@@ -55,7 +55,7 @@ Scope {
                 height: window.height
                 x: carded ? Editing.card.x : 0
                 y: carded ? Editing.card.y : 0
-                scale: carded ? Editing.card.width / window.width : 1
+                scale: carded ? Editing.card.width / Math.max(window.width, 1) : 1
                 transformOrigin: Item.TopLeft
 
                 Behavior on x { NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }

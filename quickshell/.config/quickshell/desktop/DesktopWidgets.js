@@ -6,8 +6,8 @@
 // Down the left side, under the island's height, until moved.
 const defaults = {
     clock:   { x: 0.04, y: 0.08 },
-    weather: { x: 0.04, y: 0.32 },
-    media:   { x: 0.04, y: 0.46 }
+    weather: { x: 0.04, y: 0.26 },
+    media:   { x: 0.04, y: 0.44 }
 };
 
 function fraction(value, fallback) {

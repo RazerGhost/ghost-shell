@@ -10,6 +10,8 @@ Rectangle {
     // [{ value, label }]
     required property var options
     property var current
+    // Tabs (an editor's tab bar) or, by default, a choice of values (announced as radio buttons).
+    property bool tabs: false
 
     signal picked(var value)
 
@@ -18,7 +20,7 @@ Rectangle {
     radius: Theme.radius.full
     color: Colors.m3surfaceContainerHighest
 
-    Accessible.role: Accessible.PageTabList
+    Accessible.role: tabs ? Accessible.PageTabList : Accessible.Grouping
 
     Row {
         id: segments
@@ -39,7 +41,7 @@ Rectangle {
                 color: chosen ? Colors.m3primary : "transparent"
                 Behavior on color { ColorAnimation { duration: Theme.anim.fast } }
 
-                Accessible.role: Accessible.PageTab
+                Accessible.role: root.tabs ? Accessible.PageTab : Accessible.RadioButton
                 Accessible.name: modelData.label
                 Accessible.checked: chosen
                 Accessible.onPressAction: root.picked(modelData.value)

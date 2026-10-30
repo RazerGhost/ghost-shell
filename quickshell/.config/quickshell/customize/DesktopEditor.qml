@@ -24,11 +24,14 @@ Scope {
     id: root
 
     property var saved: ({})
+    // The screen it opened on, kept while it's open (the focused one could change under it).
+    property string screenName: ""
     property string savedWallpaper: ""
 
     function open(): void {
         if (editor.active)
             return;
+        screenName = Hyprland.focusedMonitor?.name ?? "";
         saved = Presets.snapshot(Settings.values, Presets.desktopKeys);
         savedWallpaper = Wallpaper.path;
         Editing.toEmptyWorkspace();
@@ -80,7 +83,7 @@ Scope {
         PanelWindow {
             id: window
 
-            screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? null
+            screen: Quickshell.screens.find(s => s.name === root.screenName) ?? null
             anchors { top: true; bottom: true; left: true; right: true }
             exclusionMode: ExclusionMode.Ignore
             color: "transparent"
@@ -143,7 +146,7 @@ Scope {
                             anchors.verticalCenter: parent.verticalCenter
                             width: parent.width
                             // Fades into the tile, over the glass sheet.
-                            fadeColor: Qt.tint(Colors.surfaceTranslucent, Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, 0.05))
+                            fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)
                             scrolls: true
                             cardWidth: Theme.editor.pictureCard
                             options: Wallpaper.pictures.map(p => ({ value: p.filePath, label: p.fileName, thumb: p.video ? p.thumb : p.filePath }))
@@ -213,6 +216,7 @@ Scope {
                                     Accessible.onPressAction: Settings.values.accentColor = modelData.value
                                     activeFocusOnTab: true
                                     Keys.onReturnPressed: Settings.values.accentColor = modelData.value
+                                    Keys.onEnterPressed: Settings.values.accentColor = modelData.value
                                     Keys.onSpacePressed: Settings.values.accentColor = modelData.value
 
                                     Image {
@@ -224,12 +228,20 @@ Scope {
                                         asynchronous: true
                                     }
 
+                                    StateLayer {
+                                        radius: swatch.radius
+                                        color: Colors.m3onSurface
+                                        hovered: swatchMouse.containsMouse
+                                    }
+
                                     FocusRing {
                                         radius: swatch.radius
                                     }
 
                                     MouseArea {
+                                        id: swatchMouse
                                         anchors.fill: parent
+                                        hoverEnabled: true
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: Settings.values.accentColor = swatch.modelData.value
                                     }
@@ -532,7 +544,7 @@ Scope {
                     SheetTile {
                         title: "Font"
                         subtitle: "The shell's menus, island and Settings"
-                        weight: 2
+                        weight: 1.6
 
                         Grid {
                             id: fontGrid
@@ -555,6 +567,37 @@ Scope {
                                     text: modelData
                                     chosen: Theme.font.sans === modelData
                                     onClicked: Settings.values.fontSans = modelData === "Inter" ? "" : modelData
+                                }
+                            }
+                        }
+                    }
+
+                    SheetTile {
+                        title: "Monospaced"
+                        subtitle: "Error messages and code"
+                        weight: 1.4
+
+                        Grid {
+                            id: monoGrid
+                            readonly property var fonts: ["MesloLGS Nerd Font", "JetBrainsMono Nerd Font", "JetBrains Mono", "Fira Code",
+                                                          "Adwaita Mono", "Noto Sans Mono", "DejaVu Sans Mono", "Source Code Pro", "Hack"]
+                                                         .filter(f => Qt.fontFamilies().includes(f))
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width
+                            columns: Math.max(2, Math.ceil(fonts.length / 2))
+                            spacing: Theme.spacing.s
+
+                            Repeater {
+                                model: monoGrid.fonts
+
+                                OptionChip {
+                                    required property string modelData
+                                    width: (monoGrid.width - monoGrid.spacing * (monoGrid.columns - 1)) / monoGrid.columns
+                                    sample: true
+                                    sampleFont: modelData
+                                    text: modelData.replace(" Nerd Font", "")
+                                    chosen: Theme.font.mono === modelData
+                                    onClicked: Settings.values.fontMono = modelData === "MesloLGS Nerd Font" ? "" : modelData
                                 }
                             }
                         }

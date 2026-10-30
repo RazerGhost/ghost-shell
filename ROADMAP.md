@@ -935,8 +935,8 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   holds them and the IPC (`lock`, `desktop`, `close`).
 - Every change shows while it's made (user's review): the desktop editor's sheet and buttons
   are glass with Hyprland's blur behind them (`BackgroundEffect`), so see-through, glass and
-  blur style show on the sheet itself; the lock screen editor's sheet blurs the lock screen
-  behind it itself (frosted, `MultiEffect`), as Hyprland's blur can't reach inside its window;
+  blur style show on the sheet itself (the lock screen editor's was frosted, blurring the lock
+  screen in its own window, until the lock screen became a card above the sheet);
   "Making the colors…" shows while wallpaper.sh remakes them (`Wallpaper.busy`,
   `ColorScheme.busy`); a new icon theme offers restarting the shell (its own icons are read at
   start); the widgets' places can go back to the start; and the Looks gallery shows "Yours"
@@ -997,11 +997,10 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   sizes and glass show on it) and hide the dock (`Editing.hideDock`: its sheet is where the
   dock would be, and the bottom edge doesn't reveal it); the dock and island editor shows both
   at their edges, no card.
-- Full-width sheets (user's review): the sheet spans the screen (less its margins); each tab is a
-  `customize/SheetGrid.qml` lining its settings up side by side at their own widths, evenly
-  spaced, wrapping only when a row is full. A setting is a `customize/SheetItem.qml` (its name
-  on top, the control under it, macOS/iOS-sheet style), picture cards keep their size, a
-  scrolling row takes the whole row. (First tried: equal cells stretched to the sheet's width;
+- Full-width sheets (user's review): the sheet spans the screen (less its margins); each tab
+  lined its settings up side by side at their own widths (a SheetGrid of SheetItems: the name on
+  top, the control under it; both replaced by tiles, below), picture cards keeping their size,
+  a scrolling row the whole row. (First tried: equal cells stretched to the sheet's width;
   labels ended up far from their controls with gaps between, user: "horrible".) Lock screen
   editor (user's review): the clock's style and font cards are taller (`ChoiceCards.cardHeight`)
   with place, size and show stacked beside them. Picture: a titled row of larger pictures that
@@ -1049,6 +1048,35 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   now hang below the field in their own column, and in the top layout the field keeps a gap
   below the clock's column, moving down when a large clock with media and status lines reaches
   that far.
+
+### Review of the editors and widgets (2026-10-30)
+Two read-only reviews of everything since the editors began (user's pick), findings checked,
+then fixed. No way past the lock screen's password was found (the grace period starts only
+from the idle lock; every other lock ends it).
+- Editors: one at a time (opening one closes another, keeping its changes; they share
+  `Editing`); a shell reload with one open goes back to your workspace; the windows editor's
+  Play timers stop on close, Play runs once at a time, and close works while it's still
+  opening; each editor stays on the screen it opened on; the lock screen editor's Escape and
+  Enter work (`LockContent.takesKeyboard`); "Desktop's" picture shows a video wallpaper's
+  frame; the Clock tab's fonts scroll at larger shell sizes and tile widths can't go
+  negative; keypad Enter picks an accent swatch or status chip instead of finishing the
+  editor; value pickers are radio buttons to screen readers, only the editors' tab bars are
+  tabs (`Segmented.tabs`); the island clock's sample follows 12/24-hour; the monospaced font
+  has a tile again (it had no control left); `Colors.tint` for the tiles' shade; the unused
+  frosted sheet and stale comments, tokens and search words removed.
+- Widgets and wallpaper: the wallpaper is a plain item and only masked while it's a card
+  (a `ClippingRectangle` always drew it through a screen-sized texture, a live wallpaper every
+  frame); the card shows even without a wallpaper chosen; the default places no longer
+  overlap (tested); widgets grow with the text size and the time shrinks to fit; their blur
+  and input follow their own hover and fade scale; the drag handle is a grip to screen
+  readers; no division by a window width of 0.
+- Lock and login screens: in the bottom-left layout the field moves right to clear a large
+  clock; when the top layout pushes it down it keeps room for the hints, messages and the
+  message line. The login screen gets only the settings it uses (filtered by `greeter/sync.sh`
+  with bun), and its shared folder is readable by the greeter alone (`ghost greeter` applies
+  it; it was readable by every user).
+- Not done: Cancel in the desktop editor can't go back to Hyprland's default wallpaper when
+  none was chosen before (the wallpaper service has no "none" to set).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

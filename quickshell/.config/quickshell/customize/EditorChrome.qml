@@ -1,19 +1,16 @@
 import QtQuick
-import QtQuick.Effects
-import Quickshell.Widgets
 import qs.services
 import qs.theme
 import qs.widgets
 
 // What every on-screen editor has around what it edits: a wide sheet at the bottom with Cancel,
-// the tabs and Done along its top (Escape and Enter too). The tabs' contents go inside; each
-// shows itself for its `tab`, the tall ones in two columns (wide and short leaves the card
-// above more room). Fills the editor's window.
+// the tabs and Done along its top (Escape and Enter too). The tabs' contents go inside, each a
+// row of tiles (SheetTiles) showing itself for its `tab`. Fills the editor's window, and works
+// out the card the edited screen is shown as.
 //
-// The sheet is a panel like the shell's own, so the glass settings show on it while they're
-// changed: with `glass` Hyprland blurs behind it (the editor's window must ask for that, see
-// DesktopEditor.qml); with a `backdrop` (what's behind it in the same window, the lock screen)
-// it blurs that itself, frosted. Without either it's nearly solid.
+// The sheet is a panel like the shell's own: with `glass` Hyprland blurs behind it (the
+// editor's window must ask for that, see DesktopEditor.qml), so the glass settings show on it
+// while they're changed; without, it's nearly solid (the lock screen editor's, over its card).
 Item {
     id: root
 
@@ -21,7 +18,6 @@ Item {
     required property var tabs
     property string tab: tabs[0]?.value ?? ""
     property bool glass: false
-    property Item backdrop: null
     // In the middle of the screen instead of at the bottom (the dock and island editor: the
     // dock is at the bottom).
     property bool centered: false
@@ -65,30 +61,10 @@ Item {
         height: tabsColumn.height + Theme.spacing.l
         Behavior on height { NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing } }
 
-        // Frosted: what's behind the sheet in this window, blurred like Hyprland's blur.
-        ClippingRectangle {
-            anchors.fill: parent
-            visible: root.backdrop !== null
-            radius: sheet.radius
-            color: "transparent"
-
-            MultiEffect {
-                anchors.fill: parent
-                source: ShaderEffectSource {
-                    sourceItem: root.backdrop
-                    sourceRect: Qt.rect(sheet.x, sheet.y, sheet.width, sheet.height)
-                    live: true
-                }
-                blurEnabled: true
-                blur: 1
-                blurMax: Theme.lock.blur
-            }
-        }
-
         Surface {
             anchors.fill: parent
             radius: sheet.radius
-            color: root.glass || root.backdrop ? Colors.surfaceTranslucent : root.solid
+            color: root.glass ? Colors.surfaceTranslucent : root.solid
         }
 
         Column {
@@ -111,6 +87,7 @@ Item {
 
                 Segmented {
                     id: tabSwitch
+                    tabs: true
                     anchors.horizontalCenter: parent.horizontalCenter
                     opacity: root.tabs.length > 1 ? 1 : 0
                     options: root.tabs

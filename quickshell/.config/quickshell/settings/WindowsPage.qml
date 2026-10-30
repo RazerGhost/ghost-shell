@@ -4,9 +4,9 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// Windows: the gaps around tiled windows (applied through Hyprland, HyprlandSettings.qml), the
-// hot corner, and whether floating apps reopen where they were. Their border and corners are on
-// the Appearance page.
+// Windows: the buttons for the windows editor and the dock and island editor (customize/: the
+// windows' look, gaps and motion, the dock and island), the hot corner, and whether floating
+// apps reopen where they were.
 Column {
     id: page
 

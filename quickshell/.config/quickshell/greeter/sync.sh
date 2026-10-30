@@ -19,11 +19,23 @@ copy() {
     mv -f "$2.tmp" "$2"
 }
 
-for file in settings.json colors.json; do
-    if [ -f "$state/$file" ]; then
-        copy "$state/$file" "$shared/$file"
-    fi
-done
+if [ -f "$state/colors.json" ]; then
+    copy "$state/colors.json" "$shared/colors.json"
+fi
+
+# Only the settings the login screen uses: its look (the lock screen's and the login screen's
+# options, the clock, fonts, size, glass), not the rest of yours (launcher commands, apps, the
+# weather town). Keys it doesn't get keep their defaults there.
+if [ -f "$state/settings.json" ]; then
+    SETTINGS="$state/settings.json" bun -e '
+        const all = JSON.parse(require("fs").readFileSync(process.env.SETTINGS, "utf8"));
+        const keep = ["uiScale", "textScale", "cornerScale", "animationSpeed", "glass", "glassOpacity", "clock24Hour"];
+        const shown = Object.fromEntries(Object.entries(all).filter(([key]) =>
+            keep.includes(key) || /^(lock|greeter|font)/.test(key)));
+        process.stdout.write(JSON.stringify(shown, null, 4) + "\n");
+    ' >"$shared/settings.json.tmp"
+    mv -f "$shared/settings.json.tmp" "$shared/settings.json"
+fi
 
 # Your picture (~/.face, chosen in Settings -> Lock screen), shown above your name.
 if [ -f "$HOME/.face" ]; then

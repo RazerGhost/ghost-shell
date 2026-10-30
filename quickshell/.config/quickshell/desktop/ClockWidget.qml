@@ -28,6 +28,10 @@ WidgetSurface {
         }
 
         Text {
+            // Shrinks to fit a long 12-hour time ("12:59 PM") rather than spill out.
+            width: parent.width
+            fontSizeMode: Text.HorizontalFit
+            minimumPixelSize: Theme.font.title
             text: Qt.formatTime(clock.date, Settings.values.clock24Hour ? "HH:mm" : "h:mm AP")
             color: Colors.m3onSurface
             font.family: Theme.font.sans

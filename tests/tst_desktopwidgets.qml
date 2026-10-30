@@ -9,8 +9,12 @@ TestCase {
         compare(DesktopWidgets.place({}, "clock"), { x: 0.04, y: 0.08 });
         compare(DesktopWidgets.place({ clock: { x: 0.5, y: 0.25 } }, "clock"), { x: 0.5, y: 0.25 });
         // Off the screen or not a number: the default for that coordinate.
-        compare(DesktopWidgets.place({ weather: { x: 3, y: "0.1" } }, "weather"), { x: 0.04, y: 0.32 });
-        compare(DesktopWidgets.place(undefined, "media"), { x: 0.04, y: 0.46 });
+        compare(DesktopWidgets.place({ weather: { x: 3, y: "0.1" } }, "weather"), { x: 0.04, y: 0.26 });
+        compare(DesktopWidgets.place(undefined, "media"), { x: 0.04, y: 0.44 });
+        // The defaults don't overlap: 168 px widgets on a 1080 px screen, a fifth of the height
+        // apart at least.
+        const ys = ["clock", "weather", "media"].map(n => DesktopWidgets.place({}, n).y * 1080);
+        verify(ys[1] - ys[0] >= 168 && ys[2] - ys[1] >= 168, ys);
     }
 
     function test_dropped() {

@@ -1,10 +1,10 @@
 import QtQuick
+import QtQuick.Effects
 import QtMultimedia
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Services.UPower
 import Quickshell.Wayland
-import Quickshell.Widgets
 import qs.services
 import qs.theme
 
@@ -26,8 +26,9 @@ Variants {
         readonly property bool carded: Editing.cardScreen === modelData.name
 
         screen: modelData
-        // Until a wallpaper is chosen, Hyprland's default shows instead.
-        visible: Wallpaper.path !== ""
+        // Until a wallpaper is chosen, Hyprland's default shows instead (but an editor's card
+        // and the color around it still show).
+        visible: Wallpaper.path !== "" || carded
 
         anchors { top: true; bottom: true; left: true; right: true }
         exclusionMode: ExclusionMode.Ignore
@@ -36,15 +37,38 @@ Variants {
         WlrLayershell.namespace: "qs-wallpaper"
         WlrLayershell.layer: WlrLayer.Background
 
-        ClippingRectangle {
+        // The card's rounded shape, for the mask below.
+        Rectangle {
+            id: stageMask
+            width: stage.width
+            height: stage.height
+            radius: Theme.radius.l * 1.5
+            visible: false
+            layer.enabled: window.carded
+        }
+
+        // The wallpaper's area. Rounded only while it's a card: through a mask, and only then,
+        // since clipping costs a screen-sized texture (a ClippingRectangle always draws through
+        // one), every frame of a live wallpaper.
+        Item {
             id: stage
 
             x: window.carded ? Editing.card.x : 0
             y: window.carded ? Editing.card.y : 0
             width: window.carded ? Editing.card.width : window.width
             height: window.carded ? Editing.card.height : window.height
-            radius: window.carded ? Theme.radius.l * 1.5 : 0
-            color: "black"
+            layer.enabled: window.carded
+            layer.effect: MultiEffect {
+                maskEnabled: true
+                maskSource: stageMask
+                maskThresholdMin: 0.5
+                maskSpreadAtMin: 1
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                color: "black"
+            }
 
             Behavior on x { NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
             Behavior on y { NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }

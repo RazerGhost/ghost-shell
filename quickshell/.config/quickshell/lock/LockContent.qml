@@ -46,7 +46,14 @@ Item {
             shake.restart();
     }
 
-    Component.onCompleted: password.forceActiveFocus()
+    // Takes the keyboard for the password; not inside the lock screen editor, whose own keys
+    // (Escape, Enter) would go nowhere then.
+    property bool takesKeyboard: true
+
+    Component.onCompleted: {
+        if (takesKeyboard)
+            password.forceActiveFocus();
+    }
 
     // Fades in from black when it appears (Hyprland shows nothing behind a lock screen).
     opacity: 0
@@ -179,9 +186,13 @@ Item {
         anchors.bottom: parent.bottom
         // A fifth of the way up; lower when the clock and the lines under it (a large clock,
         // media, weather, battery) reach down that far, so they never overlap.
+        // Never lower than leaves room for the hints and messages under it and the message line
+        // at the bottom.
         anchors.bottomMargin: root.layout !== "top" ? parent.height * 0.2
-            : Math.max(Theme.spacing.l * 2, Math.min(parent.height * 0.2,
+            : Math.max(root.belowReserve, Math.min(parent.height * 0.2,
                        parent.height - clockColumn.y - clockColumn.height - Theme.spacing.l * 2 - height))
+        // In the bottom-left layout, moved right when a large clock reaches under it.
+        transform: Translate { x: root.fieldShift }
         spacing: Theme.spacing.m
 
         // A wrong password shakes the field side to side, like most lock screens.
@@ -302,9 +313,19 @@ Item {
         }
     }
 
+    // The room the field keeps below it: the hints and a message (two lines), and the message
+    // line at the bottom when there is one.
+    readonly property real belowReserve: Theme.spacing.m * 3 + Theme.font.normal * 4
+        + (messageLine.visible ? messageLine.height + Theme.spacing.l * 2 : Theme.spacing.l * 2)
+
+    // How far right the field moves in the bottom-left layout to clear the clock beside it.
+    readonly property real fieldShift: layout !== "left" ? 0
+        : Math.max(0, clockColumn.x + clockColumn.width + Theme.spacing.l * 2 - (width - fieldColumn.width) / 2)
+
     // Under the field, hanging from it: the hints and "Wrong password" appear and go without
     // moving the field (in its column they pushed it up into the lines under the clock).
     Column {
+        transform: Translate { x: root.fieldShift }
         anchors.top: fieldColumn.bottom
         anchors.topMargin: Theme.spacing.m
         anchors.horizontalCenter: fieldColumn.horizontalCenter
@@ -357,6 +378,7 @@ Item {
 
     // Your own line at the bottom (Settings -> Lock screen -> Message): "If found, call ...".
     Text {
+        id: messageLine
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: Theme.spacing.l * 2

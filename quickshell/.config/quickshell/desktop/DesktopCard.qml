@@ -58,7 +58,8 @@ Item {
         opacity: hover.hovered || drag.active || Editing.desktop ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: Theme.anim.fast } }
 
-        Accessible.role: Accessible.Button
+        // A grip to drag (no press action: dragging is what it does).
+        Accessible.role: Accessible.Grip
         Accessible.name: "Move the " + root.name + " widget"
 
         MaterialIcon {

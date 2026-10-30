@@ -17,7 +17,7 @@ Row {
     readonly property real fixedWidth: tiles.reduce((sum, t) => sum + (t.natural > 0 ? t.natural + Theme.spacing.m * 2 : 0), 0)
     readonly property real totalWeight: Math.max(tiles.reduce((sum, t) => sum + (t.natural > 0 ? 0 : t.weight), 0), 1)
     // One weight's width, of what the natural-width tiles leave.
-    readonly property real unit: (width - spacing * Math.max(tiles.length - 1, 0) - fixedWidth) / totalWeight
+    readonly property real unit: Math.max(0, (width - spacing * Math.max(tiles.length - 1, 0) - fixedWidth) / totalWeight)
 
     x: Theme.spacing.l
     width: (parent?.width ?? 0) - Theme.spacing.l * 2

@@ -21,10 +21,13 @@ Scope {
 
     // The lock screen's settings as they were when the editor opened, for Cancel.
     property var saved: ({})
+    // The screen it opened on, kept while it's open (the focused one could change under it).
+    property string screenName: ""
 
     function open(): void {
         if (editor.active)
             return;
+        screenName = Hyprland.focusedMonitor?.name ?? "";
         saved = Presets.snapshot(Settings.values, Presets.lockKeys);
         Wallpaper.rescan();
         editor.active = true;
@@ -50,7 +53,7 @@ Scope {
         PanelWindow {
             id: window
 
-            screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? null
+            screen: Quickshell.screens.find(s => s.name === root.screenName) ?? null
             anchors { top: true; bottom: true; left: true; right: true }
             exclusionMode: ExclusionMode.Ignore
             color: Colors.m3surface
@@ -81,6 +84,7 @@ Scope {
                         anchors.fill: parent
                         wallpaper: Wallpaper.lockPath
                         enabled: false
+                        takesKeyboard: false
 
                         LockStatus {
                             width: parent.width
@@ -99,13 +103,17 @@ Scope {
                         width: (clock?.width ?? 0) + Theme.spacing.m * 2
                         height: (clock?.height ?? 0) + Theme.spacing.m * 2
                         radius: Theme.radius.l
-                        color: clockMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.08) : "transparent"
+                        color: clockMouse.containsMouse ? Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, Theme.state.hover)
+                                                        : "transparent"
                         border.width: Theme.outline.normal / chrome.cardScale
-                        border.color: chrome.tab === "clock" ? Colors.m3primary : Qt.rgba(1, 1, 1, 0.5)
+                        border.color: chrome.tab === "clock" || activeFocus ? Colors.m3primary
+                                    : Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, 0.5)
 
                         Accessible.role: Accessible.Button
                         Accessible.name: "The clock's options"
                         Accessible.onPressAction: chrome.tab = "clock"
+                        activeFocusOnTab: true
+                        Keys.onSpacePressed: chrome.tab = "clock"
 
                         MouseArea {
                             id: clockMouse
@@ -218,11 +226,16 @@ Scope {
                     SheetTile {
                         title: "Font"
                         subtitle: "The date keeps the shell's"
-                        natural: fontCards.width
+                        // Takes what Style and "Place and size" leave; its cards scroll when they
+                        // don't fit (a larger shell size).
+                        weight: 1.6
 
                         ChoiceCards {
                             id: fontCards
-                            anchors.centerIn: parent
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: parent.width
+                            scrolls: true
+                            fadeColor: Qt.tint(chrome.solid, Colors.tint)
                             cardWidth: Theme.editor.clockCard
                             cardHeight: Math.round(Theme.editor.clockCard * 1.1)
                             options: ["", "Inter Display", "Noto Serif", "C059", "Nimbus Sans Narrow", "MesloLGS Nerd Font"]
@@ -255,15 +268,14 @@ Scope {
                             width: parent.width
                             spacing: Theme.spacing.m
 
+                            TileRow {
+                                label: "Place"
 
-                        TileRow {
-                            label: "Place"
-
-                            Segmented {
-                                options: LockClockJs.layouts.map(v => ({ value: v, label: ({ top: "Top", center: "Middle", left: "Bottom left" })[v] }))
-                                current: LockClockJs.pick(Settings.values.lockLayout, LockClockJs.layouts)
-                                onPicked: v => Settings.values.lockLayout = v
-                            }
+                                Segmented {
+                                    options: LockClockJs.layouts.map(v => ({ value: v, label: ({ top: "Top", center: "Middle", left: "Bottom left" })[v] }))
+                                    current: LockClockJs.pick(Settings.values.lockLayout, LockClockJs.layouts)
+                                    onPicked: v => Settings.values.lockLayout = v
+                                }
                         }
 
                         TileRow {
@@ -325,7 +337,7 @@ Scope {
                             anchors.verticalCenter: parent.verticalCenter
                             width: parent.width
                             // Fades into the tile, over the sheet.
-                            fadeColor: Qt.tint(chrome.solid, Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, 0.05))
+                            fadeColor: Qt.tint(chrome.solid, Colors.tint)
                             // Larger than other cards: about as tall as the sliders beside them.
                             cardWidth: Theme.editor.pictureCard
                             scrolls: true
@@ -336,7 +348,7 @@ Scope {
                             onPicked: v => Settings.values.lockWallpaper = v
                             art: Component {
                                 Image {
-                                    readonly property string file: parent.option.value || Wallpaper.path
+                                    readonly property string file: parent.option.value || Wallpaper.stillPath
                                     source: file ? "file://" + file : ""
                                     fillMode: Image.PreserveAspectCrop
                                     sourceSize.width: width * 2

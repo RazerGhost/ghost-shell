@@ -23,9 +23,23 @@ Singleton {
     property string cardScreen: ""
     property rect card: Qt.rect(0, 0, 0, 0)
 
-    // The workspace to come back to, and the empty one gone to; 0 while not away.
-    property int awayFrom: 0
-    property int emptyWorkspace: 0
+    // The workspace to come back to, and the empty one gone to; 0 while not away. Kept across a
+    // shell reload: one with an editor open (the editor itself is gone then) goes back home.
+    property alias awayFrom: persist.awayFrom
+    property alias emptyWorkspace: persist.emptyWorkspace
+
+    PersistentProperties {
+        id: persist
+        reloadableId: "editing"
+
+        property int awayFrom: 0
+        property int emptyWorkspace: 0
+
+        onReloaded: {
+            if (awayFrom !== 0)
+                root.back();
+        }
+    }
 
     // Goes to a workspace past the ones in use (it's empty).
     function toEmptyWorkspace(): void {

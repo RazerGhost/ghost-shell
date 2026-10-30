@@ -7,6 +7,8 @@ import Quickshell.Io
 // launcher: `qs ipc call customize lock|desktop|dock|windows`; `close` closes an open one, keeping its
 // changes.
 Scope {
+    id: root
+
     LockEditor {
         id: lockEditor
     }
@@ -23,23 +25,32 @@ Scope {
         id: windowsEditor
     }
 
+    // One editor at a time: they share Editing (the trip to an empty workspace, the card), so
+    // opening one closes any other, keeping its changes.
+    function only(editor: var): void {
+        for (const other of [lockEditor, desktopEditor, dockIslandEditor, windowsEditor])
+            if (other !== editor)
+                other.close();
+        editor.open();
+    }
+
     IpcHandler {
         target: "customize"
 
         function lock(): void {
-            lockEditor.open();
+            root.only(lockEditor);
         }
 
         function desktop(): void {
-            desktopEditor.open();
+            root.only(desktopEditor);
         }
 
         function dock(): void {
-            dockIslandEditor.open();
+            root.only(dockIslandEditor);
         }
 
         function windows(): void {
-            windowsEditor.open();
+            root.only(windowsEditor);
         }
 
         function close(): void {

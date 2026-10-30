@@ -177,14 +177,14 @@ Singleton {
         readonly property int menuArt:     root.px(160)  // cover in the media menu
     }
 
-    // Desktop widgets (desktop/DesktopWidgets.qml), on the wallpaper.
     // Desktop widgets (desktop/), a family like iOS's and Android's: a small square and a medium
     // one twice as wide, the same height, corners and padding.
     readonly property QtObject desktop: QtObject {
-        readonly property int size:    root.px(168) // a small widget's side; every widget's height
+        // Through text(), not px(): the widgets are mostly text, and grow with its size too.
+        readonly property int size:    root.text(168) // a small widget's side; every widget's height
         readonly property int gap:     root.px(16)  // between widgets snapped side by side
         readonly property int medium:  size * 2 + gap
-        readonly property int padding: root.px(20)
+        readonly property int padding: root.text(20)
         readonly property int radius:  root.round(28)
         readonly property int margin:  root.px(32)  // from the screen's edges, when snapped
         readonly property int reach:   root.px(24)  // how close a drop snaps
@@ -280,7 +280,6 @@ Singleton {
 
     // The on-screen editors (customize/).
     readonly property QtObject editor: QtObject {
-        readonly property int subtitle: root.px(220) // a setting's subtitle wraps at least this wide (SheetItem.qml)
         readonly property int clockCard: root.px(120) // the lock screen editor's clock style and font cards
         readonly property int slider: root.px(240)    // a slider's width in a sheet
         readonly property int pictureCard: root.px(160) // the lock screen editor's pictures

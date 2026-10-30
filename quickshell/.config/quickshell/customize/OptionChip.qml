@@ -17,7 +17,7 @@ Rectangle {
     implicitHeight: sample ? Theme.editor.fontChip : Theme.island.height
     radius: Theme.radius.m
     color: chosen ? Colors.m3primaryContainer
-                  : Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, 0.06)
+                  : Colors.tint
     Behavior on color { ColorAnimation { duration: Theme.anim.fast } }
 
     Accessible.role: Accessible.RadioButton

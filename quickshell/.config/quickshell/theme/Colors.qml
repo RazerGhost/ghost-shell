@@ -38,6 +38,9 @@ Singleton {
     readonly property color glassEdge: glass ? Qt.rgba(m3onSurface.r, m3onSurface.g, m3onSurface.b, Theme.glass.edgeAlpha)
                                              : "transparent"
 
+    // A faint shade over a panel: the editors' tiles and chips, and the fades into them.
+    readonly property color tint: Qt.rgba(m3onSurface.r, m3onSurface.g, m3onSurface.b, 0.05)
+
     // Dims the screen behind the overview, the screenshot overlay and password prompts.
     property color m3scrim:                            json.scrim
     readonly property color scrim: Qt.rgba(m3scrim.r, m3scrim.g, m3scrim.b, 0.45)

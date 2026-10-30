@@ -29,9 +29,9 @@ done
 sudo install -d -o greeter -g greeter "$greeter_home" "$greeter_home/.local" \
     "$greeter_home/.local/state" "$greeter_state"
 # The shared folder is yours, so the shell can update it without sudo; the greeter only reads
-# it. Its files show up in the greeter's state folder (where the shell's services look) through
+# it (its group), and no other user can (it holds your lock screen's picture and ~/.face). Its files show up in the greeter's state folder (where the shell's services look) through
 # symlinks. Older versions copied them there instead, and the wallpaper into the home folder.
-sudo install -d -o "$USER" -g "$USER" -m755 "$greeter_home/shared"
+sudo install -d -o "$USER" -g greeter -m750 "$greeter_home/shared"
 for file in settings.json colors.json wallpaper.json; do
     sudo ln -sfn "$greeter_home/shared/$file" "$greeter_state/$file"
 done

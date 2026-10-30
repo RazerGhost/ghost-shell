@@ -20,6 +20,8 @@ Scope {
     id: root
 
     property var saved: ({})
+    // The screen it opened on, kept while it's open (the focused one could change under it).
+    property string screenName: ""
 
     // A row of steps plus the current value when it isn't one (set by hand), so it shows.
     function withCurrent(steps: var, value: var): var {
@@ -29,6 +31,7 @@ Scope {
     function open(): void {
         if (editor.active || editorLater.running)
             return;
+        screenName = Hyprland.focusedMonitor?.name ?? "";
         saved = Presets.snapshot(Settings.values, Presets.windowsKeys);
         Editing.toEmptyWorkspace();
         Editing.hideDock = true;
@@ -49,8 +52,12 @@ Scope {
     }
 
     function close(): void {
-        if (!editor.active)
+        if (!editor.active && !editorLater.running)
             return;
+        // Closed while opening, or while a Play runs: nothing of it may happen after.
+        editorLater.stop();
+        workspaceBack.stop();
+        sampleClose.stop();
         editor.active = false;
         sample.active = false;
         examples.active = false;
@@ -113,6 +120,9 @@ Scope {
     property int playFrom: 0
 
     function playWorkspace(): void {
+        // Once at a time: a second Play would come back to the first one's empty workspace.
+        if (workspaceBack.running)
+            return;
         playFrom = Hyprland.focusedWorkspace?.id ?? 0;
         const used = Hyprland.workspaces.values.map(w => w.id).filter(id => id > 0);
         Hyprland.dispatch(`hl.dsp.focus({ workspace = ${Math.max(0, ...used) + 1} })`);
@@ -161,7 +171,7 @@ Scope {
         PanelWindow {
             id: window
 
-            screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? null
+            screen: Quickshell.screens.find(s => s.name === root.screenName) ?? null
             anchors { top: true; bottom: true; left: true; right: true }
             exclusionMode: ExclusionMode.Ignore
             color: "transparent"

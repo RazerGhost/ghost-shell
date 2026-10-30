@@ -18,8 +18,8 @@ Rectangle {
     width: natural > 0 ? natural + Theme.spacing.m * 2 : (parent?.unit ?? 0) * weight
     height: parent?.tileHeight ?? Theme.editor.tile
     radius: Theme.radius.l
-    // A shade over the sheet, glass or solid alike.
-    color: Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, 0.05)
+    // A shade over the sheet, glass or solid alike (Colors.tint).
+    color: Colors.tint
 
     Item {
         id: header

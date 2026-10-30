@@ -20,10 +20,13 @@ Scope {
     id: root
 
     property var saved: ({})
+    // The screen it opened on, kept while it's open (the focused one could change under it).
+    property string screenName: ""
 
     function open(): void {
         if (editor.active)
             return;
+        screenName = Hyprland.focusedMonitor?.name ?? "";
         saved = Presets.snapshot(Settings.values, Presets.dockIslandKeys);
         // An empty workspace (user's choice): the sheet reads clearly over the wallpaper.
         Editing.toEmptyWorkspace();
@@ -50,7 +53,7 @@ Scope {
         PanelWindow {
             id: window
 
-            screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? null
+            screen: Quickshell.screens.find(s => s.name === root.screenName) ?? null
             anchors { top: true; bottom: true; left: true; right: true }
             exclusionMode: ExclusionMode.Ignore
             color: "transparent"
@@ -104,7 +107,7 @@ Scope {
                                     height: Theme.spacing.m
                                     radius: height / 2
                                     color: index === 1 ? Colors.m3primary : Colors.m3onSurfaceVariant
-                                    opacity: index === 1 || Settings.values.workspaceDots === 0 ? 1 : 0.5
+                                    opacity: index === 1 || Settings.values.workspaceDots === 0 ? 1 : Theme.state.disabled
                                     Behavior on width { NumberAnimation { duration: Theme.anim.fast } }
                                 }
                             }
@@ -132,7 +135,11 @@ Scope {
                             // The clock as it will read.
                             Text {
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                text: (Settings.values.clockDate ? "Thu 29  " : "") + "14:32" + (Settings.values.clockSeconds ? ":05" : "")
+                                // A fixed sample time in your clock's format.
+                                text: (Settings.values.clockDate ? "Thu 29  " : "")
+                                      + Qt.formatTime(new Date(2026, 0, 1, 14, 32, 5),
+                                                      (Settings.values.clock24Hour ? "HH:mm" : "h:mm") + (Settings.values.clockSeconds ? ":ss" : "")
+                                                      + (Settings.values.clock24Hour ? "" : " AP"))
                                 color: Colors.m3onSurface
                                 font.family: Theme.font.sans
                                 font.pixelSize: Theme.font.large
@@ -203,7 +210,7 @@ Scope {
                                         height: Theme.island.height
                                         radius: Theme.radius.full
                                         color: shown ? Colors.m3primaryContainer : "transparent"
-                                        border.width: shown ? 0 : 1
+                                        border.width: shown ? 0 : Theme.outline.normal
                                         border.color: Colors.m3outlineVariant
 
                                         Accessible.role: Accessible.CheckBox
@@ -212,6 +219,7 @@ Scope {
                                         Accessible.onToggleAction: toggle()
                                         activeFocusOnTab: true
                                         Keys.onReturnPressed: toggle()
+                                        Keys.onEnterPressed: toggle()
                                         Keys.onSpacePressed: toggle()
 
                                         Row {
