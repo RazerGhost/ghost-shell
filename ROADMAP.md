@@ -1458,8 +1458,8 @@ outer thirds are (the mean difference between neighbouring pixels; one side must
 is mirrored across the middle (`LockClock.mirroredMove`, then the usual clamp), so the art's
 subject stays clear; a centred clock or an evenly busy picture moves nothing. The editor shows
 and drags the places as saved, never mirrored. Tested: `quietSide`, `sideOf`, `mirroredMove`
-(the QML tests' logic run under bun on Windows; qmltestrunner not run), and the ffmpeg + od
-pipeline on a picture busy on the left (quiet: right).
+(qmltestrunner on the laptop: 316 pass), and the ffmpeg + od pipeline on a picture busy on the
+left (quiet: right) and on the laptop's wallpaper (quiet: right, 0.13 s for a 4K picture).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
