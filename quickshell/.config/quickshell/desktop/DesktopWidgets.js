@@ -119,3 +119,17 @@ function gridSnapped(x, y, w, h, sw, sh, cell) {
     };
     return { x: axis(x, w, sw), y: axis(y, h, sh) };
 }
+
+// A widget w x h px at its saved `place` (fractions) on a sw x sh screen, moved (dx, dy) px with
+// the keyboard (the desktop editor): onto the grid when it's on (`cell` px, else 0), kept on
+// the screen; its new place as fractions.
+function nudged(place, dx, dy, w, h, sw, sh, cell) {
+    let x = place.x * sw + dx, y = place.y * sh + dy;
+    if (cell > 0) {
+        const at = gridSnapped(x, y, w, h, sw, sh, cell);
+        // Snapping back to where it started would make a step do nothing: one more line along.
+        x = Math.abs(at.x - place.x * sw) < 0.5 && dx !== 0 ? at.x + Math.sign(dx) * cell : at.x;
+        y = Math.abs(at.y - place.y * sh) < 0.5 && dy !== 0 ? at.y + Math.sign(dy) * cell : at.y;
+    }
+    return dropped(x, y, w, h, sw, sh);
+}

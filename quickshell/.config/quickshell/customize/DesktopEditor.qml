@@ -47,6 +47,7 @@ Scope {
         if (!editor.active)
             return;
         editor.active = false;
+        Editing.widget = "";
         Editing.desktop = false;
         Editing.hideDock = false;
         Editing.back();
@@ -127,6 +128,7 @@ Scope {
 
             EditorChrome {
                 id: chrome
+                extraHints: tab === "widgets" ? [{ keys: ["Shift", "←↑↓→"], label: "Move the widget" }] : []
                 tabs: [
                     { value: "looks", label: "Looks" },
                     { value: "themes", label: "Themes" },
@@ -632,10 +634,34 @@ Scope {
                                 Keys.onReturnPressed: toggle()
                                 Keys.onEnterPressed: toggle()
                                 Keys.onSpacePressed: toggle()
-                                // Tab to one further along: the row scrolls to show it.
+                                // Shift + arrows move this widget on the desktop (one grid step, or
+                                // Theme.spacing.l * 2 without the grid); it's outlined there.
+                                Keys.onPressed: event => {
+                                    const arrows = [Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down];
+                                    if (!(event.modifiers & Qt.ShiftModifier) || !arrows.includes(event.key) || !on)
+                                        return;
+                                    const kind = DesktopWidgetsJs.kinds.find(k => k.key === modelData.key);
+                                    const screen = Quickshell.screens[0];
+                                    const grid = Settings.values.desktopGrid ? Theme.px(DesktopWidgetsJs.gridSize(Settings.values.desktopGridSize)) : 0;
+                                    const step = grid || Theme.spacing.l * 2;
+                                    const dx = event.key === Qt.Key_Left ? -step : event.key === Qt.Key_Right ? step : 0;
+                                    const dy = event.key === Qt.Key_Up ? -step : event.key === Qt.Key_Down ? step : 0;
+                                    const place = DesktopWidgetsJs.nudged(DesktopWidgetsJs.place(Settings.values.desktopWidgets, kind.name), dx, dy,
+                                                                          kind.medium ? Theme.desktop.medium : Theme.desktop.size, Theme.desktop.size,
+                                                                          screen?.width ?? 1920, screen?.height ?? 1080, grid);
+                                    Settings.values.desktopWidgets = DesktopWidgetsJs.withPlace(Settings.values.desktopWidgets, kind.name, place);
+                                    event.accepted = true;
+                                }
+                                // Tab to one further along: the row scrolls to show it. The widget it
+                                // stands for is outlined on the desktop meanwhile.
                                 onActiveFocusChanged: {
-                                    if (activeFocus)
+                                    const name = DesktopWidgetsJs.kinds.find(k => k.key === modelData.key)?.name ?? "";
+                                    if (activeFocus) {
                                         gallery.positionViewAtIndex(index, ListView.Contain);
+                                        Editing.widget = name;
+                                    } else if (Editing.widget === name) {
+                                        Editing.widget = "";
+                                    }
                                 }
 
                                 Loader {

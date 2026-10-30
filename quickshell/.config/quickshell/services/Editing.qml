@@ -15,6 +15,9 @@ Singleton {
     // The desktop and windows editors keep the dock out of the way: their sheet is where it
     // would be (the island stays, like Android's status bar, showing colors and sizes).
     property bool hideDock: false
+    // The desktop widget the desktop editor's keyboard is on (its card in the Widgets gallery):
+    // outlined on the desktop, moved with Shift + arrows ("" for none).
+    property string widget: ""
 
     // The desktop drawn as a card while an editor is open (like GNOME's workspaces): on this
     // screen ("" while not), in this rectangle of it. The wallpaper (wallpaper/WallpaperLayer.qml)

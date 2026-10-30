@@ -54,6 +54,17 @@ Item {
         id: hover
     }
 
+    // Outlined while the desktop editor's keyboard is on this widget (Editing.widget).
+    Rectangle {
+        anchors.fill: parent
+        anchors.margins: -Theme.spacing.xs
+        visible: Editing.widget === root.name
+        radius: Theme.desktop.radius + Theme.spacing.xs
+        color: "transparent"
+        border.width: Theme.focus.width / (root.parent?.scale ?? 1)
+        border.color: Colors.m3primary
+    }
+
     Rectangle {
         id: handle
         anchors.top: parent.top

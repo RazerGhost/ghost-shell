@@ -1339,6 +1339,15 @@ screen (`DesktopWidgets.gridLines`, `gridSnapped`, tested). The lines are one sc
 any scale (in the editor's shrunk card a 1 px line fell below a pixel and some faded out,
 user's find).
 
+### Desktop widgets by keyboard (built 2026-10-30)
+User's pick (a gap the review found: the lock screen's parts took the keyboard, the desktop's
+widgets didn't). The desktop widgets' layer never takes the keyboard, so it goes through the
+editor: in the Widgets tab, a widget's card in the gallery that has the keyboard outlines that
+widget on the desktop (`Editing.widget`), and Shift + arrows move it, a grid step at a time
+while the grid is on (a step from a line lands on the next one), else 48 px, kept on the
+screen (`DesktopWidgets.nudged`, tested). The hint row says so on that tab
+(`EditorChrome.extraHints`).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

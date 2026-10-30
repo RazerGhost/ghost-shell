@@ -78,4 +78,16 @@ TestCase {
         const edge = DesktopWidgets.gridSnapped(1900, 1070, 168, 168, 1920, 1080, 48);
         verify(edge.x + 168 <= 1920 && edge.y + 168 <= 1080);
     }
+
+    function test_nudged() {
+        // No grid: by the step, kept on the screen.
+        compare(DesktopWidgets.nudged({ x: 0.5, y: 0.5 }, 48, 0, 168, 168, 1920, 1080, 0), { x: (960 + 48) / 1920, y: 0.5 });
+        compare(DesktopWidgets.nudged({ x: 0, y: 0 }, -48, -48, 168, 168, 1920, 1080, 0), { x: 0, y: 0 });
+        // On the grid: a step of one cell from a line lands on the next line.
+        const start = { x: 960 / 1920, y: 540 / 1080 };
+        const right = DesktopWidgets.nudged(start, 32, 0, 168, 168, 1920, 1080, 32);
+        compare(right.x * 1920, 992);
+        const down = DesktopWidgets.nudged(start, 0, 32, 168, 168, 1920, 1080, 32);
+        compare(down.y * 1080, 572);
+    }
 }
