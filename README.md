@@ -24,7 +24,8 @@ machine can take what it needs.
   volume and brightness, lock and login screen, idle and night light, screenshots and screen
   recording, a password prompt for apps (polkit), an equalizer, screen time, web apps
   (`ghost webapp`), an update count, wallpapers (`ghost wallpapers get` fetches anime art from
-  wallhaven.cc into your folder, safe for work only), and a welcome tour on the first start.
+  wallhaven.cc into your folder, safe for work only; `--style sky|lofi|painterly|minimal` for
+  one kind), and a welcome tour on the first start.
 - **Editors on the screen itself** for how it looks, like Android's "Wallpaper & style" with iOS's
   lock screen editing: the lock screen (clock styles, fonts, looks, picture, widgets), the desktop
   (saved themes, wallpaper, colors, desktop widgets, glass, sizes, fonts), the dock and island, and how

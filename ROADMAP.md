@@ -1461,6 +1461,18 @@ and drags the places as saved, never mirrored. Tested: `quietSide`, `sideOf`, `m
 (qmltestrunner on the laptop: 316 pass), and the ffmpeg + od pipeline on a picture busy on the
 left (quiet: right) and on the laptop's wallpaper (quiet: right, 0.13 s for a 4K picture).
 
+### Wallpaper styles (built 2026-10-30)
+User's picks of the kinds of anime art they like: `ghost wallpapers get --style S` fetches the
+all-time favourites of one (words typed after narrow it): sky (scenery, big clouds, cities at
+dusk, trains: "clouds"), lofi (cozy rooms, rain on windows: "indoors +window"), painterly
+(painted illustration, anime or not: "digital painting" with general art too) and minimal (one
+figure or shape and empty space, which suits the lock screen's quiet side: "+minimalism -text").
+Each search was tried against wallhaven's API first, reading the tags of its top favourites
+(plain words that turned out too small or off: "lofi" had 16 results, "scenery" 98; exclusions of
+two-word tags like "-anime girls" return nothing). The desktop editor's More art tile has the
+styles as chips (Top, the month's best, as before; Sky, Lofi, Painterly, Minimal) beside the
+search field. Konachan was looked at and dropped (user: not the kind of anime they want).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

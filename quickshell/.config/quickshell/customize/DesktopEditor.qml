@@ -491,32 +491,62 @@ Scope {
                     }
 
                     // More art from wallhaven.cc into your folder (ghost wallpapers get): the month's
-                    // best anime, or what the words find; safe for work only.
+                    // best anime, or one of your styles' favourites (--style), or what the words
+                    // find (narrowing a style); safe for work only.
                     SheetTile {
+                        id: artTile
                         title: "More art"
                         subtitle: "From wallhaven.cc, into your folder"
-                        natural: Theme.editor.slider
+                        natural: Theme.editor.slider * 2
+
+                        // "" = the month's best.
+                        property string style: ""
 
                         Column {
                             anchors.verticalCenter: parent.verticalCenter
                             width: parent.width
                             spacing: Theme.spacing.m
 
-                            TextField {
-                                id: artWords
+                            Row {
                                 width: parent.width
-                                placeholder: "Search (or the month's best)"
-                                keepsEscape: true
-                                onAccepted: fetchArt.get()
-                                onEscaped: text = ""
+                                spacing: Theme.spacing.s
+
+                                Repeater {
+                                    model: [{ value: "", label: "Top" }, { value: "sky", label: "Sky" }, { value: "lofi", label: "Lofi" },
+                                            { value: "painterly", label: "Painterly" }, { value: "minimal", label: "Minimal" }]
+
+                                    OptionChip {
+                                        required property var modelData
+                                        width: (parent.width - parent.spacing * 4) / 5
+                                        text: modelData.label
+                                        chosen: artTile.style === modelData.value
+                                        onClicked: artTile.style = modelData.value
+                                    }
+                                }
                             }
 
-                            TextButton {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                text: fetchArt.running ? "Getting them…" : "Get 12"
-                                filled: true
-                                enabled: !fetchArt.running
-                                onClicked: fetchArt.get()
+                            Row {
+                                width: parent.width
+                                spacing: Theme.spacing.s
+
+                                TextField {
+                                    id: artWords
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: parent.width - getArt.width - parent.spacing
+                                    placeholder: artTile.style ? "Narrow it (optional)" : "Search (or the month's best)"
+                                    keepsEscape: true
+                                    onAccepted: fetchArt.get()
+                                    onEscaped: text = ""
+                                }
+
+                                TextButton {
+                                    id: getArt
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: fetchArt.running ? "Getting them…" : "Get 12"
+                                    filled: true
+                                    enabled: !fetchArt.running
+                                    onClicked: fetchArt.get()
+                                }
                             }
                         }
 
@@ -527,7 +557,9 @@ Scope {
                                 if (running)
                                     return;
                                 const words = artWords.text.trim().split(/\s+/).filter(w => w !== "");
-                                command = [Quickshell.env("HOME") + "/.local/bin/ghost", "wallpapers", "get", "--count", "12", "--"].concat(words);
+                                const style = artTile.style ? ["--style", artTile.style] : [];
+                                command = [Quickshell.env("HOME") + "/.local/bin/ghost", "wallpapers", "get", "--count", "12"]
+                                    .concat(style, ["--"], words);
                                 running = true;
                             }
 

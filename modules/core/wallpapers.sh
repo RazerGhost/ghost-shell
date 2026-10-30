@@ -4,27 +4,47 @@
 # ~/Pictures/Wallpapers by default), never into the repo. No account: wallhaven's public search
 # API. `ghost wallpapers` runs this; the desktop editor's Wallpaper tab too.
 #
-#   ghost wallpapers get [--count N] [--general] [--] [search words]
+#   ghost wallpapers get [--style S] [--count N] [--general] [--] [search words]
 #       the month's best (or the best matching the words), at least 1920x1080 in 16:9; N of them
 #       (12 by default, at most 48) that aren't in the folder yet. --general: illustrations and
-#       scenery too, not only anime.
+#       scenery too, not only anime. --style: the all-time favourites of one of the styles you
+#       like (words added narrow it further):
+#         sky        scenery, big clouds, cities at dusk, trains ("clouds")
+#         lofi       cozy rooms, rain on windows ("indoors +window")
+#         painterly  painted illustration, anime or not ("digital painting", with --general)
+#         minimal    one figure or shape and a lot of empty space ("+minimalism -text"; suits the
+#                    lock screen's quiet side)
+#       Each search was tried on wallhaven (2026-10-30): its favourites' tags match the style.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 . modules/lib.sh
 
-[[ ${1:-} == get ]] || fail "usage: ghost wallpapers get [search words] [--count N] [--general]"
+[[ ${1:-} == get ]] || fail "usage: ghost wallpapers get [--style sky|lofi|painterly|minimal] [search words] [--count N] [--general]"
 shift
-count=12 categories=010 words=()
+count=12 categories=010 words=() style=""
 while (($#)); do
     case $1 in
         --count) [[ ${2:-} =~ ^[0-9]+$ ]] || fail "--count needs a number"; count=$((10#$2)); shift 2 ;;
         --general) categories=110; shift ;;
+        --style) [[ -n ${2:-} ]] || fail "--style needs a style"; style=$2; shift 2 ;;
         # The rest are search words, even ones starting with "--" (the shell's search field).
         --) shift; words+=("$@"); break ;;
         *) words+=("$1"); shift ;;
     esac
 done
 ((count >= 1 && count <= 48)) || fail "--count is 1 to 48"
+
+# A style's search words go first, the typed ones after; its favourites instead of the month's best.
+sorting=""
+case $style in
+    "") ;;
+    sky) words=(clouds "${words[@]}") ;;
+    lofi) words=(indoors +window "${words[@]}") ;;
+    painterly) words=(digital painting "${words[@]}"); categories=110 ;;
+    minimal) words=(+minimalism -text "${words[@]}") ;;
+    *) fail "--style is sky, lofi, painterly or minimal" ;;
+esac
+[[ -n $style ]] && sorting=favorites
 
 # The folder the shell uses: Settings' wallpaperFolder ("~/" allowed), else the default.
 folder=$(SETTINGS="$HOME/.local/state/quickshell/settings.json" bun -e '
@@ -40,11 +60,11 @@ mkdir -p "$folder"
 # the words as a query, else the month's top list. Pages until there are enough new ones.
 got=0 failed=0 page=1
 while ((got < count && page <= 5)); do
-    url=$(WORDS="${words[*]}" CATS=$categories PAGE=$page bun -e '
+    url=$(WORDS="${words[*]}" CATS=$categories PAGE=$page SORTING=$sorting bun -e '
         const q = process.env.WORDS.trim();
         const params = new URLSearchParams({ categories: process.env.CATS, purity: "100", atleast: "1920x1080",
                                              ratios: "16x9", page: process.env.PAGE,
-                                             sorting: q ? "relevance" : "toplist", topRange: "1M" });
+                                             sorting: process.env.SORTING || (q ? "relevance" : "toplist"), topRange: "1M" });
         if (q) params.set("q", q);
         process.stdout.write("https://wallhaven.cc/api/v1/search?" + params);
     ')

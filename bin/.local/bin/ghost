@@ -13,7 +13,7 @@
 #   ghost calendar add [name] | remove <name> | list | sync
 #                     a subscribed calendar (a Proton Calendar share link) in the today menu
 #                     (modules/calendar/calendar.sh)
-#   ghost wallpapers get [search words] [--count N] [--general]
+#   ghost wallpapers get [--style sky|lofi|painterly|minimal] [search words] [--count N] [--general]
 #                     art from wallhaven.cc (anime by default, safe for work only) into your
 #                     wallpaper folder (modules/core/wallpapers.sh)
 #   ghost looks export | import
