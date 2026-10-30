@@ -234,6 +234,7 @@ Scope {
 
                     LooksTile {
                         yours: root.saved
+                        picture: Wallpaper.stillPath
                         savedKey: "windowLooks"
                         savedKeys: Presets.windowsKeys.filter(k => k !== "windowLooks")
                         subtitle: "Borders, corners, gaps and motion"
@@ -246,13 +247,6 @@ Scope {
                                 // Gaps and corners larger than to scale, so the looks tell apart.
                                 readonly property real unit: width / 640
 
-                                Image {
-                                    anchors.fill: parent
-                                    source: Wallpaper.stillPath ? "file://" + Wallpaper.stillPath : ""
-                                    fillMode: Image.PreserveAspectCrop
-                                    sourceSize.width: width * 2
-                                    asynchronous: true
-                                }
 
                                 Repeater {
                                     model: 2

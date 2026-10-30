@@ -87,6 +87,7 @@ Scope {
 
                     LooksTile {
                         yours: root.saved
+                        picture: Wallpaper.stillPath
                         savedKey: "dockLooks"
                         savedKeys: Presets.dockIslandKeys.filter(k => k !== "dockLooks")
                         subtitle: "How much the island shows, and the dock"
@@ -98,13 +99,6 @@ Scope {
                                 readonly property var values: parent.option.values
                                 readonly property real unit: width / 40
 
-                                Image {
-                                    anchors.fill: parent
-                                    source: Wallpaper.stillPath ? "file://" + Wallpaper.stillPath : ""
-                                    fillMode: Image.PreserveAspectCrop
-                                    sourceSize.width: width * 2
-                                    asynchronous: true
-                                }
 
                                 // The island at the top edge.
                                 Rectangle {

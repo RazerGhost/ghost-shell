@@ -118,6 +118,8 @@ Item {
     // field with its hints (LockClock.clamped).
     property point dragShift: Qt.point(0, 0)
     property point widgetsDragShift: Qt.point(0, 0)
+    // A drag just let go is being saved (customize/LockEditor.qml): no glide meanwhile.
+    property bool settling: false
     readonly property bool dragging: dragShift.x !== 0 || dragShift.y !== 0 || widgetsDragShift.x !== 0 || widgetsDragShift.y !== 0
     readonly property var fieldArea: ({ x: fieldColumn.x + fieldShift, y: fieldColumn.y, width: fieldColumn.width,
                                         height: fieldColumn.height + belowReserve })
@@ -183,8 +185,8 @@ Item {
         transform: Translate {
             x: root.clockShift.x
             y: root.clockShift.y
-            Behavior on x { enabled: !root.dragging; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
-            Behavior on y { enabled: !root.dragging; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+            Behavior on x { enabled: !root.dragging && !root.settling; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+            Behavior on y { enabled: !root.dragging && !root.settling; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
         }
         spacing: Theme.spacing.xs
 
@@ -214,8 +216,8 @@ Item {
             transform: Translate {
                 x: root.widgetsShift.x - root.clockShift.x
                 y: root.widgetsShift.y - root.clockShift.y
-                Behavior on x { enabled: !root.dragging; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
-                Behavior on y { enabled: !root.dragging; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+                Behavior on x { enabled: !root.dragging && !root.settling; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+                Behavior on y { enabled: !root.dragging && !root.settling; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
             }
             width: Theme.lock.fieldWidth
             topPadding: Theme.spacing.l * 2

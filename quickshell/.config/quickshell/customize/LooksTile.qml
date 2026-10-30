@@ -10,11 +10,14 @@ import "SavedLooks.js" as SavedLooks
 // after. "Yours" always comes first: your settings from when the editor opened (`yours`, its
 // snapshot for Cancel), so picking it goes back to them; it's the chosen card while no look
 // matches. It stays put, so the cards don't shift under the pointer. `art` draws a card: it
-// gets `parent.option.values`, the look's settings.
+// gets `parent.option.values`, the look's settings, and draws over `picture` (a file path, the
+// card's backdrop: the wallpaper or the lock screen's picture).
 //
-// With `savedKey` (the setting holding them), your own looks follow the presets, and a last
-// "Save" card keeps the settings now as one (`savedKeys`: what a look of yours keeps). While
-// one of yours is chosen, the header has its name to change (Enter) and a delete button.
+// With `savedKey` (the setting holding them), your own looks follow the presets, and while your
+// settings match none of them a last "Save" card keeps them as one (`savedKeys`: what a look of
+// yours keeps; saving one that matches would make a look that can never be chosen). While one
+// of yours is chosen, the header has its name to change (Enter; Escape puts it back) and a
+// delete button.
 SheetTile {
     id: tile
 
@@ -22,6 +25,7 @@ SheetTile {
     // The editor's settings when it opened.
     required property var yours
     property Component art
+    property string picture
     // Fades the row's end into the tile (the sheet behind it differs per editor).
     property color fadeColor
     property string savedKey: ""
@@ -50,11 +54,16 @@ SheetTile {
             anchors.verticalCenter: parent.verticalCenter
             width: Theme.editor.slider * 0.7
             placeholder: "Name"
+            keepsEscape: true
             Accessible.name: "This look's name"
             // Set, not bound: typing would end a binding.
             Component.onCompleted: text = tile.chosen
-            onAccepted: Settings.values[tile.savedKey] = SavedLooks.renamed(tile.saved, tile.chosen, text,
-                                                                           tile.presets.map(p => p.name))
+            // A name that's empty or taken isn't kept: the field shows the name again.
+            onAccepted: {
+                Settings.values[tile.savedKey] = SavedLooks.renamed(tile.saved, tile.chosen, text, tile.presets.map(p => p.name));
+                text = tile.chosen;
+            }
+            onEscaped: text = tile.chosen
             Connections {
                 target: tile
                 function onChosenChanged(): void {
@@ -78,7 +87,7 @@ SheetTile {
         fadeColor: tile.fadeColor
         options: [{ value: "", label: "Yours", values: tile.yours }]
             .concat(tile.looks.map(l => ({ value: l.name, label: l.name, values: l.values })))
-            .concat(tile.savedKey !== "" ? [{ value: "<save>", label: "Save this look", save: true, values: {} }] : [])
+            .concat(tile.savedKey !== "" && tile.chosen === "" ? [{ value: "<save>", label: "Save this look", action: true, values: {} }] : [])
         current: tile.chosen
         onPicked: v => {
             if (v === "<save>") {
@@ -89,22 +98,32 @@ SheetTile {
                 Presets.apply(Settings.values, tile.looks, v);
                 return;
             }
-            // Only what these looks set: the other gallery's choice on the tab stays.
+            // What these looks set (all of it for a look of yours): the other gallery's choice on
+            // the tab stays.
             const back = {};
-            for (const key of Object.keys(tile.presets[0].values))
+            for (const key of tile.savedKeys)
                 back[key] = tile.yours[key];
             Presets.restore(Settings.values, back);
         }
-        // The editor's art, or for the last card a plus.
+        // The picture, the editor's art over it; for the last card a plus.
         art: Component {
             Item {
                 id: card
                 readonly property var option: parent.option
 
+                Image {
+                    anchors.fill: parent
+                    visible: !card.option.action
+                    source: tile.picture ? "file://" + tile.picture : ""
+                    fillMode: Image.PreserveAspectCrop
+                    sourceSize.width: width * 2
+                    asynchronous: true
+                }
+
                 Loader {
                     anchors.fill: parent
                     readonly property var option: card.option
-                    sourceComponent: card.option.save ? saveArt : tile.art
+                    sourceComponent: card.option.action ? saveArt : tile.art
                 }
             }
         }

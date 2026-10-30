@@ -29,11 +29,21 @@ Scope {
     CustomizeMenu {
         id: menu
         onPicked: id => {
-            if (id === "quick")
-                Quickshell.execDetached(["qs", "ipc", "call", "island", "editQuickSettings"]);
-            else
+            if (id !== "quick") {
                 root.only(({ lock: lockEditor, desktop: desktopEditor, dock: dockIslandEditor, windows: windowsEditor })[id]);
+                return;
+            }
+            // Quick settings is the island's: no editor in front of it.
+            root.closeAll();
+            Quickshell.execDetached(["qs", "ipc", "call", "island", "editQuickSettings"]);
         }
+    }
+
+    function closeAll(): void {
+        lockEditor.close();
+        desktopEditor.close();
+        dockIslandEditor.close();
+        windowsEditor.close();
     }
 
     // One editor at a time: they share Editing (the trip to an empty workspace, the card), so
@@ -48,8 +58,9 @@ Scope {
     IpcHandler {
         target: "customize"
 
+        // Super+U: open, or close again.
         function menu(): void {
-            menu.show();
+            menu.toggle();
         }
 
         function lock(): void {
@@ -69,10 +80,7 @@ Scope {
         }
 
         function close(): void {
-            lockEditor.close();
-            desktopEditor.close();
-            dockIslandEditor.close();
-            windowsEditor.close();
+            root.closeAll();
         }
     }
 }

@@ -25,13 +25,16 @@ Item {
     // translation is already back to nothing (NOTES).
     property point dragged: Qt.point(0, 0)
     property bool moving: false
+    // A drop being saved: no glide while the drag is put away and the place written (both at
+    // once would count the drag twice for a moment).
+    property bool settling: false
 
     x: spot.x * parent.width + (moving ? dragged.x : 0)
     y: spot.y * parent.height + (moving ? dragged.y : 0)
     // A new place (a widget layout, "Put them back", a drop lining up) is glided to; the drag
     // itself follows the pointer.
-    Behavior on x { enabled: !root.moving; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
-    Behavior on y { enabled: !root.moving; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+    Behavior on x { enabled: !root.moving && !root.settling; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+    Behavior on y { enabled: !root.moving && !root.settling; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
     width: body.childrenRect.width
     height: body.childrenRect.height
 
@@ -106,8 +109,10 @@ Item {
                                                   root.width, root.height, area.width, area.height, others,
                                                   Theme.desktop.margin, Theme.desktop.gap, Theme.desktop.reach);
                 const place = DesktopWidgets.dropped(at.x, at.y, root.width, root.height, area.width, area.height);
+                root.settling = true;
                 Settings.values.desktopWidgets = DesktopWidgets.withPlace(Settings.values.desktopWidgets, root.name, place);
                 root.moving = false;
+                Qt.callLater(() => root.settling = false);
             }
         }
     }

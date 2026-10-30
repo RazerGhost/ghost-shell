@@ -117,7 +117,8 @@ Column {
 
             spacing: Theme.spacing.xs
 
-            Accessible.role: root.chosenValues ? Accessible.CheckBox : Accessible.RadioButton
+            // A card that does something (an option with `action`, "Save this look") is a button.
+            Accessible.role: modelData.action ? Accessible.Button : root.chosenValues ? Accessible.CheckBox : Accessible.RadioButton
             Accessible.name: modelData.label
             Accessible.checked: chosen
             Accessible.onPressAction: root.picked(modelData.value)

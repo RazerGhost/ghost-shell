@@ -71,6 +71,11 @@ Item {
         area: root.parent ?? root
     }
 
+    // For controls outside the frame (the lock screen's outlines on the card): their arrow keys.
+    function navigate(key: int): bool {
+        return navigation.move(key);
+    }
+
     function switchTab(by: int): void {
         const i = root.tabs.findIndex(t => t.value === root.tab);
         root.tab = root.tabs[(i + by + root.tabs.length) % root.tabs.length].value;

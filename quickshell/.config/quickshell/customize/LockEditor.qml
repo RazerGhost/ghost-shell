@@ -44,46 +44,28 @@ Scope {
             root.done();
     }
 
-    // The clock and date moved `by` (px of the lock screen) from where they are now: saved as
-    // where they ended up (clamped by LockContent), as fractions of the screen.
-    function moveClock(by: point): void {
+    // The clock and date ("clock") or the player and widgets ("widgets") moved `by` px of the lock
+    // screen: a drag let go (`dragged`: the part already shows there, through LockContent's drag
+    // shift) or an arrow key's step (glided to). Saved as where it ends up, clamped by
+    // LockContent, as fractions of the screen. A drag of a few px is a click with a wobble, not a
+    // move: the place stays (and with it a look's match).
+    function movePart(part: string, by: point, dragged: bool): void {
         const lock = editor.item?.lockContent;
         if (!lock)
             return;
-        lock.dragShift = by;
-        // clockShift holds the saved offset and the move together, clamped.
-        const shift = lock.clockShift;
-        Settings.values.lockClockOffset = { x: shift.x / lock.width, y: shift.y / lock.height };
+        const clock = part === "clock";
+        const now = clock ? lock.clockShift : lock.widgetsShift;
+        const small = dragged && Math.hypot(by.x, by.y) < Theme.spacing.s;
+        const shift = dragged ? now : clock ? lock.clockShiftFor(now.x + by.x, now.y + by.y)
+                                            : lock.widgetsShiftFor(now.x + by.x, now.y + by.y);
+        // After a drag the part stays where it was let go: no glide while the drag is put away
+        // and the new place saved (both at once would count the drag twice for a moment).
+        lock.settling = dragged;
         lock.dragShift = Qt.point(0, 0);
-    }
-
-    // An arrow key's step: saved straight from where it is, so the move glides (a drag's sets
-    // dragShift, which follows the pointer at once).
-    function stepClock(by: point): void {
-        const lock = editor.item?.lockContent;
-        if (!lock)
-            return;
-        const shift = lock.clockShiftFor(lock.clockShift.x + by.x, lock.clockShift.y + by.y);
-        Settings.values.lockClockOffset = { x: shift.x / lock.width, y: shift.y / lock.height };
-    }
-
-    function stepWidgets(by: point): void {
-        const lock = editor.item?.lockContent;
-        if (!lock)
-            return;
-        const shift = lock.widgetsShiftFor(lock.widgetsShift.x + by.x, lock.widgetsShift.y + by.y);
-        Settings.values.lockWidgetsOffset = { x: shift.x / lock.width, y: shift.y / lock.height };
-    }
-
-    // The same for the player and widgets under the clock.
-    function moveWidgets(by: point): void {
-        const lock = editor.item?.lockContent;
-        if (!lock)
-            return;
-        lock.widgetsDragShift = by;
-        const shift = lock.widgetsShift;
-        Settings.values.lockWidgetsOffset = { x: shift.x / lock.width, y: shift.y / lock.height };
         lock.widgetsDragShift = Qt.point(0, 0);
+        if (!small)
+            Settings.values[clock ? "lockClockOffset" : "lockWidgetsOffset"] = { x: shift.x / lock.width, y: shift.y / lock.height };
+        Qt.callLater(() => lock.settling = false);
     }
 
     function cancel(): void {
@@ -152,8 +134,8 @@ Scope {
                                       (column?.y ?? 0) + lock.clockShift.y + (clock?.y ?? 0),
                                       clock?.width ?? 0, clock?.height ?? 0)
                         onMoving: by => lock.dragShift = by
-                        onMoved: by => root.moveClock(by)
-                        onStepped: by => root.stepClock(by)
+                        onMoved: by => root.movePart("clock", by, true)
+                        onStepped: by => root.movePart("clock", by, false)
                     }
 
                     EditOutline {
@@ -169,8 +151,8 @@ Scope {
                                       (column?.y ?? 0) + lock.widgetsShift.y + (slot?.y ?? 0) + (slot?.topPadding ?? 0),
                                       status.contentWidth, Math.max(status.height, Theme.lock.widget))
                         onMoving: by => lock.widgetsDragShift = by
-                        onMoved: by => root.moveWidgets(by)
-                        onStepped: by => root.stepWidgets(by)
+                        onMoved: by => root.movePart("widgets", by, true)
+                        onStepped: by => root.movePart("widgets", by, false)
                     }
                 }
             }
@@ -193,6 +175,7 @@ Scope {
 
                     LooksTile {
                         yours: root.saved
+                        picture: Wallpaper.lockPath
                         savedKey: "lockLooks"
                         savedKeys: Presets.lockKeys.filter(k => k !== "lockLooks")
                         subtitle: "Your picture with each look's clock"
@@ -203,13 +186,6 @@ Scope {
                                 id: look
                                 readonly property var values: parent.option.values
 
-                                Image {
-                                    anchors.fill: parent
-                                    source: Wallpaper.lockPath ? "file://" + Wallpaper.lockPath : ""
-                                    fillMode: Image.PreserveAspectCrop
-                                    sourceSize.width: width * 2
-                                    asynchronous: true
-                                }
 
                                 Rectangle {
                                     anchors.fill: parent

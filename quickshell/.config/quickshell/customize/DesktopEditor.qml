@@ -150,6 +150,7 @@ Scope {
 
                     LooksTile {
                         yours: root.saved
+                        picture: Wallpaper.stillPath
                         title: "Style"
                         subtitle: "Glass, blur, corners and color style, over your wallpaper"
                         presets: Presets.desktop
@@ -159,13 +160,6 @@ Scope {
                                 id: look
                                 readonly property var values: parent.option.values
 
-                                Image {
-                                    anchors.fill: parent
-                                    source: Wallpaper.stillPath ? "file://" + Wallpaper.stillPath : ""
-                                    fillMode: Image.PreserveAspectCrop
-                                    sourceSize.width: width * 2
-                                    asynchronous: true
-                                }
 
                                 // A panel as the shell would draw it in this look.
                                 Rectangle {
@@ -209,6 +203,7 @@ Scope {
 
                     LooksTile {
                         yours: root.saved
+                        picture: Wallpaper.stillPath
                         title: "Widget layouts"
                         savedKey: "widgetLooks"
                         savedPrefix: "My layout"
@@ -220,13 +215,6 @@ Scope {
                                 id: layout
                                 readonly property var values: parent.option.values
 
-                                Image {
-                                    anchors.fill: parent
-                                    source: Wallpaper.stillPath ? "file://" + Wallpaper.stillPath : ""
-                                    fillMode: Image.PreserveAspectCrop
-                                    sourceSize.width: width * 2
-                                    asynchronous: true
-                                }
 
                                 // Each widget that's on, at its place and size on the screen, shrunk.
                                 Repeater {

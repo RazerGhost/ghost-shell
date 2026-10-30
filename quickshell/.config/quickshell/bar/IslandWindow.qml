@@ -535,10 +535,18 @@ PanelWindow {
                         QuickSettings {
                             width: parent.width
                             onOpenMenu: menu => root.island.panel = menu
-                            Component.onCompleted: {
+                            // Asked for edit mode (the customize menu): built now or already open.
+                            function takeEdit(): void {
                                 if (root.island.quickEdit) {
                                     editing = true;
                                     root.island.quickEdit = false;
+                                }
+                            }
+                            Component.onCompleted: takeEdit()
+                            Connections {
+                                target: root.island
+                                function onQuickEditChanged(): void {
+                                    takeEdit();
                                 }
                             }
                         }

@@ -2,8 +2,11 @@ import QtQuick
 import qs.theme
 
 // A rounded text field with a placeholder, like SearchField without the magnifier: the Wi-Fi
-// password, the today menu's new task, a notification's quick reply. `password` hides what's
-// typed; Enter sends `accepted`. `input` is the TextInput, for focus and anything else.
+// password, the today menu's new task, a notification's quick reply, the editors' names.
+// `password` hides what's typed; Enter sends `accepted` and goes no further (an editor around
+// the field would take it as Done). With `keepsEscape`, Escape sends `escaped` instead of
+// reaching what's around it (an editor's Cancel). `input` is the TextInput, for focus and
+// anything else.
 Rectangle {
     id: root
 
@@ -11,8 +14,10 @@ Rectangle {
     property alias input: input
     property string placeholder
     property bool password: false
+    property bool keepsEscape: false
 
     signal accepted()
+    signal escaped()
 
     function focusInput(): void {
         input.forceActiveFocus();
@@ -45,7 +50,14 @@ Rectangle {
         Accessible.name: root.placeholder
         Accessible.passwordEdit: root.password
 
-        onAccepted: root.accepted()
+        // Handled here, not by the TextInput: it emits `accepted` and then lets the key go on.
+        Keys.onReturnPressed: root.accepted()
+        Keys.onEnterPressed: root.accepted()
+        Keys.onEscapePressed: event => {
+            event.accepted = root.keepsEscape;
+            if (root.keepsEscape)
+                root.escaped();
+        }
 
         Text {
             anchors.verticalCenter: parent.verticalCenter

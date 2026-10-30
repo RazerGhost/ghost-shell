@@ -3,9 +3,11 @@ import qs.theme
 
 // An outline around a part of the lock screen in the lock screen editor's card (`area`, in the
 // lock screen's own units), like an iOS lock screen being edited; its line is scaled back to the
-// usual width, and clicking it opens that part's tab (customize/LockEditor.qml). Dragging it
-// (or the arrow keys while it has the keyboard) moves that part: `moving` while the pointer
-// is down, then `moved` once let go, both in the lock screen's own units.
+// usual width, and clicking it (or Enter) opens that part's tab (customize/LockEditor.qml).
+// Dragging it moves that part: `moving` while the pointer is down, then `moved` once let go, both
+// in the lock screen's own units; Shift + an arrow key steps it (`stepped`). The plain arrow
+// keys move on to the next control and Escape cancels, as everywhere in the editor: the card
+// isn't inside the editor's frame, so they're handed to it here.
 Rectangle {
     id: outline
 
@@ -36,18 +38,26 @@ Rectangle {
                 : Qt.rgba(Colors.m3onSurface.r, Colors.m3onSurface.g, Colors.m3onSurface.b, 0.5)
 
     Accessible.role: Accessible.Button
-    Accessible.name: name + "; drag or use the arrow keys to move it"
+    Accessible.name: name
+    Accessible.description: "Drag it, or Shift and the arrow keys, to move it"
     Accessible.onPressAction: sheet.tab = tab
     activeFocusOnTab: true
     Keys.onSpacePressed: sheet.tab = tab
+    Keys.onReturnPressed: sheet.tab = tab
+    Keys.onEnterPressed: sheet.tab = tab
+    Keys.onEscapePressed: sheet.cancelled()
     Keys.onPressed: event => {
-        const step = Theme.spacing.l * 2;
-        const by = event.key === Qt.Key_Left ? Qt.point(-step, 0) : event.key === Qt.Key_Right ? Qt.point(step, 0)
-                 : event.key === Qt.Key_Up ? Qt.point(0, -step) : event.key === Qt.Key_Down ? Qt.point(0, step) : null;
-        if (by) {
-            stepped(by);
-            event.accepted = true;
+        const arrows = [Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down];
+        if (!arrows.includes(event.key))
+            return;
+        if (!(event.modifiers & Qt.ShiftModifier)) {
+            event.accepted = sheet.navigate(event.key);
+            return;
         }
+        const step = Theme.spacing.l * 2;
+        stepped(event.key === Qt.Key_Left ? Qt.point(-step, 0) : event.key === Qt.Key_Right ? Qt.point(step, 0)
+              : event.key === Qt.Key_Up ? Qt.point(0, -step) : Qt.point(0, step));
+        event.accepted = true;
     }
 
     HoverHandler {

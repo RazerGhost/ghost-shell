@@ -25,8 +25,8 @@ Scope {
         { id: "quick", icon: "tune", title: "Quick settings", text: "Your tiles and buttons, in your order" }
     ]
 
-    function show(): void {
-        open = true;
+    function toggle(): void {
+        open = !open;
     }
 
     function pick(index: int): void {
