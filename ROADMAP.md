@@ -1505,6 +1505,26 @@ Settings now (`widgets/WindowTitleBar.qml`; `WindowButton` and `OptionChip` move
   `nwg-shell-wallpapers` left the core module's packages; Hyprland's default still shows while no
   wallpaper is chosen.
 
+### Presets placed around the art (built 2026-10-30; untested on the laptop)
+User's request: better places and combinations for the presets. The README's screenshots show
+none, so each lock look and widget layout was drawn as boxes at 1920 x 1080 over wallhaven art
+in the user's styles (a centred figure at dusk, a rain window, a sky scene, a painted landscape;
+the widget boxes exact, the lock ones estimated from Theme's sizes). Most lock looks stacked
+the clock, player and widgets in the middle, over the picture's subject; Corner scattered its
+parts (the widgets clamped to the top edge, apart from the player); Flanked's widgets floated
+far from the clock. Changed (`customize/Presets.js`; tests pass under bun, qmltestrunner not run):
+- Lock: Corner is now Side (a thin clock, the date, the player and four widgets in one column on
+  the left third; with the quiet side on it moves to the calmer side); Editorial in the
+  bottom-left corner (a serif clock like a magazine cover); Minimal at the top instead of the
+  middle; Flanked's widgets closer to the clock (13.5 % of the width instead of 17). Classic,
+  Analog, Bold and Split as before. The lock positions are estimates: check each on the laptop.
+- Desktop widget layouts: the corner ones 80 px from both edges (the tests keep widgets 80 px
+  down, below the island's band); Workday centred top to bottom with the sky and battery side by
+  side at its foot, so its edges are even; Everything as three rows across the top left, in the
+  upper half (pictures often have their ground and subject lower down); a new Side (clock, sky
+  and battery, player in a left column, centred top to bottom), the lock screen's Side on the
+  desktop. Clean and Music as before (Music moved 16 px in to the same margin).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

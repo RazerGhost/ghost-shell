@@ -11,29 +11,32 @@ const clockLook = (style, layout, size, font, blur, dim) => ({ lockClockStyle: s
 const lock = [
     { name: "Classic", values: Object.assign(clockLook("big", "top", 100, "", 100, 25),
         { lockWidgets: ["weather", "battery", "notifications"], lockPlaces: null, lockClockOffset: null, lockWidgetsOffset: null }) },
-    { name: "Minimal", values: Object.assign(clockLook("thin", "center", 100, "", 100, 40),
+    { name: "Minimal", values: Object.assign(clockLook("thin", "top", 100, "", 100, 40),
         { lockWidgets: [], lockPlaces: null, lockClockOffset: null, lockWidgetsOffset: null }) },
     { name: "Analog", values: Object.assign(clockLook("analog", "left", 100, "", 60, 30),
         { lockWidgets: ["weather", "notifications"], lockPlaces: null, lockClockOffset: null, lockWidgetsOffset: null }) },
     { name: "Bold", values: Object.assign(clockLook("stacked", "top", 125, "Inter Display", 100, 25),
         { lockWidgets: ["weather", "battery", "notifications", "todo"], lockPlaces: null, lockClockOffset: null, lockWidgetsOffset: null }) },
-    { name: "Editorial", values: Object.assign(clockLook("big", "center", 125, "C059", 80, 35),
+    // A serif clock in the bottom-left corner, like a magazine cover, the middle left to the art.
+    { name: "Editorial", values: Object.assign(clockLook("big", "left", 125, "C059", 80, 35),
         { lockWidgets: ["weather"], lockPlaces: null, lockClockOffset: null, lockWidgetsOffset: null }) },
     // The clock in the bottom-left corner, the widgets apart from it to the right.
     { name: "Split", values: Object.assign(clockLook("big", "left", 100, "", 100, 30),
         { lockWidgets: ["weather", "battery", "notifications", "timer"], lockClockOffset: null, lockWidgetsOffset: null,
           lockPlaces: { player: { x: 0.6, y: 0 }, weather: { x: 0.6, y: 0 }, battery: { x: 0.6, y: 0 },
                         notifications: { x: 0.6, y: 0 }, timer: { x: 0.6, y: 0 } } }) },
-    // A thin clock and the date in the top-left corner, the widgets across from them on the right.
-    { name: "Corner", values: Object.assign(clockLook("thin", "top", 100, "", 100, 35),
-        { lockWidgets: ["weather", "battery", "notifications"], lockClockOffset: null, lockWidgetsOffset: null,
-          lockPlaces: { clock: { x: -0.36, y: -0.08 }, date: { x: -0.36, y: -0.08 },
-                        player: { x: 0.33, y: -0.16 }, weather: { x: 0.36, y: -0.39 }, battery: { x: 0.36, y: -0.39 },
-                        notifications: { x: 0.36, y: -0.39 } } }) },
-    // A bold clock in the middle, the weather and the battery on either side of it.
+    // Everything in one column on the left third (a thin clock, the date, the player and four
+    // widgets), the rest of the picture left to the art; with the quiet side on, it moves to
+    // whichever side is calmer.
+    { name: "Side", values: Object.assign(clockLook("thin", "top", 100, "", 100, 35),
+        { lockWidgets: ["weather", "battery", "notifications", "todo"], lockClockOffset: null, lockWidgetsOffset: null,
+          lockPlaces: { clock: { x: -0.33, y: 0 }, date: { x: -0.33, y: 0 }, player: { x: -0.33, y: 0 },
+                        weather: { x: -0.33, y: 0 }, battery: { x: -0.33, y: 0 }, notifications: { x: -0.33, y: 0 },
+                        todo: { x: -0.33, y: 0 } } }) },
+    // A bold clock in the middle, the weather and the battery close on either side of it.
     { name: "Flanked", values: Object.assign(clockLook("big", "top", 125, "Inter Display", 100, 30),
         { lockWidgets: ["weather", "battery"], lockClockOffset: null, lockWidgetsOffset: null,
-          lockPlaces: { weather: { x: -0.17, y: -0.24 }, battery: { x: 0.17, y: -0.24 } } }) }
+          lockPlaces: { weather: { x: -0.135, y: -0.24 }, battery: { x: 0.135, y: -0.24 } } }) }
 ];
 
 // The desktop's style, over your wallpaper, accent and widgets: the glass, blur, corners and how
@@ -65,17 +68,24 @@ function widgetLayout(places) {
 
 const desktopWidgets = [
     { name: "Clean", values: widgetLayout({}) },
+    // The corner ones sit 80 px from both edges (below the island's band at the top too).
     // The time and sky, top left.
-    { name: "Glance", values: widgetLayout({ clock: [64, 96], weather: [432, 96] }) },
+    { name: "Glance", values: widgetLayout({ clock: [80, 80], weather: [448, 80] }) },
     // A row along the top: the time, a timer and what to do.
-    { name: "Focus", values: widgetLayout({ clock: [64, 96], timer: [432, 96], todo: [616, 96] }) },
+    { name: "Focus", values: widgetLayout({ clock: [80, 80], timer: [448, 80], todo: [632, 80] }) },
     // The player at the bottom left, the time above it, the sky beside it.
-    { name: "Music", values: widgetLayout({ clock: [64, 608], media: [64, 792], weather: [432, 792] }) },
-    // A column on the right: the time, the day's events, tasks, the battery.
-    { name: "Workday", values: widgetLayout({ clock: [1504, 96], calendar: [1504, 280], todo: [1504, 464], battery: [1504, 648] }) },
-    // All of them, two columns on the left.
-    { name: "Everything", values: widgetLayout({ clock: [64, 96], calendar: [64, 280], media: [64, 464], todo: [64, 648],
-                                                weather: [432, 96], battery: [432, 280], timer: [432, 464] }) }
+    { name: "Music", values: widgetLayout({ clock: [80, 608], media: [80, 792], weather: [448, 792] }) },
+    // A column on the right, centred top to bottom: the time, the day's events, tasks, and the
+    // sky and battery side by side, so its edges are even.
+    { name: "Workday", values: widgetLayout({ clock: [1488, 180], calendar: [1488, 364], todo: [1488, 548],
+                                             weather: [1488, 732], battery: [1672, 732] }) },
+    // All of them in three rows across the top left, keeping to the upper half (pictures often
+    // have the ground and their subject lower down).
+    { name: "Everything", values: widgetLayout({ clock: [80, 80], calendar: [448, 80], media: [80, 264], todo: [448, 264],
+                                                weather: [80, 448], battery: [264, 448], timer: [448, 448] }) },
+    // A column on the left, centred top to bottom: the time, the sky and battery, the player
+    // (the lock screen's Side look on the desktop).
+    { name: "Side", values: widgetLayout({ clock: [80, 272], weather: [80, 456], battery: [264, 456], media: [80, 640] }) }
 ];
 
 // The island and dock: how much the island shows and when and how large the dock is.
