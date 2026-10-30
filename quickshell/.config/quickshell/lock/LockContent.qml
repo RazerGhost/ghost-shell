@@ -129,16 +129,22 @@ Item {
     readonly property var widgetsShift: widgetsShiftFor(widgetsOffset.x * width + widgetsDragShift.x,
                                                         widgetsOffset.y * height + widgetsDragShift.y)
 
+    // What a moved part keeps clear of: the field with its hints, and the login screen's power
+    // buttons and the message line at the bottom when they show.
+    readonly property var keepClear: [fieldArea]
+        .concat(powerRow.visible ? [{ x: powerRow.x, y: powerRow.y, width: powerRow.width, height: powerRow.height }] : [])
+        .concat(messageLine.visible ? [{ x: messageLine.x, y: messageLine.y, width: messageLine.width, height: messageLine.height }] : [])
+
     // Where each ends up moved (dx, dy) px from its layout's place, clamped.
     function clockShiftFor(dx: real, dy: real): var {
         return LockClockJs.clamped({ x: clockColumn.x, y: clockColumn.y, width: clockColumn.width, height: statusSlot.y },
-                                   dx, dy, width, height, fieldArea, Theme.spacing.l * 2, Theme.spacing.l);
+                                   dx, dy, width, height, keepClear, Theme.spacing.l * 2, Theme.spacing.l);
     }
 
     function widgetsShiftFor(dx: real, dy: real): var {
         return LockClockJs.clamped({ x: clockColumn.x + statusSlot.x, y: clockColumn.y + statusSlot.y,
                                      width: statusSlot.width, height: statusSlot.height },
-                                   dx, dy, width, height, fieldArea, Theme.spacing.l * 2, Theme.spacing.l);
+                                   dx, dy, width, height, keepClear, Theme.spacing.l * 2, Theme.spacing.l);
     }
 
     states: [
@@ -437,6 +443,7 @@ Item {
     }
 
     Row {
+        id: powerRow
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.margins: Theme.spacing.l * 2

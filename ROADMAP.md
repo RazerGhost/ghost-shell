@@ -1324,8 +1324,10 @@ Two read-only reviews of everything since the last review, findings checked, the
   island look's clock follows 12/24 hours.
 - Also: launcher entries "Customize" and "Edit quick settings", search words, and the login
   screen's copy of the settings leaves out your saved lock looks.
-- Not done: a clock or widgets dragged to the very bottom of the login screen can sit over its
-  power buttons and message line (they stay on top and clickable).
+- A clock or widgets dragged to the very bottom of the login screen could sit over its power
+  buttons and message line: fixed after (user's pick): they're kept clear like the field
+  (`LockClock.clamped` takes several rects, `LockContent.keepClear`; tested), only where the
+  part would cover one, so the bottom-left clock beside a centred message stays put.
 
 ### A grid for the desktop widgets (done, verified on the laptop 2026-10-30)
 User's request: a grid to place widgets symmetrically. The desktop editor's Widgets tab, Places:

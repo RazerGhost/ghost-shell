@@ -46,5 +46,12 @@ TestCase {
         compare(LockClock.clamped(rect, 0, 500, 1920, 1080, field, 32, 24), { x: 0, y: 376 });
         // Beside the field (far left), it may go down to the bottom margin.
         compare(LockClock.clamped(rect, -700, 500, 1920, 1080, field, 32, 24), { x: -700, y: 500 });
+        // The login screen's power buttons at the bottom right: kept above them there, not
+        // beside them.
+        const buttons = { x: 1700, y: 1000, width: 180, height: 48 };
+        // Dragged down to the bottom right: stops above the buttons (1000 - 24 - 200 = 776).
+        compare(LockClock.clamped(rect, 800, 800, 1920, 1080, [field, buttons], 32, 24), { x: 728, y: 576 });
+        // At the bottom left, beside them: down to the bottom margin (1080 - 32 - 200 = 848).
+        compare(LockClock.clamped(rect, -700, 800, 1920, 1080, [field, buttons], 32, 24), { x: -700, y: 648 });
     }
 }

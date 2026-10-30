@@ -35,15 +35,20 @@ function offset(saved) {
 }
 
 // The move (dx, dy, px) of the clock's column (`rect`: { x, y, width, height } at its layout's
-// place) kept on the screen (sw x sh, `margin` from the edges) and off the password field
-// (`field`'s rect, `gap` around it): where it would cover the field, it stops just above it.
-function clamped(rect, dx, dy, sw, sh, field, margin, gap) {
+// place) kept on the screen (sw x sh, `margin` from the edges) and off what must stay clear
+// (`fields`: rects, or one: the password field with its hints, the login screen's power
+// buttons, the message line; `gap` around each): where it would cover one, it stops just above.
+function clamped(rect, dx, dy, sw, sh, fields, margin, gap) {
     const within = (v, low, high) => Math.min(Math.max(v, low), Math.max(low, high));
     const x = within(rect.x + dx, margin, sw - margin - rect.width);
     let y = within(rect.y + dy, margin, sh - margin - rect.height);
-    const across = x < field.x + field.width + gap && x + rect.width > field.x - gap;
-    const below = y + rect.height > field.y - gap && y < field.y + field.height + gap;
-    if (across && below)
-        y = Math.max(margin, field.y - gap - rect.height);
+    // Lowest first: stopping above one can bring it onto one higher up.
+    const list = (Array.isArray(fields) ? fields : [fields]).slice().sort((a, b) => b.y - a.y);
+    for (const field of list) {
+        const across = x < field.x + field.width + gap && x + rect.width > field.x - gap;
+        const below = y + rect.height > field.y - gap && y < field.y + field.height + gap;
+        if (across && below)
+            y = Math.max(margin, field.y - gap - rect.height);
+    }
     return { x: x - rect.x, y: y - rect.y };
 }
