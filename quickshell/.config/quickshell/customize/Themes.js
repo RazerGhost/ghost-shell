@@ -4,6 +4,7 @@
 // JavaScript, so it can be tested on its own (tests/tst_themes.qml).
 .pragma library
 .import "../desktop/DesktopWidgets.js" as DesktopWidgets
+.import "Presets.js" as Presets
 
 const keys = ["colorScheme", "colorStyle", "colorContrast", "accentColor",
               "glass", "glassOpacity", "blurStyle", "cornerScale", "fontSans", "fontMono", "iconTheme",
@@ -52,8 +53,8 @@ function made(themes, values, wallpaper, primary) {
 
 // The theme the desktop looks like now, else "" (changed since, or never saved).
 function current(themes, values, wallpaper) {
-    const same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
-    const match = themes.find(t => t.wallpaper === wallpaper && Object.keys(t.values).every(k => same(values[k], t.values[k])));
+    const match = themes.find(t => t.wallpaper === wallpaper
+                                   && Object.keys(t.values).every(k => Presets.same(values[k], t.values[k])));
     return match ? match.name : "";
 }
 

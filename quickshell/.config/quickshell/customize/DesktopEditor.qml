@@ -149,6 +149,7 @@ Scope {
                     visible: chrome.tab === "looks"
 
                     LooksTile {
+                        yours: root.saved
                         title: "Style"
                         subtitle: "Glass, blur, corners and color style, over your wallpaper"
                         presets: Presets.desktop
@@ -207,6 +208,7 @@ Scope {
                     }
 
                     LooksTile {
+                        yours: root.saved
                         title: "Widget layouts"
                         subtitle: "Which widgets, and where"
                         presets: Presets.desktopWidgets

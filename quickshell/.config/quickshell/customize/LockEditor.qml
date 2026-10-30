@@ -172,6 +172,7 @@ Scope {
                     visible: chrome.tab === "looks"
 
                     LooksTile {
+                        yours: root.saved
                         subtitle: "Your picture with each look's clock"
                         presets: Presets.lock
                         fadeColor: Qt.tint(chrome.solid, Colors.tint)

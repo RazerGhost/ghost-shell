@@ -233,6 +233,7 @@ Scope {
                     visible: chrome.tab === "looks"
 
                     LooksTile {
+                        yours: root.saved
                         subtitle: "Borders, corners, gaps and motion"
                         presets: Presets.windows
                         fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)

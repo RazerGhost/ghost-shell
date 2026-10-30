@@ -93,6 +93,26 @@ TestCase {
         }
     }
 
+    // settings.json comes back with object keys sorted: still the same preset.
+    function test_sameIgnoresKeyOrder() {
+        verify(Presets.same({ clock: { x: 0.1, y: 0.2 }, battery: { y: 0.6, x: 0.5 } },
+                            { battery: { x: 0.5, y: 0.6 }, clock: { y: 0.2, x: 0.1 } }));
+        verify(Presets.same(undefined, null));
+        verify(Presets.same(["a", "b"], ["a", "b"]));
+        verify(!Presets.same(["a", "b"], ["b", "a"]));
+        verify(!Presets.same({ a: 1 }, { a: 1, b: 2 }));
+        verify(!Presets.same({ a: null }, { b: null }));
+        verify(!Presets.same([], {}));
+        verify(!Presets.same(0, null));
+        const workday = Presets.desktopWidgets.find(p => p.name === "Workday").values;
+        const reread = JSON.parse(JSON.stringify(workday));
+        const sorted = {};
+        for (const key of Object.keys(reread.desktopWidgets).sort())
+            sorted[key] = reread.desktopWidgets[key];
+        reread.desktopWidgets = sorted;
+        compare(Presets.current(reread, Presets.desktopWidgets), "Workday");
+    }
+
     function test_applyCopies() {
         const values = {};
         Presets.apply(values, Presets.dockIsland, "Minimal");

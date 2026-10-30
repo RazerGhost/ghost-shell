@@ -86,6 +86,7 @@ Scope {
                     visible: chrome.tab === "looks"
 
                     LooksTile {
+                        yours: root.saved
                         subtitle: "How much the island shows, and the dock"
                         presets: Presets.dockIsland
                         fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)

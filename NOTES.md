@@ -408,6 +408,12 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   (checked offscreen, 2026-10-29): the video wallpaper's still frame, always at the same path,
   gets the video's path after a `#`.
 
+- `FileView` + `JsonAdapter` writes objects with their keys sorted (Qt's `QJsonObject`), and
+  Settings reloads its own file after each write (`watchChanges`): an object set as
+  `{ clock, battery }` comes back as `{ battery, clock }`. Compare settings by content
+  (`Presets.same`), never by `JSON.stringify` (verified 2026-10-30 with a throwaway `qs -p`;
+  the presets kept falling back to "Yours").
+
 ## Testing on the laptop
 
 - README screenshots: an empty workspace up to 5 (higher ones add workspace dots), `grim -s 0.75`

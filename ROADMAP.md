@@ -1235,6 +1235,12 @@ only its editor's settings, with values its controls offer, none twice).
   apart to the right, through `lockWidgetsOffset`). Never the next event: its title would
   show to anyone at the screen (tested). The cards show each look's widgets as dots under its
   clock.
+- Fix (user's find: picking a preset fell back to "Yours", and the galleries didn't show all
+  their cards): settings.json is written with object keys sorted, so a layout's widget places
+  came back in another order and no longer matched (`Presets.same` compares by content, also
+  for saved themes; tested), and the "Yours" card coming and going rebuilt the row under the
+  pointer. "Yours" now always comes first and means your settings from when the editor opened:
+  picking it goes back to them (only what that gallery sets).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

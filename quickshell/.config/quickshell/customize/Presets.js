@@ -118,10 +118,24 @@ function restore(values, saved) {
         values[key] = saved[key];
 }
 
-// The preset whose values all match the settings, else "" (a look of your own). Lists and
-// objects (the hidden status icons) by their contents.
+// Whether two settings' values are the same: lists and objects by their contents, whatever the
+// order of an object's keys (settings.json is written with them sorted, so the widgets' places
+// come back in another order than a preset gave them), and unset counting as null.
+function same(a, b) {
+    a = a ?? null;
+    b = b ?? null;
+    if (a === b)
+        return true;
+    if (typeof a !== "object" || typeof b !== "object" || a === null || b === null)
+        return false;
+    if (Array.isArray(a) !== Array.isArray(b))
+        return false;
+    const keys = Object.keys(a);
+    return keys.length === Object.keys(b).length && keys.every(k => Object.prototype.hasOwnProperty.call(b, k) && same(a[k], b[k]));
+}
+
+// The preset whose values all match the settings, else "" (a look of your own).
 function current(values, presets) {
-    const same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
     const match = presets.find(p => Object.keys(p.values).every(k => same(values?.[k], p.values[k])));
     return match ? match.name : "";
 }
