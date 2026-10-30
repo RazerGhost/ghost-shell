@@ -7,7 +7,8 @@ import qs.widgets
 // circle. Weather (its icon and temperature), battery (a ring with the percentage), how many
 // notifications came in (never what they say) and to-dos are open, the timer (a ring emptying
 // around the time left); the next event is wide, its
-// time over its title. Picked in the lock screen editor (lock/LockWidgets.js).
+// time over its title, and the weather and battery have wide versions too, like iOS's
+// rectangular widgets. Picked in the lock screen editor (lock/LockWidgets.js).
 Surface {
     id: root
 
@@ -15,13 +16,17 @@ Surface {
     required property string kind
     readonly property var next: Agenda.upcoming[0] ?? null
 
-    width: kind === "event" ? Theme.lock.widget * 2 + Theme.lock.widgetGap : Theme.lock.widget
+    // The wide ones (the next event, the wide weather and battery) take two places' width.
+    readonly property bool wide: kind === "event" || kind === "weatherWide" || kind === "batteryWide"
+    width: wide ? Theme.lock.widget * 2 + Theme.lock.widgetGap : Theme.lock.widget
     height: Theme.lock.widget
     radius: height / 2
 
     Accessible.role: Accessible.StaticText
-    Accessible.name: kind === "weather" ? (Weather.current ? `${Weather.current.temperature}° ${Weather.current.label}` : "No weather yet")
-                   : kind === "battery" ? "Battery " + Math.round(Battery.level * 100) + "%"
+    Accessible.name: kind === "weather" || kind === "weatherWide"
+                     ? (Weather.current ? `${Weather.current.temperature}° ${Weather.current.label}` : "No weather yet")
+                   : kind === "battery" || kind === "batteryWide"
+                     ? "Battery " + Math.round(Battery.level * 100) + "%" + (Battery.timeLabel ? ", " + Battery.timeLabel : "")
                    : kind === "notifications" ? Notifications.history.length + (Notifications.history.length === 1 ? " notification" : " notifications")
                    : kind === "todo" ? Planner.open + (Planner.open === 1 ? " to-do open" : " to-dos open")
                    : kind === "timer" ? (Countdown.active ? "Timer, " + Countdown.label + " left" : "No timer")
@@ -113,6 +118,111 @@ Surface {
             font.pixelSize: Theme.font.normal
             font.weight: Font.DemiBold
             font.features: { "tnum": 1 }
+        }
+    }
+
+    // The weather, wide: the sky's icon, the temperature large, the sky and today's high and low.
+    Row {
+        visible: root.kind === "weatherWide"
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        anchors.leftMargin: Theme.lock.widgetInset
+        spacing: Theme.spacing.s
+
+        MaterialIcon {
+            anchors.verticalCenter: parent.verticalCenter
+            icon: Weather.current?.icon ?? "cloud_off"
+            color: Colors.m3onSurfaceVariant
+            font.pixelSize: Theme.icon.normal * 1.4
+        }
+
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            text: Weather.current ? Weather.current.temperature + "°" : "–"
+            color: Colors.m3onSurface
+            font.family: Theme.font.sans
+            font.pixelSize: Theme.font.title
+            font.weight: Font.DemiBold
+        }
+
+        Column {
+            anchors.verticalCenter: parent.verticalCenter
+            width: root.width - Theme.lock.widgetInset * 2 - Theme.icon.normal * 1.4 - Theme.font.title * 2 - Theme.spacing.s * 2
+
+            Text {
+                width: parent.width
+                text: Weather.current?.label ?? "No weather"
+                color: Colors.m3onSurface
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.small
+                font.weight: Font.Medium
+                elide: Text.ElideRight
+            }
+
+            Text {
+                width: parent.width
+                visible: Weather.current !== null
+                text: Weather.current ? `↑${Weather.current.high}° ↓${Weather.current.low}°` : ""
+                color: Colors.m3onSurfaceVariant
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.small
+            }
+        }
+    }
+
+    // The battery, wide: a bar filling with the charge, the percentage over it and the time left.
+    Column {
+        visible: root.kind === "batteryWide"
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.leftMargin: Theme.lock.widgetInset
+        anchors.rightMargin: Theme.lock.widgetInset
+        spacing: Theme.spacing.xs
+
+        Row {
+            spacing: Theme.spacing.xs
+
+            MaterialIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                icon: Battery.charging ? "bolt" : "battery_android_full"
+                color: Battery.low ? Colors.m3error : Colors.m3onSurfaceVariant
+                font.pixelSize: Theme.icon.small
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: Math.round(Battery.level * 100) + "%"
+                color: Colors.m3onSurface
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.normal
+                font.weight: Font.DemiBold
+                font.features: { "tnum": 1 }
+            }
+        }
+
+        Rectangle {
+            width: parent.width
+            height: Theme.lock.gaugeWidth * 2
+            radius: height / 2
+            color: Colors.tint
+
+            Rectangle {
+                width: parent.width * Math.max(0, Math.min(Battery.level, 1))
+                height: parent.height
+                radius: parent.radius
+                color: Battery.low ? Colors.m3error : Colors.m3onSurface
+                Behavior on width { NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing } }
+            }
+        }
+
+        Text {
+            width: parent.width
+            text: Battery.timeLabel || (Battery.charging ? "Charging" : "On battery")
+            color: Colors.m3onSurfaceVariant
+            font.family: Theme.font.sans
+            font.pixelSize: Theme.font.small
+            elide: Text.ElideRight
         }
     }
 

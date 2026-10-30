@@ -1413,6 +1413,13 @@ The desktop editor's Wallpaper tab has a "More art" tile: search words (optional
 then the gallery has them and a notification says how many came. Tried into a scratch folder:
 downloads, skips what's there, searches.
 
+### Wide lock screen widgets (built 2026-10-30)
+User's pick, like iOS's rectangular ones: "Weather, wide" (the sky's icon, the temperature large,
+the sky and today's high and low) and "Battery, wide" (a bar filling with the charge, the
+percentage and the time left or until full), in the lock screen editor's Widgets tab. Twice as
+wide as the round ones, like the next event, but one of the four (`LockWidgets.known`). Machines
+without a battery get neither battery widget.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

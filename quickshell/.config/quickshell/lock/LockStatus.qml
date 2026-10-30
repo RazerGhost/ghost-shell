@@ -17,7 +17,7 @@ Column {
 
     // Not the battery on a machine without one.
     readonly property var widgets: LockWidgets.shown(Settings.values.lockWidgets, Settings.values)
-        .filter(id => id !== "battery" || Battery.present)
+        .filter(id => !id.startsWith("battery") || Battery.present)
     spacing: Theme.spacing.l
 
     MediaCard {

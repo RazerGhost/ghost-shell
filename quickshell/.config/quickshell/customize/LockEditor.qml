@@ -410,7 +410,8 @@ Scope {
                         id: widgetsTile
 
                         readonly property var list: LockWidgets.shown(Settings.values.lockWidgets, Settings.values)
-                        readonly property var names: ({ weather: "Weather", battery: "Battery", notifications: "Notifications",
+                        readonly property var names: ({ weather: "Weather", weatherWide: "Weather, wide", battery: "Battery",
+                                                        batteryWide: "Battery, wide", notifications: "Notifications",
                                                         todo: "To-do", timer: "Timer", event: "Next event" })
 
                         title: "Under the clock"
@@ -424,7 +425,7 @@ Scope {
 
                             Repeater {
                                 model: widgetsTile.list.concat(LockWidgets.known.filter(id => !widgetsTile.list.includes(id)))
-                                    .filter(id => id !== "battery" || Battery.present)
+                                    .filter(id => !id.startsWith("battery") || Battery.present)
 
                                 Column {
                                     id: pick

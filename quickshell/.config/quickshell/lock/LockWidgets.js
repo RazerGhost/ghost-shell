@@ -3,9 +3,10 @@
 // be tested on its own (tests/tst_lockwidgets.qml).
 .pragma library
 
-// Every one there is, in the order the editor offers them. The event is twice as wide as the
-// others but counts as one of the `most`.
-const known = ["weather", "battery", "notifications", "todo", "timer", "event"];
+// Every one there is, in the order the editor offers them. The wide ones (the weather's and
+// battery's wide versions, the event) are twice as wide as the others but count as one of the
+// `most`.
+const known = ["weather", "weatherWide", "battery", "batteryWide", "notifications", "todo", "timer", "event"];
 const most = 4;
 
 // A saved list made safe: known ids only, each once, at most `most`. Without a list yet, the
