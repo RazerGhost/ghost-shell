@@ -1130,7 +1130,7 @@ User's pick: an iOS-like row of small widgets under the clock, picked in the loc
   order, and dragging one onto another moves it there (Shift + Left / Right with the keyboard;
   `LockWidgets.moved`, tested); on the lock screen in the card, the player and widgets are
   outlined like the clock, and clicking them opens the Widgets tab (one `Outline` component
-  for both).
+  for both). Verified on the laptop, with the desktop editor's Cancel fix.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
