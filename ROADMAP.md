@@ -977,8 +977,14 @@ or a key); their visual options leave Settings, which keeps only what isn't seen
   size) into the card, which follows the sheet's height as tabs change; the clock's outline
   is inside the card. User's review: more room for both. Cancel and Done moved into the sheet's
   top row (beside the tabs), the sheet is up to 1240 px wide and every tall tab is two columns
-  side by side in all four editors, so the sheet is shorter and the card larger. Next: the desktop (wallpaper and widgets drawn in the card), the windows
-  (the examples tiled into it with `hl.monitor`'s `reserved_area`), the dock and island.
+  side by side in all four editors, so the sheet is shorter and the card larger. The Clock tab:
+  style and font cards side by side (the same card size), place, size and show in one row.
+- The desktop editor publishes its card (`Editing.card`, `cardScreen`): the wallpaper layer
+  clips its picture to it with the background color around (animating in and out), and the
+  widgets' layer scales them into it; dragging divides the pointer's move by the scale, and
+  their input and blur regions are computed with it (`desktop/WidgetRegion.qml`). Next: the
+  windows (the examples tiled into the card with `hl.monitor`'s `reserved_area`), the dock and
+  island.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
