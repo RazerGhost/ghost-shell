@@ -193,6 +193,7 @@ Singleton {
             property bool desktopCalendar: false
             property bool desktopBattery: false
             property bool desktopTodo: false
+            property bool desktopTimer: false
             property var desktopWidgets: ({})
             // Your saved looks (customize/Themes.js): [{ name, wallpaper, primary, values }].
             property var themes: []

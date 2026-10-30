@@ -5,12 +5,13 @@ import qs.widgets
 
 // One of the lock screen's widgets under the clock, like iOS's: round, on a translucent
 // circle. Weather (its icon and temperature), battery (a ring with the percentage), how many
-// notifications came in (never what they say) and to-dos are open; the next event is wide, its
+// notifications came in (never what they say) and to-dos are open, the timer (a ring emptying
+// around the time left); the next event is wide, its
 // time over its title. Picked in the lock screen editor (lock/LockWidgets.js).
 Rectangle {
     id: root
 
-    // "weather", "battery", "notifications", "todo" or "event"
+    // "weather", "battery", "notifications", "todo", "timer" or "event"
     required property string kind
     readonly property var next: Agenda.upcoming[0] ?? null
 
@@ -26,6 +27,7 @@ Rectangle {
                    : kind === "battery" ? "Battery " + Math.round(Battery.level * 100) + "%"
                    : kind === "notifications" ? Notifications.history.length + " notifications"
                    : kind === "todo" ? Planner.open + " to-dos open"
+                   : kind === "timer" ? (Countdown.active ? "Timer, " + Countdown.label + " left" : "No timer")
                    : next ? Agenda.when(next) + ", " + next.title : "No events"
 
     // An icon over a short value: weather, notifications, to-dos.
@@ -82,6 +84,38 @@ Rectangle {
                 font.weight: Font.DemiBold
                 font.features: { "tnum": 1 }
             }
+        }
+    }
+
+    // The timer: idle, its icon; running, a ring emptying around the time left.
+    MaterialIcon {
+        anchors.centerIn: parent
+        visible: root.kind === "timer" && !Countdown.active
+        icon: "timer"
+        color: Colors.m3onSurfaceVariant
+        font.pixelSize: Theme.icon.normal
+    }
+
+    ProgressRing {
+        anchors.fill: parent
+        anchors.margins: Theme.spacing.s
+        visible: root.kind === "timer" && Countdown.active
+        value: Countdown.progress
+        color: Countdown.paused ? Colors.m3onSurfaceVariant : Colors.m3onSurface
+        lineWidth: Theme.desktop.ringWidth * 0.75
+
+        Text {
+            anchors.centerIn: parent
+            width: parent.width - parent.lineWidth * 2
+            horizontalAlignment: Text.AlignHCenter
+            fontSizeMode: Text.HorizontalFit
+            minimumPixelSize: Theme.font.small * 0.8
+            text: Countdown.label
+            color: Colors.m3onSurface
+            font.family: Theme.font.sans
+            font.pixelSize: Theme.font.normal
+            font.weight: Font.DemiBold
+            font.features: { "tnum": 1 }
         }
     }
 

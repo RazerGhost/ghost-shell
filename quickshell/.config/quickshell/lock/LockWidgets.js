@@ -4,7 +4,7 @@
 .pragma library
 
 // Every one there is, in the order the editor offers them; the event is wide (two places).
-const known = ["weather", "battery", "notifications", "todo", "event"];
+const known = ["weather", "battery", "notifications", "todo", "timer", "event"];
 const most = 4;
 
 // A saved list made safe: known ids only, each once, at most `most`. Without a list yet, the

@@ -1,6 +1,7 @@
 // The today menu's timer: counts down from a few minutes, can pause, and at zero sends a
 // critical notification with the alarm sound (it stays until dismissed and also shows during Do
-// Not Disturb). The island shows the time left while it runs. Kept across shell reloads.
+// Not Disturb). The island shows the time left while it runs; quick settings' timer button, the
+// desktop's and the lock screen's timer widgets show it too. Kept across shell reloads.
 pragma Singleton
 
 import QtQuick
@@ -15,8 +16,14 @@ Singleton {
     property real now: Date.now()
     readonly property real left: paused ? saved.pausedLeft : saved.endsAt - now
     readonly property string label: PlannerJs.remaining(left)
+    // How much is left, 1 at the start to 0 at the end: the widgets' rings.
+    readonly property real progress: active && saved.total > 0 ? Math.max(0, Math.min(left / saved.total, 1)) : 0
+    // The last length started (5 minutes at first): quick settings' button starts it again.
+    readonly property int lastMinutes: saved.minutes
 
     function start(minutes: int): void {
+        saved.minutes = minutes;
+        saved.total = minutes * 60000;
         saved.pausedLeft = 0;
         saved.endsAt = Date.now() + minutes * 60000;
         now = Date.now();
@@ -43,6 +50,8 @@ Singleton {
         reloadableId: "countdown"
         property real endsAt: 0      // ms since the epoch while running, else 0
         property real pausedLeft: 0  // ms left while paused, else 0
+        property real total: 0       // ms the running timer started with
+        property int minutes: 5
     }
 
     Timer {

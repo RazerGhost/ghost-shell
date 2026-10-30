@@ -7,8 +7,8 @@ import qs.widgets
 
 // Widgets on the wallpaper (the desktop editor's Widgets tab): a clock, the weather, the
 // media player while something plays, the calendar's next events, the battery and the to-do
-// list (ClockWidget, WeatherWidget, MediaWidget, CalendarWidget, BatteryWidget, TodoWidget: one
-// family of sizes). On the first screen, on the layer just above the wallpaper, so windows cover them.
+// list and the timer (ClockWidget, WeatherWidget, MediaWidget, CalendarWidget, BatteryWidget,
+// TodoWidget, TimerWidget: one family of sizes). On the first screen, on the layer just above the wallpaper, so windows cover them.
 // Each can be dragged by its handle (DesktopCard.qml).
 Scope {
     id: root
@@ -16,6 +16,7 @@ Scope {
     readonly property bool any: Settings.values.desktopClock || Settings.values.desktopWeather
                                 || Settings.values.desktopMedia || Settings.values.desktopCalendar
                                 || Settings.values.desktopBattery || Settings.values.desktopTodo
+                                || Settings.values.desktopTimer
 
     LazyLoader {
         active: root.any
@@ -39,6 +40,7 @@ Scope {
                 WidgetRegion { stage: widgetStage; widget: calendarCard }
                 WidgetRegion { stage: widgetStage; widget: batteryCard }
                 WidgetRegion { stage: widgetStage; widget: todoCard }
+                WidgetRegion { stage: widgetStage; widget: timerCard }
             }
 
             BackgroundEffect.blurRegion: Region {
@@ -48,6 +50,7 @@ Scope {
                 WidgetRegion { stage: widgetStage; widget: calendarCard; corner: Theme.desktop.radius }
                 WidgetRegion { stage: widgetStage; widget: batteryCard; corner: Theme.desktop.radius }
                 WidgetRegion { stage: widgetStage; widget: todoCard; corner: Theme.desktop.radius }
+                WidgetRegion { stage: widgetStage; widget: timerCard; corner: Theme.desktop.radius }
                 // Never empty: Hyprland 0.57 blurs the whole surface for an empty region (NOTES).
                 Region { width: 1; height: 1 }
             }
@@ -116,6 +119,14 @@ Scope {
                     shown: Settings.values.desktopTodo
 
                     TodoWidget {}
+                }
+
+                DesktopCard {
+                    id: timerCard
+                    name: "timer"
+                    shown: Settings.values.desktopTimer
+
+                    TimerWidget {}
                 }
             }
         }

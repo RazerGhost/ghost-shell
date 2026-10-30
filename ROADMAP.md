@@ -1152,6 +1152,17 @@ and says "Remove <app>", and letting go unpins it. A drag never counts as a clic
 previews stay away meanwhile, and the dock stays shown while the pointer is above it. The
 right-click menu's Move left / right stay (and the editor's note that pins are moved there).
 
+### Timer everywhere (built 2026-10-30)
+User's pick: the today menu's timer (`services/Countdown.qml`, which now keeps the length it
+started with for a ring, and the last length used) in more places:
+- Quick settings: a "Timer" round button to add in edit mode; it starts the last length (5
+  minutes at first), and while the timer runs pauses and resumes it; its name says the time left.
+  Cancelling stays in the today menu.
+- Desktop: a small timer widget: 1, 5, 15 and 25 minutes to start; running, a ring emptying
+  around the time left, with pause or resume and cancel. In the editor's gallery and themes.
+- Lock screen: a round timer widget (its icon, or a ring around the time left), picked in the
+  lock screen editor's Widgets tab like the others.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

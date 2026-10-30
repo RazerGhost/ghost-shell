@@ -20,7 +20,7 @@ const lockKeys = ["lockClockStyle", "lockLayout", "lockClockSize", "lockClockFon
 // it isn't a setting).
 const desktopKeys = ["colorScheme", "colorStyle", "colorContrast", "accentColor",
                      "desktopClock", "desktopWeather", "desktopMedia", "desktopCalendar",
-                     "desktopBattery", "desktopTodo", "desktopWidgets",
+                     "desktopBattery", "desktopTodo", "desktopTimer", "desktopWidgets",
                      "glass", "glassOpacity", "blurStyle", "uiScale", "textScale", "cornerScale",
                      "fontSans", "fontMono", "iconTheme"];
 

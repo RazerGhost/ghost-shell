@@ -408,7 +408,7 @@ Scope {
 
                         readonly property var list: LockWidgets.shown(Settings.values.lockWidgets, Settings.values)
                         readonly property var names: ({ weather: "Weather", battery: "Battery", notifications: "Notifications",
-                                                        todo: "To-do", event: "Next event" })
+                                                        todo: "To-do", timer: "Timer", event: "Next event" })
 
                         title: "Under the clock"
                         subtitle: "Up to four · drag to change their order · an event's title shows to anyone"

@@ -30,7 +30,7 @@ machine can take what it needs.
   windows look (borders, gaps, animations, on example windows). Each shows the screen as a card
   with live previews; type "customize" in the launcher.
 - **Desktop widgets**: a clock, the weather, the media player, the calendar's next events, the
-  battery and the to-do list on the wallpaper, picked from a gallery and dragged into place.
+  battery, the to-do list and a timer on the wallpaper, picked from a gallery and dragged into place.
 - **A settings app** for what would otherwise be config files: displays, sound, keyboard and
   touchpad, power, default apps, keybinds, Btrfs snapshots and more.
 - **Glass**: see-through panels with Hyprland's blur behind exactly their shape.

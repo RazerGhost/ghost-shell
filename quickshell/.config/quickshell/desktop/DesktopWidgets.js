@@ -11,7 +11,8 @@ const defaults = {
     media:    { x: 0.04, y: 0.44 },
     calendar: { x: 0.24, y: 0.08 },
     battery:  { x: 0.24, y: 0.26 },
-    todo:     { x: 0.24, y: 0.44 }
+    todo:     { x: 0.24, y: 0.44 },
+    timer:    { x: 0.34, y: 0.26 }
 };
 
 function fraction(value, fallback) {

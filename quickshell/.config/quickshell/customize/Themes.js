@@ -7,7 +7,7 @@
 const keys = ["colorScheme", "colorStyle", "colorContrast", "accentColor",
               "glass", "glassOpacity", "blurStyle", "cornerScale", "fontSans", "fontMono", "iconTheme",
               "desktopClock", "desktopWeather", "desktopMedia", "desktopCalendar", "desktopBattery",
-              "desktopTodo", "desktopWidgets"];
+              "desktopTodo", "desktopTimer", "desktopWidgets"];
 
 // The saved list made safe (a hand-edited file can't break the tab): each with a name, a
 // wallpaper path ("" for none), its accent color for the card, and only known keys.

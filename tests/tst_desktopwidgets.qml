@@ -13,7 +13,7 @@ TestCase {
         compare(DesktopWidgets.place(undefined, "media"), { x: 0.04, y: 0.44 });
         // The defaults don't overlap: 168 px high widgets on a 1920 x 1080 screen, the medium
         // ones 352 px wide.
-        const width = { clock: 352, weather: 168, media: 352, calendar: 352, battery: 168, todo: 352 };
+        const width = { clock: 352, weather: 168, media: 352, calendar: 352, battery: 168, todo: 352, timer: 168 };
         const rects = Object.keys(width).map(n => {
             const p = DesktopWidgets.place({}, n);
             return { n, x: p.x * 1920, y: p.y * 1080, w: width[n], h: 168 };

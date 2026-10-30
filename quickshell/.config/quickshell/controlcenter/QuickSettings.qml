@@ -38,7 +38,8 @@ Item {
         dark: { icon: "dark_mode", title: "Dark mode" },
         record: { icon: "radio_button_checked", title: "Record the screen" },
         screenshot: { icon: "screenshot_region", title: "Screenshot" },
-        wallpaper: { icon: "wallpaper", title: "Wallpaper" }
+        wallpaper: { icon: "wallpaper", title: "Wallpaper" },
+        timer: { icon: "timer", title: "Timer" }
     })
 
     // The island grows and shrinks to fit the current page.
@@ -196,6 +197,21 @@ Item {
             title: "Game mode"
             active: GameMode.on
             onClicked: GameMode.on = !GameMode.on
+        }
+    }
+
+    // The today menu's timer: starts the length used last, and while it runs pauses and resumes
+    // it (cancel it in the today menu). Its name says the time left.
+    Component {
+        id: timerToggle
+
+        RoundToggle {
+            icon: Countdown.paused ? "pause_circle" : "timer"
+            title: !Countdown.active ? "Timer: start " + Countdown.lastMinutes + " min"
+                 : Countdown.label + (Countdown.paused ? " left, paused" : " left: pause")
+            active: Countdown.active && !Countdown.paused
+            onClicked: !Countdown.active ? Countdown.start(Countdown.lastMinutes)
+                     : Countdown.paused ? Countdown.resume() : Countdown.pause()
         }
     }
 
@@ -363,7 +379,7 @@ Item {
                     title: root.info[modelData].title
                     control: ({ mic: micToggle, dnd: dndToggle, nightlight: nightToggle, awake: awakeToggle, game: gameToggle,
                                 airplane: airplaneToggle, dark: darkToggle, record: recordToggle,
-                                screenshot: screenshotToggle, wallpaper: wallpaperToggle })[modelData]
+                                screenshot: screenshotToggle, wallpaper: wallpaperToggle, timer: timerToggle })[modelData]
                     editing: root.editing
                     onRemoveRequested: Settings.values.quickToggles = QuickItems.removed(root.toggleList, itemId)
                     onMoveRequested: to => Settings.values.quickToggles = QuickItems.moved(root.toggleList, index, to)
