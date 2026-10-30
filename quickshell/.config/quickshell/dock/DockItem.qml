@@ -11,7 +11,8 @@ import "DockApps.js" as DockApps
 // accent color), a badge with its notifications in the today menu's history, and its name above it
 // on hover (DockBar shows window previews instead for apps with windows). Click: open the
 // app, or switch to it (again to cycle its windows; on the focused app's only window, minimize
-// it). Right-click: menu.
+// it). Right-click: menu. Drag it along the dock to move it among the pinned apps (pinning a
+// running one), or up off the dock to unpin it, like macOS (DockBar does the dropping).
 MouseArea {
     id: root
 
@@ -26,7 +27,15 @@ MouseArea {
     // Set by DockBar while this app's window previews show: they replace the name label.
     property bool previewing: false
 
+    // How far the icon has been dragged from where it was pressed, while dragging.
+    property point dragOffset: Qt.point(0, 0)
+    property bool dragging: false
+    property point pressedAt
+    // Up this far, a pinned app shows "Remove" and is unpinned when let go.
+    readonly property bool removing: dragging && item.pinned && dragOffset.y < -Theme.dock.height
+
     signal menuRequested()
+    signal dropped(real dx, real dy)
 
     function activate(): void {
         const target = DockApps.clickTarget(windows, Windows.active);
@@ -48,9 +57,33 @@ MouseArea {
     onClicked: mouse => {
         if (mouse.button === Qt.RightButton)
             menuRequested();
-        else
+        else if (!dragged)
             activate();
     }
+
+    // A move of a few px past the press starts a drag; a drag ends without a click.
+    property bool dragged: false
+    onPressed: mouse => {
+        pressedAt = Qt.point(mouse.x, mouse.y);
+        dragged = false;
+    }
+    onPositionChanged: mouse => {
+        if (!(mouse.buttons & Qt.LeftButton))
+            return;
+        const dx = mouse.x - pressedAt.x, dy = mouse.y - pressedAt.y;
+        if (!dragging && Math.hypot(dx, dy) > Theme.spacing.m)
+            dragging = dragged = true;
+        if (dragging)
+            dragOffset = Qt.point(dx, dy);
+    }
+    onReleased: {
+        if (!dragging)
+            return;
+        dropped(dragOffset.x, dragOffset.y);
+        dragging = false;
+        dragOffset = Qt.point(0, 0);
+    }
+    z: dragging ? 1 : 0
 
     Accessible.role: Accessible.Button
     Accessible.name: name + (windows.length > 0 ? ", " + windows.length + " open" : "")
@@ -64,6 +97,9 @@ MouseArea {
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: root.containsMouse ? -Theme.spacing.xs : -2
         implicitSize: Theme.dock.icon
+        // Follows the pointer while dragged, fading while it would be removed.
+        transform: Translate { x: root.dragOffset.x; y: root.dragOffset.y }
+        opacity: root.removing ? Theme.state.disabled : 1
 
         Behavior on anchors.verticalCenterOffset {
             NumberAnimation { duration: Theme.anim.fast; easing.type: Theme.anim.easing }
@@ -125,8 +161,9 @@ MouseArea {
         width: label.implicitWidth + Theme.spacing.m * 2
         height: label.implicitHeight + Theme.spacing.xs * 2
         radius: Theme.radius.full
-        opacity: root.containsMouse && !root.previewing ? 1 : 0
+        opacity: root.removing || (root.containsMouse && !root.previewing && !root.dragging) ? 1 : 0
         visible: opacity > 0
+        transform: Translate { x: root.dragOffset.x; y: root.dragOffset.y }
 
         Behavior on opacity {
             NumberAnimation { duration: Theme.anim.fast }
@@ -135,7 +172,7 @@ MouseArea {
         Text {
             id: label
             anchors.centerIn: parent
-            text: root.name
+            text: root.removing ? "Remove " + root.name : root.name
             color: Colors.m3onSurface
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.small

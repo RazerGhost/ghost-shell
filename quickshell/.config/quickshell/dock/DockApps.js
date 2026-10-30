@@ -48,6 +48,14 @@ function notificationCount(notifications, id, name) {
         || (n.appName && (lower(n.appName) === lower(id) || lower(n.appName) === lower(name)))).length;
 }
 
+// The pins with `id` (pinned already or not) put at `index` among the others: where it was
+// dropped on the dock. The index is clamped into the list.
+function placePin(pinned, id, index) {
+    const list = Array.from(pinned).filter(p => p !== id);
+    list.splice(Math.max(0, Math.min(index, list.length)), 0, id);
+    return list;
+}
+
 // The pins with `id` moved `by` places (-1 left, 1 right); the same list when it can't move.
 function movePin(pinned, id, by) {
     const list = Array.from(pinned);

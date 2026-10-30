@@ -1144,6 +1144,14 @@ User's pick: saved looks for the whole desktop, like Android's themes.
   which theme the desktop matches now). Saved in `themes` in settings.json; the editor's Cancel
   doesn't undo saving or deleting one, only the look.
 
+### Dock: drag to reorder (built 2026-10-30)
+User's pick. Like macOS: drag an icon along the dock and let go where it should be among the
+pinned apps (its middle decides; `DockApps.placePin`, tested); a running app that isn't pinned
+dropped among them is pinned there; dragged up more than the dock's height, a pinned app fades
+and says "Remove <app>", and letting go unpins it. A drag never counts as a click, the
+previews stay away meanwhile, and the dock stays shown while the pointer is above it. The
+right-click menu's Move left / right stay (and the editor's note that pins are moved there).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

@@ -26,6 +26,11 @@ Scope {
         file.writeAdapter();
     }
 
+    function placePin(id: string, index: int): void {
+        state.pinned = DockApps.placePin(pinned, id, index);
+        file.writeAdapter();
+    }
+
     function togglePin(id: string): void {
         state.pinned = pinned.includes(id) ? pinned.filter(p => p !== id) : [...pinned, id];
         file.writeAdapter();

@@ -21,7 +21,9 @@ PanelWindow {
     // The pointer is at the bottom edge or on the dock, or its menu is open. Stays true for a
     // moment after the pointer leaves, so the dock doesn't flicker away.
     readonly property bool wanted: trigger.containsMouse || hitArea.containsMouse || menu.visible
-                                   || previews.hovered
+                                   || previews.hovered || dragging
+    // An app is being dragged (DockItem): the dock stays while the pointer is above it.
+    property bool dragging: false
     property bool revealed: false
     onWantedChanged: {
         if (wanted) {
@@ -172,6 +174,7 @@ PanelWindow {
                         required property int index
 
                         height: row.height
+                        z: dockItem.dragging ? 1 : 0
 
                         // A thin line between the pinned apps and the other running ones.
                         Rectangle {
@@ -183,11 +186,36 @@ PanelWindow {
                         }
 
                         DockItem {
+                            id: dockItem
                             item: slot.modelData
+                            onDraggingChanged: {
+                                window.dragging = dragging;
+                                if (dragging)
+                                    previews.close();
+                            }
+                            // Dropped up off the dock: unpinned. Along it: put among the pinned
+                            // apps where the icon's middle landed (pinning a running one), unless
+                            // a running one is let go past the pinned ones.
+                            onDropped: (dx, dy) => {
+                                const id = slot.modelData.id;
+                                if (removing) {
+                                    window.dock.togglePin(id);
+                                    return;
+                                }
+                                if (Math.abs(dy) > Theme.dock.height)
+                                    return;
+                                const middle = slot.x + x + width / 2 + dx;
+                                const pinnedSlots = Array.from(row.children)
+                                    .filter(c => c.modelData?.pinned && c.modelData.id !== id);
+                                const index = pinnedSlots.filter(c => c.x + c.width - width / 2 < middle).length;
+                                const lastEnd = pinnedSlots.reduce((end, c) => Math.max(end, c.x + c.width), 0);
+                                if (slot.modelData.pinned || middle < lastEnd + width / 2)
+                                    window.dock.placePin(id, index);
+                            }
                             previewing: previews.item === slot.modelData && previews.visible
                             // Resting on an app with windows shows them above the dock.
                             onContainsMouseChanged: {
-                                if (containsMouse && windows.length > 0 && menu.item === null)
+                                if (containsMouse && !dragging && windows.length > 0 && menu.item === null)
                                     previews.request(slot.modelData, mapToItem(window.contentItem, width / 2, 0).x);
                                 else
                                     previews.release();

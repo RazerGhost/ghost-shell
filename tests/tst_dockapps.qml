@@ -51,6 +51,15 @@ TestCase {
         compare(DockApps.notificationCount([], "zen", "Zen Browser"), 0);
     }
 
+    function test_placePin() {
+        compare(DockApps.placePin(["zen", "ghostty", "files"], "zen", 2), ["ghostty", "files", "zen"]);
+        compare(DockApps.placePin(["zen", "ghostty", "files"], "files", 0), ["files", "zen", "ghostty"]);
+        // Not pinned yet: pinned at that place.
+        compare(DockApps.placePin(["zen", "ghostty"], "steam", 1), ["zen", "steam", "ghostty"]);
+        compare(DockApps.placePin(["zen"], "steam", 9), ["zen", "steam"]);
+        compare(DockApps.placePin(["zen"], "steam", -2), ["steam", "zen"]);
+    }
+
     function test_movePin() {
         compare(DockApps.movePin(["zen", "ghostty", "files"], "ghostty", -1), ["ghostty", "zen", "files"]);
         compare(DockApps.movePin(["zen", "ghostty", "files"], "ghostty", 1), ["zen", "files", "ghostty"]);

@@ -14,7 +14,7 @@ import "Presets.js" as Presets
 // empty workspace (Done or Cancel go back). The sheet sits in the middle of the screen, clear
 // of both. Island: the workspace dots, the clock and
 // which status icons show. Dock: when it shows and its icons' size; pinning and moving apps is
-// the dock's own right-click menu. Cancel writes the earlier settings back. Opened from
+// done on the dock itself (drag, right-click). Cancel writes the earlier settings back. Opened from
 // Settings -> Windows and the launcher (Customize.qml).
 Scope {
     id: root
@@ -62,7 +62,7 @@ Scope {
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
             // Input only on the editor's own controls: the dock underneath keeps its clicks
-            // (right-click an app to pin or move it).
+            // (drag an app to move or unpin it, right-click to pin it).
             mask: Region {
                 item: chrome.sheet
             }
@@ -338,7 +338,7 @@ Scope {
                             Text {
                                 width: parent.width
                                 horizontalAlignment: Text.AlignHCenter
-                                text: "Right-click an app in the dock to pin, unpin or move it"
+                                text: "Drag an app along the dock to move it, or up off it to unpin it; right-click to pin"
                                 color: Colors.m3onSurfaceVariant
                                 font.family: Theme.font.sans
                                 font.pixelSize: Theme.font.small
