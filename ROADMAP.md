@@ -1094,7 +1094,7 @@ User's pick after the review: Android's edit mode, on the panel itself.
 - The battery line in the bottom row ends in "…" before the buttons (the pencil made it run
   under them).
 
-### More desktop widgets (built 2026-10-30)
+### More desktop widgets (done, verified on the laptop 2026-10-30)
 User's pick after the quick settings editor: more of the same family.
 - Calendar (medium, like iOS's): the month in the accent, the day large and the weekday on the
   left, the next three events on the right (`Agenda.upcoming`, "Today 14:00" from
