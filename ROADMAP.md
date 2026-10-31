@@ -394,6 +394,13 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   same for the phone (battery, sending files, clipboard). Both start in `autostart.lua`.
 - The phone module opens KDE Connect's ports (1714-1764) in ufw, which CachyOS turns on and
   which refused them, so the phone couldn't find the laptop (`modules/phone/setup.sh`, 2026-10-31).
+- Phone in quick settings (built 2026-10-31; untested: no phone paired yet): a Phone tile to add
+  in edit mode (the connected phone's name and battery) and its page: ring it, send files (picked
+  with zenity), send the clipboard, browse its files (KDE Connect's mount, in the file manager),
+  and Open KDE Connect for pairing. `services/Phone.qml` asks `phone.sh` every 10 s while the tile
+  or page shows (`kdeconnect-cli -a`, the battery from the daemon's D-Bus battery plugin; parsing
+  in `Phone.js`, tested). Nautilus: right-click files -> Scripts -> Send to phone (the `nautilus`
+  Stow package; with several phones connected it asks which).
 - Tray icons that name an icon no theme has (KDE Connect's Plasma-only
   `kdeconnectindicatordark`) fall back to the app's icon from its desktop file, by fuzzy lookup
   or exact name, else a generic one.

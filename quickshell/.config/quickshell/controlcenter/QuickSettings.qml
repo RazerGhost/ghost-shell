@@ -13,7 +13,7 @@ import "../widgets/OrderedList.js" as OrderedList
 Item {
     id: root
 
-    property string page: "main" // "main", "wifi", "bluetooth", "sound" or "system"
+    property string page: "main" // "main", "wifi", "bluetooth", "sound", "phone" or "system"
 
     // A button here opens another island menu ("power"), or closes the island ("").
     signal openMenu(string menu)
@@ -31,6 +31,7 @@ Item {
         bluetooth: { icon: "bluetooth", title: "Bluetooth", control: bluetoothTile },
         sound: { icon: "volume_up", title: "Sound", control: soundTile },
         power: { icon: "balance", title: "Power mode", control: powerTile },
+        phone: { icon: "smartphone", title: "Phone", control: phoneTile },
         mic: { icon: "mic", title: "Microphone", control: micToggle },
         dnd: { icon: "do_not_disturb_on", title: "Do Not Disturb", control: dndToggle },
         nightlight: { icon: "nightlight", title: "Night light", control: nightToggle },
@@ -46,7 +47,8 @@ Item {
 
     // The island grows and shrinks to fit the current page.
     implicitHeight: (page === "wifi" ? wifiPage : page === "bluetooth" ? bluetoothPage
-                     : page === "sound" ? soundPage : page === "system" ? systemPage : mainPage).implicitHeight
+                     : page === "sound" ? soundPage : page === "phone" ? phonePage
+                     : page === "system" ? systemPage : mainPage).implicitHeight
                     + padding
     clip: true // pages slide in from the side
 
@@ -116,6 +118,21 @@ Item {
             active: !Audio.muted
             hasPage: true
             onClicked: root.page = "sound"
+        }
+    }
+
+    Component {
+        id: phoneTile
+
+        // KDE Connect (the phone module): the connected phone and its battery.
+        Tile {
+            width: tileGrid.tileWidth
+            icon: "smartphone"
+            title: Phone.phone?.name ?? "Phone"
+            subtitle: Phone.label
+            active: Phone.phone !== null
+            hasPage: true
+            onClicked: root.page = "phone"
         }
     }
 
@@ -686,6 +703,25 @@ Item {
         width: root.width - root.padding * 2
         visible: x < root.width
         onBack: root.page = "main"
+
+        Behavior on x {
+            NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }
+        }
+    }
+
+    PhonePage {
+        id: phonePage
+        x: root.page === "phone" ? root.padding : root.width
+        width: root.width - root.padding * 2
+        visible: x < root.width
+        onBack: root.page = "main"
+
+        // Only ask KDE Connect while the tile or this page shows.
+        Binding {
+            target: Phone
+            property: "active"
+            value: root.visible && (root.page === "phone" || root.tileList.includes("phone"))
+        }
 
         Behavior on x {
             NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }
