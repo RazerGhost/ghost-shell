@@ -1,12 +1,14 @@
-// The Wallpapers window (user's choice: its own window like Settings, not a tile in the desktop
-// editor): finds art on wallhaven.cc, anime by default and only ever safe for work. Search, or
+// The Wallpapers page of the launcher (user's choice: it grows out of the search bar, at three
+// sizes; it was a window of its own, and before that a tile in the desktop editor): finds art
+// on wallhaven.cc, anime by default and only ever safe for work. Search, or
 // pick one of your styles, and one of wallhaven's colors if you like; the results come as
 // pictures, more as you scroll. Click one for a larger look, then Download (into your folder) or
 // Set as wallpaper, or one of its tags for more like it. Nothing is downloaded until you choose it.
 // "Yours" shows the pictures in your folder the same way, to set one or delete it (to the trash). The searches and the checks on each result are services/Wallhaven.js (tested);
 // downloading is `ghost wallpapers fetch <id>`, which checks the picture again. Opened from the
-// desktop editor's Wallpaper tab, the picker strip, the launcher or `qs ipc call wallpapers browse`.
-pragma Singleton
+// desktop editor's Wallpaper tab, the picker strip, the launcher's search or
+// `qs ipc call wallpapers browse` (LauncherState). The launcher keeps it for as long as the shell
+// runs, so the results and downloads stay while it's closed.
 
 import QtQuick
 import Quickshell
@@ -17,17 +19,11 @@ import qs.theme
 import qs.widgets
 import "../services/Wallhaven.js" as Wallhaven
 
-Singleton {
+Item {
     id: root
 
-    property alias open: persist.open
-
-    PersistentProperties {
-        id: persist
-        reloadableId: "wallpaperBrowser"
-
-        property bool open: false
-    }
+    // Shown in the launcher (its Wallpapers page, while it's open).
+    property bool active: false
 
     // The search: your words and the chosen style ("" = the month's best), or a picture's tag
     // ({ id, name }; "More like this", on its own), and a color ("" = any; Wallhaven.colors).
@@ -155,16 +151,20 @@ Singleton {
     // the end can't ask for them; a maximized window holds more than a page).
     readonly property bool hasMore: page === 0 || page < lastPage
     function fill(): void {
-        if (open && mode === "find" && chosen === null && hasMore && !failed && grid.count > 0 && grid.contentHeight <= grid.height)
+        if (active && mode === "find" && chosen === null && hasMore && !failed && grid.count > 0 && grid.contentHeight <= grid.height)
             loadMore();
     }
 
-    onOpenChanged: {
-        if (open && pictures.length === 0)
+    onActiveChanged: {
+        if (!active)
+            return;
+        if (pictures.length === 0)
             search();
+        if (chosen === null)
+            Qt.callLater(searchField.focusInput);
     }
-    // Still open after a shell reload: the results are gone, so look again.
-    Component.onCompleted: if (open && pictures.length === 0) search()
+    // Still shown after a shell reload: the results are gone, so look again.
+    Component.onCompleted: if (active && pictures.length === 0) search()
 
     // "More like this": the pictures with one of the chosen picture's tags (wallhaven's own
     // "similar" search isn't open to the API without an account). The tags come from the
@@ -257,414 +257,242 @@ Singleton {
         }
     }
 
-    FloatingWindow {
-        id: window
+    // The search and the styles.
+    Row {
+        id: searchRow
 
-        visible: root.open
-        title: "Wallpapers"
-        implicitWidth: Theme.wallpaper.browserWidth
-        implicitHeight: Theme.wallpaper.browserHeight
-        minimumSize: Qt.size(Theme.wallpaper.browserThumb * 2, Theme.settings.minContent)
-        color: Colors.m3surface
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        spacing: Theme.spacing.s
+        visible: root.chosen === null
 
-        // Closing the window (Super+W, Alt+F4) hides it.
-        onVisibleChanged: {
-            if (!visible)
-                root.open = false;
-            else
-                searchField.focusInput();
+        Segmented {
+            id: modes
+            anchors.verticalCenter: parent.verticalCenter
+            tabs: true
+            options: [{ value: "find", label: "Find" }, { value: "yours", label: "Yours" }]
+            current: root.mode
+            onPicked: v => root.showMode(v)
         }
 
-        WindowTitleBar {
-            id: titleBar
-            appWindow: window
-            title: "Wallpapers"
-            onCloseRequested: root.open = false
+        // Yours: how many, and the folder.
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            visible: root.mode === "yours"
+            width: parent.width - modes.width - openFolder.width - parent.spacing * 2
+            leftPadding: Theme.spacing.s
+            text: root.yours.length + (root.yours.length === 1 ? " picture in " : " pictures in ")
+                  + Wallpaper.folder.replace(Quickshell.env("HOME"), "~")
+            elide: Text.ElideMiddle
+            color: Colors.m3onSurfaceVariant
+            font.family: Theme.font.sans
+            font.pixelSize: Theme.font.normal
         }
 
-        // The search and the styles.
-        Row {
-            id: searchRow
+        TextButton {
+            id: openFolder
+            anchors.verticalCenter: parent.verticalCenter
+            visible: root.mode === "yours"
+            text: "Open folder"
+            onClicked: Apps.run(["sh", "-c", 'mkdir -p "$1" && exec xdg-open "$1"', "sh", Wallpaper.folder], "xdg-open", "")
+        }
 
-            anchors.top: titleBar.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.margins: Theme.spacing.l
-            anchors.topMargin: 0
-            spacing: Theme.spacing.s
-            visible: root.chosen === null
-
-            Segmented {
-                id: modes
-                anchors.verticalCenter: parent.verticalCenter
-                tabs: true
-                options: [{ value: "find", label: "Find" }, { value: "yours", label: "Yours" }]
-                current: root.mode
-                onPicked: v => root.showMode(v)
+        SearchField {
+            id: searchField
+            visible: root.mode === "find"
+            width: Math.max(Theme.wallpaper.browserThumb, parent.width - modes.width - styles.width - parent.spacing * 2)
+            placeholder: root.tag ? "" : root.style ? "Narrow it down (optional)" : "Search wallhaven (or the month's best)"
+            onTextChanged: {
+                root.words = text;
+                // Typing starts a search of your own.
+                if (text !== "")
+                    root.tag = null;
+            }
+            onKeyPressed: event => {
+                if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                    root.search();
+                    event.accepted = true;
+                } else if (event.key === Qt.Key_Down && grid.count > 0) {
+                    grid.forceActiveFocus();
+                    event.accepted = true;
+                }
             }
 
-            // Yours: how many, and the folder.
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                visible: root.mode === "yours"
-                width: parent.width - modes.width - openFolder.width - parent.spacing * 2
-                leftPadding: Theme.spacing.s
-                text: root.yours.length + (root.yours.length === 1 ? " picture in " : " pictures in ")
-                      + Wallpaper.folder.replace(Quickshell.env("HOME"), "~")
-                elide: Text.ElideMiddle
-                color: Colors.m3onSurfaceVariant
-                font.family: Theme.font.sans
-                font.pixelSize: Theme.font.normal
-            }
-
+            // The tag being looked at ("More like this"), × back to the month's best.
             TextButton {
-                id: openFolder
-                anchors.verticalCenter: parent.verticalCenter
-                visible: root.mode === "yours"
-                text: "Open folder"
-                onClicked: Apps.run(["sh", "-c", 'mkdir -p "$1" && exec xdg-open "$1"', "sh", Wallpaper.folder], "xdg-open", "")
-            }
-
-            SearchField {
-                id: searchField
-                visible: root.mode === "find"
-                width: Math.max(Theme.wallpaper.browserThumb, parent.width - modes.width - styles.width - parent.spacing * 2)
-                placeholder: root.tag ? "" : root.style ? "Narrow it down (optional)" : "Search wallhaven (or the month's best)"
-                onTextChanged: {
-                    root.words = text;
-                    // Typing starts a search of your own.
-                    if (text !== "")
-                        root.tag = null;
+                visible: root.tag !== null
+                text: "Like: " + (root.tag?.name ?? "") + "  ×"
+                color: Colors.m3secondaryContainer
+                onClicked: {
+                    root.tag = null;
+                    root.search();
                 }
-                onKeyPressed: event => {
-                    if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                        root.search();
-                        event.accepted = true;
-                    } else if (event.key === Qt.Key_Down && grid.count > 0) {
-                        grid.forceActiveFocus();
-                        event.accepted = true;
-                    }
-                }
-
-                // The tag being looked at ("More like this"), × back to the month's best.
-                TextButton {
-                    visible: root.tag !== null
-                    text: "Like: " + (root.tag?.name ?? "") + "  ×"
-                    color: Colors.m3secondaryContainer
-                    onClicked: {
-                        root.tag = null;
-                        root.search();
-                    }
-                    Accessible.name: "Stop showing pictures like " + (root.tag?.name ?? "")
-                }
-            }
-
-            Row {
-                id: styles
-                visible: root.mode === "find"
-                spacing: Theme.spacing.xs
-
-                Repeater {
-                    model: Wallhaven.styles
-
-                    OptionChip {
-                        required property var modelData
-                        width: Theme.wallpaper.browserThumb / 2.4
-                        text: modelData.label
-                        chosen: root.tag === null && root.style === modelData.value
-                        onClicked: {
-                            root.style = modelData.value;
-                            root.tag = null;
-                            root.search();
-                        }
-                    }
-                }
+                Accessible.name: "Stop showing pictures like " + (root.tag?.name ?? "")
             }
         }
 
-        // wallhaven's colors: pictures with a lot of one. Click the chosen one again for any color.
         Row {
-            id: colorRow
-
-            anchors.top: searchRow.bottom
-            anchors.left: parent.left
-            anchors.margins: Theme.spacing.l
-            anchors.topMargin: Theme.spacing.m
+            id: styles
+            visible: root.mode === "find"
             spacing: Theme.spacing.xs
-            visible: root.chosen === null && root.mode === "find"
-            height: visible ? implicitHeight : 0
-
-            Accessible.role: Accessible.Grouping
-            Accessible.name: "Colors"
 
             Repeater {
-                model: Wallhaven.colors
+                model: Wallhaven.styles
 
-                Rectangle {
-                    id: swatch
-
+                OptionChip {
                     required property var modelData
-                    readonly property bool picked: root.color === modelData.hex
-
-                    function toggle(): void {
-                        root.color = picked ? "" : modelData.hex;
+                    width: Theme.wallpaper.browserThumb / 2.4
+                    text: modelData.label
+                    chosen: root.tag === null && root.style === modelData.value
+                    onClicked: {
+                        root.style = modelData.value;
+                        root.tag = null;
                         root.search();
                     }
-
-                    width: Theme.icon.normal + Theme.spacing.xs
-                    height: width
-                    radius: width / 2
-                    color: "#" + modelData.hex
-                    border.width: picked ? Theme.outline.strong : Theme.outline.normal
-                    border.color: picked ? Colors.m3primary : Colors.m3outlineVariant
-                    scale: picked ? 1.15 : swatchMouse.containsMouse ? 1.08 : 1
-                    Behavior on scale {
-                        NumberAnimation { duration: Theme.anim.fast }
-                    }
-
-                    Accessible.role: Accessible.CheckBox
-                    Accessible.name: modelData.name
-                    Accessible.checked: picked
-                    Accessible.onPressAction: toggle()
-                    activeFocusOnTab: true
-                    Keys.onReturnPressed: toggle()
-                    Keys.onEnterPressed: toggle()
-                    Keys.onSpacePressed: toggle()
-
-                    FocusRing {
-                        radius: swatch.radius
-                    }
-
-                    MouseArea {
-                        id: swatchMouse
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: swatch.toggle()
-                    }
-
-                    Tooltip {
-                        target: swatch
-                        text: swatch.modelData.name
-                        shown: swatchMouse.containsMouse || swatch.activeFocus
-                    }
                 }
             }
         }
+    }
 
-        // The pictures found, more as you scroll to the end.
-        GridView {
-            id: grid
+    // wallhaven's colors: pictures with a lot of one. Click the chosen one again for any color.
+    Row {
+        id: colorRow
 
-            readonly property int columns: Math.max(2, Math.floor(width / Theme.wallpaper.browserThumb))
+        anchors.top: searchRow.bottom
+        anchors.left: parent.left
+        anchors.topMargin: Theme.spacing.m
+        spacing: Theme.spacing.xs
+        visible: root.chosen === null && root.mode === "find"
+        height: visible ? implicitHeight : 0
 
-            anchors.top: colorRow.bottom
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.margins: Theme.spacing.l - Theme.spacing.xs
-            anchors.topMargin: Theme.spacing.m
-            visible: root.chosen === null
-            clip: true
-            boundsBehavior: Flickable.StopAtBounds
-            cellWidth: Math.floor(width / columns)
-            cellHeight: Math.round((cellWidth - Theme.spacing.s) * 9 / 16) + Theme.spacing.s
-            model: root.shown
-            keyNavigationEnabled: true
-            onAtYEndChanged: if (atYEnd && count > 0 && root.mode === "find") root.loadMore()
-            onHeightChanged: Qt.callLater(root.fill)
-            onWidthChanged: Qt.callLater(root.fill) // more columns
+        Accessible.role: Accessible.Grouping
+        Accessible.name: "Colors"
 
-            Keys.onReturnPressed: if (currentIndex >= 0) root.chosen = root.shown[currentIndex]
-            Keys.onEnterPressed: if (currentIndex >= 0) root.chosen = root.shown[currentIndex]
-            Keys.onSpacePressed: if (currentIndex >= 0) root.chosen = root.shown[currentIndex]
-            Keys.onUpPressed: event => {
-                if (currentIndex < columns)
-                    searchField.focusInput();
-                else
-                    event.accepted = false;
-            }
+        Repeater {
+            model: Wallhaven.colors
 
-            Accessible.role: Accessible.List
-            Accessible.name: "Wallpapers found"
-
-            delegate: MouseArea {
-                id: cell
+            Rectangle {
+                id: swatch
 
                 required property var modelData
-                required property int index
-                // Its check in Find; in Yours, the wallpaper you have now.
-                readonly property bool have: modelData.path ? Wallpaper.path === modelData.path || Wallpaper.path === modelData.darkPath
-                                                            : root.owned.includes(modelData.file)
-                readonly property bool coming: root.pending.includes(modelData.id)
+                readonly property bool picked: root.color === modelData.hex
 
-                width: grid.cellWidth
-                height: grid.cellHeight
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: root.chosen = modelData
+                function toggle(): void {
+                    root.color = picked ? "" : modelData.hex;
+                    root.search();
+                }
 
-                Accessible.role: Accessible.Button
-                Accessible.name: modelData.path ? modelData.file + (have ? ", your wallpaper" : "")
-                    : "Wallpaper " + (index + 1) + ", " + modelData.resolution + (have ? ", downloaded" : coming ? ", downloading" : "")
-                Accessible.onPressAction: root.chosen = modelData
+                width: Theme.icon.normal + Theme.spacing.xs
+                height: width
+                radius: width / 2
+                color: "#" + modelData.hex
+                border.width: picked ? Theme.outline.strong : Theme.outline.normal
+                border.color: picked ? Colors.m3primary : Colors.m3outlineVariant
+                scale: picked ? 1.15 : swatchMouse.containsMouse ? 1.08 : 1
+                Behavior on scale {
+                    NumberAnimation { duration: Theme.anim.fast }
+                }
 
-                ClippingRectangle {
-                    id: frame
+                Accessible.role: Accessible.CheckBox
+                Accessible.name: modelData.name
+                Accessible.checked: picked
+                Accessible.onPressAction: toggle()
+                activeFocusOnTab: true
+                Keys.onReturnPressed: toggle()
+                Keys.onEnterPressed: toggle()
+                Keys.onSpacePressed: toggle()
+
+                FocusRing {
+                    radius: swatch.radius
+                }
+
+                MouseArea {
+                    id: swatchMouse
                     anchors.fill: parent
-                    anchors.margins: Theme.spacing.xs
-                    radius: Theme.radius.m
-                    color: Colors.m3surfaceContainerHigh
-
-                    Image {
-                        anchors.fill: parent
-                        source: cell.modelData.thumb
-                        fillMode: Image.PreserveAspectCrop
-                        asynchronous: true
-                        sourceSize.width: width
-                        opacity: status === Image.Ready ? 1 : 0
-                        Behavior on opacity {
-                            NumberAnimation { duration: Theme.anim.fast }
-                        }
-                    }
-
-                    StateLayer {
-                        radius: frame.radius
-                        color: Colors.m3onSurface
-                        hovered: cell.containsMouse
-                    }
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: swatch.toggle()
                 }
 
-                // The keyboard's place in the grid.
-                Rectangle {
-                    anchors.fill: frame
-                    radius: frame.radius
-                    color: "transparent"
-                    visible: cell.GridView.isCurrentItem && grid.activeFocus
-                    border.width: Theme.focus.width
-                    border.color: Colors.m3primary
-                }
-
-                // In your folder already, or on its way.
-                Rectangle {
-                    anchors.right: frame.right
-                    anchors.bottom: frame.bottom
-                    anchors.margins: Theme.spacing.s
-                    width: Theme.icon.normal + Theme.spacing.s
-                    height: width
-                    radius: width / 2
-                    visible: cell.have || cell.coming
-                    color: Colors.m3primaryContainer
-
-                    MaterialIcon {
-                        anchors.centerIn: parent
-                        icon: cell.modelData.path ? "wallpaper" : cell.have ? "check" : "downloading"
-                        color: Colors.m3onPrimaryContainer
-                        font.pixelSize: Theme.icon.small
-                    }
-                }
-            }
-
-            footer: Item {
-                width: grid.width
-                height: Theme.list.rowHeight
-
-                Text {
-                    anchors.centerIn: parent
-                    visible: !more.visible
-                    text: root.mode === "yours" ? (root.yours.length === 0 ? "None yet: find some under Find" : "")
-                        : root.failed ? "wallhaven didn't answer. Try again in a moment."
-                        : root.loading ? "Looking…"
-                        : root.page > 0 && root.pictures.length === 0 ? "Nothing found"
-                        : root.page > 0 && !root.hasMore ? "That's all of them" : ""
-                    color: Colors.m3onSurfaceVariant
-                    font.family: Theme.font.sans
-                    font.pixelSize: Theme.font.normal
-                }
-
-                // Also after a failed page: scrolling to the end again doesn't move atYEnd.
-                TextButton {
-                    id: more
-                    anchors.centerIn: parent
-                    visible: root.mode === "find" && !root.loading && root.page > 0 && root.pictures.length > 0 && root.hasMore
-                    text: root.failed ? "Try again" : "Load more"
-                    onClicked: root.loadMore()
+                Tooltip {
+                    target: swatch
+                    text: swatch.modelData.name
+                    shown: swatchMouse.containsMouse || swatch.activeFocus
                 }
             }
         }
+    }
 
-        // One picture large, with what to do with it. Left and Right step through the results,
-        // Escape goes back to them.
-        Item {
-            id: preview
+    // The pictures found, more as you scroll to the end.
+    GridView {
+        id: grid
 
-            anchors.top: titleBar.bottom
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.margins: Theme.spacing.l
-            anchors.topMargin: 0
-            visible: root.chosen !== null
-            focus: visible
-            onVisibleChanged: if (visible) forceActiveFocus()
+        readonly property int columns: Math.max(2, Math.floor(width / Theme.wallpaper.browserThumb))
 
-            // By path for yours: a rescan makes new entries for the same pictures.
-            readonly property int at: root.chosen === null ? -1
-                : root.shown.findIndex(p => p === root.chosen || (p.path && p.path === root.chosen.path))
-            readonly property bool own: !!root.chosen?.path
-            readonly property bool current: own && (Wallpaper.path === root.chosen.path || Wallpaper.path === root.chosen.darkPath)
-            readonly property bool have: root.chosen !== null && root.owned.includes(root.chosen.file)
-            readonly property bool coming: root.chosen !== null && root.pending.includes(root.chosen.id)
+        anchors.top: colorRow.bottom
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.margins: -Theme.spacing.xs
+        anchors.topMargin: Theme.spacing.m
+        visible: root.chosen === null
+        clip: true
+        boundsBehavior: Flickable.StopAtBounds
+        cellWidth: Math.floor(width / columns)
+        cellHeight: Math.round((cellWidth - Theme.spacing.s) * 9 / 16) + Theme.spacing.s
+        model: root.shown
+        keyNavigationEnabled: true
+        onAtYEndChanged: if (atYEnd && count > 0 && root.mode === "find") root.loadMore()
+        onHeightChanged: Qt.callLater(root.fill)
+        onWidthChanged: Qt.callLater(root.fill) // more columns
 
-            function step(by: int): void {
-                const next = at + by;
-                if (next < 0 || next >= root.shown.length)
-                    return;
-                root.chosen = root.shown[next];
-                grid.currentIndex = next;
-                if (root.mode === "find" && next >= root.pictures.length - 2)
-                    root.loadMore();
-            }
+        Keys.onReturnPressed: if (currentIndex >= 0) root.chosen = root.shown[currentIndex]
+        Keys.onEnterPressed: if (currentIndex >= 0) root.chosen = root.shown[currentIndex]
+        Keys.onSpacePressed: if (currentIndex >= 0) root.chosen = root.shown[currentIndex]
+        Keys.onUpPressed: event => {
+            if (currentIndex < columns)
+                searchField.focusInput();
+            else
+                event.accepted = false;
+        }
 
-            function back(): void {
-                deleteButton.armed = false;
-                root.chosen = null;
-                grid.positionViewAtIndex(grid.currentIndex, GridView.Contain);
-                grid.forceActiveFocus();
-            }
+        Accessible.role: Accessible.List
+        Accessible.name: "Wallpapers found"
 
-            Keys.onEscapePressed: back()
-            Keys.onLeftPressed: step(-1)
-            Keys.onRightPressed: step(1)
-            Keys.onDeletePressed: if (own) deleteButton.press()
-            onAtChanged: deleteButton.armed = false
+        delegate: MouseArea {
+            id: cell
+
+            required property var modelData
+            required property int index
+            // Its check in Find; in Yours, the wallpaper you have now.
+            readonly property bool have: modelData.path ? Wallpaper.path === modelData.path || Wallpaper.path === modelData.darkPath
+                                                        : root.owned.includes(modelData.file)
+            readonly property bool coming: root.pending.includes(modelData.id)
+
+            width: grid.cellWidth
+            height: grid.cellHeight
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.chosen = modelData
+
+            Accessible.role: Accessible.Button
+            Accessible.name: modelData.path ? modelData.file + (have ? ", your wallpaper" : "")
+                : "Wallpaper " + (index + 1) + ", " + modelData.resolution + (have ? ", downloaded" : coming ? ", downloading" : "")
+            Accessible.onPressAction: root.chosen = modelData
 
             ClippingRectangle {
-                id: large
-
-                anchors.top: parent.top
-                anchors.bottom: tagRow.top
-                anchors.bottomMargin: Theme.spacing.m
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: Math.min(parent.width, height * 16 / 9)
-                radius: Theme.radius.l
+                id: frame
+                anchors.fill: parent
+                anchors.margins: Theme.spacing.xs
+                radius: Theme.radius.m
                 color: Colors.m3surfaceContainerHigh
 
-                // The thumbnail at once, the full picture over it when it's in.
                 Image {
                     anchors.fill: parent
-                    source: root.chosen?.thumb ?? ""
+                    source: cell.modelData.thumb
                     fillMode: Image.PreserveAspectCrop
                     asynchronous: true
-                }
-
-                Image {
-                    id: full
-                    anchors.fill: parent
-                    source: root.chosen?.url ?? ""
-                    fillMode: Image.PreserveAspectCrop
-                    asynchronous: true
-                    // Decoded at the size it's shown, not the picture's 4K.
                     sourceSize.width: width
                     opacity: status === Image.Ready ? 1 : 0
                     Behavior on opacity {
@@ -672,131 +500,271 @@ Singleton {
                     }
                 }
 
-                Text {
-                    anchors.left: parent.left
-                    anchors.bottom: parent.bottom
-                    anchors.margins: Theme.spacing.m
-                    visible: full.status === Image.Loading
-                    text: "Loading the full picture… " + Math.round(full.progress * 100) + " %"
-                    color: "white"
-                    style: Text.Outline
-                    styleColor: "#80000000"
-                    font.family: Theme.font.sans
-                    font.pixelSize: Theme.font.small
+                StateLayer {
+                    radius: frame.radius
+                    color: Colors.m3onSurface
+                    hovered: cell.containsMouse
                 }
             }
 
-            // Its tags: click one for more like it.
-            Row {
-                id: tagRow
+            // The keyboard's place in the grid.
+            Rectangle {
+                anchors.fill: frame
+                radius: frame.radius
+                color: "transparent"
+                visible: cell.GridView.isCurrentItem && grid.activeFocus
+                border.width: Theme.focus.width
+                border.color: Colors.m3primary
+            }
 
-                anchors.bottom: actions.top
-                anchors.bottomMargin: Theme.spacing.m
-                anchors.horizontalCenter: parent.horizontalCenter
-                height: Theme.island.height
-                spacing: Theme.spacing.xs
+            // In your folder already, or on its way.
+            Rectangle {
+                anchors.right: frame.right
+                anchors.bottom: frame.bottom
+                anchors.margins: Theme.spacing.s
+                width: Theme.icon.normal + Theme.spacing.s
+                height: width
+                radius: width / 2
+                visible: cell.have || cell.coming
+                color: Colors.m3primaryContainer
 
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    rightPadding: Theme.spacing.s
-                    text: root.chosenTags.length > 0 ? "More like this:" : ""
-                    color: Colors.m3onSurfaceVariant
-                    font.family: Theme.font.sans
-                    font.pixelSize: Theme.font.normal
+                MaterialIcon {
+                    anchors.centerIn: parent
+                    icon: cell.modelData.path ? "wallpaper" : cell.have ? "check" : "downloading"
+                    color: Colors.m3onPrimaryContainer
+                    font.pixelSize: Theme.icon.small
                 }
+            }
+        }
 
-                Repeater {
-                    // As many as fit on one line.
-                    model: root.chosenTags
+        footer: Item {
+            width: grid.width
+            height: Theme.list.rowHeight
 
-                    TextButton {
-                        required property var modelData
-                        required property int index
-                        anchors.verticalCenter: parent.verticalCenter
-                        visible: x + width <= preview.width
-                        text: modelData.name
-                        color: Colors.tint
-                        onClicked: root.moreLike(modelData)
-                        Accessible.name: "More like this: " + modelData.name
-                    }
+            Text {
+                anchors.centerIn: parent
+                visible: !more.visible
+                text: root.mode === "yours" ? (root.yours.length === 0 ? "None yet: find some under Find" : "")
+                    : root.failed ? "wallhaven didn't answer. Try again in a moment."
+                    : root.loading ? "Looking…"
+                    : root.page > 0 && root.pictures.length === 0 ? "Nothing found"
+                    : root.page > 0 && !root.hasMore ? "That's all of them" : ""
+                color: Colors.m3onSurfaceVariant
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.normal
+            }
+
+            // Also after a failed page: scrolling to the end again doesn't move atYEnd.
+            TextButton {
+                id: more
+                anchors.centerIn: parent
+                visible: root.mode === "find" && !root.loading && root.page > 0 && root.pictures.length > 0 && root.hasMore
+                text: root.failed ? "Try again" : "Load more"
+                onClicked: root.loadMore()
+            }
+        }
+    }
+
+    // One picture large, with what to do with it. Left and Right step through the results,
+    // Escape goes back to them.
+    Item {
+        id: preview
+
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        visible: root.chosen !== null
+        focus: visible
+        onVisibleChanged: if (visible) forceActiveFocus()
+
+        // By path for yours: a rescan makes new entries for the same pictures.
+        readonly property int at: root.chosen === null ? -1
+            : root.shown.findIndex(p => p === root.chosen || (p.path && p.path === root.chosen.path))
+        readonly property bool own: !!root.chosen?.path
+        readonly property bool current: own && (Wallpaper.path === root.chosen.path || Wallpaper.path === root.chosen.darkPath)
+        readonly property bool have: root.chosen !== null && root.owned.includes(root.chosen.file)
+        readonly property bool coming: root.chosen !== null && root.pending.includes(root.chosen.id)
+
+        function step(by: int): void {
+            const next = at + by;
+            if (next < 0 || next >= root.shown.length)
+                return;
+            root.chosen = root.shown[next];
+            grid.currentIndex = next;
+            if (root.mode === "find" && next >= root.pictures.length - 2)
+                root.loadMore();
+        }
+
+        function back(): void {
+            deleteButton.armed = false;
+            root.chosen = null;
+            grid.positionViewAtIndex(grid.currentIndex, GridView.Contain);
+            grid.forceActiveFocus();
+        }
+
+        Keys.onEscapePressed: back()
+        Keys.onLeftPressed: step(-1)
+        Keys.onRightPressed: step(1)
+        Keys.onDeletePressed: if (own) deleteButton.press()
+        onAtChanged: deleteButton.armed = false
+
+        ClippingRectangle {
+            id: large
+
+            anchors.top: parent.top
+            anchors.bottom: tagRow.top
+            anchors.bottomMargin: Theme.spacing.m
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: Math.min(parent.width, height * 16 / 9)
+            radius: Theme.radius.l
+            color: Colors.m3surfaceContainerHigh
+
+            // The thumbnail at once, the full picture over it when it's in.
+            Image {
+                anchors.fill: parent
+                source: root.chosen?.thumb ?? ""
+                fillMode: Image.PreserveAspectCrop
+                asynchronous: true
+            }
+
+            Image {
+                id: full
+                anchors.fill: parent
+                source: root.chosen?.url ?? ""
+                fillMode: Image.PreserveAspectCrop
+                asynchronous: true
+                // Decoded at the size it's shown, not the picture's 4K.
+                sourceSize.width: width
+                opacity: status === Image.Ready ? 1 : 0
+                Behavior on opacity {
+                    NumberAnimation { duration: Theme.anim.fast }
                 }
             }
 
-            Item {
-                id: actions
-
+            Text {
+                anchors.left: parent.left
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: Theme.spacing.l
-                width: parent.width
-                height: Theme.island.height
+                anchors.margins: Theme.spacing.m
+                visible: full.status === Image.Loading
+                text: "Loading the full picture… " + Math.round(full.progress * 100) + " %"
+                color: "white"
+                style: Text.Outline
+                styleColor: "#80000000"
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.small
+            }
+        }
+
+        // Its tags: click one for more like it.
+        Row {
+            id: tagRow
+
+            anchors.bottom: actions.top
+            anchors.bottomMargin: Theme.spacing.m
+            anchors.horizontalCenter: parent.horizontalCenter
+            height: Theme.island.height
+            spacing: Theme.spacing.xs
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                rightPadding: Theme.spacing.s
+                text: root.chosenTags.length > 0 ? "More like this:" : ""
+                color: Colors.m3onSurfaceVariant
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.normal
+            }
+
+            Repeater {
+                // As many as fit on one line.
+                model: root.chosenTags
 
                 TextButton {
-                    anchors.left: parent.left
+                    required property var modelData
+                    required property int index
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Back"
-                    onClicked: preview.back()
+                    visible: x + width <= preview.width
+                    text: modelData.name
+                    color: Colors.tint
+                    onClicked: root.moreLike(modelData)
+                    Accessible.name: "More like this: " + modelData.name
+                }
+            }
+        }
+
+        Item {
+            id: actions
+
+            anchors.bottom: parent.bottom
+            width: parent.width
+            height: Theme.island.height
+
+            TextButton {
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                text: "Back"
+                onClicked: preview.back()
+            }
+
+            Text {
+                anchors.centerIn: parent
+                text: (preview.own ? root.chosen.file : root.chosen?.resolution ?? "") + "  ·  " + (preview.at + 1) + " of " + root.shown.length
+                color: Colors.m3onSurfaceVariant
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.normal
+            }
+
+            Row {
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacing.s
+
+                TextButton {
+                    visible: !preview.own
+                    text: preview.have ? "Downloaded" : preview.coming ? "Downloading…" : "Download"
+                    enabled: !preview.have && !preview.coming
+                    onClicked: root.download(root.chosen, false)
                 }
 
-                Text {
-                    anchors.centerIn: parent
-                    text: (preview.own ? root.chosen.file : root.chosen?.resolution ?? "") + "  ·  " + (preview.at + 1) + " of " + root.shown.length
-                    color: Colors.m3onSurfaceVariant
-                    font.family: Theme.font.sans
-                    font.pixelSize: Theme.font.normal
+                // Yours: to the trash, after a second click (or Delete twice) within 4 s.
+                // Not the wallpaper you have now: pick another first.
+                TextButton {
+                    id: deleteButton
+
+                    property bool armed: false
+
+                    function press(): void {
+                        if (!enabled)
+                            return;
+                        if (!armed) {
+                            armed = true;
+                            disarm.restart();
+                            return;
+                        }
+                        armed = false;
+                        root.trash(root.chosen);
+                    }
+
+                    visible: preview.own
+                    enabled: !preview.current && !trashing.running
+                    text: preview.current ? "Your wallpaper now" : armed ? "Delete? Click again" : "Delete"
+                    color: armed ? Colors.m3errorContainer : "transparent"
+                    onClicked: press()
+
+                    Timer {
+                        id: disarm
+                        interval: 4000
+                        onTriggered: deleteButton.armed = false
+                    }
                 }
 
-                Row {
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.spacing.s
-
-                    TextButton {
-                        visible: !preview.own
-                        text: preview.have ? "Downloaded" : preview.coming ? "Downloading…" : "Download"
-                        enabled: !preview.have && !preview.coming
-                        onClicked: root.download(root.chosen, false)
-                    }
-
-                    // Yours: to the trash, after a second click (or Delete twice) within 4 s.
-                    // Not the wallpaper you have now: pick another first.
-                    TextButton {
-                        id: deleteButton
-
-                        property bool armed: false
-
-                        function press(): void {
-                            if (!enabled)
-                                return;
-                            if (!armed) {
-                                armed = true;
-                                disarm.restart();
-                                return;
-                            }
-                            armed = false;
-                            root.trash(root.chosen);
-                        }
-
-                        visible: preview.own
-                        enabled: !preview.current && !trashing.running
-                        text: preview.current ? "Your wallpaper now" : armed ? "Delete? Click again" : "Delete"
-                        color: armed ? Colors.m3errorContainer : "transparent"
-                        onClicked: press()
-
-                        Timer {
-                            id: disarm
-                            interval: 4000
-                            onTriggered: deleteButton.armed = false
-                        }
-                    }
-
-                    TextButton {
-                        readonly property bool isCurrent: preview.own ? preview.current
-                            : Wallpaper.path === Wallpaper.folder + "/" + (root.chosen?.file ?? "")
-                        text: isCurrent ? "Your wallpaper" : "Set as wallpaper"
-                        filled: true
-                        enabled: !isCurrent
-                        onClicked: preview.own ? Wallpaper.set(root.chosen.path) : root.download(root.chosen, true)
-                    }
+                TextButton {
+                    readonly property bool isCurrent: preview.own ? preview.current
+                        : Wallpaper.path === Wallpaper.folder + "/" + (root.chosen?.file ?? "")
+                    text: isCurrent ? "Your wallpaper" : "Set as wallpaper"
+                    filled: true
+                    enabled: !isCurrent
+                    onClicked: preview.own ? Wallpaper.set(root.chosen.path) : root.download(root.chosen, true)
                 }
             }
         }

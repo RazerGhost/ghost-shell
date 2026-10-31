@@ -78,7 +78,7 @@ Singleton {
         }
     }
 
-    // Gaps changed in the settings window: read them again once Hyprland has reloaded.
+    // Gaps changed in Settings: read them again once Hyprland has reloaded.
     Connections {
         target: Settings.values
 

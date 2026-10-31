@@ -1,6 +1,6 @@
 // Starting apps from their .desktop entries, shared by the launcher, the dock and the keybinds
 // (through the "apps" IPC target in launcher/Launcher.qml). The default terminal, browser and
-// file manager are chosen in the settings window. Every app runs in its own systemd scope
+// file manager are chosen in Settings. Every app runs in its own systemd scope
 // (`run`), so when memory runs out systemd-oomd closes that app, not the whole session.
 pragma Singleton
 

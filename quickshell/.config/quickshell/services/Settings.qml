@@ -1,4 +1,4 @@
-// The user's settings (the settings window changes them), saved in
+// The user's settings (Settings changes them), saved in
 // ~/.local/state/quickshell/settings.json: outside the shell directory, since a change there
 // would reload the shell. Read them as Settings.values.<name>; assigning one saves the file.
 pragma Singleton
@@ -221,6 +221,9 @@ Singleton {
             // The music app last heard (its desktop entry id), which the media widget offers to
             // open while nothing plays (services/Media.qml).
             property string lastMediaApp: ""
+            // The launcher's Settings and Wallpapers pages: "compact", "large" or "full"
+            // (services/LauncherState.qml).
+            property string launcherPanelSize: "large"
             // The grid widgets line up with when dropped (desktop/DesktopWidgets.js), and its
             // spacing in px at 100 %.
             property bool desktopGrid: false

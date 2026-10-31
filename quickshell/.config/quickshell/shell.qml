@@ -67,27 +67,25 @@ ShellRoot {
         }
     }
 
-    // Here because the settings window is a singleton, which only exists once something uses it.
+    // Settings and Wallpapers are pages of the launcher (LauncherState).
     IpcHandler {
         target: "settings"
 
         function open(): void {
-            SettingsWindow.open = true;
+            LauncherState.showSettings("");
         }
 
-        // A page by its id ("lock", "appearance", ...; SettingsWindow's list).
+        // A page by its id ("lock", "appearance", ...; settings/SettingsPages.js).
         function page(name: string): void {
-            SettingsWindow.page = name;
-            SettingsWindow.open = true;
+            LauncherState.showSettings(name);
         }
     }
 
-    // The Wallpapers window, a singleton like the settings window.
     IpcHandler {
         target: "wallpapers"
 
         function browse(): void {
-            WallpaperBrowser.open = true;
+            LauncherState.show("wallpapers");
         }
     }
 }

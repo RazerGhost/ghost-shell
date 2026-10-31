@@ -6,7 +6,7 @@
 -- shell isn't running).
 local fallbackLock = "hyprlock -c /usr/share/hypr/hyprlock.conf"
 
--- The terminal, browser and file manager are chosen in Quickshell's settings window, so these
+-- The terminal, browser and file manager are chosen in Quickshell's Settings, so these
 -- binds ask the shell to open them. If the shell isn't running (qs ipc fails), they fall back to
 -- these, so there's always a way to get a terminal.
 local function app(kind, fallback)

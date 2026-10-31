@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell
 import qs.services
 import qs.theme
-import qs.wallpaper
 import qs.widgets
 import "../theme/ThemeScale.js" as ThemeScale
 
@@ -65,7 +64,7 @@ Column {
 
             TextButton {
                 text: "Find wallpapers"
-                onClicked: WallpaperBrowser.open = true
+                onClicked: LauncherState.show("wallpapers")
             }
         }
 

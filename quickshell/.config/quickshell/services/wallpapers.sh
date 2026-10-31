@@ -2,7 +2,7 @@
 # Every picture the wallpaper picker offers, one path per line (grouped and paired by
 # services/Wallpapers.js): the ones in your folder ($1, from Settings). Not the system's
 # collections (Hyprland's, CachyOS's, nwg-shell's; user's choice 2026-10-30: they weren't the art
-# they want); the Wallpapers window finds more. JPEG XL, AVIF and HEIC only when Qt can show them
+# they want); the launcher's Wallpapers page finds more. JPEG XL, AVIF and HEIC only when Qt can show them
 # (kimageformats). Videos (live wallpapers) come as "<video><tab><thumbnail>": a frame made once
 # with ffmpeg into ~/.cache/quickshell/wallpaper-thumbs, for the picker.
 formats='png|jpe?g|webp'

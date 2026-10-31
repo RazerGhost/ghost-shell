@@ -23,7 +23,7 @@ if not ok then
     print("hyprland.lua: colors.lua not loaded, using fallback colors (" .. tostring(err) .. ")")
 end
 
--- shell-settings.lua is written by Quickshell's settings window (keyboard, touchpad, gaps,
+-- shell-settings.lua is written by Quickshell's Settings (keyboard, touchpad, gaps,
 -- borders, corners) and isn't in git. Last, so it overrides input.lua and look.lua.
 ok, err = pcall(require, "shell-settings")
 if not ok then

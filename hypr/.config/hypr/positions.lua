@@ -64,7 +64,7 @@ load_positions()
 -- window, and would take or overwrite its place.
 local skipped_titles = { ["Animation sample"] = true, ["Example window"] = true, ["Another window"] = true }
 
--- The settings window can turn this off (ShellSettings comes from shell-settings.lua).
+-- Settings can turn this off (ShellSettings comes from shell-settings.lua).
 local function enabled()
     return not (ShellSettings and ShellSettings.remember_positions == false)
 end

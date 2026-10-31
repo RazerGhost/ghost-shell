@@ -34,7 +34,7 @@ Singleton {
     property bool pickerOpen: false
 
     // Every picture to choose from, as { filePath, fileName, darkPath, own }: the ones in your
-    // folder (the system's collections aren't offered; the Wallpapers window finds more). Found
+    // folder (the system's collections aren't offered; the launcher's Wallpapers page finds more). Found
     // by services/wallpapers.sh and grouped by Wallpapers.js (tested): a Plasma picture at your
     // screen's size, dark versions paired with their light ones.
     property var pictures: []

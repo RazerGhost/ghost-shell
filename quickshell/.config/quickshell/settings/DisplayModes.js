@@ -1,4 +1,4 @@
-// The settings window's Display page: a screen's modes from Hyprland (`hyprctl monitors -j`), its
+// Settings' Display page: a screen's modes from Hyprland (`hyprctl monitors -j`), its
 // current setup, and the Lua that sets it (`hl.monitor`), used both to try a change live and in
 // the generated shell-settings.lua (HyprlandConfig.js). Plain JavaScript, so it can be tested on
 // its own (tests/tst_displaymodes.qml).

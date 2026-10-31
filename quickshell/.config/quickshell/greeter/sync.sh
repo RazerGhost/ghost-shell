@@ -44,7 +44,7 @@ else
     rm -f "$shared/face"
 fi
 
-# The keyboard layout and touchpad settings (written by the shell's settings window); the login
+# The keyboard layout and touchpad settings (written by the shell's Settings); the login
 # screen's Hyprland loads this copy (system/etc/greetd/hypr/hyprland.lua). Without game mode's
 # block (settings/HyprlandConfig.js): logging out with game mode on mustn't leave the login
 # screen without animations; nor the windows editor's rule at the end (HyprlandRuntime.qml).

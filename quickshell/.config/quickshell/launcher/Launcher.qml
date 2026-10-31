@@ -6,21 +6,27 @@ import Quickshell.Wayland
 import qs.services
 import qs.theme
 import qs.widgets
+import qs.settings
+import qs.wallpaper
 import "Fuzzy.js" as Fuzzy
 import "../settings/Keybinds.js" as Keybinds
+import "../settings/SettingsPages.js" as SettingsPages
 
 // App launcher: type to fuzzy-search installed apps and open windows, arrow keys to pick, Enter
 // to launch or switch, Escape or a click outside to close. "/ name" searches files in the home
 // folder (fd) and "> command" runs a command in the terminal (Fuzzy.mode, tested). Toggled with
 // `qs ipc call launcher toggle` (tap Super or Super+Space).
+// Settings and Wallpapers grow out of it (user's choice, 2026-10-31, instead of windows of
+// their own): found by the search, or opened straight on them (Super+I, LauncherState), the card
+// turns into the page at one of three sizes (compact, large, the whole screen; the buttons in its
+// header or Ctrl+Up / Ctrl+Down). With nothing typed, the customize tiles sit above the apps
+// (Super+U opens it with them selected; it was a menu of its own).
 Scope {
     id: root
 
     // The shell's own entries, found like your commands: the on-screen editors (customize/) and
     // the Wallpapers window.
     readonly property var shellCommands: [
-        { name: "Customize", command: "qs ipc call customize menu",
-          icon: "preferences-desktop", subtitle: "Pick what to customize (Super + U)" },
         { name: "Edit quick settings", command: "qs ipc call island editQuickSettings",
           icon: "preferences-system", subtitle: "Your tiles and buttons, in your order" },
         { name: "Customize the lock screen", command: "qs ipc call customize lock",
@@ -31,17 +37,51 @@ Scope {
           icon: "preferences-desktop-theme", subtitle: "The dock, workspace dots, clock and status icons, in place" },
         { name: "Customize the windows", command: "qs ipc call customize windows",
           icon: "preferences-system-windows", subtitle: "Borders, corners, gaps and animations, on your windows" },
-        { name: "Wallpapers", command: "qs ipc call wallpapers browse",
-          icon: "preferences-desktop-wallpaper", subtitle: "Find anime art on wallhaven.cc and download it" }
+        { name: "Wallpapers", page: "wallpapers",
+          icon: "preferences-desktop-wallpaper", subtitle: "Find anime art on wallhaven.cc and download it" },
+        { name: "Settings", page: "settings",
+          icon: "preferences-system", subtitle: "Every setting, by page (Super + I)" }
     ]
 
-    property bool open: false
+    readonly property bool open: LauncherState.open
+    readonly property string page: LauncherState.page
+
+    // The customize tiles (Super+U), with nothing typed.
+    readonly property var customizeTiles: [
+        { id: "lock", icon: "lock", title: "Lock screen", run: ["qs", "ipc", "call", "customize", "lock"] },
+        { id: "desktop", icon: "wallpaper", title: "Desktop", run: ["qs", "ipc", "call", "customize", "desktop"] },
+        { id: "dock", icon: "dock_to_bottom", title: "Dock and island", run: ["qs", "ipc", "call", "customize", "dock"] },
+        { id: "windows", icon: "select_window", title: "Windows", run: ["qs", "ipc", "call", "customize", "windows"] },
+        { id: "quick", icon: "tune", title: "Quick settings", run: ["qs", "ipc", "call", "customize", "quick"] }
+    ]
+
+    function customize(tile: var): void {
+        LauncherState.open = false;
+        Quickshell.execDetached(tile.run);
+    }
+
+    // Back from a page: Settings' compact page to its list first, then to the search.
+    function back(): void {
+        if (page === "settings" && settingsLoader.item?.back())
+            return;
+        LauncherState.page = "";
+        Qt.callLater(() => search.focusInput());
+    }
 
     // A result: an app or one of its shortcuts ({ entry, action }; action null for the app), a
     // window ({ window }), a file ({ file }), a command to run ({ command }), a web search
     // ({ web }: DuckDuckGo in the default browser), a color ({ color }: copied) or a keybind
     // ({ keybind }: just shown).
     function launch(result: var): void {
+        // A page of its own (Settings, Wallpapers): the card turns into it.
+        if (result.setting) {
+            LauncherState.showSettings(result.setting.id);
+            return;
+        }
+        if (result.custom?.page) {
+            LauncherState.show(result.custom.page);
+            return;
+        }
         if (result.web !== undefined)
             Apps.openPath("https://duckduckgo.com/?q=" + encodeURIComponent(result.web));
         else if (result.color)
@@ -62,7 +102,7 @@ Scope {
             Apps.launchAction(result.action, result.entry);
         else
             Apps.launch(result.entry);
-        open = false;
+        LauncherState.open = false;
     }
 
     function appResults(text: string): var {
@@ -71,7 +111,9 @@ Scope {
                                     open && text.trim() !== "" ? windowList() : [],
                                     { favorites: Settings.values.launcherFavorites, hidden: Settings.values.launcherHidden,
                                       commands: Settings.values.launcherCommands.concat(root.shellCommands) });
-        return (color ? [{ color: color }] : []).concat(found, text.trim() !== "" ? [{ web: text.trim() }] : []);
+        // Settings' pages that have it, after the apps (from two letters: one finds them all).
+        const settings = text.trim().length >= 2 ? SettingsPages.matching(text).slice(0, 3).map(p => ({ setting: p })) : [];
+        return (color ? [{ color: color }] : []).concat(found, settings, text.trim() !== "" ? [{ web: text.trim() }] : []);
     }
 
     // The keybinds for "? ...": read from Hyprland once per opening, when "?" is typed.
@@ -105,7 +147,7 @@ Scope {
         target: "launcher"
 
         function toggle(): void {
-            root.open = !root.open;
+            LauncherState.toggle();
         }
     }
 
@@ -124,17 +166,30 @@ Scope {
         }
     }
 
+    // The launcher steps aside for what it opened: a window taking the focus (an app, a folder from
+    // Settings), an on-screen editor (Customize.qml closes it).
+    Connections {
+        target: Hyprland
+
+        function onActiveToplevelChanged(): void {
+            if (root.open)
+                LauncherState.open = false;
+        }
+    }
+
     PanelWindow {
         id: window
 
         screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? null
         visible: root.open
 
-        // No anchors: the compositor centers the surface on the screen.
-        implicitWidth: Theme.launcher.width
-        implicitHeight: panel.implicitHeight
+        // The whole screen, see-through; only the card takes input (`mask`), so a click beside it
+        // reaches what's under it and closes the launcher (the focus grab). Fixed at the screen's
+        // size so the card can grow and shrink smoothly inside it.
+        anchors { top: true; bottom: true; left: true; right: true }
         exclusionMode: ExclusionMode.Ignore
         color: "transparent"
+        mask: Region { item: panel }
 
         WlrLayershell.namespace: "qs-launcher"
 
@@ -149,30 +204,85 @@ Scope {
         HyprlandFocusGrab {
             windows: [window]
             active: window.visible
-            onCleared: root.open = false
+            onCleared: LauncherState.open = false
         }
 
-        // Start fresh every time it opens.
+        // The search starts fresh every time it opens; a page keeps its place.
         onVisibleChanged: {
-            if (visible) {
-                search.text = "";
-                search.focusInput();
+            if (!visible)
+                return;
+            search.text = "";
+            if (root.page === "")
+                Qt.callLater(root.customizeFocus);
+            else if (root.page === "settings")
+                Qt.callLater(() => settingsLoader.item?.focusSearch());
+        }
+
+        Connections {
+            target: LauncherState
+
+            function onPageChanged(): void {
+                if (!window.visible)
+                    return;
+                if (LauncherState.page === "settings")
+                    Qt.callLater(() => settingsLoader.item?.focusSearch());
+                else if (LauncherState.page === "")
+                    Qt.callLater(() => search.focusInput());
+            }
+
+            function onCustomizeChanged(): void {
+                if (window.visible)
+                    Qt.callLater(root.customizeFocus);
             }
         }
+
+        // The card: the search bar's size, or a page's at LauncherState.size, centered (full:
+        // the screen below the island).
+        readonly property int gap: Theme.spacing.l
+        readonly property size pageSize: LauncherState.size === "compact"
+            ? Qt.size(Math.max(Theme.launcher.width, Theme.wallpaper.browserThumb * 2), Math.min(height - gap * 2, Theme.launcher.pageHeight))
+            : LauncherState.size === "large"
+            ? Qt.size(Math.min(width - gap * 2, Theme.launcher.pageWidth), Math.min(height - gap * 2, Theme.launcher.pageHeight))
+            : Qt.size(width - gap * 2, height - Theme.island.height - gap * 2)
 
         Surface {
             id: panel
 
-            width: parent.width
-            implicitHeight: column.implicitHeight + Theme.spacing.m * 2
+            readonly property bool paged: root.page !== ""
+            width: paged ? window.pageSize.width : Theme.launcher.width
+            height: paged ? window.pageSize.height : column.implicitHeight + Theme.spacing.m * 2
+            x: (window.width - width) / 2
+            y: paged && LauncherState.size === "full" ? Theme.island.height + window.gap : (window.height - height) / 2
             radius: Theme.radius.m * 2
+            clip: true
 
+            Behavior on width { enabled: window.visible; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+            Behavior on height { enabled: window.visible; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+            Behavior on y { enabled: window.visible; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+
+            // Escape: back from a page (Settings' compact page to its list first), else close.
+            // Ctrl+Up / Ctrl+Down: a page's size. Keys the controls don't use come here.
+            Keys.onPressed: event => {
+                if (event.key === Qt.Key_Escape) {
+                    if (root.page !== "")
+                        root.back();
+                    else
+                        LauncherState.open = false;
+                    event.accepted = true;
+                } else if (root.page !== "" && (event.modifiers & Qt.ControlModifier)
+                           && (event.key === Qt.Key_Up || event.key === Qt.Key_Down)) {
+                    LauncherState.resize(event.key === Qt.Key_Up ? 1 : -1);
+                    event.accepted = true;
+                }
+            }
             Column {
                 id: column
 
-                anchors.fill: parent
-                anchors.margins: Theme.spacing.m
+                x: Theme.spacing.m
+                y: Theme.spacing.m
+                width: Theme.launcher.width - Theme.spacing.m * 2
                 spacing: Theme.spacing.s
+                visible: !panel.paged
 
                 SearchField {
                     id: search
@@ -198,19 +308,24 @@ Scope {
                     onKeyPressed: event => {
                         switch (event.key) {
                         case Qt.Key_Escape:
-                            root.open = false;
+                            LauncherState.open = false;
+                            break;
+                        case Qt.Key_Up:
+                            // From the top of the list to the customize tiles.
+                            if (list.currentIndex <= 0 && !calc.selected && tiles.visible) {
+                                tiles.itemAt(0)?.forceActiveFocus(Qt.TabFocusReason);
+                                break;
+                            }
+                            if (list.currentIndex === 0 && calc.answer !== "")
+                                calc.selected = true;
+                            else
+                                list.decrementCurrentIndex();
                             break;
                         case Qt.Key_Down:
                             if (calc.selected)
                                 calc.selected = false;
                             else
                                 list.incrementCurrentIndex();
-                            break;
-                        case Qt.Key_Up:
-                            if (list.currentIndex === 0 && calc.answer !== "")
-                                calc.selected = true;
-                            else
-                                list.decrementCurrentIndex();
                             break;
                         case Qt.Key_Return:
                         case Qt.Key_Enter:
@@ -226,11 +341,101 @@ Scope {
                     }
                 }
 
+                // What to customize (Super+U; the menu it replaced): the on-screen editors and quick
+                // settings' edit mode, with nothing typed. Left / Right between them, Down back to
+                // the search; typing goes to the search.
+                Row {
+                    id: tileRow
+                    visible: search.text === ""
+                    width: parent.width
+                    spacing: Theme.spacing.s
+
+                    Accessible.role: Accessible.Grouping
+                    Accessible.name: "Customize"
+
+                    Repeater {
+                        id: tiles
+                        model: root.customizeTiles
+
+                        Rectangle {
+                            id: tile
+
+                            required property var modelData
+                            required property int index
+                            readonly property bool lit: activeFocus || tileMouse.containsMouse
+
+                            width: (tileRow.width - tileRow.spacing * (tiles.count - 1)) / Math.max(tiles.count, 1)
+                            height: tileColumn.implicitHeight + Theme.spacing.m * 2
+                            radius: Theme.radius.l
+                            color: lit ? Colors.m3primaryContainer : Colors.tint
+                            Behavior on color { ColorAnimation { duration: Theme.anim.fast } }
+
+                            Accessible.role: Accessible.Button
+                            Accessible.name: "Customize: " + modelData.title
+                            Accessible.onPressAction: root.customize(modelData)
+                            activeFocusOnTab: true
+                            Keys.onReturnPressed: root.customize(modelData)
+                            Keys.onEnterPressed: root.customize(modelData)
+                            Keys.onSpacePressed: root.customize(modelData)
+                            Keys.onLeftPressed: tiles.itemAt(Math.max(0, index - 1))?.forceActiveFocus(Qt.TabFocusReason)
+                            Keys.onRightPressed: tiles.itemAt(Math.min(tiles.count - 1, index + 1))?.forceActiveFocus(Qt.TabFocusReason)
+                            Keys.onDownPressed: search.focusInput()
+                            Keys.onPressed: event => {
+                                // Typing: into the search, which hides the tiles.
+                                if (event.text !== "" && event.text.trim() !== "" && !(event.modifiers & (Qt.ControlModifier | Qt.AltModifier))) {
+                                    search.text += event.text;
+                                    search.focusInput();
+                                    event.accepted = true;
+                                }
+                            }
+
+                            MouseArea {
+                                id: tileMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.customize(tile.modelData)
+                            }
+
+                            FocusRing {
+                                radius: tile.radius
+                            }
+
+                            Column {
+                                id: tileColumn
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.top: parent.top
+                                anchors.margins: Theme.spacing.m
+                                spacing: Theme.spacing.xs
+
+                                MaterialIcon {
+                                    icon: tile.modelData.icon
+                                    color: tile.lit ? Colors.m3onPrimaryContainer : Colors.m3onSurface
+                                    font.pixelSize: Theme.icon.normal * 1.2
+                                }
+
+                                Text {
+                                    width: parent.width
+                                    text: tile.modelData.title
+                                    color: tile.lit ? Colors.m3onPrimaryContainer : Colors.m3onSurface
+                                    font.family: Theme.font.sans
+                                    font.pixelSize: Theme.font.small
+                                    font.weight: Font.DemiBold
+                                    wrapMode: Text.Wrap
+                                    maximumLineCount: 2
+                                    elide: Text.ElideRight
+                                }
+                            }
+                        }
+                    }
+                }
+
                 CalcRow {
                     id: calc
                     width: parent.width
                     current: search.text
-                    onCopied: root.open = false
+                    onCopied: LauncherState.open = false
                 }
 
                 FileSearch {
@@ -287,6 +492,110 @@ Scope {
                     font.pixelSize: Theme.font.normal
                 }
             }
+
+            // A page: Back, its name, the size buttons, and the page.
+            Item {
+                id: pageArea
+
+                anchors.fill: parent
+                anchors.margins: Theme.spacing.m
+                visible: panel.paged
+
+                Item {
+                    id: pageHeader
+
+                    width: parent.width
+                    height: Theme.island.height
+
+                    IconButton {
+                        id: backButton
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+                        icon: "arrow_back"
+                        label: "Back"
+                        onClicked: root.back()
+                    }
+
+                    Text {
+                        anchors.left: backButton.right
+                        anchors.leftMargin: Theme.spacing.s
+                        anchors.right: pageButtons.left
+                        anchors.rightMargin: Theme.spacing.s
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: root.page === "settings"
+                              ? "Settings" + (settingsLoader.item?.showsPage ? "  ·  " + (SettingsPages.find(LauncherState.settingsPage)?.title ?? "") : "")
+                              : "Wallpapers"
+                        color: Colors.m3onSurface
+                        font.family: Theme.font.sans
+                        font.pixelSize: Theme.font.title
+                        font.weight: Font.DemiBold
+                        elide: Text.ElideRight
+                        Accessible.role: Accessible.Heading
+                        Accessible.name: text
+                    }
+
+                    Row {
+                        id: pageButtons
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacing.xs
+
+                        IconButton {
+                            icon: "close_fullscreen"
+                            label: "Smaller (Ctrl + Down)"
+                            enabled: LauncherState.size !== "compact"
+                            opacity: enabled ? 1 : Theme.state.disabled
+                            onClicked: LauncherState.resize(-1)
+                        }
+
+                        IconButton {
+                            icon: "open_in_full"
+                            label: "Larger (Ctrl + Up)"
+                            enabled: LauncherState.size !== "full"
+                            opacity: enabled ? 1 : Theme.state.disabled
+                            onClicked: LauncherState.resize(1)
+                        }
+
+                        IconButton {
+                            icon: "close"
+                            label: "Close"
+                            onClicked: LauncherState.open = false
+                        }
+                    }
+                }
+
+                Item {
+                    anchors.top: pageHeader.bottom
+                    anchors.topMargin: Theme.spacing.m
+                    anchors.bottom: parent.bottom
+                    width: parent.width
+
+                    // Built while it's the page (its pages are built as they're chosen).
+                    Loader {
+                        id: settingsLoader
+                        anchors.fill: parent
+                        active: root.page === "settings"
+                        sourceComponent: SettingsView {
+                            compact: LauncherState.size === "compact"
+                        }
+                    }
+
+                    // Kept for as long as the shell runs: its results and downloads stay.
+                    WallpaperBrowser {
+                        anchors.fill: parent
+                        visible: root.page === "wallpapers"
+                        active: visible && window.visible
+                    }
+                }
+            }
         }
+    }
+
+    // Super+U: the customize tiles have the keyboard.
+    function customizeFocus(): void {
+        if (LauncherState.customize && root.page === "")
+            tiles.itemAt(0)?.forceActiveFocus(Qt.TabFocusReason);
+        else
+            search.focusInput();
     }
 }

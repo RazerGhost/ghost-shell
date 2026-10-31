@@ -5,9 +5,9 @@ import qs.services
 import "LooksFile.js" as LooksFile
 
 // The on-screen editors (user's choice over pickers inside Settings: Android's customization
-// with iOS's and macOS's way of editing on the screen itself). Opened from the customize menu
-// (Super+U, CustomizeMenu.qml), Settings and the launcher:
-// `qs ipc call customize menu|lock|desktop|dock|windows`; `close` closes an open one, keeping its
+// with iOS's and macOS's way of editing on the screen itself). Opened from the launcher's
+// customize tiles (Super+U), Settings and the launcher's search:
+// `qs ipc call customize menu|lock|desktop|dock|windows|quick`; `close` closes an open one, keeping its
 // changes.
 Scope {
     id: root
@@ -28,19 +28,6 @@ Scope {
         id: windowsEditor
     }
 
-    CustomizeMenu {
-        id: menu
-        onPicked: id => {
-            if (id !== "quick") {
-                root.only(({ lock: lockEditor, desktop: desktopEditor, dock: dockIslandEditor, windows: windowsEditor })[id]);
-                return;
-            }
-            // Quick settings is the island's: no editor in front of it.
-            root.closeAll();
-            Quickshell.execDetached(["qs", "ipc", "call", "island", "editQuickSettings"]);
-        }
-    }
-
     function closeAll(): void {
         lockEditor.close();
         desktopEditor.close();
@@ -51,6 +38,7 @@ Scope {
     // One editor at a time: they share Editing (the trip to an empty workspace, the card), so
     // opening one closes any other, keeping its changes.
     function only(editor: var): void {
+        LauncherState.open = false; // a Customize button in Settings, or a tile, opened it
         for (const other of [lockEditor, desktopEditor, dockIslandEditor, windowsEditor])
             if (other !== editor)
                 other.close();
@@ -113,8 +101,15 @@ Scope {
         }
 
         // Super+U: open, or close again.
+        // The customize tiles in the launcher (Super+U; they were a menu of their own).
         function menu(): void {
-            menu.toggle();
+            LauncherState.showCustomize();
+        }
+
+        // Quick settings in its edit mode: no editor in front of it.
+        function quick(): void {
+            root.closeAll();
+            Quickshell.execDetached(["qs", "ipc", "call", "island", "editQuickSettings"]);
         }
 
         function lock(): void {

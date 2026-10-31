@@ -1572,6 +1572,34 @@ onto the screen as one. Also there: the Size tile's size choices ran into the ne
 `Segmented.maxWidth` shrinks its segments and their labels to fit (measured with FontMetrics;
 reading its own width made a binding loop).
 
+### Settings, Wallpapers and Customize grow out of the launcher (built 2026-10-31)
+User's request: not separate windows and a separate menu, but integrated with the search bar,
+at different sizes, still able to go full screen (user's picks: grow out of the launcher, three
+sizes, the customize tiles under the empty search, the old windows replaced).
+- The launcher (`launcher/Launcher.qml`) is one see-through surface over the whole screen that
+  takes input only on its card (`mask`), so the card can grow smoothly between the search bar
+  and a page. Its state is `services/LauncherState.qml` (open, page, Settings' page, the
+  customize focus; kept across reloads), which the rest of the shell uses to open it.
+- Pages: Settings (`settings/SettingsView.qml`, was SettingsWindow; the page list and its search
+  in `SettingsPages.js`, tested) and Wallpapers (`wallpaper/WallpaperBrowser.qml`, now a plain
+  item the launcher keeps for as long as the shell runs, so results and downloads survive
+  closing it). The header has Back, the page's name, smaller / larger and close. Sizes
+  (`launcherPanelSize`, remembered): compact (the search bar's width: Settings shows its list,
+  then a page on its own; Back returns to the list), large (1040 x 680 at 100 %, a sidebar beside
+  the page) and full (the screen below the island). Ctrl+Up / Ctrl+Down too; Escape goes back,
+  then closes.
+- The search finds Settings' pages (up to three, after the apps, from two letters) and has
+  "Settings" and "Wallpapers" entries. Super+I, quick settings' gear, `qs ipc call settings
+  open|page <id>` and `wallpapers browse` open the launcher on them.
+- Customize: with nothing typed, five tiles above the apps (lock screen, desktop, dock and
+  island, windows, quick settings); Up from the top of the list or Super+U (`customize menu`)
+  gives them the keyboard, Left / Right move, Enter opens, typing goes to the search; Super+U
+  again closes. `customize quick` closes an open editor before quick settings' edit mode. The
+  menu (`CustomizeMenu.qml`), `WindowTitleBar` and `WindowButton` are gone.
+- It steps aside when a window takes the focus (an app or folder opened from it) and when an
+  editor opens. Checked on screen: the tiles, Settings large and compact, Wallpapers large and
+  full.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

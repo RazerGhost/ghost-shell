@@ -135,7 +135,7 @@ Column {
                 text: "Find more"
                 onClicked: {
                     Wallpaper.pickerOpen = false;
-                    WallpaperBrowser.open = true;
+                    LauncherState.show("wallpapers");
                 }
             }
 

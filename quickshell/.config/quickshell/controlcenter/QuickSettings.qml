@@ -629,7 +629,7 @@ Item {
                     icon: "settings"
                     label: "Settings"
                     onClicked: {
-                        SettingsWindow.open = true;
+                        LauncherState.showSettings("");
                         root.openMenu("");
                     }
                 }

@@ -8,7 +8,6 @@ import qs.desktop
 import qs.services
 import qs.settings
 import qs.theme
-import qs.wallpaper
 import qs.widgets
 import "../services/ColorScheme.js" as ColorSchemeJs
 import "../settings/HyprlandConfig.js" as HyprlandConfig
@@ -495,9 +494,9 @@ Scope {
                         }
                     }
 
-                    // More art: the Wallpapers window (wallpaper/WallpaperBrowser.qml; user's choice: its
-                    // own window, not this tile). Windows show under the editor, so it finishes
-                    // first, keeping your changes, like Done.
+                    // More art: the launcher's Wallpapers page (wallpaper/WallpaperBrowser.qml). It
+                    // shows under the editor, so the editor finishes first, keeping your changes,
+                    // like Done.
                     SheetTile {
                         title: "More art"
                         subtitle: "Find pictures on wallhaven.cc"
@@ -509,7 +508,7 @@ Scope {
                             filled: true
                             onClicked: {
                                 root.close();
-                                WallpaperBrowser.open = true;
+                                LauncherState.show("wallpapers");
                             }
                         }
                     }

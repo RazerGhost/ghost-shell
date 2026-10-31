@@ -1,6 +1,6 @@
 // Night light through hyprsunset: warmer colors to go easy on the eyes in the evening.
 //
-// The quick settings tile turns it on and off; with a schedule (settings window) it also turns
+// The quick settings tile turns it on and off; with a schedule (Settings) it also turns
 // on at the start time and off at the end time. Toggling in between lasts until the next of
 // those. hyprsunset can't report whether it's on (only the last temperature it was given), so
 // the state lives here, and the shell sets hyprsunset to match when it starts.

@@ -1,4 +1,4 @@
-// wallhaven.cc's public search API (no account), for the Wallpapers window
+// wallhaven.cc's public search API (no account), for the launcher's Wallpapers page
 // (wallpaper/WallpaperBrowser.qml) and `ghost wallpapers` (modules/core/wallpapers.sh, through
 // js_with). Plain JavaScript, so it can be tested on its own (tests/tst_wallhaven.qml).
 // Only ever safe for work: the search asks for it, and every result is checked again.

@@ -114,7 +114,7 @@ const ownWallpaperLua = [
 // is on and whether a wallpaper is chosen.
 function lua(v, gameMode, wallpaperChosen) {
     return [
-        "-- Written by Quickshell's settings window (settings/HyprlandSettings.qml); don't edit:",
+        "-- Written by Quickshell's Settings (settings/HyprlandSettings.qml); don't edit:",
         "-- it's overwritten. Loaded last by hyprland.lua, so it overrides input.lua and look.lua.",
         "hl.config({",
         "    input = {",

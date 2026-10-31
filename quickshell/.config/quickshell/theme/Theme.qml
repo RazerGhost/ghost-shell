@@ -255,9 +255,7 @@ Singleton {
 
     readonly property QtObject wallpaper: QtObject {
         readonly property int thumbHeight: root.px(120) // thumbnails in the picker (16:9)
-        readonly property int browserWidth: root.px(1040)  // the Wallpapers window when it opens
-        readonly property int browserHeight: root.px(680)
-        readonly property int browserThumb: root.px(240)   // its pictures' smallest width (16:9)
+        readonly property int browserThumb: root.px(240)   // the Wallpapers page's pictures' smallest width (16:9)
     }
 
     readonly property QtObject emoji: QtObject {
@@ -291,6 +289,9 @@ Singleton {
         readonly property int width:     root.px(ThemeScale.pick(Settings.values.launcherWidth, ThemeScale.launcherWidths, 560))
         readonly property int rows:      ThemeScale.pick(Settings.values.launcherRows, ThemeScale.launcherRows, 8)
         readonly property int rowHeight: root.px(52)
+        // Settings and Wallpapers grown out of it, at the large size (compact is its width).
+        readonly property int pageWidth:  root.px(1040)
+        readonly property int pageHeight: root.px(680)
     }
 
     // The on-screen editors (customize/).
@@ -303,16 +304,11 @@ Singleton {
         readonly property int fontChip: root.px(56)   // a font's chip, "Aa" over its name
         readonly property int label: root.px(40)      // a short label before a control in a tile
         readonly property int sample: root.px(360) // the windows editor's sample window
-        readonly property int menuTile: root.px(176) // a tile in the customize menu (Super+U)
     }
 
     readonly property QtObject settings: QtObject {
-        readonly property int width:     root.px(880) // the settings window when it opens
-        readonly property int height:    root.px(620)
-        readonly property int titleBar:  root.px(52)  // the bar at the top: drag to move, maximize, close
         readonly property int sidebar:   root.px(230) // the category list
         readonly property int content:   root.px(600) // the pages' maximum width
-        readonly property int minContent: root.px(400) // the smallest the page area (and window height) gets
         readonly property int rowHeight: root.px(64)
         readonly property int stepper:   root.px(96)  // the value between a stepper's - and +
         readonly property int stepperWide: root.px(170) // a stepper showing a screen mode ("1920 × 1080, 165 Hz")
