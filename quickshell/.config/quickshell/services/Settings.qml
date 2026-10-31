@@ -145,6 +145,7 @@ Singleton {
             // until edited, its defaults.
             property var quickTiles: null
             property var quickToggles: null
+            property var quickLarge: []  // wide tiles taking the whole row (made large in edit mode)
 
             property bool hotCorner: true // the pointer in the top-left corner opens the overview
 

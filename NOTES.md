@@ -238,6 +238,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `onAdapterUpdated: writeAdapter()` saves every change. A `var` holding a JSON list reads back
   as an array-like, not a JavaScript Array: `Array.isArray` is false (verified); copy it with
   `Array.from` before checking it.
+- Assigning a key a `JsonAdapter` doesn't declare (`Settings.values.newKey = ...`) does nothing
+  but log "Cannot assign to non-existent property" (verified 2026-10-31): every settings key
+  needs its `property` in `services/Settings.qml` first.
 - `onAdapterUpdated: writeAdapter()` with `watchChanges` + `onFileChanged: reload()` loses
   changes made in a row: each write runs in the background, and the re-read of an early one
   brings back old values for the later ones (verified 2026-10-30 with a throwaway `qs -p`: of

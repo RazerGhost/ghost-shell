@@ -13,6 +13,8 @@ TestCase {
         // An empty list stays empty (you removed them all).
         compare(QuickItems.shown([], QuickItems.tiles, QuickItems.defaultTiles), []);
         compare(QuickItems.shown("wifi", QuickItems.tiles, QuickItems.defaultTiles), QuickItems.defaultTiles);
+        // A list read back from settings.json is array-like, not an Array.
+        compare(QuickItems.shown({ 0: "phone", 1: "wifi", length: 2 }, QuickItems.tiles, []), ["phone", "wifi"]);
     }
 
     function test_available() {

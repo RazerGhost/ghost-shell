@@ -14,10 +14,11 @@ const defaultToggles = ["mic", "dnd", "nightlight", "awake", "game"];
 // A saved list made safe: known ids only, each once, in the saved order; the defaults when
 // there's no list (a hand-edited file can't break the panel, and an empty list stays empty).
 function shown(saved, known, defaults) {
-    if (!Array.isArray(saved))
+    // A list read back from settings.json is array-like, not an Array (NOTES.md).
+    if (saved === null || typeof saved !== "object" || typeof saved.length !== "number")
         return defaults.slice();
     const out = [];
-    for (const id of saved)
+    for (const id of Array.from(saved))
         if (known.includes(id) && !out.includes(id))
             out.push(id);
     return out;
