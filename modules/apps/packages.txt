@@ -12,3 +12,9 @@ micro
 # Recording and streaming, and 3D (both were on Windows)
 obs-studio
 blender
+# System tools like Windows': a task manager (processes, graphs, services, startup apps), disks
+# (partitions, formatting, health), what fills the disk, and resizing partitions
+mission-center
+gnome-disk-utility
+baobab
+gparted
