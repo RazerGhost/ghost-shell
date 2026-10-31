@@ -185,6 +185,8 @@ Singleton {
         readonly property int size:    root.text(168) // a small widget's side; every widget's height
         readonly property int gap:     root.px(16)  // between widgets snapped side by side
         readonly property int medium:  size * 2 + gap
+        // How large the widgets are against 100 %: their places zoom by it (DesktopWidgets.js).
+        readonly property real zoom:   size / 168
         readonly property int padding: root.text(20)
         readonly property int radius:  root.round(28)
         readonly property int margin:  root.px(32)  // from the screen's edges, when snapped

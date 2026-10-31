@@ -227,12 +227,16 @@ Scope {
 
                                     Rectangle {
                                         required property var modelData
-                                        readonly property var place: DesktopWidgetsJs.place(layout.values.desktopWidgets, modelData.name)
                                         readonly property real unit: layout.width / Math.max(Screen.width, 1)
+                                        readonly property real w: modelData.medium ? Theme.desktop.medium : Theme.desktop.size
+                                        // Where it shows on the screen at the shell's size, shrunk.
+                                        readonly property var at: DesktopWidgetsJs.shown(
+                                            DesktopWidgetsJs.place(layout.values.desktopWidgets, modelData.name), w, Theme.desktop.size,
+                                            Screen.width, Screen.height, Theme.desktop.zoom)
 
-                                        x: place.x * layout.width
-                                        y: place.y * layout.height
-                                        width: (modelData.medium ? Theme.desktop.medium : Theme.desktop.size) * unit
+                                        x: at.x * unit
+                                        y: at.y * unit
+                                        width: w * unit
                                         height: Theme.desktop.size * unit
                                         radius: Theme.desktop.radius * unit
                                         color: Colors.sketch
@@ -707,7 +711,8 @@ Scope {
                                     const { dx, dy } = DesktopWidgetsJs.keyStep(direction, grid, Theme.spacing.l * 2);
                                     const place = DesktopWidgetsJs.nudged(DesktopWidgetsJs.place(Settings.values.desktopWidgets, kind.name), dx, dy,
                                                                           kind.medium ? Theme.desktop.medium : Theme.desktop.size, Theme.desktop.size,
-                                                                          screen?.width ?? 1920, screen?.height ?? 1080, grid);
+                                                                          screen?.width ?? 1920, screen?.height ?? 1080, grid,
+                                                                          Theme.desktop.zoom);
                                     Settings.values.desktopWidgets = DesktopWidgetsJs.withPlace(Settings.values.desktopWidgets, kind.name, place);
                                     event.accepted = true;
                                 }

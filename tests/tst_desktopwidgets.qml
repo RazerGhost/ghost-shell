@@ -85,6 +85,30 @@ TestCase {
         compare(DesktopWidgets.keyStep("tab", 32, 48), null);
     }
 
+    function test_zoom() {
+        // At 100 % a place is just its fraction of the screen.
+        compare(DesktopWidgets.shown({ x: 0.25, y: 0.5 }, 168, 168, 1920, 1080, 1), { x: 480, y: 540 });
+        // Smaller, places move toward the middle by the same factor as the widgets: two widgets
+        // side by side at 100 % (a 16 px gap) are still side by side, the gap shrunk with them.
+        const k = 0.85;
+        const a = DesktopWidgets.shown({ x: 100 / 1920, y: 200 / 1080 }, 168 * k, 168 * k, 1920, 1080, k);
+        const b = DesktopWidgets.shown({ x: 284 / 1920, y: 200 / 1080 }, 168 * k, 168 * k, 1920, 1080, k);
+        fuzzyCompare(b.x - a.x, 184 * k, 0.001);
+        compare(a.y, b.y);
+        // The middle stays the middle.
+        compare(DesktopWidgets.shown({ x: 0.5, y: 0.5 }, 100, 100, 1920, 1080, 0.85), { x: 960, y: 540 });
+        // Larger, kept on the screen.
+        compare(DesktopWidgets.shown({ x: 0.95, y: 0 }, 300, 200, 1920, 1080, 1.3).x, 1620);
+        // Dropping where it shows gives back the place it came from.
+        const place = { x: 0.7, y: 0.3 };
+        const at = DesktopWidgets.shown(place, 142, 142, 1920, 1080, k);
+        const back = DesktopWidgets.dropped(at.x, at.y, 142, 142, 1920, 1080, k);
+        fuzzyCompare(back.x, 0.7, 0.0001);
+        fuzzyCompare(back.y, 0.3, 0.0001);
+        // A bad zoom counts as 100 %.
+        compare(DesktopWidgets.shown({ x: 0.25, y: 0.5 }, 10, 10, 1920, 1080, 0), { x: 480, y: 540 });
+    }
+
     function test_nudged() {
         // No grid: by the step, kept on the screen.
         compare(DesktopWidgets.nudged({ x: 0.5, y: 0.5 }, 48, 0, 168, 168, 1920, 1080, 0), { x: (960 + 48) / 1920, y: 0.5 });

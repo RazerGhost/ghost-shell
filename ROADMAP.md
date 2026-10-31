@@ -1557,6 +1557,15 @@ the Music category starts playing; before that the first installed music app, Sp
 Checked in a scratch window with no player. Also: tooltips no longer warn while their window
 doesn't exist yet (a null parent instead of undefined).
 
+### Desktop widgets keep together at any size (built 2026-10-31)
+User's find (shell size 85 %, text 90 %): the widgets shrank with the sizes but their places,
+kept as fractions of the screen, didn't, so the gaps stayed full size and groups (a widget
+layout, widgets lined up by hand) spread apart. Places are now kept as they'd be at 100 % and
+zoom toward or away from the screen's middle by the widgets' own factor
+(`Theme.desktop.zoom`, `DesktopWidgets.shown` / `dropped`, tested: neighbours stay neighbours,
+the middle stays put, a drop gives back its place), for dragging, the keyboard's nudges and the
+editor's layout cards too. Checked on screen at 85 % / 90 %.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

@@ -42,11 +42,29 @@ function place(saved, name) {
     return { x: fraction(own?.x, fallback.x), y: fraction(own?.y, fallback.y) };
 }
 
-// A widget dropped at (x, y) px, w x h px, on a screen sw x sh px: its place as fractions,
-// kept wholly on the screen.
-function dropped(x, y, w, h, sw, sh) {
-    const clamp = (v, max) => Math.min(Math.max(v, 0), Math.max(max, 0));
-    return { x: clamp(x, sw - w) / sw, y: clamp(y, sh - h) / sh };
+// Places are kept as they'd be at 100 % (the shell's and text's sizes, Theme.desktop.zoom). At
+// another size the widgets are smaller or larger, so their places move toward or away from the
+// screen's middle by the same factor: the whole arrangement zooms, and widgets laid out side
+// by side stay side by side (with fractions alone, at 85 % the gaps between them stayed full
+// size and a group spread apart).
+function clamp(v, max) {
+    return Math.min(Math.max(v, 0), Math.max(max, 0));
+}
+
+// Where a widget w x h px with the saved `place` shows on a sw x sh screen at `zoom`: {x, y}
+// in px, kept wholly on the screen.
+function shown(place, w, h, sw, sh, zoom) {
+    const k = zoom > 0 ? zoom : 1;
+    return { x: clamp(sw / 2 + (place.x * sw - sw / 2) * k, sw - w),
+             y: clamp(sh / 2 + (place.y * sh - sh / 2) * k, sh - h) };
+}
+
+// A widget dropped at (x, y) px, w x h px, on a screen sw x sh px at `zoom` (1 when left out):
+// its place as fractions, as it would be at 100 %; kept wholly on the screen.
+function dropped(x, y, w, h, sw, sh, zoom) {
+    const k = zoom > 0 ? zoom : 1;
+    const at = (v, max, size) => Math.min(Math.max((size / 2 + (clamp(v, max) - size / 2) / k) / size, 0), 1);
+    return { x: at(x, sw - w, sw), y: at(y, sh - h, sh) };
 }
 
 // The saved places with `name` at `place`, as a new object (so the setting's change is seen
@@ -127,16 +145,17 @@ function keyStep(direction, cell, step) {
     return ({ left: { dx: -by, dy: 0 }, right: { dx: by, dy: 0 }, up: { dx: 0, dy: -by }, down: { dx: 0, dy: by } })[direction] ?? null;
 }
 
-// A widget w x h px at its saved `place` (fractions) on a sw x sh screen, moved (dx, dy) px with
-// the keyboard (the desktop editor): onto the grid when it's on (`cell` px, else 0), kept on
-// the screen; its new place as fractions.
-function nudged(place, dx, dy, w, h, sw, sh, cell) {
-    let x = place.x * sw + dx, y = place.y * sh + dy;
+// A widget w x h px at its saved `place` (fractions) on a sw x sh screen at `zoom`, moved
+// (dx, dy) px with the keyboard (the desktop editor): onto the grid when it's on (`cell` px,
+// else 0), kept on the screen; its new place as fractions.
+function nudged(place, dx, dy, w, h, sw, sh, cell, zoom) {
+    const from = shown(place, w, h, sw, sh, zoom);
+    let x = from.x + dx, y = from.y + dy;
     if (cell > 0) {
         const at = gridSnapped(x, y, w, h, sw, sh, cell);
         // Snapping back to where it started would make a step do nothing: one more line along.
-        x = Math.abs(at.x - place.x * sw) < 0.5 && dx !== 0 ? at.x + Math.sign(dx) * cell : at.x;
-        y = Math.abs(at.y - place.y * sh) < 0.5 && dy !== 0 ? at.y + Math.sign(dy) * cell : at.y;
+        x = Math.abs(at.x - from.x) < 0.5 && dx !== 0 ? at.x + Math.sign(dx) * cell : at.x;
+        y = Math.abs(at.y - from.y) < 0.5 && dy !== 0 ? at.y + Math.sign(dy) * cell : at.y;
     }
-    return dropped(x, y, w, h, sw, sh);
+    return dropped(x, y, w, h, sw, sh, zoom);
 }

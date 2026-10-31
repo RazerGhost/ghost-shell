@@ -20,6 +20,11 @@ Item {
     default property alias content: body.data
 
     readonly property var spot: DesktopWidgets.place(Settings.values.desktopWidgets, name)
+    // Where that is at the shell's size (DesktopWidgets.shown): places zoom with the widgets.
+    readonly property point at: {
+        const p = DesktopWidgets.shown(spot, width, height, parent?.width ?? 0, parent?.height ?? 0, Theme.desktop.zoom);
+        return Qt.point(p.x, p.y);
+    }
 
     // How far the handle has been dragged; follows the drag while it lasts, and the place is
     // saved when it ends. Kept here, not read from the handler at the end: by then its
@@ -30,8 +35,8 @@ Item {
     // once would count the drag twice for a moment).
     property bool settling: false
 
-    x: spot.x * parent.width + (moving ? dragged.x : 0)
-    y: spot.y * parent.height + (moving ? dragged.y : 0)
+    x: at.x + (moving ? dragged.x : 0)
+    y: at.y + (moving ? dragged.y : 0)
     // A new place (a widget layout, "Put them back", a drop lining up) is glided to; the drag
     // itself follows the pointer.
     Behavior on x { enabled: !root.moving && !root.settling; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
@@ -116,14 +121,15 @@ Item {
                 const others = Array.from(area.children)
                     .filter(c => c !== root && c.name !== undefined && c.visible)
                     .map(c => ({ x: c.x, y: c.y, w: c.width, h: c.height }));
-                const x = root.spot.x * area.width + root.dragged.x;
-                const y = root.spot.y * area.height + root.dragged.y;
+                const x = root.at.x + root.dragged.x;
+                const y = root.at.y + root.dragged.y;
                 const at = Settings.values.desktopGrid
                     ? DesktopWidgets.gridSnapped(x, y, root.width, root.height, area.width, area.height,
                                                  Theme.px(DesktopWidgets.gridSize(Settings.values.desktopGridSize)))
                     : DesktopWidgets.snapped(x, y, root.width, root.height, area.width, area.height, others,
                                              Theme.desktop.margin, Theme.desktop.gap, Theme.desktop.reach);
-                const place = DesktopWidgets.dropped(at.x, at.y, root.width, root.height, area.width, area.height);
+                const place = DesktopWidgets.dropped(at.x, at.y, root.width, root.height, area.width, area.height,
+                                                     Theme.desktop.zoom);
                 root.settling = true;
                 Settings.values.desktopWidgets = DesktopWidgets.withPlace(Settings.values.desktopWidgets, root.name, place);
                 root.moving = false;
