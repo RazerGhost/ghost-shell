@@ -1109,6 +1109,10 @@ User's pick after the review: Android's edit mode, on the panel itself.
   under them).
 - An odd number of wide tiles: the last one takes the whole row instead of leaving half of it
   empty (user's find, 2026-10-31; the tiles are a `Flow`, since a `Grid` widens a column for it).
+- Large and small wide tiles, like Android's (user's pick, 2026-10-31): in edit mode a badge in
+  a tile's bottom corner (or Enter / Space) makes it large, the whole row, or small again
+  (`quickLarge`; Reset makes them all small). A small one with no small one to pair with takes
+  the row too (`QuickItems.fullRow`, tested).
 
 ### More desktop widgets (done, verified on the laptop 2026-10-30)
 User's pick after the quick settings editor: more of the same family.

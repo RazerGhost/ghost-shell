@@ -35,3 +35,24 @@ function removed(list, id) {
 function added(list, id) {
     return list.includes(id) ? list.slice() : [...list, id];
 }
+
+// Which wide tiles take a whole row, in `shown` (your order): the ones you made large
+// (`large`, Settings' quickLarge), and a small one with no small one to pair with (the next is
+// large, or it's the last), so no row is left half empty.
+function fullRow(shown, large) {
+    const full = [];
+    for (let i = 0; i < shown.length; i++) {
+        const id = shown[i];
+        const next = shown[i + 1];
+        if (!large.includes(id) && next !== undefined && !large.includes(next))
+            i++; // pairs with the next one
+        else
+            full.push(id);
+    }
+    return full;
+}
+
+// Large if it was small and the other way round.
+function toggled(list, id) {
+    return list.includes(id) ? removed(list, id) : added(list, id);
+}

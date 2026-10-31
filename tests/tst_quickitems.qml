@@ -25,4 +25,19 @@ TestCase {
         compare(QuickItems.added(["mic"], "mic"), ["mic"]);
         compare(QuickItems.removed(["mic", "dark"], "mic"), ["dark"]);
     }
+
+    function test_fullRow() {
+        // All small: pairs, and an odd one out at the end takes the row.
+        compare(QuickItems.fullRow(["wifi", "bluetooth", "sound"], []), ["sound"]);
+        compare(QuickItems.fullRow(["wifi", "bluetooth"], []), []);
+        // A large one takes its row, and a small one before it has nothing to pair with.
+        compare(QuickItems.fullRow(["wifi", "phone", "sound", "power"], ["phone"]), ["wifi", "phone"]);
+        compare(QuickItems.fullRow(["phone", "wifi", "sound"], ["phone"]), ["phone"]);
+        compare(QuickItems.fullRow([], ["phone"]), []);
+    }
+
+    function test_toggled() {
+        compare(QuickItems.toggled([], "phone"), ["phone"]);
+        compare(QuickItems.toggled(["phone", "wifi"], "phone"), ["wifi"]);
+    }
 }

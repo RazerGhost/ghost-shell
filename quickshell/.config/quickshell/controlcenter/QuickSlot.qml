@@ -5,7 +5,8 @@ import qs.widgets
 // One tile or round button in quick settings (QuickSettings.qml), in its place in your order.
 // In edit mode, like Android's: it wiggles a little, a badge in its corner removes it, and
 // dragging it onto another one moves it there (or Shift + Left / Right with the keyboard,
-// Delete removes). Out of edit mode it's just the control.
+// Delete removes). A wide tile also has a badge in the other corner that makes it large or
+// small (Enter or Space). Out of edit mode it's just the control.
 Item {
     id: slot
 
@@ -16,8 +17,12 @@ Item {
     property bool editing: false
     // The control's corners, for the keyboard's ring (the round buttons are circles).
     property real radius: Theme.radius.l
+    // Wide tiles: large (the whole row) or small (half), switched in edit mode.
+    property bool resizable: false
+    property bool large: false
 
     signal removeRequested()
+    signal resizeRequested()
     // Dropped onto the slot at `to` (or moved there with the keyboard).
     signal moveRequested(int to)
 
@@ -67,13 +72,18 @@ Item {
     }
 
     Accessible.role: Accessible.Button
-    Accessible.name: slot.editing ? slot.title + ": Shift and arrow keys move it, Delete removes it" : slot.title
+    Accessible.name: !slot.editing ? slot.title
+        : slot.title + ": Shift and arrow keys move it, Delete removes it"
+          + (slot.resizable ? ", Enter makes it " + (slot.large ? "small" : "large") : "")
     activeFocusOnTab: slot.editing
     Keys.onPressed: event => {
         if (!slot.editing)
             return;
         if (event.key === Qt.Key_Delete || event.key === Qt.Key_Backspace) {
             slot.removeRequested();
+            event.accepted = true;
+        } else if (slot.resizable && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space)) {
+            slot.resizeRequested();
             event.accepted = true;
         } else if (event.modifiers & Qt.ShiftModifier && (event.key === Qt.Key_Left || event.key === Qt.Key_Right)) {
             slot.moveRequested(slot.index + (event.key === Qt.Key_Left ? -1 : 1));
@@ -115,5 +125,37 @@ Item {
         Accessible.role: Accessible.Button
         Accessible.name: "Remove " + slot.title
         Accessible.onPressAction: slot.removeRequested()
+    }
+
+    // The badge that makes a wide tile large or small.
+    Rectangle {
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        anchors.margins: -Theme.spacing.xs
+        width: Theme.icon.small + Theme.spacing.xs
+        height: width
+        radius: width / 2
+        visible: slot.editing && slot.resizable
+        color: Colors.m3surfaceContainerHighest
+        border.width: Theme.outline.normal
+        border.color: Colors.m3outlineVariant
+
+        MaterialIcon {
+            anchors.centerIn: parent
+            icon: slot.large ? "close_fullscreen" : "open_in_full"
+            color: Colors.m3onSurface
+            font.pixelSize: Theme.icon.small
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            anchors.margins: -Theme.spacing.xs
+            cursorShape: Qt.PointingHandCursor
+            onClicked: slot.resizeRequested()
+        }
+
+        Accessible.role: Accessible.Button
+        Accessible.name: (slot.large ? "Make small: " : "Make large: ") + slot.title
+        Accessible.onPressAction: slot.resizeRequested()
     }
 }

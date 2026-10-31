@@ -322,14 +322,20 @@ Item {
 
             Text {
                 anchors.left: parent.left
+                anchors.right: editButtons.left
+                anchors.rightMargin: Theme.spacing.s
                 anchors.verticalCenter: parent.verticalCenter
-                text: "Drag to move, − to remove"
+                text: "Drag to move, the corners remove or resize"
+                wrapMode: Text.WordWrap
+                maximumLineCount: 2
+                elide: Text.ElideRight
                 color: Colors.m3onSurfaceVariant
                 font.family: Theme.font.sans
                 font.pixelSize: Theme.font.small
             }
 
             Row {
+                id: editButtons
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.spacing.xs
@@ -338,6 +344,7 @@ Item {
                     text: "Reset"
                     onClicked: {
                         Settings.values.quickTiles = QuickItems.defaultTiles.slice();
+                        Settings.values.quickLarge = [];
                         Settings.values.quickToggles = QuickItems.defaultToggles.slice();
                     }
                 }
@@ -357,12 +364,14 @@ Item {
             spacing: Theme.spacing.s
 
             readonly property real tileWidth: (width - spacing) / 2
-            // The tiles shown (no Bluetooth adapter: no tile). An odd one out at the end takes
-            // the whole row instead of leaving half of it empty.
+            // The tiles shown (no Bluetooth adapter: no tile), and the ones taking a whole row: the
+            // ones you made large in edit mode, and a small one with nothing to pair with.
             readonly property var shownTiles: root.tileList.filter(id => id !== "bluetooth" || BluetoothStatus.adapter !== null)
+            readonly property var largeTiles: QuickItems.shown(Settings.values.quickLarge, QuickItems.tiles, [])
+            readonly property var fullRow: QuickItems.fullRow(shownTiles, largeTiles)
 
             function widthOf(id: string): real {
-                return shownTiles.length % 2 === 1 && shownTiles[shownTiles.length - 1] === id ? width : tileWidth;
+                return fullRow.includes(id) ? width : tileWidth;
             }
 
             Repeater {
@@ -378,6 +387,10 @@ Item {
                     editing: root.editing
                     onRemoveRequested: Settings.values.quickTiles = QuickItems.removed(root.tileList, itemId)
                     onMoveRequested: to => Settings.values.quickTiles = OrderedList.moved(root.tileList, index, to)
+                    // Large (the whole row) or small (half), like Android's tiles.
+                    resizable: true
+                    large: tileGrid.largeTiles.includes(itemId)
+                    onResizeRequested: Settings.values.quickLarge = QuickItems.toggled(tileGrid.largeTiles, itemId)
                 }
             }
         }
