@@ -109,6 +109,26 @@ TestCase {
         compare(DesktopWidgets.shown({ x: 0.25, y: 0.5 }, 10, 10, 1920, 1080, 0), { x: 480, y: 540 });
     }
 
+    function test_arrange() {
+        // A column at the bottom left at 100 %: clock over media, 16 px apart.
+        const items = k => [
+            { name: "clock", x: 80 / 1920, y: 600 / 1080, w: 352 * k, h: 168 * k },
+            { name: "media", x: 80 / 1920, y: 784 / 1080, w: 352 * k, h: 168 * k },
+            { name: "timer", x: 1600 / 1920, y: 80 / 1080, w: 168 * k, h: 168 * k }
+        ];
+        // At 100 % nothing moves.
+        compare(DesktopWidgets.arrange(items(1), 1920, 1080, 1, 32).media, { x: 80, y: 784 });
+        // At 162 % the column would run off the bottom: it shifts up as one, still 16 px apart
+        // (scaled), not piled onto each other.
+        const big = DesktopWidgets.arrange(items(1.625), 1920, 1080, 1.625, 32);
+        fuzzyCompare(big.media.y - big.clock.y, 184 * 1.625, 0.001);
+        verify(big.media.y + 168 * 1.625 <= 1080);
+        compare(big.clock.x, big.media.x);
+        // The timer, far away, is its own group.
+        verify(big.timer.x + 168 * 1.625 <= 1920);
+        verify(big.timer.y >= 0);
+    }
+
     function test_nudged() {
         // No grid: by the step, kept on the screen.
         compare(DesktopWidgets.nudged({ x: 0.5, y: 0.5 }, 48, 0, 168, 168, 1920, 1080, 0), { x: (960 + 48) / 1920, y: 0.5 });

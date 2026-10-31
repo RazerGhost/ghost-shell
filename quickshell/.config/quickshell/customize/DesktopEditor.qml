@@ -1001,6 +1001,8 @@ Scope {
                                     }
 
                                     Segmented {
+                                        // No wider than the tile (at large sizes it ran into the next one).
+                                        maxWidth: sizeRow.parent.width - Theme.editor.label - sizeRow.spacing
                                         options: sizeRow.modelData.values.map(v => ({ value: v, label: Math.round(v * 100) + " %" }))
                                         current: sizeRow.modelData.current
                                         onPicked: v => Settings.values[sizeRow.modelData.key] = v

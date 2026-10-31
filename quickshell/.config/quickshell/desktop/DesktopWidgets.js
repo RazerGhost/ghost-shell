@@ -59,6 +59,44 @@ function shown(place, w, h, sw, sh, zoom) {
              y: clamp(sh / 2 + (place.y * sh - sh / 2) * k, sh - h) };
 }
 
+// Every widget showing, [{ name, x, y, w, h }] (x, y its saved place as fractions; w, h its size
+// now), placed on a sw x sh screen at `zoom`: { name: { x, y } } in px. Widgets that sit
+// together at 100 % (within `near` px) move as one group: zoomed around the middle, and a group
+// that would run past an edge is shifted back as a whole, so its widgets keep their places
+// against each other (each kept on the screen by itself, at a large size they piled up).
+function arrange(items, sw, sh, zoom, near) {
+    const k = zoom > 0 ? zoom : 1;
+    const rects = items.map(i => {
+        const x = i.x * sw, y = i.y * sh, w = i.w / k, h = i.h / k; // at 100 %
+        return { name: i.name, x: x, y: y, w: w, h: h,
+                 zx: sw / 2 + (x - sw / 2) * k, zy: sh / 2 + (y - sh / 2) * k, zw: i.w, zh: i.h };
+    });
+    // Groups: widgets closer than `near` to each other, and so on along.
+    const group = rects.map((_, i) => i);
+    const root = i => group[i] === i ? i : (group[i] = root(group[i]));
+    const touch = (a, b) => a.x < b.x + b.w + near && b.x < a.x + a.w + near
+                         && a.y < b.y + b.h + near && b.y < a.y + a.h + near;
+    for (let i = 0; i < rects.length; i++)
+        for (let j = i + 1; j < rects.length; j++)
+            if (touch(rects[i], rects[j]))
+                group[root(i)] = root(j);
+    const shifts = {};
+    rects.forEach((r, i) => {
+        const g = root(i);
+        const s = shifts[g] ?? (shifts[g] = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity });
+        s.x0 = Math.min(s.x0, r.zx); s.y0 = Math.min(s.y0, r.zy);
+        s.x1 = Math.max(s.x1, r.zx + r.zw); s.y1 = Math.max(s.y1, r.zy + r.zh);
+    });
+    // Back onto the screen: past the start edge first, else past the end edge.
+    const back = (a, b, size) => a < 0 ? -a : b > size ? Math.max(size - b, -a) : 0;
+    const placed = {};
+    rects.forEach((r, i) => {
+        const s = shifts[root(i)];
+        placed[r.name] = { x: clamp(r.zx + back(s.x0, s.x1, sw), sw - r.zw), y: clamp(r.zy + back(s.y0, s.y1, sh), sh - r.zh) };
+    });
+    return placed;
+}
+
 // A widget dropped at (x, y) px, w x h px, on a screen sw x sh px at `zoom` (1 when left out):
 // its place as fractions, as it would be at 100 %; kept wholly on the screen.
 function dropped(x, y, w, h, sw, sh, zoom) {

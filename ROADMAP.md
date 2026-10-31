@@ -1565,6 +1565,12 @@ zoom toward or away from the screen's middle by the widgets' own factor
 (`Theme.desktop.zoom`, `DesktopWidgets.shown` / `dropped`, tested: neighbours stay neighbours,
 the middle stays put, a drop gives back its place), for dragging, the keyboard's nudges and the
 editor's layout cards too. Checked on screen at 85 % / 90 %.
+Then (user's find at 125 % / 130 %): zoomed out from the middle, a group near an edge ran past
+it and each widget was pushed back on its own, so they piled up. Widgets within two gaps of each
+other at 100 % are a group (`DesktopWidgets.arrange`, tested), zoomed together and shifted back
+onto the screen as one. Also there: the Size tile's size choices ran into the next tile;
+`Segmented.maxWidth` shrinks its segments and their labels to fit (measured with FontMetrics;
+reading its own width made a binding loop).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

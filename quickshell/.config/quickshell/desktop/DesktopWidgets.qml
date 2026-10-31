@@ -60,6 +60,12 @@ Scope {
                 id: widgetStage
 
                 readonly property bool carded: Editing.cardScreen === (window.screen?.name ?? "")
+                // Where each widget showing goes at the shell's size, groups kept together
+                // (DesktopWidgets.arrange); DesktopCard reads its own.
+                readonly property var arranged: DesktopWidgetsJs.arrange(
+                    Array.from(children).filter(c => c.name !== undefined && c.shown)
+                        .map(c => ({ name: c.name, x: c.spot.x, y: c.spot.y, w: c.width, h: c.height })),
+                    width, height, Theme.desktop.zoom, Theme.desktop.gap * 2)
 
                 width: window.width
                 height: window.height

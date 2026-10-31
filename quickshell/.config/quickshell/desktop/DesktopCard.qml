@@ -20,9 +20,11 @@ Item {
     default property alias content: body.data
 
     readonly property var spot: DesktopWidgets.place(Settings.values.desktopWidgets, name)
-    // Where that is at the shell's size (DesktopWidgets.shown): places zoom with the widgets.
+    // Where that is at the shell's size: places zoom with the widgets, a group of them together
+    // (the stage's `arranged`, DesktopWidgets.arrange); on its own while it isn't shown.
     readonly property point at: {
-        const p = DesktopWidgets.shown(spot, width, height, parent?.width ?? 0, parent?.height ?? 0, Theme.desktop.zoom);
+        const p = parent?.arranged?.[name]
+            ?? DesktopWidgets.shown(spot, width, height, parent?.width ?? 0, parent?.height ?? 0, Theme.desktop.zoom);
         return Qt.point(p.x, p.y);
     }
 
