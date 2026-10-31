@@ -392,6 +392,8 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
 - `udiskie` (core module) mounts USB sticks and SD cards with a notification; its tray menu in
   quick settings' background row unmounts and ejects. `kdeconnect-indicator` (phone module) the
   same for the phone (battery, sending files, clipboard). Both start in `autostart.lua`.
+- The phone module opens KDE Connect's ports (1714-1764) in ufw, which CachyOS turns on and
+  which refused them, so the phone couldn't find the laptop (`modules/phone/setup.sh`, 2026-10-31).
 - Tray icons that name an icon no theme has (KDE Connect's Plasma-only
   `kdeconnectindicatordark`) fall back to the app's icon from its desktop file, by fuzzy lookup
   or exact name, else a generic one.
