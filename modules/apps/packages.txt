@@ -9,3 +9,6 @@ loupe
 celluloid
 yazi
 micro
+# Recording and streaming, and 3D (both were on Windows)
+obs-studio
+blender
