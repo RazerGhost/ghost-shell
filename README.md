@@ -93,11 +93,12 @@ its setup (`setup.sh`).
 | `phone` | KDE Connect |
 | `proton` | Proton Mail, Pass and VPN |
 | `calendar` | calendar events in the today menu, from a Proton Calendar share link (`ghost calendar add`) |
+| `llm` | local coding LLM on the NVIDIA GPU: Ollama, OpenCode, Aider (setup and decisions in the ghost-llm repo) |
 | `wave3` | the Elgato Wave:3 microphone with openxlr and a voice chain ([its README](modules/wave3/README.md)) |
 
-Every module except `wave3` is installed unless `~/.config/ghost/modules` lists the ones this
-machine wants, one per line (`wave3` only ever comes from that list: it's for the machine the
-microphone is plugged into). That file isn't in the repo, so each machine keeps its own:
+Every module except `llm` and `wave3` is installed unless `~/.config/ghost/modules` lists the ones this
+machine wants, one per line (`llm` and `wave3` only ever come from that list: they're for the machine
+with the NVIDIA GPU and the one the microphone is plugged into). That file isn't in the repo, so each machine keeps its own:
 
 ```sh
 mkdir -p ~/.config/ghost

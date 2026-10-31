@@ -1,0 +1,8 @@
+# Local coding LLM on the RTX (see ~/Projects/ghost-llm). Ollama with CUDA (pulls in cuda,
+# ~5 GiB), GPU monitor, and the OpenCode agent; uv runs Aider (setup.sh).
+# pacman packages; # lines and blank lines are skipped.
+
+ollama-cuda
+nvtop
+uv
+opencode

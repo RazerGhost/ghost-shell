@@ -36,10 +36,10 @@ cd "$repo"
 . modules/lib.sh
 
 # In the order they're set up: core first (configs, colors), the apps after it.
-all_modules=(core system snapshots apps dev gaming discord spotify zen haunt capture phone proton calendar wave3)
+all_modules=(core system snapshots apps dev gaming discord spotify zen haunt capture phone proton calendar llm wave3)
 # Only for machines that list them in ~/.config/ghost/modules, never part of "all": hardware
 # that's plugged into one machine.
-opt_in=(wave3)
+opt_in=(llm wave3)
 declare -A about=(
     [core]="Hyprland, the shell, fonts and themes, the login screen, the colors"
     [system]="this laptop's GPU rule, boot options, greetd and services (sudo)"
@@ -55,6 +55,7 @@ declare -A about=(
     [phone]="KDE Connect: your phone's notifications, clipboard and files"
     [proton]="Proton Mail, Pass and VPN"
     [calendar]="calendar events in the today menu, from a Proton Calendar share link"
+    [llm]="local coding LLM on the NVIDIA GPU: Ollama, OpenCode, Aider (only where it has the GPU)"
     [wave3]="the Elgato Wave:3 with openxlr and a voice chain (only where it's plugged in)"
 )
 machine_modules="$HOME/.config/ghost/modules"
