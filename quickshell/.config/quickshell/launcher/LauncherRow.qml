@@ -32,7 +32,7 @@ MouseArea {
         : modelData.command ? "Run in the terminal"
         : modelData.custom ? modelData.custom.subtitle ?? "Your command: " + modelData.custom.command
         : modelData.setting ? "Settings  ·  " + modelData.setting.section
-        : modelData.action ? entry.name : entry?.genericName || entry?.comment || ""
+        : modelData.action ? entry?.name ?? "" : entry?.genericName || entry?.comment || ""
     readonly property string icon: modelData.web !== undefined ? "system-search"
         : modelData.keybind ? "input-keyboard"
         : modelData.window ? Windows.iconFor(modelData.window)

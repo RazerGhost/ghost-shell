@@ -239,11 +239,15 @@ Scope {
         // The card: the search bar's size, or a page's at LauncherState.size, centered (full:
         // the screen below the island).
         readonly property int gap: Theme.spacing.l
+        // The screen's size, not the window's: a freshly shown window starts smaller until
+        // Hyprland gives it the screen, and the card would slide in from the top (user's find).
+        readonly property real screenWidth: screen?.width ?? width
+        readonly property real screenHeight: screen?.height ?? height
         readonly property size pageSize: LauncherState.size === "compact"
-            ? Qt.size(Math.max(Theme.launcher.width, Theme.wallpaper.browserThumb * 2), Math.min(height - gap * 2, Theme.launcher.pageHeight))
+            ? Qt.size(Math.max(Theme.launcher.width, Theme.wallpaper.browserThumb * 2), Math.min(screenHeight - gap * 2, Theme.launcher.pageHeight))
             : LauncherState.size === "large"
-            ? Qt.size(Math.min(width - gap * 2, Theme.launcher.pageWidth), Math.min(height - gap * 2, Theme.launcher.pageHeight))
-            : Qt.size(width - gap * 2, height - Theme.island.height - gap * 2)
+            ? Qt.size(Math.min(screenWidth - gap * 2, Theme.launcher.pageWidth), Math.min(screenHeight - gap * 2, Theme.launcher.pageHeight))
+            : Qt.size(screenWidth - gap * 2, screenHeight - Theme.island.height - gap * 2)
 
         Surface {
             id: panel
@@ -251,8 +255,8 @@ Scope {
             readonly property bool paged: root.page !== ""
             width: paged ? window.pageSize.width : Theme.launcher.width
             height: paged ? window.pageSize.height : column.implicitHeight + Theme.spacing.m * 2
-            x: (window.width - width) / 2
-            y: paged && LauncherState.size === "full" ? Theme.island.height + window.gap : (window.height - height) / 2
+            x: (window.screenWidth - width) / 2
+            y: paged && LauncherState.size === "full" ? Theme.island.height + window.gap : (window.screenHeight - height) / 2
             radius: Theme.radius.m * 2
             clip: true
 
@@ -381,8 +385,12 @@ Scope {
                             Keys.onRightPressed: tiles.itemAt(Math.min(tiles.count - 1, index + 1))?.forceActiveFocus(Qt.TabFocusReason)
                             Keys.onDownPressed: search.focusInput()
                             Keys.onPressed: event => {
-                                // Typing: into the search, which hides the tiles.
-                                if (event.text !== "" && event.text.trim() !== "" && !(event.modifiers & (Qt.ControlModifier | Qt.AltModifier))) {
+                                // Typing: into the search, which hides the tiles. Backspace (its
+                                // text is a control character) only goes back to the search.
+                                if (event.key === Qt.Key_Backspace) {
+                                    search.focusInput();
+                                    event.accepted = true;
+                                } else if (/^[^\x00-\x20\x7f]/.test(event.text) && !(event.modifiers & (Qt.ControlModifier | Qt.AltModifier))) {
                                     search.text += event.text;
                                     search.focusInput();
                                     event.accepted = true;
