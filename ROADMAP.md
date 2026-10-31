@@ -394,8 +394,8 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   same for the phone (battery, sending files, clipboard). Both start in `autostart.lua`.
 - The phone module opens KDE Connect's ports (1714-1764) in ufw, which CachyOS turns on and
   which refused them, so the phone couldn't find the laptop (`modules/phone/setup.sh`, 2026-10-31).
-- Phone in quick settings (built 2026-10-31; the name, battery and sending files verified with a Nothing Phone 2,
-  ring, clipboard and browsing not yet): a Phone tile to add
+- Phone in quick settings (done, verified on the laptop with a Nothing Phone 2, 2026-10-31): a
+  Phone tile to add
   in edit mode (the connected phone's name and battery) and its page: ring it, send files (picked
   with zenity), send the clipboard, browse its files (KDE Connect's mount, in the file manager),
   and Open KDE Connect for pairing. `services/Phone.qml` asks `phone.sh` every 10 s while the tile
