@@ -83,7 +83,7 @@ Item {
         id: wifiTile
 
         Tile {
-            width: tileGrid.tileWidth
+            width: tileGrid.widthOf("wifi")
             icon: NetworkStatus.icon
             title: "Wi-Fi"
             subtitle: NetworkStatus.label
@@ -97,7 +97,7 @@ Item {
         id: bluetoothTile
 
         Tile {
-            width: tileGrid.tileWidth
+            width: tileGrid.widthOf("bluetooth")
             icon: BluetoothStatus.icon
             title: "Bluetooth"
             subtitle: BluetoothStatus.label
@@ -111,7 +111,7 @@ Item {
         id: soundTile
 
         Tile {
-            width: tileGrid.tileWidth
+            width: tileGrid.widthOf("sound")
             icon: Audio.icon
             title: "Sound"
             subtitle: Audio.sink ? Audio.deviceName(Audio.sink) : "No output"
@@ -126,7 +126,7 @@ Item {
 
         // KDE Connect (the phone module): the connected phone and its battery.
         Tile {
-            width: tileGrid.tileWidth
+            width: tileGrid.widthOf("phone")
             icon: "smartphone"
             title: Phone.phone?.name ?? "Phone"
             subtitle: Phone.label
@@ -141,7 +141,7 @@ Item {
 
         // power-profiles-daemon. Cycles power saver -> balanced -> performance.
         Tile {
-            width: tileGrid.tileWidth
+            width: tileGrid.widthOf("power")
 
             // Some machines have no performance profile; skip it when cycling there.
             readonly property list<int> profiles: PowerProfiles.hasPerformanceProfile
@@ -350,14 +350,20 @@ Item {
             }
         }
 
-        // The wide tiles, two to a row.
-        Grid {
+        // The wide tiles, two to a row (a Flow: a Grid would widen a column for a whole-row tile).
+        Flow {
             id: tileGrid
             width: parent.width
-            columns: 2
             spacing: Theme.spacing.s
 
             readonly property real tileWidth: (width - spacing) / 2
+            // The tiles shown (no Bluetooth adapter: no tile). An odd one out at the end takes
+            // the whole row instead of leaving half of it empty.
+            readonly property var shownTiles: root.tileList.filter(id => id !== "bluetooth" || BluetoothStatus.adapter !== null)
+
+            function widthOf(id: string): real {
+                return shownTiles.length % 2 === 1 && shownTiles[shownTiles.length - 1] === id ? width : tileWidth;
+            }
 
             Repeater {
                 model: root.tileList
@@ -368,7 +374,7 @@ Item {
                     title: root.info[modelData].title
                     control: root.info[modelData].control
                     // No Bluetooth adapter: no tile, and no empty place for it in the grid.
-                    visible: modelData !== "bluetooth" || BluetoothStatus.adapter !== null
+                    visible: tileGrid.shownTiles.includes(modelData)
                     editing: root.editing
                     onRemoveRequested: Settings.values.quickTiles = QuickItems.removed(root.tileList, itemId)
                     onMoveRequested: to => Settings.values.quickTiles = OrderedList.moved(root.tileList, index, to)

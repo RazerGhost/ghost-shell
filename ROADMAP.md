@@ -1107,6 +1107,8 @@ User's pick after the review: Android's edit mode, on the panel itself.
   (stops a recording, or opens the screenshot tool on Record), screenshot, wallpaper.
 - The battery line in the bottom row ends in "…" before the buttons (the pencil made it run
   under them).
+- An odd number of wide tiles: the last one takes the whole row instead of leaving half of it
+  empty (user's find, 2026-10-31; the tiles are a `Flow`, since a `Grid` widens a column for it).
 
 ### More desktop widgets (done, verified on the laptop 2026-10-30)
 User's pick after the quick settings editor: more of the same family.
