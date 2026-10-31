@@ -55,7 +55,7 @@ Save it as a profile named **Voice** in openxlr (Header, Profiles) so it survive
 copy only fills a fresh install; to keep your tuning in the dotfiles:
 
 ```sh
-cp ~/.config/openxlr/profiles/0fd9-0070/Voice.json ~/dotfiles/modules/wave3/Voice.json
+cp ~/.config/openxlr/profiles/0fd9-0070/Voice.json ~/Projects/ghost-shell/modules/wave3/Voice.json
 ```
 
 Check the diff before committing: a profile saved from the UI also holds the hardware settings

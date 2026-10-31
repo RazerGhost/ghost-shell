@@ -1,6 +1,6 @@
 # Ghost Shell (the dotfiles repo)
 
-Arch Linux + Hyprland dotfiles, deployed with GNU Stow; on GitHub as RazerGhost/ghost-shell, checked out at ~/dotfiles on the laptop. The `ghost` command (`bin/.local/bin/ghost`) runs the setup.
+Arch Linux + Hyprland dotfiles, deployed with GNU Stow; on GitHub as RazerGhost/ghost-shell, checked out at ~/Projects/ghost-shell on the laptop (it was ~/dotfiles until 2026-10-31). The `ghost` command (`bin/.local/bin/ghost`) runs the setup.
 
 - Each top-level directory except `modules/`, `system/`, `tests/` and `docs/` is a Stow package mirroring `$HOME`, e.g. `hypr/.config/hypr/hyprland.lua`. Don't move or rename these while the desktop runs from them: the links break for a moment (Hyprland once lost hyprland.lua that way).
 - `modules/<name>/` holds one part of the setup each: its packages (`packages.txt` for pacman, `aur.txt` for paru) and its setup (`setup.sh`, re-runnable). The modules are core, system, snapshots, apps, dev, gaming, discord, spotify, zen, haunt, capture, phone, proton, calendar and wave3; `modules/lib.sh` (`step`, `fail`, `clone_or_pull`, `clone_at`, `json_edit`) is shared. New packages and setup steps go in the module they belong to (or a new one, added to `all_modules` and `about` in `bin/.local/bin/ghost`).
