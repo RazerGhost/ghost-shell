@@ -68,6 +68,10 @@ TestCase {
         const found = Fuzzy.results(entries, "wallp", [], options);
         compare(found.length, 1);
         compare(found[0].custom.command, "ghost theme");
+        // The shell's own entries open a launcher page instead of a command.
+        const pages = Fuzzy.results(entries, "wallp", [], { commands: [{ name: "Wallpapers", page: "wallpapers" }] });
+        compare(pages.length, 1);
+        compare(pages[0].custom.page, "wallpapers");
         // Without options, as before.
         compare(Fuzzy.results(entries, "").length, 3);
     }

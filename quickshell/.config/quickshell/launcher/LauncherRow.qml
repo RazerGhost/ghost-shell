@@ -21,6 +21,7 @@ MouseArea {
         : modelData.file ? modelData.file.name
         : modelData.command ? modelData.command
         : modelData.custom ? modelData.custom.name
+        : modelData.setting ? modelData.setting.title
         : modelData.action?.name ?? entry?.name ?? ""
     // For a shortcut, the app it belongs to.
     readonly property string subtitle: modelData.web !== undefined ? "DuckDuckGo, in your browser"
@@ -30,6 +31,7 @@ MouseArea {
         : modelData.file ? modelData.file.folder
         : modelData.command ? "Run in the terminal"
         : modelData.custom ? modelData.custom.subtitle ?? "Your command: " + modelData.custom.command
+        : modelData.setting ? "Settings  ·  " + modelData.setting.section
         : modelData.action ? entry.name : entry?.genericName || entry?.comment || ""
     readonly property string icon: modelData.web !== undefined ? "system-search"
         : modelData.keybind ? "input-keyboard"
@@ -37,6 +39,7 @@ MouseArea {
         : modelData.file ? Fuzzy.fileIcon(modelData.file.name)
         : modelData.command ? "utilities-terminal"
         : modelData.custom ? (modelData.custom.icon || "system-run")
+        : modelData.setting ? "preferences-system"
         : entry?.icon ?? ""
 
     signal activated()

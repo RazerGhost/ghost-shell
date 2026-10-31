@@ -133,7 +133,8 @@ function scoredActions(entries, query) {
 // above an app that only matches loosely. With an empty query, just the apps: your favorites
 // first, in the order you starred them, then the rest by name. `windows` as for scoredWindows();
 // `options` { favorites, hidden: desktop entry ids, commands: [{ name, command }] } from Settings
-// (Settings -> Default apps), each optional.
+// (Settings -> Default apps; the shell's own entries open a launcher page instead: { name, page }),
+// each optional.
 function results(entries, query, windows, options) {
     const q = query.trim();
     const favorites = options?.favorites ?? [];
@@ -146,7 +147,8 @@ function results(entries, query, windows, options) {
     }
     // On equal scores: apps, then your commands, their shortcuts, then windows.
     const rank = r => r.window ? 3 : r.action ? 2 : r.custom ? 1 : 0;
-    const commands = (options?.commands ?? []).filter(c => typeof c?.name === "string" && typeof c?.command === "string");
+    const commands = (options?.commands ?? []).filter(c => typeof c?.name === "string"
+        && (typeof c?.command === "string" || typeof c?.page === "string"));
     return scoredApps(shown, q).map(r => ({ entry: r.entry, action: null, window: null, custom: null, score: r.score }))
         .concat(commands.map(c => ({ entry: null, action: null, window: null, custom: c, score: score(q, c.name) }))
             .filter(r => r.score > 0))
