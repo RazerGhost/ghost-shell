@@ -10,20 +10,19 @@ import qs.widgets
 
 // Pop-ups in the top-right corner of the focused screen, under the island (user's choice,
 // 2026-11-03: they used to drop from the island one at a time, and waited while any menu was
-// open): "Shell reloaded" (see Island.qml), up to three notifications at once, oldest at the
-// top, and a window asking for attention. Each notification stays Settings' notificationSeconds,
+// open): up to three notifications at once, oldest at the top, and a window asking for
+// attention. Shell reloads show in the island itself (IslandWindow.qml). Each notification stays Settings' notificationSeconds,
 // the attention card the same; the pointer over the stack pauses them, critical notifications
 // stay until dismissed.
 PanelWindow {
     id: root
 
-    required property var island // Island.qml: toggle(), reloadShown, reloadError
+    required property var island // Island.qml: toggle()
 
     readonly property string monitorName: Hyprland.focusedMonitor?.name ?? ""
     readonly property list<Notification> notifications: Notifications.popups
     readonly property HyprlandToplevel attention: Windows.needsAttention
-    readonly property bool reload: island.reloadShown
-    readonly property bool hasAny: notifications.length > 0 || attention !== null || reload
+    readonly property bool hasAny: notifications.length > 0 || attention !== null
     // How long a pop-up stays, from Settings (1-60 s).
     readonly property int popupTime: Math.min(60, Math.max(1, Number(Settings.values.notificationSeconds) || 5)) * 1000
 
@@ -82,18 +81,6 @@ PanelWindow {
             y: Theme.spacing.s
             width: parent.width - Theme.spacing.s * 2
             spacing: Theme.spacing.s
-
-            // "Shell reloaded", or why it couldn't.
-            Item {
-                width: parent.width
-                implicitHeight: notice.implicitHeight + Theme.spacing.m * 2
-                visible: root.reload
-
-                ReloadNotice {
-                    id: notice
-                    error: root.island.reloadError
-                }
-            }
 
             Repeater {
                 // ScriptModel keeps the cards that stay when one goes, with their timers.

@@ -1698,9 +1698,11 @@ User's pick of the full Quickshell 0.3.2 / Hyprland 0.57 docs scan's small items
 User's picks from the layout research (the volume pop-up stays where it is):
 - Notifications pop up in the top-right corner of the focused screen, under the island
   (`bar/PopupStack.qml`): up to three at once, oldest at the top, each with its own time (the
-  pointer over them pauses all, critical ones stay), with the attention card and the reload
-  notice in the same stack. They no longer wait behind an open menu (`Notifications.popups`,
-  `done`).
+  pointer over them pauses all, critical ones stay), with the attention card in the same stack.
+  They no longer wait behind an open menu (`Notifications.popups`, `done`). The shell's reload
+  notice was there too for a day; alone in the corner it looked out of place (user's find), so a
+  reload shows "Reloaded" in the time's place, and a failed one opens the island with the error
+  (`IslandViews.shown`, tested).
 - First built as three pills (workspaces left, time middle, status icons right; the side ones in
   the top corners when attached). The user's review the same day: quick settings belonged in the
   middle, and workspaces, status icons and background apps in the island (or beside it) looked

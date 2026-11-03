@@ -13,7 +13,9 @@ import "IslandViews.js" as IslandViews
 // (user's choice, 2026-11-03: workspaces, status icons and background apps in it, or in pills of
 // their own, looked uneven). A click opens today (or media while music shows), a right-click
 // quick settings, where the status icons and background apps are now. Switching workspaces shows
-// the dots for a moment in the time's place; scrolling over the island steps through them.
+// the dots for a moment in the time's place; scrolling over the island steps through them. A
+// shell reload shows "Reloaded" there too, or opens the island with why it failed (it was a card
+// in the corner, among the notifications, for a day: it's the shell's own status, not one).
 // Notifications pop up in the top-right corner (PopupStack.qml). Floating below the top edge, or
 // attached to it (Settings' islandAttached; the dock and island editor).
 PanelWindow {
@@ -33,10 +35,12 @@ PanelWindow {
     // The workspace dots, for a moment after the workspace changes (and while the pointer is on
     // them, to click one), in the time's place.
     property bool flashing: false
-    readonly property bool showDots: flashing && !open
+    // "Reloaded" for a moment in the time's place after the shell reloads (Island.qml).
+    readonly property bool showReloaded: island.reloadShown && island.reloadError === "" && !open
+    readonly property bool showDots: flashing && !open && !showReloaded
     // While music plays the island shows the music instead of the time. Once it opens (hover
     // player or a menu) the time comes back, since the music is then shown below it.
-    readonly property bool showMedia: Settings.values.islandMedia && Media.playing && !pill.expanded && !showDots
+    readonly property bool showMedia: Settings.values.islandMedia && Media.playing && !pill.expanded && !showDots && !showReloaded
 
     onOpenChanged: peek = ""
 
@@ -143,13 +147,13 @@ PanelWindow {
     IslandPill {
         id: pill
 
-        shown: IslandViews.shown(root.panel, root.peek)
+        shown: IslandViews.shown(root.panel, root.island.reloadShown && root.island.reloadError !== "", root.peek)
         hasFocus: root.open
         // Each menu's own width. Kept while closing, so the menu fading out doesn't reflow.
         onShownChanged: if (shown !== "") openWidth = Theme.island.menuWidth(shown)
         onCloseRequested: root.island.panel = ""
 
-        // The time, the music or the workspace dots, and the alerts beside them.
+        // The time, the music, the workspace dots or "Reloaded", and the alerts beside them.
         row: IslandButton {
             id: center
 
@@ -164,7 +168,8 @@ PanelWindow {
 
             Item {
                 anchors.verticalCenter: parent.verticalCenter
-                implicitWidth: root.showDots ? workspaces.implicitWidth
+                implicitWidth: root.showReloaded ? reloaded.implicitWidth
+                             : root.showDots ? workspaces.implicitWidth
                              : root.showMedia ? activity.implicitWidth : clock.implicitWidth
                 implicitHeight: Theme.island.height
 
@@ -175,7 +180,7 @@ PanelWindow {
                 Clock {
                     id: clock
                     anchors.horizontalCenter: parent.horizontalCenter
-                    opacity: root.showMedia || root.showDots ? 0 : 1
+                    opacity: root.showMedia || root.showDots || root.showReloaded ? 0 : 1
                     visible: opacity > 0
 
                     Behavior on opacity {
@@ -194,6 +199,34 @@ PanelWindow {
                     }
                 }
 
+                Row {
+                    id: reloaded
+                    anchors.centerIn: parent
+                    spacing: Theme.spacing.xs
+                    opacity: root.showReloaded ? 1 : 0
+                    visible: opacity > 0
+
+                    Behavior on opacity {
+                        NumberAnimation { duration: Theme.anim.normal }
+                    }
+
+                    MaterialIcon {
+                        anchors.verticalCenter: parent.verticalCenter
+                        icon: "check_circle"
+                        font.pixelSize: Theme.icon.small
+                        color: Colors.m3primary
+                    }
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "Reloaded"
+                        color: Colors.m3onSurface
+                        font.family: Theme.font.sans
+                        font.pixelSize: Theme.font.normal
+                        font.weight: Font.DemiBold
+                    }
+                }
+
                 // Kept, not hidden, so it follows the workspace while it's out of sight.
                 Workspaces {
                     id: workspaces
@@ -209,6 +242,16 @@ PanelWindow {
             }
 
             IslandAlerts {}
+        }
+
+        // Why the shell couldn't reload (the old shell keeps running).
+        MenuSlot {
+            shown: pill.shown === "reload"
+            extraHeight: Theme.spacing.m * 2
+
+            ReloadNotice {
+                error: root.island.reloadError
+            }
         }
 
         // The hover player. Clicking it (outside its buttons) opens the media menu.

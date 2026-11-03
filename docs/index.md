@@ -100,12 +100,12 @@ Recovery procedures (lock screen crash, login screen failure) are in ROADMAP Pha
 |---|---|
 | Island: one shape with the time (or music) and alerts, floating or attached to the top edge (`islandAttached`); click for today, right-click for quick settings; morphs into every menu | `bar/Island.qml`, `IslandWindow.qml`, `IslandPill.qml`, `PillShape.qml`, `PillPath.js`, `IslandViews.js`, `IslandButton.qml` |
 | Island alerts: recording, timer, microphone, camera, screen sharing, low battery | `bar/IslandAlerts.qml` |
-| Pop-ups in the top-right corner: up to three notifications, attention requests, the reload notice | `bar/PopupStack.qml` |
+| Pop-ups in the top-right corner: up to three notifications, attention requests | `bar/PopupStack.qml` |
 | Workspace dots (3-10 or only used), shown in the island for a moment after a switch; scroll over the island to step | `bar/Workspaces.qml`, `services/WorkspaceSlots.js` |
 | Clock (day, seconds, 24-hour options) | `bar/Clock.qml` |
 | Status icons in quick settings' top row: Wi-Fi, Bluetooth, VPN, airplane, updates, muted (each hideable), the battery | `controlcenter/StatusIcons.qml`, `BatteryPill.qml`, `widgets/WifiIcon.qml` |
 | Media "live activity" (cover replaces the clock), small player on hover | `bar/MediaActivity.qml`, `controlcenter/MediaCard.qml` |
-| Shell reload notices and errors | `bar/ReloadNotice.qml` |
+| Shell reloads: "Reloaded" in the island's time place, a failed reload's error opened out of the island | `bar/IslandWindow.qml`, `bar/ReloadNotice.qml` |
 | Recording dot, timer countdown in the island | `services/Recorder.qml`, `services/Countdown.qml` |
 
 ### Island menus

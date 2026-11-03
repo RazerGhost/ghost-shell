@@ -2,9 +2,10 @@ import QtQuick
 import qs.theme
 import qs.widgets
 
-// The island's note after the shell reloads (a file in its folder changed): "Shell reloaded",
-// centered, or "Shell reload failed" with the error across the full width (the old shell keeps
-// running then). Replaces Quickshell's own pop-up.
+// Why the shell couldn't reload (a file in its folder changed), opened out of the island
+// (IslandWindow.qml; a reload that works only shows "Reloaded" in the time's place): "Shell
+// reload failed" and the error across the full width (the old shell keeps running then).
+// Replaces Quickshell's own pop-up.
 Row {
     id: root
 
