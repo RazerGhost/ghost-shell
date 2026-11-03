@@ -12,6 +12,7 @@ import "../lock/LockClock.js" as LockClockJs
 import "../lock/LockWidgets.js" as LockWidgets
 import "../widgets/OrderedList.js" as OrderedList
 import "Presets.js" as Presets
+import "../services/FileUrl.js" as FileUrl
 
 // The lock screen editor, like long-pressing the iOS lock screen: the real lock screen, live,
 // as a card on the background color, with Cancel and Done at the top and a sheet at the bottom with the looks (presets), the
@@ -363,7 +364,7 @@ Scope {
                             art: Component {
                                 Image {
                                     readonly property string file: parent.option.value || Wallpaper.stillPath
-                                    source: file ? "file://" + file : ""
+                                    source: FileUrl.of(file)
                                     fillMode: Image.PreserveAspectCrop
                                     sourceSize.width: width * 2
                                     asynchronous: true

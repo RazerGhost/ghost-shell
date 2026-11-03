@@ -4,6 +4,7 @@ import Quickshell.Widgets
 import qs.services
 import qs.theme
 import qs.widgets
+import "../services/FileUrl.js" as FileUrl
 
 // The wallpaper picker's contents (WallpaperPicker.qml is the strip): one row of
 // pictures, scrolling sideways (the mouse wheel too): yours, from your wallpaper folder. Click
@@ -93,7 +94,7 @@ Column {
             Image {
                 anchors.fill: parent
                 // A video shows its thumbnail (services/wallpapers.sh made it).
-                source: !root.opened ? "" : "file://" + (cell.modelData.video ? cell.modelData.thumb : cell.filePath)
+                source: !root.opened ? "" : FileUrl.of(cell.modelData.video ? cell.modelData.thumb : cell.filePath)
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
                 // Thumbnails only; decoding full-size pictures would take seconds and memory.

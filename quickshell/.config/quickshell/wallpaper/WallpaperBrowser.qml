@@ -18,6 +18,7 @@ import qs.services
 import qs.theme
 import qs.widgets
 import "../services/Wallhaven.js" as Wallhaven
+import "../services/FileUrl.js" as FileUrl
 
 Item {
     id: root
@@ -46,7 +47,7 @@ Item {
     property string mode: "find"
     // Your folder's pictures in the results' shape; `path` marks them as yours.
     readonly property var yours: Wallpaper.pictures.map(p => {
-        const picture = "file://" + (p.video ? p.thumb : p.filePath);
+        const picture = FileUrl.of(p.video ? p.thumb : p.filePath);
         return { id: "", file: p.fileName, thumb: picture, url: picture, resolution: "", path: p.filePath,
                  darkPath: p.darkPath };
     })

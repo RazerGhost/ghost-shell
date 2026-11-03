@@ -4,6 +4,7 @@ import qs.theme
 import qs.widgets
 import "Presets.js" as Presets
 import "SavedLooks.js" as SavedLooks
+import "../services/FileUrl.js" as FileUrl
 
 // An editor's "Looks" tab: its presets (Presets.js) as picture cards in one row, like the iOS
 // lock screen gallery; picking one sets its settings at once, and each can still be changed
@@ -149,7 +150,7 @@ SheetTile {
                 Image {
                     anchors.fill: parent
                     visible: !card.option.action
-                    source: tile.picture ? "file://" + tile.picture : ""
+                    source: FileUrl.of(tile.picture)
                     fillMode: Image.PreserveAspectCrop
                     sourceSize.width: width * 2
                     asynchronous: true

@@ -15,6 +15,7 @@ import "../theme/ThemeScale.js" as ThemeScale
 import "../desktop/DesktopWidgets.js" as DesktopWidgetsJs
 import "Presets.js" as Presets
 import "Themes.js" as Themes
+import "../services/FileUrl.js" as FileUrl
 
 // The desktop editor, like Android's "Wallpaper & style": the real desktop, drawn as a card. Opening
 // it goes to an empty workspace (windows would cover the desktop) and Done or Cancel go back;
@@ -325,7 +326,7 @@ Scope {
                                         // A video by its thumbnail; without one (not scanned), just the color.
                                         readonly property string file: picture?.video ? picture.thumb ?? ""
                                                                      : Wallpaper.isVideoPath(look.theme.wallpaper) ? "" : look.theme.wallpaper
-                                        source: file ? "file://" + file : ""
+                                        source: FileUrl.of(file)
                                         fillMode: Image.PreserveAspectCrop
                                         sourceSize.width: width * 2
                                         asynchronous: true
@@ -482,7 +483,7 @@ Scope {
                             onPicked: v => Wallpaper.set(v)
                             art: Component {
                                 Image {
-                                    source: "file://" + parent.option.thumb
+                                    source: FileUrl.of(parent.option.thumb)
                                     fillMode: Image.PreserveAspectCrop
                                     sourceSize.width: width * 2
                                     asynchronous: true
@@ -569,7 +570,7 @@ Scope {
                                     Image {
                                         anchors.fill: parent
                                         visible: swatch.modelData.value === ""
-                                        source: Wallpaper.stillPath ? "file://" + Wallpaper.stillPath : ""
+                                        source: FileUrl.of(Wallpaper.stillPath)
                                         fillMode: Image.PreserveAspectCrop
                                         sourceSize: Qt.size(width * 2, height * 2)
                                         asynchronous: true
@@ -863,7 +864,7 @@ Scope {
 
                             Image {
                                 anchors.fill: parent
-                                source: Wallpaper.stillPath ? "file://" + Wallpaper.stillPath : ""
+                                source: FileUrl.of(Wallpaper.stillPath)
                                 fillMode: Image.PreserveAspectCrop
                                 sourceSize.width: width * 2
                                 asynchronous: true

@@ -6,6 +6,7 @@ import Quickshell.Widgets
 import qs.services
 import qs.theme
 import qs.widgets
+import "../services/FileUrl.js" as FileUrl
 
 // The lock screen and the login screen share one look: picture, blur, dimming, clock and date,
 // changed on the screen itself in the lock screen editor (customize/LockEditor.qml, the button
@@ -101,7 +102,7 @@ Column {
                     Image {
                         id: faceThumb
                         anchors.fill: parent
-                        source: faceRow.exists ? "file://" + faceRow.face + "#" + faceRow.version : ""
+                        source: faceRow.exists ? FileUrl.of(faceRow.face) + "#" + faceRow.version : ""
                         fillMode: Image.PreserveAspectCrop
                         sourceSize: Qt.size(width * 2, height * 2)
                         cache: false

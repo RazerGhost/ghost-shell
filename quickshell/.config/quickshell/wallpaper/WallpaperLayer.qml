@@ -7,6 +7,7 @@ import Quickshell.Services.UPower
 import Quickshell.Wayland
 import qs.services
 import qs.theme
+import "../services/FileUrl.js" as FileUrl
 
 // Draws the chosen wallpaper (services/Wallpaper.qml) behind everything on every monitor.
 // A new one fades in over the old one. A video (a live wallpaper) plays over its still frame,
@@ -90,7 +91,7 @@ Variants {
                 // Every video's frame has the same name: the video's path after the # makes each a new
                 // address, so the next video's frame loads (and isn't kept from the last one).
                 source: !Wallpaper.stillPath ? ""
-                      : "file://" + Wallpaper.stillPath + (Wallpaper.isVideo ? "#" + encodeURIComponent(Wallpaper.path) : "")
+                      : FileUrl.of(Wallpaper.stillPath) + (Wallpaper.isVideo ? "#" + encodeURIComponent(Wallpaper.path) : "")
                 cache: !Wallpaper.isVideo
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
@@ -121,7 +122,7 @@ Variants {
 
                 sourceComponent: Video {
                     id: video
-                    source: "file://" + Wallpaper.path
+                    source: FileUrl.of(Wallpaper.path)
                     fillMode: VideoOutput.PreserveAspectCrop
                     loops: MediaPlayer.Infinite
                     muted: true

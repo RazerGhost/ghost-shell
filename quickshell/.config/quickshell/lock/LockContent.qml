@@ -8,6 +8,7 @@ import qs.theme
 import qs.widgets
 import "LockClock.js" as LockClockJs
 import "LockWidgets.js" as LockWidgets
+import "../services/FileUrl.js" as FileUrl
 
 // What the lock screen shows on each monitor: the wallpaper blurred and darkened, a big clock
 // (LockClock.qml) and the date, and the password field. Lock.qml checks the password. The login
@@ -87,7 +88,7 @@ Item {
         id: wallpaper
         anchors.fill: parent
         visible: false // drawn through the blur below
-        source: root.wallpaper ? "file://" + root.wallpaper : ""
+        source: FileUrl.of(root.wallpaper)
         fillMode: Image.PreserveAspectCrop
         sourceSize: Qt.size(width, height)
     }
@@ -349,7 +350,7 @@ Item {
             Image {
                 id: faceImage
                 anchors.fill: parent
-                source: root.face ? "file://" + root.face : ""
+                source: FileUrl.of(root.face)
                 fillMode: Image.PreserveAspectCrop
                 sourceSize: Qt.size(width * 2, height * 2)
                 Accessible.ignored: true

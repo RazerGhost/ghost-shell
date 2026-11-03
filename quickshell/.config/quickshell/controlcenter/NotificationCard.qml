@@ -7,6 +7,7 @@ import qs.theme
 import qs.widgets
 import "NotificationProgress.js" as NotificationProgress
 import "NotificationTime.js" as NotificationTime
+import "../services/FileUrl.js" as FileUrl
 
 // One notification: app icon (or the notification's own image), app and time, title, text,
 // and the app's action buttons. Click it to run its default action; × dismisses it. Used for
@@ -29,7 +30,7 @@ MouseArea {
         if (source === "")
             return "";
         if (source.startsWith("/"))
-            return "file://" + source;
+            return FileUrl.of(source);
         if (source.includes("://"))
             return source;
         return Quickshell.iconPath(source, true);
