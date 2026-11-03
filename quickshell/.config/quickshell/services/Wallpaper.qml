@@ -48,6 +48,8 @@ Singleton {
     // A new wallpaper's colors are being made (wallpaper.sh runs matugen; about a second), or
     // it waits for the color scheme's run.
     readonly property bool busy: apply.running || waiting !== null
+    // wallpaper.sh runs for the wallpaper now (not just waiting): ColorScheme waits for it.
+    readonly property bool running: apply.running
 
     // The wallpaper last asked for ("" for none). `path` only changes once wallpaper.sh has
     // written it (for a video, after its frame is made), so the desktop editor's Cancel and

@@ -44,8 +44,35 @@ Singleton {
         }
     }
 
+    // Who set the card last: an editor closing as the next opens (one editor straight to
+    // another) is torn down after the new one set it, and only clears it if it's still its own.
+    property var cardOwner: null
+
+    function showCard(owner: var, screenName: string, rect: rect): void {
+        cardOwner = owner;
+        card = rect;
+        cardScreen = screenName;
+    }
+
+    function hideCard(owner: var): void {
+        if (cardOwner !== owner)
+            return;
+        cardOwner = null;
+        cardScreen = "";
+    }
+
+    // Going back waits a moment: an editor opening right after (Customize.only closes one
+    // editor and opens the next in one go) stays on the empty workspace instead. Going back
+    // and away at once read the workspace before Hyprland had switched, so the second editor
+    // took the empty one for home, and Done left you there.
+    property bool backPending: false
+
     // Goes to a workspace past the ones in use (it's empty).
     function toEmptyWorkspace(): void {
+        if (backPending) {
+            backPending = false; // still there, still knowing the way home
+            return;
+        }
         awayFrom = Hyprland.focusedWorkspace?.id ?? 1;
         const used = Hyprland.workspaces.values.map(w => w.id).filter(id => id > 0);
         emptyWorkspace = Math.max(0, ...used) + 1;
@@ -53,8 +80,16 @@ Singleton {
     }
 
     function back(): void {
-        if (awayFrom === 0)
+        if (awayFrom === 0 || backPending)
             return;
+        backPending = true;
+        Qt.callLater(goBack);
+    }
+
+    function goBack(): void {
+        if (!backPending)
+            return; // another editor opened meanwhile
+        backPending = false;
         Hyprland.dispatch(`hl.dsp.focus({ workspace = ${awayFrom} })`);
         awayFrom = 0;
         emptyWorkspace = 0;

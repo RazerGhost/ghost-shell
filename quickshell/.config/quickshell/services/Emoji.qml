@@ -25,8 +25,20 @@ Singleton {
         recentFile.writeAdapter();
         const app = Windows.active?.wayland?.appId ?? "";
         const terminal = DesktopEntries.heuristicLookup(app)?.categories.includes("TerminalEmulator") ?? false;
-        insert.command = terminal ? ["wtype", "--", emoji] : ["sh", "-c", root.pasteScript, "sh", emoji];
+        queue = [...queue, terminal ? ["wtype", "--", emoji] : ["sh", "-c", root.pasteScript, "sh", emoji]];
         insertLater.restart();
+    }
+
+    // Emoji picked while the last one is still pasted (about 0.7 s) wait their turn, in order:
+    // setting `running` on a running Process does nothing, which lost them.
+    property var queue: []
+
+    function next(): void {
+        if (insert.running || queue.length === 0)
+            return;
+        insert.command = queue[0];
+        queue = queue.slice(1);
+        insert.running = true;
     }
 
     readonly property string pasteScript: `
@@ -42,12 +54,13 @@ Singleton {
 
     Process {
         id: insert
+        onExited: root.next()
     }
 
     Timer {
         id: insertLater
         interval: 200 // the same wait as pasting from the clipboard menu
-        onTriggered: insert.running = true
+        onTriggered: root.next()
     }
 
     FileView {

@@ -74,7 +74,9 @@ Singleton {
 
     Timer {
         interval: 30 * 60 * 1000
-        running: root.place !== null
+        // While a town is set, also when its lookup failed (offline at login): otherwise nothing
+        // would try again until the town changed.
+        running: root.location !== ""
         repeat: true
         // Offline (or the service was down) last time: start over with the place lookup.
         onTriggered: root.current ? root.update() : root.refresh()

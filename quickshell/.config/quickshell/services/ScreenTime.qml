@@ -71,7 +71,7 @@ Singleton {
         repeat: true
         onTriggered: {
             const appId = Windows.active?.wayland?.appId ?? "";
-            if (idle.isIdle || appId === "")
+            if (Session.locked || idle.isIdle || appId === "")
                 return;
             // By desktop entry, so the page can show the app's name and icon.
             const app = DesktopEntries.heuristicLookup(appId)?.id ?? appId;

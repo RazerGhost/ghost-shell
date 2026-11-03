@@ -21,8 +21,8 @@ Column {
         } else if (device.paired) {
             device.connect();
         } else {
-            // BlueZ won't bond while the adapter isn't pairable (it starts out off here).
-            BluetoothStatus.adapter.pairable = true;
+            // BlueZ won't bond while the adapter isn't pairable (off otherwise: BluetoothStatus).
+            BluetoothStatus.allowPairing();
             device.pair();
         }
     }

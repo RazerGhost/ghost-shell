@@ -74,8 +74,10 @@ Singleton {
     LatestProcess {
         id: download
         onExited: code => {
-            // command[4] is the file this run wrote ("sh", "-c", script, "sh", target, url).
-            if (code === 0)
+            // command[4] is the file this run wrote, command[5] its address ("sh", "-c", script,
+            // "sh", target, url). Only for the track still playing: an older track's download
+            // finishing late would put its cover back.
+            if (code === 0 && command[5] === root.artUrl)
                 root.artFile = command[4];
         }
     }

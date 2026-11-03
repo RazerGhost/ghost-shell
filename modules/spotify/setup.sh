@@ -25,5 +25,5 @@ if [[ -f $HOME/.config/spotify/prefs ]]; then
     # select it (matugen runs the same hook on every wallpaper change).
     sh "$HOME/.config/matugen/hooks/spicetify-ghost.sh"
 else
-    echo "Skipped: open Spotify once and log in, then run `ghost install spotify`."
+    echo "Skipped: open Spotify once and log in, then run \`ghost install spotify\`."
 fi

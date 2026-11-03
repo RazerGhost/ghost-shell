@@ -8,6 +8,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
 import "TouchpadDevices.js" as TouchpadDevices
 
@@ -27,6 +28,20 @@ Singleton {
         const lua = safe.map(n => `hl.device({ name = "${n}", enabled = ${on} })`).join("; ");
         if (lua !== "")
             Quickshell.execDetached(["hyprctl", "eval", lua]);
+    }
+
+    // `hyprctl eval` settings don't survive a config reload (NOTES.md), and the shell reloads
+    // Hyprland for many settings and game mode: the touchpad would be back on while `applied`
+    // still says off. Forget it and look again.
+    Connections {
+        target: Hyprland
+
+        function onRawEvent(event): void {
+            if (event.name !== "configreloaded" || !root.enabled)
+                return;
+            root.applied = null;
+            checkSoon.restart();
+        }
     }
 
     // Switched on: look now. Switched off: the touchpad back on.

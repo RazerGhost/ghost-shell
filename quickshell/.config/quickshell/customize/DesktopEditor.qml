@@ -108,11 +108,8 @@ Scope {
                     Editing.card = chrome.card;
                 }
             }
-            Component.onCompleted: {
-                Editing.card = chrome.card;
-                Editing.cardScreen = screen?.name ?? "";
-            }
-            Component.onDestruction: Editing.cardScreen = ""
+            Component.onCompleted: Editing.showCard(window, screen?.name ?? "", chrome.card)
+            Component.onDestruction: Editing.hideCard(window)
 
             // Input only on the sheet: the desktop widgets underneath can be dragged.
             mask: Region {

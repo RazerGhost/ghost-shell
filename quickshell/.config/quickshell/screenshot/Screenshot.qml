@@ -90,8 +90,12 @@ Scope {
         }
     }
 
-    // The folder has to exist before a picture is saved into it.
-    Process {
+    // The folder has to exist before a picture is saved into it: made at start and again
+    // whenever Settings names another one (a Process with `running: true` only ran once).
+    onFolderChanged: makeFolder.start()
+
+    LatestProcess {
+        id: makeFolder
         running: true
         command: ["mkdir", "-p", root.folder]
     }
@@ -153,8 +157,15 @@ Scope {
             const path = root.action === "shot" ? root.fileName()
                 : Quickshell.env("XDG_RUNTIME_DIR") + "/qs-capture-" + Date.now() + ".png";
             cut.grabToImage(result => {
-                result.saveToFile(path);
+                const saved = result.saveToFile(path);
                 capture.immediate = false;
+                if (!saved) {
+                    // Say so rather than "saved": the folder may be gone or not writable.
+                    root.open = false;
+                    Notifications.send("Screenshot", "dialog-warning", "Couldn't save the screenshot",
+                                       "It couldn't be written to " + path + ".", false, []);
+                    return;
+                }
                 if (root.action === "shot")
                     root.done(path);
                 else

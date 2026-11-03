@@ -12,7 +12,7 @@ step "Zen: the wallpaper's colors"
 zen="$HOME/.config/zen"
 profile=$(sed -n 's/^Default=//p' "$zen/installs.ini" 2>/dev/null | head -n 1)
 if [[ -z $profile || ! -d $zen/$profile ]]; then
-    echo "Skipped: start Zen once, then run `ghost install zen`."
+    echo "Skipped: start Zen once, then run \`ghost install zen\`."
     exit 0
 fi
 chrome="$zen/$profile/chrome"

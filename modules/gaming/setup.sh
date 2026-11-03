@@ -14,7 +14,7 @@ if [[ -d $steam_dir/ubuntu12_64 ]]; then
     ln -sf /usr/lib/millennium/libmillennium_bootstrap_x86.so "$steam_dir/ubuntu12_32/libXtst.so.6"
     ln -sf /usr/lib/millennium/libmillennium_bootstrap_hhx64.so "$steam_dir/ubuntu12_64/libXtst.so.6"
 else
-    echo "Skipped: start Steam once, then run `ghost install gaming`."
+    echo "Skipped: start Steam once, then run \`ghost install gaming\`."
 fi
 
 step "Steam: Material-Theme in the wallpaper's colors"
@@ -44,5 +44,5 @@ if [[ -f $millennium_config ]]; then
     '
     echo "Restart Steam to load the theme."
 else
-    echo "Skipped selecting it: start Steam once (Millennium writes its settings), then run `ghost install gaming`."
+    echo "Skipped selecting it: start Steam once (Millennium writes its settings), then run \`ghost install gaming\`."
 fi

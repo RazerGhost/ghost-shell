@@ -46,6 +46,15 @@ Singleton {
         }
     }
 
+    Connections {
+        target: Wallpaper
+
+        function onRunningChanged(): void {
+            if (!Wallpaper.running && Settings.loaded)
+                applyLater.restart();
+        }
+    }
+
     SystemClock {
         id: clock
         precision: SystemClock.Minutes
@@ -68,8 +77,11 @@ Singleton {
         id: applyLater
         interval: 300
         onTriggered: {
-            // A change during a run is picked up when it ends (apply's onExited).
-            if (!root.known || apply.running)
+            // A change during a run is picked up when it ends (apply's onExited). A wallpaper's
+            // run read the old scheme file when it started: running alongside, whichever ends
+            // last would win, so wait for it too (picked up by the Connections below). Not for a
+            // wallpaper waiting on us (`Wallpaper.busy`): that one runs after this.
+            if (!root.known || apply.running || Wallpaper.running)
                 return;
             if (!root.appliedRead) {
                 root.applied = current.text();

@@ -182,11 +182,10 @@ Scope {
 
             // The desktop as a card (EditorChrome.card), the examples tiled inside it.
             Component.onCompleted: {
-                Editing.card = chrome.card;
-                Editing.cardScreen = screen?.name ?? "";
+                Editing.showCard(window, screen?.name ?? "", chrome.card);
                 tiling.restart();
             }
-            Component.onDestruction: Editing.cardScreen = ""
+            Component.onDestruction: Editing.hideCard(window)
 
             Connections {
                 target: chrome
