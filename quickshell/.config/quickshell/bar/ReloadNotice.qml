@@ -44,9 +44,8 @@ Row {
             color: Colors.m3onSurfaceVariant
             font.family: Theme.font.mono
             font.pixelSize: Theme.font.small
+            // In full (user's request): the cause is usually the last line of the chain.
             wrapMode: Text.Wrap
-            maximumLineCount: 6
-            elide: Text.ElideRight
         }
     }
 }
