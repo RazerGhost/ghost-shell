@@ -123,4 +123,10 @@ TestCase {
                 "kb_layout=us\nsensitivity=0\nnatural_scroll=false\ntap_to_click=true\n"
                 + "cursor_theme=Adwaita\ncursor_size=24\n");
     }
+
+    function test_bell() {
+        verify(HyprlandConfig.lua({}, false, false, true).includes('bell_sound = "default"'));
+        verify(HyprlandConfig.lua({}, false, false, false).includes('bell_sound = "none"'));
+        verify(HyprlandConfig.lua({}, false, false).includes('bell_sound = "none"'));
+    }
 }

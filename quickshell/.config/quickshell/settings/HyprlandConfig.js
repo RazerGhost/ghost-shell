@@ -110,9 +110,16 @@ const ownWallpaperLua = [
     ""
 ];
 
+// Apps ringing the bell (a terminal's \a, xdg-system-bell): Hyprland plays the system's bell
+// sound itself (0.57), but only while the shell's sounds would play too: Settings -> Sound
+// (all sounds, notifications), not during Do Not Disturb or game mode. `bell` is that answer.
+function bellLua(bell) {
+    return [`hl.config({ misc = { bell_sound = "${bell === true ? "default" : "none"}" } })`, ""];
+}
+
 // The Lua file Hyprland loads last (hyprland.lua), from the settings' values, whether game mode
-// is on and whether a wallpaper is chosen.
-function lua(v, gameMode, wallpaperChosen) {
+// is on, whether a wallpaper is chosen and whether the bell may ring (bellLua).
+function lua(v, gameMode, wallpaperChosen, bell) {
     return [
         "-- Written by Quickshell's Settings (settings/HyprlandSettings.qml); don't edit:",
         "-- it's overwritten. Loaded last by hyprland.lua, so it overrides input.lua and look.lua.",
@@ -142,6 +149,7 @@ function lua(v, gameMode, wallpaperChosen) {
         ...cursorLua(v),
         ...(gameMode === true ? gameModeLua : []),
         ...(wallpaperChosen === true ? ownWallpaperLua : []),
+        ...bellLua(bell),
         // Screens set up in the Display page, by output name (the rest keep monitors.lua's
         // "preferred"); one that isn't safe to write is left out.
         ...Object.entries(v.monitors || {}).map(([output, setup]) => DisplayModes.lua(output, setup)).filter(l => l !== ""),

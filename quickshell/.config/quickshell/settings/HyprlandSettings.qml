@@ -11,7 +11,9 @@ import "HyprlandConfig.js" as HyprlandConfig
 Scope {
     id: root
 
-    readonly property string text: HyprlandConfig.lua(Settings.values, GameMode.on, Wallpaper.path !== "")
+    readonly property bool bell: Settings.values.soundEvents && Settings.values.soundNotifications
+                                 && !Notifications.doNotDisturb && !GameMode.on
+    readonly property string text: HyprlandConfig.lua(Settings.values, GameMode.on, Wallpaper.path !== "", bell)
         + (HyprlandRuntime.lua ? "\n-- While the windows editor is open (services/HyprlandRuntime.qml).\n" + HyprlandRuntime.lua + "\n" : "")
 
     // Not before the wallpaper's file is read either: a moment without it would write Hyprland's
