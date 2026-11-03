@@ -145,7 +145,18 @@ Singleton {
         // wallpaper strip, the launcher and editors) starts here, and windows below it.
         readonly property int reserved:   gap + height
         readonly property int openRadius: root.round(32)  // bottom corners when open (closed: half the height)
-        readonly property int panelWidth: root.px(380) // width of the open menus
+        // The menus' widths (user's choice, 2026-11-04: each its own, so the island morphs into
+        // a shape that fits it): wider for the grids and lists, narrower for the power menu.
+        // panelWidth is the rest's (the hover player, the corner pop-ups).
+        readonly property int panelWidth: root.px(380)
+        readonly property var menuWidths: ({
+            settings: root.px(460), clipboard: root.px(460), emoji: root.px(460),
+            today: root.px(400), media: root.px(400), tray: root.px(400),
+            power: root.px(340)
+        })
+        function menuWidth(name: string): int {
+            return menuWidths[name] ?? panelWidth;
+        }
         // Height of the island's window. The open island never grows past this; the rest of
         // the window is transparent and lets clicks through.
         readonly property int maxHeight:  root.px(840)

@@ -145,6 +145,8 @@ PanelWindow {
 
         shown: IslandViews.shown(root.panel, root.peek)
         hasFocus: root.open
+        // Each menu's own width. Kept while closing, so the menu fading out doesn't reflow.
+        onShownChanged: if (shown !== "") openWidth = Theme.island.menuWidth(shown)
         onCloseRequested: root.island.panel = ""
 
         // The time, the music or the workspace dots, and the alerts beside them.

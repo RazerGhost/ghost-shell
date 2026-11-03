@@ -1842,8 +1842,12 @@ windows).
   is open. Notifications carry no timestamp, so the service records arrival times; after a shell
   restart (not a reload) the history is empty.
 - **Island window height** is 840 px (was 680) so the "today" menu with notifications fits.
-- **Island menu widths:** menus are `Theme.island.panelWidth` (380) wide, and the island's window
-  is just that wide (plus its curves and offset); the wallpaper picker is its own surface.
+- **Island menu widths** (user's choice, 2026-11-04: each menu its own, over one wider size):
+  quick settings, clipboard and emoji 460, today, media and background apps 400, power 340
+  (`Theme.island.menuWidth`); the hover player and the corner pop-ups stay `panelWidth` (380).
+  The island keeps a menu's width while it closes, so the fading menu doesn't reflow. Quick
+  settings' round buttons fit six to a row at 460 when there are more than five. The island's
+  window spans the screen's width; the wallpaper picker is its own surface.
 - **The bottom edge belongs to the dock:** nothing else goes there.
 - **Settings window title bar** (user's request: like the other apps): drawn by the window
   itself, GTK style: "Settings" over the sidebar, the page name, maximize and close (round

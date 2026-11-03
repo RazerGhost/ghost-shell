@@ -433,7 +433,8 @@ Item {
         }
 
         // The simple on/off settings and shortcuts, as round buttons (Android 16's small tiles),
-        // five to a row.
+        // five to a row, or as many as fit with a gap of at least spacing.l when there are more
+        // (six at 460 px); never more columns than buttons, so a short row still spreads out.
         Grid {
             id: toggleGrid
 
@@ -441,10 +442,11 @@ Item {
             // hidden behind the volume slider.
             z: 1
             width: parent.width
-            columns: 5
+            columns: Math.max(5, Math.min(root.toggleList.length,
+                                          Math.floor((width + Theme.spacing.l) / (Theme.tile.round + Theme.spacing.l))))
             rowSpacing: Theme.spacing.s
             // Spread evenly: the gaps share what the buttons leave.
-            columnSpacing: (width - Theme.tile.round * 5) / 4
+            columnSpacing: (width - Theme.tile.round * columns) / (columns - 1)
 
             Repeater {
                 model: root.toggleList
