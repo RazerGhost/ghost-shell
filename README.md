@@ -41,7 +41,7 @@ machine can take what it needs.
   Zed, Yazi, Zen, Discord, Spotify, Steam and MangoHud.
 
 The full plan and every decision behind it: [ROADMAP.md](ROADMAP.md). Keybinds:
-[docs/keybinds.md](docs/keybinds.md).
+[docs/keybinds.md](docs/keybinds.md). Every feature and rule with its files: [docs/index.md](docs/index.md).
 
 ## Install
 
