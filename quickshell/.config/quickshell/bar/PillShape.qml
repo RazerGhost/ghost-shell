@@ -3,9 +3,9 @@ import QtQuick.Shapes
 import qs.theme
 import "PillPath.js" as PillPath
 
-// The outline of one of the island's pills (bar/IslandPill.qml): floating, or attached to the
-// top edge in the middle or in a top corner (`mode`, see PillPath.js). The body is bodyWidth x
-// bodyHeight and starts at bodyX in the shape (the fillets stick out of it). Animating
+// The island's outline (bar/IslandPill.qml): floating, or attached to the top edge (`mode`, see
+// PillPath.js). The body is bodyWidth x bodyHeight and starts at bodyX in the shape (the fillets
+// stick out of it). Animating
 // bodyWidth, bodyHeight and radius morphs it; the path follows every frame.
 Shape {
     id: root
@@ -22,7 +22,7 @@ Shape {
     readonly property var geometry: PillPath.size(mode, bodyWidth, bodyHeight, fillet)
     readonly property real bodyX: geometry.bodyX
     // The radius actually drawn (it never exceeds what the body has room for).
-    readonly property real drawnRadius: PillPath.radius(mode, bodyWidth, bodyHeight, radius, fillet)
+    readonly property real drawnRadius: PillPath.radius(bodyWidth, bodyHeight, radius)
 
     width: geometry.width
     height: geometry.height

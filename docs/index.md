@@ -98,11 +98,12 @@ Recovery procedures (lock screen crash, login screen failure) are in ROADMAP Pha
 
 | Feature | Files |
 |---|---|
-| Island: three pills (workspaces, clock, status icons), floating or attached to the top edge and corners (`islandAttached`); each morphs into its menus (quick settings and power from the middle one, opened by the status icons) | `bar/Island.qml`, `IslandWindow.qml`, `IslandPill.qml`, `PillShape.qml`, `PillPath.js`, `IslandViews.js` |
+| Island: one shape with the time (or music) and alerts, floating or attached to the top edge (`islandAttached`); click for today, right-click for quick settings; morphs into every menu | `bar/Island.qml`, `IslandWindow.qml`, `IslandPill.qml`, `PillShape.qml`, `PillPath.js`, `IslandViews.js`, `IslandButton.qml` |
+| Island alerts: recording, timer, microphone, camera, screen sharing, low battery | `bar/IslandAlerts.qml` |
 | Pop-ups in the top-right corner: up to three notifications, attention requests, the reload notice | `bar/PopupStack.qml` |
-| Workspace dots (3-10 or only used), hover numbers with minimized windows, scroll to step | `bar/Workspaces.qml`, `WorkspaceNumbers.qml`, `services/WorkspaceSlots.js` |
+| Workspace dots (3-10 or only used), shown in the island for a moment after a switch; scroll over the island to step | `bar/Workspaces.qml`, `services/WorkspaceSlots.js` |
 | Clock (day, seconds, 24-hour options) | `bar/Clock.qml` |
-| Status icons: Wi-Fi, Bluetooth, VPN, airplane, timer, updates, muted, battery (each hideable); privacy icons always shown | `bar/StatusIcons.qml`, `BatteryPill.qml`, `widgets/WifiIcon.qml` |
+| Status icons in quick settings' top row: Wi-Fi, Bluetooth, VPN, airplane, updates, muted (each hideable), the battery | `controlcenter/StatusIcons.qml`, `BatteryPill.qml`, `widgets/WifiIcon.qml` |
 | Media "live activity" (cover replaces the clock), small player on hover | `bar/MediaActivity.qml`, `controlcenter/MediaCard.qml` |
 | Shell reload notices and errors | `bar/ReloadNotice.qml` |
 | Recording dot, timer countdown in the island | `services/Recorder.qml`, `services/Countdown.qml` |
@@ -117,7 +118,7 @@ Recovery procedures (lock screen crash, login screen failure) are in ROADMAP Pha
 | Sound page: output, microphone, per-app volume, equalizer preset | `controlcenter/SoundPage.qml` |
 | System page: CPU, memory, GPUs, disk, busiest apps with End task | `controlcenter/SystemPage.qml`, `services/SystemStats.qml`, `system-stats.sh` |
 | Phone page: ring, send files, clipboard, browse | `controlcenter/PhonePage.qml`, `services/Phone.qml`, `phone.sh` |
-| Background apps (tray) | `controlcenter/Tray.qml` |
+| Background apps (tray), from quick settings' bottom row | `controlcenter/Tray.qml` |
 | Today: date, folded calendar with event dots, weather, agenda, to-do, note, timer, grouped notifications | `controlcenter/TodayPanel.qml`, `TodayTools.qml`, `WeatherRow.qml`, `AgendaList.qml` |
 | Media menu: cover colors, seek, shuffle/repeat | `controlcenter/MediaPanel.qml`, `MediaAccent.js` |
 | Clipboard: history, images, search, pins, paste into the previous window | `controlcenter/ClipboardPanel.qml`, `services/Clipboard.qml`, `ClipboardEntries.js` |

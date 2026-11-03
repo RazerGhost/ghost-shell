@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Services.SystemTray
 import Quickshell.Services.UPower
 import qs.services
 import qs.settings
@@ -9,7 +10,7 @@ import "QuickItems.js" as QuickItems
 import "../services/PowerModes.js" as PowerModes
 import "../widgets/OrderedList.js" as OrderedList
 
-// The quick settings menu: tiles, volume and brightness sliders and the battery.
+// The quick settings menu: the status icons and battery, tiles, volume and brightness sliders.
 // The Wi-Fi, Bluetooth and Sound tiles slide in a page of their own, like Android.
 Item {
     id: root
@@ -319,6 +320,37 @@ Item {
             NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }
         }
 
+        // The status icons and the battery, like the top of Android's quick settings (user's
+        // choice, 2026-11-03: they left the closed island).
+        Item {
+            width: parent.width
+            height: Theme.island.height
+            visible: !root.editing
+
+            StatusIcons {
+                anchors.left: parent.left
+                anchors.leftMargin: Theme.spacing.s
+            }
+
+            Row {
+                visible: Battery.present
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.spacing.s
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacing.s
+
+                BatteryPill {}
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: Math.round(Battery.level * 100) + "%" + (Battery.timeLabel ? " · " + Battery.timeLabel : "")
+                    color: Colors.m3onSurfaceVariant
+                    font.family: Theme.font.sans
+                    font.pixelSize: Theme.font.small
+                }
+            }
+        }
+
         // Edit mode's header: what it is, back to the defaults, and done.
         Item {
             width: parent.width
@@ -612,37 +644,12 @@ Item {
             }
         }
 
-        // Battery on the left; edit, system, settings, wallpaper and power buttons on the right.
+        // Edit, system, settings, wallpaper and power buttons (and background apps while there
+        // are some).
         Item {
             width: parent.width
             visible: !root.editing
             implicitHeight: Theme.slider.height
-
-            Row {
-                visible: Battery.present
-                anchors.left: parent.left
-                anchors.leftMargin: Theme.spacing.s
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.spacing.s
-
-                MaterialIcon {
-                    id: batteryIcon
-                    anchors.verticalCenter: parent.verticalCenter
-                    icon: Battery.icon
-                    color: Battery.low ? Colors.m3error : Colors.m3onSurface
-                }
-
-                // Up to the buttons, then "…".
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: Math.min(implicitWidth, bottomButtons.x - Theme.spacing.s * 3 - batteryIcon.width)
-                    elide: Text.ElideRight
-                    text: Math.round(Battery.level * 100) + "%" + (Battery.timeLabel ? " · " + Battery.timeLabel : "")
-                    color: Colors.m3onSurfaceVariant
-                    font.family: Theme.font.sans
-                    font.pixelSize: Theme.font.normal
-                }
-            }
 
             Row {
                 id: bottomButtons
@@ -650,6 +657,15 @@ Item {
                 anchors.rightMargin: Theme.spacing.xs
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.spacing.s
+
+                // The system tray's apps (user's choice, 2026-11-03: out of the island).
+                IconButton {
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: SystemTray.items.values.length > 0
+                    icon: "apps"
+                    label: "Background apps"
+                    onClicked: root.openMenu("tray")
+                }
 
                 IconButton {
                     anchors.verticalCenter: parent.verticalCenter

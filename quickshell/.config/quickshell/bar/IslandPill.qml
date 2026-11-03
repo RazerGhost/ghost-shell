@@ -3,18 +3,14 @@ import Quickshell
 import qs.theme
 import qs.widgets
 
-// One of the island's three pills (bar/IslandWindow.qml): the workspaces on the left, the time in
-// the middle, the status icons on the right. Its top row is `row`; below it, the view whose slot
-// is `shown` (a menu or a hover view), into which the pill morphs: width, height and corners
-// animate together. The left pill grows to the right, the right one to the left, the middle one
-// both ways. Floating (the default), each is rounded all round below the top edge; attached
-// (Settings' islandAttached), the middle one grows out of the top edge and the side ones out of
-// the top corners (PillShape.qml).
+// The island's shape (bar/IslandWindow.qml), under the webcam. Its top row is `row`; below it,
+// the view whose slot is `shown` (a menu or a hover view), into which it morphs: width, height
+// and corners animate together, growing both ways from the middle. Floating (the default) it's
+// rounded all round below the top edge; attached (Settings' islandAttached) it grows out of the
+// top edge (PillShape.qml).
 Item {
     id: pill
 
-    // "left", "center" or "right"
-    required property string side
     // The view shown below the row ("" closed); MenuSlots compare it with their own name.
     property string shown: ""
     // Its menu is open: the keyboard goes to it (arrow keys between its controls, Escape closes).
@@ -26,19 +22,19 @@ Item {
     readonly property bool expanded: shown !== ""
     readonly property bool hovered: content.containsMouse
     readonly property real closedWidth: row.implicitWidth + Theme.island.padding * 2
-    readonly property string mode: !Theme.island.attached ? "float" : side === "center" ? "top" : side
+    readonly property string mode: Theme.island.attached ? "top" : "float"
     // Blur behind exactly the shape (ext-background-effect): the body with its round corners, and
-    // the fillets (squares with the fillet's circle cut out). IslandWindow joins the three.
+    // the fillets (squares with the fillet's circle cut out).
     readonly property Region blur: Region {
         item: content
         topLeftRadius: pill.mode === "float" ? shape.drawnRadius : 0
         topRightRadius: pill.mode === "float" ? shape.drawnRadius : 0
-        bottomLeftRadius: pill.mode === "left" ? 0 : shape.drawnRadius
-        bottomRightRadius: pill.mode === "right" ? 0 : shape.drawnRadius
+        bottomLeftRadius: shape.drawnRadius
+        bottomRightRadius: shape.drawnRadius
 
-        // The fillet into the top edge on the left ("top", "right").
+        // The fillet into the top edge on the left (attached).
         Region {
-            readonly property bool used: pill.mode === "top" || pill.mode === "right"
+            readonly property bool used: pill.mode === "top"
             x: pill.x
             y: pill.y
             width: used ? shape.fillet : 0
@@ -54,9 +50,9 @@ Item {
             }
         }
 
-        // The fillet into the top edge on the right ("top", "left").
+        // The fillet into the top edge on the right (attached).
         Region {
-            readonly property bool used: pill.mode === "top" || pill.mode === "left"
+            readonly property bool used: pill.mode === "top"
             x: pill.x + shape.bodyX + shape.bodyWidth
             y: pill.y
             width: used ? shape.fillet : 0
@@ -71,32 +67,11 @@ Item {
                 height: shape.fillet * 2
             }
         }
-
-        // The fillet into the side edge below a corner pill ("left", "right").
-        Region {
-            readonly property bool used: pill.mode === "left" || pill.mode === "right"
-            readonly property real left: pill.mode === "left" ? pill.x : pill.x + shape.bodyX + shape.bodyWidth - shape.fillet
-            x: left
-            y: pill.y + shape.bodyHeight
-            width: used ? shape.fillet : 0
-            height: used ? shape.fillet : 0
-
-            Region {
-                shape: RegionShape.Ellipse
-                intersection: Intersection.Subtract
-                x: pill.mode === "left" ? pill.x : pill.x + shape.bodyX + shape.bodyWidth - shape.fillet * 2
-                y: pill.y + shape.bodyHeight
-                width: shape.fillet * 2
-                height: shape.fillet * 2
-            }
-        }
     }
 
     signal closeRequested()
 
-    x: side === "left" ? Theme.island.side
-        : side === "right" ? parent.width - Theme.island.side - width
-        : (parent.width - width) / 2 + Theme.island.offset // under the webcam
+    x: (parent.width - width) / 2 + Theme.island.offset // under the webcam
     y: Theme.island.gap
     width: shape.width
     height: shape.height
@@ -151,13 +126,11 @@ Item {
             area: views
         }
 
-        // The top row stays against the pill's outer side as it grows (the middle one centered).
+        // The top row stays centered as it grows.
         Row {
             id: row
 
-            x: pill.side === "left" ? Theme.island.padding
-                : pill.side === "right" ? parent.width - width - Theme.island.padding
-                : (parent.width - width) / 2
+            x: (parent.width - width) / 2
             height: Theme.island.height
         }
 
@@ -166,7 +139,7 @@ Item {
             id: views
 
             anchors.top: row.bottom
-            x: pill.side === "left" ? 0 : pill.side === "right" ? parent.width - width : (parent.width - width) / 2
+            x: (parent.width - width) / 2
             width: Math.max(pill.closedWidth, pill.openWidth)
             implicitHeight: children.find(slot => slot.shown)?.implicitHeight ?? 0
         }

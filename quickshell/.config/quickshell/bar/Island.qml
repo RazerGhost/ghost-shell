@@ -4,19 +4,19 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import qs.services
 
-// The bar: an "island" of three pills at the top of each monitor (floating, or attached to the
-// edge): the workspaces, the time and the status icons. Clicking the time or the status icons
-// morphs that pill into a menu: "today" (calendar) or "settings" (quick settings). While music
-// plays, a "live activity" (the cover) takes the time's place: hovering it shows a small player
-// (and the time again), clicking it or the player opens the "media" menu. Hovering the workspace
-// dots shows the minimized windows. New notifications pop up in the top-right corner of the
+// The bar: an "island" at the top of each monitor (floating, or attached to the edge) showing the
+// time and what needs attention. A click morphs it into the "today" menu (calendar), a
+// right-click into "settings" (quick settings). While music plays, a "live activity" (the cover)
+// takes the time's place: hovering it shows a small player (and the time again), clicking it or
+// the player opens the "media" menu. Switching workspaces shows the dots for a moment. New
+// notifications pop up in the top-right corner of the
 // focused monitor (PopupStack.qml). One menu is open at a time, on one monitor; click outside it
 // or press Escape to close it. This file holds that shared state; IslandWindow.qml draws the
 // island on each monitor.
 Scope {
     id: root
 
-    // "", "today", "settings", "media", "power", "clipboard" or "emoji"
+    // "", "today", "settings", "media", "power", "tray", "clipboard" or "emoji"
     property alias panel: persist.panel
     property alias screenName: persist.screenName // the monitor the menu is open on
 

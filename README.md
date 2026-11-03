@@ -13,10 +13,11 @@ machine can take what it needs.
 
 ## What's in it
 
-- **The island**: the bar, three pills floating below the top edge (or attached to it): the
-  workspaces, the time (or the playing song's cover) and status icons. Notifications pop up in the
-  top-right corner. The pills open into menus: quick settings (Wi-Fi, Bluetooth,
-  sound, power mode, game mode, system stats), today (date, weather, calendar and its events, to-do, note, timer,
+- **The island**: the bar, one shape floating below the top edge (or attached to it) with only
+  the time (or the playing song's cover) and what needs attention (recording, microphone, camera,
+  timer, low battery); switching workspaces shows the dots for a moment. Notifications pop up in
+  the top-right corner. It opens into menus (click: today, right-click: quick settings): quick
+  settings (status icons, Wi-Fi, Bluetooth, sound, power mode, game mode, system stats), today (date, weather, calendar and its events, to-do, note, timer,
   notifications), background apps, media, clipboard, emoji.
 - **Windows**: a tiling layout of its own (halves, thirds, quarters from the window menu, or by
   the number of windows), Snap Assist, window tabs, Alt+Tab with live previews, an overview

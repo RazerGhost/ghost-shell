@@ -18,20 +18,10 @@ TestCase {
         compare(PillPath.size("top", 100, 36, 14), { width: 128, height: 36, bodyX: 14 });
     }
 
-    function test_corners() {
-        // Against the left edge: only the inner bottom corner is round; the fillet below runs
-        // into the left edge at the shape's bottom.
-        compare(PillPath.path("left", 100, 36, 18, 14),
-                "M 0 0 L 114 0 A 14 14 0 0 0 100 14 L 100 18 A 18 18 0 0 1 82 36 L 14 36 A 14 14 0 0 0 0 50 Z");
-        compare(PillPath.path("right", 100, 36, 18, 14),
-                "M 0 0 L 114 0 L 114 50 A 14 14 0 0 0 100 36 L 32 36 A 18 18 0 0 1 14 18 L 14 14 A 14 14 0 0 0 0 0 Z");
-        compare(PillPath.size("right", 100, 36, 14), { width: 114, height: 50, bodyX: 14 });
-    }
-
     function test_radiusFits() {
-        // Never larger than the body (or than leaves room for a corner pill's fillets).
-        compare(PillPath.radius("float", 30, 36, 32, 14), 15);
-        compare(PillPath.radius("left", 400, 30, 32, 14), 16);
-        compare(PillPath.radius("top", 400, 600, 32, 14), 32);
+        // Never larger than the body allows.
+        compare(PillPath.radius(30, 36, 32), 15);
+        compare(PillPath.radius(400, 30, 32), 15);
+        compare(PillPath.radius(400, 600, 32), 32);
     }
 }

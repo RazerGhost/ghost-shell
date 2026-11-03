@@ -79,8 +79,9 @@ Singleton {
             property int nightLightEnd: 7 * 60
             property int nightLightTemperature: 4000 // Kelvin; lower is warmer
 
-            // The island's status icons you've hidden, by key (bar/StatusIcons.qml); the privacy
-            // ones (recording, microphone, camera, screen sharing) always show.
+            // The status icons you've hidden, by key (quick settings' controlcenter/StatusIcons.qml,
+            // and the island's timer, bar/IslandAlerts.qml); the privacy ones (recording,
+            // microphone, camera, screen sharing) always show in the island.
             property var hiddenStatusIcons: []
             // The dock: "hide" (shows at the bottom edge), "always" (reserves its space) or "off".
             property string dockMode: "hide"

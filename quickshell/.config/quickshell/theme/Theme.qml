@@ -57,7 +57,7 @@ Singleton {
     }
 
     readonly property QtObject icon: QtObject {
-        readonly property int small:    root.px(16) // status icons in the closed island
+        readonly property int small:    root.px(16) // status icons (quick settings, the island's alerts)
         readonly property int normal:   root.px(20) // buttons, tiles, sliders
         readonly property int launcher: root.px(32) // app icons in the launcher list
         readonly property int osd:      root.px(18) // the OSD's icon
@@ -137,8 +137,8 @@ Singleton {
         readonly property int fillet:     root.px(14)  // radius of the concave joins to the screen edge
         // Floating (the default) or attached to the top edge (Settings' islandAttached).
         readonly property bool attached:  Settings.values.islandAttached === true
-        // Floating: the gap above the pills, and the side pills' distance from the screen's sides,
-        // the windows' own gap to the edges, so the pills line up with them.
+        // Floating: the gap above the island, and the corner pop-ups' distance from the screen's
+        // side, the windows' own gap to the edges, so they line up with them.
         readonly property int gap:        attached ? 0 : root.px(6)
         readonly property int side:       attached ? 0 : Math.max(gap, HyprlandConfig.number(Settings.values.gapsOut, 20))
         // The top band the island takes: what's below it (menus' cards, the OSD at the top, the
@@ -149,6 +149,8 @@ Singleton {
         // Height of the island's window. The open island never grows past this; the rest of
         // the window is transparent and lets clicks through.
         readonly property int maxHeight:  root.px(840)
+        // How long the workspace dots stay in the time's place after the workspace changes (ms).
+        readonly property int workspaceFlash: 1200
     }
 
     readonly property QtObject tile: QtObject {
@@ -286,7 +288,7 @@ Singleton {
         readonly property real low: 0.15 // at or below this (and discharging) the battery turns red
         readonly property real warn: 0.20     // a "battery low" notification (services/BatteryAlerts.qml)
         readonly property real critical: 0.10 // a critical one, which stays until dismissed
-        // The battery pill in the island (bar/BatteryPill.qml).
+        // The battery pill in quick settings (controlcenter/BatteryPill.qml).
         readonly property int width:  root.px(22)
         readonly property int height: root.px(11)
         readonly property int radius: root.round(4)

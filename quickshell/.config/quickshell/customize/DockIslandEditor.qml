@@ -12,8 +12,8 @@ import "Presets.js" as Presets
 // The dock and island editor, like editing macOS's menu bar and Dock in place: the real island
 // and dock (shown while it's open, wherever the dock would hide) change as you pick, on an
 // empty workspace (Done or Cancel go back). The sheet sits in the middle of the screen, clear
-// of both. Island: the workspace dots, the clock and
-// which status icons show. Dock: when it shows and its icons' size; pinning and moving apps is
+// of both. Island: floating or attached, the workspace dots
+// it shows when you switch, the clock and which status icons show (in quick settings). Dock: when it shows and its icons' size; pinning and moving apps is
 // done on the dock itself (drag, right-click). Cancel writes the earlier settings back. Opened from
 // Settings -> Windows and the launcher (Customize.qml).
 Scope {
@@ -114,22 +114,6 @@ Scope {
                                         anchors.centerIn: parent
                                         spacing: look.unit
 
-                                        Row {
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            spacing: look.unit * 0.4
-
-                                            Repeater {
-                                                model: look.values.workspaceDots || 2
-
-                                                Rectangle {
-                                                    width: look.unit * 0.8
-                                                    height: width
-                                                    radius: width / 2
-                                                    color: index === 0 ? Colors.m3primary : Colors.m3onSurfaceVariant
-                                                }
-                                            }
-                                        }
-
                                         Text {
                                             anchors.verticalCenter: parent.verticalCenter
                                             // A sample afternoon, as your clock would read it (12 or 24 hours).
@@ -179,15 +163,15 @@ Scope {
                     }
                 }
 
-                // Island: the workspace dots (drawn at your count), the clock (as it will read) and
-                // which status icons show.
+                // Island: its style, the workspace dots (drawn at your count), the clock (as it will
+                // read) and which status icons show.
                 SheetTiles {
                     visible: chrome.tab === "island"
 
-                    // Floating pills, or attached to the top edge (the side ones in its corners).
+                    // Floating, or attached to the top edge.
                     SheetTile {
                         title: "Style"
-                        subtitle: Theme.island.attached ? "Grows out of the top edge and corners" : "Floats below the top edge"
+                        subtitle: Theme.island.attached ? "Grows out of the top edge" : "Floats below the top edge"
 
                         Segmented {
                             anchors.centerIn: parent
@@ -199,7 +183,7 @@ Scope {
 
                     SheetTile {
                         title: "Workspace dots"
-                        subtitle: Settings.values.workspaceDots === 0 ? "Only the ones in use" : "Always this many, more when in use"
+                        subtitle: "Shown in the island when you switch; " + (Settings.values.workspaceDots === 0 ? "only the ones in use" : "more when in use")
                         weight: 1.3
 
                         // The dots as the island draws them: the current one a wide pill.
@@ -281,11 +265,12 @@ Scope {
                         }
                     }
 
-                    // Status icons as chips, filled while shown (the privacy ones always show:
-                    // recording, microphone, camera, screen sharing).
+                    // Status icons as chips, filled while shown: quick settings' top row, and the
+                    // island's timer (the privacy ones always show in the island: recording,
+                    // microphone, camera, screen sharing).
                     SheetTile {
                         title: "Status icons"
-                        subtitle: "Microphone, camera and sharing always show"
+                        subtitle: "In quick settings; the timer in the island"
                         weight: 1.4
 
                         Flow {
@@ -302,8 +287,7 @@ Scope {
                                         { key: "airplane", icon: "flight", label: "Airplane" },
                                         { key: "timer", icon: "timer", label: "Timer" },
                                         { key: "updates", icon: "download", label: "Updates" },
-                                        { key: "muted", icon: "volume_off", label: "Muted" },
-                                        { key: "battery", icon: "battery_full", label: "Battery" }
+                                        { key: "muted", icon: "volume_off", label: "Muted" }
                                     ]
 
                                     Rectangle {

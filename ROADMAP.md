@@ -1694,28 +1694,33 @@ User's pick of the full Quickshell 0.3.2 / Hyprland 0.57 docs scan's small items
   `Networking.checkConnectivity()`. Hyprland 0.57.1 (fixes a lock screen error when a screen is
   unplugged) comes with the next system update.
 
-### The island as three pills, notifications in the corner (built 2026-11-03)
+### One island, notifications in the corner (built 2026-11-03)
 User's picks from the layout research (the volume pop-up stays where it is):
 - Notifications pop up in the top-right corner of the focused screen, under the island
   (`bar/PopupStack.qml`): up to three at once, oldest at the top, each with its own time (the
   pointer over them pauses all, critical ones stay), with the attention card and the reload
-  notice in the same stack. They wait only while the right pill's menu (background apps) is
-  open there (it sits in that corner), not behind every menu as before (`Notifications.popups`, `done`).
-- The island is three pills (`bar/IslandPill.qml`, one window per screen across the top): the
-  workspaces on the left (hover: the numbers and minimized windows), the time or the music in
-  the middle (today, media, clipboard, emoji; still under the webcam), the status icons on the
-  right (background apps). Each morphs into its menus; the left grows right, the right grows
-  left. Quick settings and power open from the middle pill, though the status icons ask for them
-  (user's choice, the same day: tried in the right pill first). `IslandViews.side`/`shown` (tested) say which pill shows what.
-  The symmetric widths of the one-shape island are gone.
-- Floating by default: a gap above, rounded all round, the side pills as far from the screen's
-  sides as the windows are (gaps_out), so they line up. Attached (the dock and island editor's
-  Style, `islandAttached`): the middle pill grows out of the top edge as before, and the side
-  pills out of the top corners, flat against both edges with a fillet into each, like tabs.
-  The outlines are SVG paths from `bar/PillPath.js` (tested); `Theme.island.reserved` (gap +
-  height) is what the menus' cards, the OSD at the top, the wallpaper strip, launcher, overview,
-  editors and window menu sit below.
-- Not yet: the dock and island editor's Looks cards still draw the one-shape island.
+  notice in the same stack. They no longer wait behind an open menu (`Notifications.popups`,
+  `done`).
+- First built as three pills (workspaces left, time middle, status icons right; the side ones in
+  the top corners when attached). The user's review the same day: quick settings belonged in the
+  middle, and workspaces, status icons and background apps in the island (or beside it) looked
+  uneven. Now one shape (`bar/IslandPill.qml`) under the webcam with only the time (or the
+  music's cover) and alerts beside it (`bar/IslandAlerts.qml`: a recording, the timer, the
+  microphone, camera or screen in use, a low battery). A click opens today (or media), a
+  right-click quick settings (`IslandButton.secondaryActivated`); it morphs into every menu.
+- Workspaces: the dots take the time's place for 1.2 s after the workspace changes
+  (`Theme.island.workspaceFlash`; longer while the pointer is on them, to click one), and
+  scrolling over the island steps through them. All of them and the minimized windows are in the
+  overview (Super+Tab); the hover numbers (`WorkspaceNumbers`) are gone.
+- Status icons (Wi-Fi, Bluetooth, VPN, airplane, updates, muted) and the battery with its
+  percentage are quick settings' top row (`controlcenter/StatusIcons.qml`, `BatteryPill.qml`);
+  background apps open from a button in its bottom row (while there are some). The dock and
+  island editor's Status icons chips hide them there (and the island's timer).
+- Floating by default: a gap above, rounded all round. Attached (the dock and island editor's
+  Style, `islandAttached`): it grows out of the top edge as before. The outline is an SVG path
+  from `bar/PillPath.js` (tested); `Theme.island.reserved` (gap + height) is what the menus'
+  cards, the OSD at the top, the wallpaper strip, launcher, overview, editors and window menu sit
+  below.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

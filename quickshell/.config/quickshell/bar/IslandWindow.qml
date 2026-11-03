@@ -1,7 +1,6 @@
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
-import Quickshell.Services.SystemTray
 import Quickshell.Wayland
 import qs.controlcenter
 import qs.services
@@ -9,14 +8,14 @@ import qs.theme
 import qs.widgets
 import "IslandViews.js" as IslandViews
 
-// The island on one monitor (see Island.qml), as three pills (user's choice, 2026-11-03; it was
-// one shape with everything in it): the workspaces on the left, the time (or the playing music)
-// in the middle, the status icons on the right. The middle one opens today, media, clipboard,
-// emoji, and quick settings and power (asked for by the status icons); the right one background
-// apps; the left one shows every
-// workspace and the minimized windows while hovered. Notifications pop up in the top-right
-// corner instead (PopupStack.qml). Floating below the top edge, or attached to it (Settings'
-// islandAttached; the dock and island editor).
+// The island on one monitor (see Island.qml): one shape under the webcam that shows only the time
+// (or the playing music) and what needs attention (IslandAlerts.qml), and morphs into every menu
+// (user's choice, 2026-11-03: workspaces, status icons and background apps in it, or in pills of
+// their own, looked uneven). A click opens today (or media while music shows), a right-click
+// quick settings, where the status icons and background apps are now. Switching workspaces shows
+// the dots for a moment in the time's place; scrolling over the island steps through them.
+// Notifications pop up in the top-right corner (PopupStack.qml). Floating below the top edge, or
+// attached to it (Settings' islandAttached; the dock and island editor).
 PanelWindow {
     id: root
 
@@ -27,21 +26,21 @@ PanelWindow {
     readonly property string panel: island.screenName === modelData.name ? island.panel : ""
     readonly property bool open: panel !== ""
 
-    // A small view opened by hovering: "media" (the player, over the live activity) or
-    // "workspaces" (all workspaces as numbers and the minimized windows, over the dots). Unlike a
-    // menu it takes no keyboard and closes when the pointer leaves its pill.
+    // A small view opened by hovering: "media" (the player, over the live activity). Unlike a
+    // menu it takes no keyboard and closes when the pointer leaves the island.
     property string peek: ""
-    // The dots, for the numbers on hover (named apart from WorkspaceNumbers' own `workspaces`).
-    readonly property Item workspaceDots: workspaces
 
-    // While music plays the middle pill shows the music instead of the time. Once it opens
-    // (hover player or a menu) the time comes back, since the music is then shown below it.
-    readonly property bool showMedia: Settings.values.islandMedia && Media.playing && !middle.expanded
+    // The workspace dots, for a moment after the workspace changes (and while the pointer is on
+    // them, to click one), in the time's place.
+    property bool flashing: false
+    readonly property bool showDots: flashing && !open
+    // While music plays the island shows the music instead of the time. Once it opens (hover
+    // player or a menu) the time comes back, since the music is then shown below it.
+    readonly property bool showMedia: Settings.values.islandMedia && Media.playing && !pill.expanded && !showDots
 
     onOpenChanged: peek = ""
 
-    // Hover the live activity or the workspace dots briefly to open their view; leave the pill
-    // to close it.
+    // Hover the live activity briefly to open the player; leave the island to close it.
     Timer {
         interval: Theme.media.hoverDelay
         running: center.containsMouse && root.showMedia
@@ -50,14 +49,27 @@ PanelWindow {
 
     Timer {
         interval: Theme.media.hoverDelay
-        running: workspaces.hovered && !root.open
-        onTriggered: root.peek = "workspaces"
+        running: root.peek === "media" && !pill.hovered
+        onTriggered: root.peek = ""
     }
 
     Timer {
-        interval: Theme.media.hoverDelay
-        running: (root.peek === "media" && !middle.hovered) || (root.peek === "workspaces" && !left.hovered)
-        onTriggered: root.peek = ""
+        id: flashTimer
+        interval: Theme.island.workspaceFlash
+        onTriggered: {
+            if (workspaces.hovered)
+                restart();
+            else
+                root.flashing = false;
+        }
+    }
+
+    Connections {
+        target: workspaces
+        function onActiveChanged(): void {
+            root.flashing = true;
+            flashTimer.restart();
+        }
     }
 
     // The window spans the top of the screen as tall as a pill can get, and stays that size:
@@ -68,16 +80,10 @@ PanelWindow {
     anchors.right: true
     implicitHeight: Theme.island.maxHeight
     color: "transparent"
-    mask: Region {
-        item: left
-        Region { item: middle }
-        Region { item: right }
-    }
-    BackgroundEffect.blurRegion: Region {
-        regions: [left.blur, middle.blur, right.blur]
-    }
+    mask: Region { item: pill }
+    BackgroundEffect.blurRegion: pill.blur
 
-    // Reserve only the closed pills' band; open menus float over windows.
+    // Reserve only the closed island's band; open menus float over windows.
     exclusionMode: ExclusionMode.Normal
     exclusiveZone: Theme.island.reserved
 
@@ -105,7 +111,7 @@ PanelWindow {
         onCleared: root.island.panel = ""
     }
 
-    // One view below a pill's top row: a menu or a hover view. The shown one fades in while the
+    // One view below the island's top row: a menu or a hover view. The shown one fades in while the
     // pill grows around it. `extraHeight` is room the content's margins take below it. Light
     // views are written inside the slot and always exist. The menus are a `content` Component
     // instead, built only while shown or fading out and freed after: built all the time (on
@@ -134,65 +140,30 @@ PanelWindow {
         }
     }
 
-    // The workspaces. Hovering them shows every workspace as a number, and the minimized windows.
     IslandPill {
-        id: left
+        id: pill
 
-        side: "left"
-        shown: IslandViews.shown("left", root.panel, root.peek === "workspaces" ? "workspaces" : "")
+        shown: IslandViews.shown(root.panel, root.peek)
+        hasFocus: root.open
         onCloseRequested: root.island.panel = ""
 
-        row: Workspaces {
-            id: workspaces
-            anchors.verticalCenter: parent.verticalCenter
-            screen: root.modelData
-        }
-
-        MenuSlot {
-            shown: left.shown === "peek-workspaces"
-            extraHeight: Theme.spacing.m * 2
-
-            Column {
-                x: Theme.spacing.l
-                y: Theme.spacing.s
-                width: parent.width - Theme.spacing.l * 2
-                spacing: Theme.spacing.m
-
-                WorkspaceNumbers {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    workspaces: root.workspaceDots
-                }
-
-                MinimizedList {
-                    width: parent.width
-                    visible: Windows.minimized.length > 0
-                    onRestored: root.peek = ""
-                }
-            }
-        }
-    }
-
-    // The time, or the live activity while music plays. Clicking opens whichever is showing.
-    IslandPill {
-        id: middle
-
-        side: "center"
-        shown: IslandViews.shown("center", root.panel, root.peek === "media" ? "media" : "")
-        hasFocus: IslandViews.side(root.panel) === "center"
-        onCloseRequested: root.island.panel = ""
-
+        // The time, the music or the workspace dots, and the alerts beside them.
         row: IslandButton {
             id: center
 
             readonly property string menu: root.showMedia ? "media" : "today"
 
             label: root.showMedia ? "Media" : "Calendar"
-            active: root.panel === menu
+            secondaryLabel: "Quick settings"
+            active: root.open
             onActivated: root.island.toggle(menu, root.modelData.name)
+            onSecondaryActivated: root.island.toggle("settings", root.modelData.name)
+            onWheel: wheel => workspaces.scroll(wheel.angleDelta.y)
 
             Item {
                 anchors.verticalCenter: parent.verticalCenter
-                implicitWidth: root.showMedia ? activity.implicitWidth : clock.implicitWidth
+                implicitWidth: root.showDots ? workspaces.implicitWidth
+                             : root.showMedia ? activity.implicitWidth : clock.implicitWidth
                 implicitHeight: Theme.island.height
 
                 Behavior on implicitWidth {
@@ -202,7 +173,7 @@ PanelWindow {
                 Clock {
                     id: clock
                     anchors.horizontalCenter: parent.horizontalCenter
-                    opacity: root.showMedia ? 0 : 1
+                    opacity: root.showMedia || root.showDots ? 0 : 1
                     visible: opacity > 0
 
                     Behavior on opacity {
@@ -220,12 +191,27 @@ PanelWindow {
                         NumberAnimation { duration: Theme.anim.normal }
                     }
                 }
+
+                // Kept, not hidden, so it follows the workspace while it's out of sight.
+                Workspaces {
+                    id: workspaces
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    screen: root.modelData
+                    opacity: root.showDots ? 1 : 0
+                    enabled: root.showDots
+
+                    Behavior on opacity {
+                        NumberAnimation { duration: Theme.anim.normal }
+                    }
+                }
             }
+
+            IslandAlerts {}
         }
 
         // The hover player. Clicking it (outside its buttons) opens the media menu.
         MenuSlot {
-            shown: middle.shown === "peek-media"
+            shown: pill.shown === "peek-media"
             extraHeight: Theme.spacing.s
 
             MediaCard {
@@ -238,7 +224,7 @@ PanelWindow {
         }
 
         MenuSlot {
-            shown: middle.shown === "emoji"
+            shown: pill.shown === "emoji"
             content: Component {
                 EmojiPanel {
                     width: parent.width
@@ -251,7 +237,7 @@ PanelWindow {
         }
 
         MenuSlot {
-            shown: middle.shown === "clipboard"
+            shown: pill.shown === "clipboard"
             content: Component {
                 ClipboardPanel {
                     width: parent.width
@@ -264,7 +250,7 @@ PanelWindow {
         }
 
         MenuSlot {
-            shown: middle.shown === "media"
+            shown: pill.shown === "media"
             content: Component {
                 MediaPanel {
                     width: parent.width
@@ -273,7 +259,7 @@ PanelWindow {
         }
 
         MenuSlot {
-            shown: middle.shown === "power"
+            shown: pill.shown === "power"
             content: Component {
                 PowerPanel {
                     width: parent.width
@@ -283,7 +269,7 @@ PanelWindow {
         }
 
         MenuSlot {
-            shown: middle.shown === "settings"
+            shown: pill.shown === "settings"
             content: Component {
                 QuickSettings {
                     width: parent.width
@@ -307,63 +293,16 @@ PanelWindow {
         }
 
         MenuSlot {
-            shown: middle.shown === "today"
+            shown: pill.shown === "today"
             content: Component {
                 TodayPanel {
                     width: parent.width
                 }
             }
         }
-    }
-
-    // The status icons (they open quick settings in the middle pill) and, while apps run in the
-    // background, an arrow at the outer end that opens their menu.
-    IslandPill {
-        id: right
-
-        side: "right"
-        shown: IslandViews.shown("right", root.panel, "")
-        hasFocus: IslandViews.side(root.panel) === "right"
-        onCloseRequested: root.island.panel = ""
-
-        row: [
-            IslandButton {
-                id: status
-                anchors.verticalCenter: parent.verticalCenter
-                label: "Quick settings"
-                active: root.panel === "settings"
-                onActivated: root.island.toggle("settings", root.modelData.name)
-
-                StatusIcons {}
-            },
-            IslandButton {
-                id: trayButton
-                anchors.verticalCenter: parent.verticalCenter
-                visible: SystemTray.items.values.length > 0
-                label: "Background apps"
-                // The last app quit while its menu was open: close the empty menu.
-                onVisibleChanged: {
-                    if (!visible && root.panel === "tray")
-                        root.island.panel = "";
-                }
-                active: root.panel === "tray"
-                onActivated: root.island.toggle("tray", root.modelData.name)
-
-                MaterialIcon {
-                    anchors.verticalCenter: parent.verticalCenter
-                    icon: "keyboard_arrow_down"
-                    font.pixelSize: Theme.icon.small
-                    rotation: root.panel === "tray" ? 180 : 0
-
-                    Behavior on rotation {
-                        NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }
-                    }
-                }
-            }
-        ]
 
         MenuSlot {
-            shown: right.shown === "tray"
+            shown: pill.shown === "tray"
             content: Component {
                 Tray {
                     width: parent.width
@@ -371,6 +310,5 @@ PanelWindow {
                 }
             }
         }
-
     }
 }

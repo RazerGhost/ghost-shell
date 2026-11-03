@@ -7,24 +7,21 @@ import qs.controlcenter
 import qs.services
 import qs.theme
 import qs.widgets
-import "IslandViews.js" as IslandViews
 
 // Pop-ups in the top-right corner of the focused screen, under the island (user's choice,
 // 2026-11-03: they used to drop from the island one at a time, and waited while any menu was
 // open): "Shell reloaded" (see Island.qml), up to three notifications at once, oldest at the
 // top, and a window asking for attention. Each notification stays Settings' notificationSeconds,
 // the attention card the same; the pointer over the stack pauses them, critical notifications
-// stay until dismissed. They wait while the island's right pill has a menu open on that screen
-// (background apps), which sits in the same corner.
+// stay until dismissed.
 PanelWindow {
     id: root
 
-    required property var island // Island.qml: panel, screenName, reloadShown, reloadError
+    required property var island // Island.qml: toggle(), reloadShown, reloadError
 
     readonly property string monitorName: Hyprland.focusedMonitor?.name ?? ""
-    readonly property bool cornerBusy: island.screenName === monitorName && IslandViews.side(island.panel) === "right"
-    readonly property list<Notification> notifications: cornerBusy ? [] : Notifications.popups
-    readonly property HyprlandToplevel attention: cornerBusy ? null : Windows.needsAttention
+    readonly property list<Notification> notifications: Notifications.popups
+    readonly property HyprlandToplevel attention: Windows.needsAttention
     readonly property bool reload: island.reloadShown
     readonly property bool hasAny: notifications.length > 0 || attention !== null || reload
     // How long a pop-up stays, from Settings (1-60 s).

@@ -3,8 +3,8 @@ import qs.services
 import qs.theme
 
 // Android 16-style battery: a pill that fills up with the charge level, in the accent color
-// while charging and red when low. No text inside (user's choice: the percentage is in quick
-// settings).
+// while charging and red when low. No text inside: the percentage is beside it in quick
+// settings.
 Item {
     id: root
 

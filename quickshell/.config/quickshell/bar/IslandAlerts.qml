@@ -3,64 +3,22 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// Small status glyphs on the right of the closed island, like Android's status bar.
-// Airplane mode, a VPN, Bluetooth, a timer, the microphone, camera or screen in use, waiting
-// updates and mute only show up when they have something to say. MaterialIcon hides its glyph
-// from screen readers (decorative elsewhere); here the glyph is the information, so each one
-// says what it means (`Accessible.ignored: false`).
+// What needs attention, beside the time in the closed island (user's choice, 2026-11-03: the
+// other status icons are in quick settings, controlcenter/StatusIcons.qml): a screen recording with its time,
+// the timer's time left, the microphone, camera or screen in use (like Android's privacy dots),
+// and a low battery. Each shows only while it's going on. The glyph is the information, so each
+// says what it means to screen readers (MaterialIcon hides its glyph by default).
 Row {
     id: root
 
-    // Settings -> Appearance -> Status icons can hide all but the privacy ones (a recording,
-    // the microphone, camera or screen in use), which always show.
-    readonly property var hidden: Array.from(Settings.values.hiddenStatusIcons ?? [])
-
-    function shows(key: string): bool {
-        return !hidden.includes(key);
-    }
+    readonly property bool timerShown: Countdown.active && !Array.from(Settings.values.hiddenStatusIcons ?? []).includes("timer")
+    readonly property bool lowBattery: Battery.present && Battery.low
+    // Something shows (the island keeps a gap before it only then).
+    readonly property bool any: Recorder.recording || timerShown || Audio.recordingApps.length > 0
+                                || Privacy.cameraInUse || Privacy.screenShared || lowBattery
 
     anchors.verticalCenter: parent.verticalCenter
     spacing: Theme.spacing.xs
-
-    WifiIcon {
-        anchors.verticalCenter: parent.verticalCenter
-        visible: root.shows("wifi")
-        icon: NetworkStatus.icon
-        font.pixelSize: Theme.icon.small
-        Accessible.name: "Network: " + NetworkStatus.label
-        Accessible.ignored: false
-        Accessible.role: Accessible.StaticText
-    }
-
-    MaterialIcon {
-        anchors.verticalCenter: parent.verticalCenter
-        visible: root.shows("airplane") && NetworkExtras.airplane
-        icon: "flight"
-        font.pixelSize: Theme.icon.small
-        Accessible.name: "Airplane mode"
-        Accessible.ignored: false
-        Accessible.role: Accessible.StaticText
-    }
-
-    MaterialIcon {
-        anchors.verticalCenter: parent.verticalCenter
-        visible: root.shows("vpn") && NetworkExtras.activeVpn !== null
-        icon: "vpn_key"
-        font.pixelSize: Theme.icon.small
-        Accessible.name: "VPN: " + (NetworkExtras.activeVpn?.name ?? "")
-        Accessible.ignored: false
-        Accessible.role: Accessible.StaticText
-    }
-
-    MaterialIcon {
-        anchors.verticalCenter: parent.verticalCenter
-        visible: root.shows("bluetooth") && BluetoothStatus.connected.length > 0
-        icon: "bluetooth_connected"
-        font.pixelSize: Theme.icon.small
-        Accessible.name: "Bluetooth: " + BluetoothStatus.label
-        Accessible.ignored: false
-        Accessible.role: Accessible.StaticText
-    }
 
     // A screen recording is running: a red dot and the time (services/Recorder.qml).
     Row {
@@ -92,7 +50,7 @@ Row {
     // The today menu's timer is running: the time left.
     Row {
         anchors.verticalCenter: parent.verticalCenter
-        visible: root.shows("timer") && Countdown.active
+        visible: root.timerShown
         spacing: Theme.spacing.xs
 
         MaterialIcon {
@@ -151,25 +109,12 @@ Row {
 
     MaterialIcon {
         anchors.verticalCenter: parent.verticalCenter
-        visible: root.shows("updates") && Updates.count > 0
-        icon: "download"
+        visible: root.lowBattery
+        icon: Battery.icon
+        color: Colors.m3error
         font.pixelSize: Theme.icon.small
-        Accessible.name: Updates.summary
+        Accessible.name: "Battery low, " + Math.round(Battery.level * 100) + "%"
         Accessible.ignored: false
         Accessible.role: Accessible.StaticText
-    }
-
-    MaterialIcon {
-        anchors.verticalCenter: parent.verticalCenter
-        visible: root.shows("muted") && Audio.muted
-        icon: "volume_off"
-        font.pixelSize: Theme.icon.small
-        Accessible.name: "Sound muted"
-        Accessible.ignored: false
-        Accessible.role: Accessible.StaticText
-    }
-
-    BatteryPill {
-        visible: root.shows("battery") && Battery.present
     }
 }
