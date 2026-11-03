@@ -20,4 +20,11 @@ TestCase {
         compare(BatteryTime.duration(7170), "2h 0m");
         compare(BatteryTime.duration(3570), "1h 0m");
     }
+
+    function test_details() {
+        compare(BatteryTime.details(85.6, 12.34, false), "Health 86 % · Using 12.3 W");
+        compare(BatteryTime.details(85.6, 30, true), "Health 86 % · Charging at 30.0 W");
+        compare(BatteryTime.details(-1, 0, true), "");
+        compare(BatteryTime.details(100, 0, false), "Health 100 %");
+    }
 }

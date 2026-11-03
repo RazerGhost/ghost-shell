@@ -37,3 +37,16 @@ function pluggedIn(before, gameOn, perf) {
         return { before: -1, profile: null };
     return { before: -1, profile: gameOn ? perf : before };
 }
+
+// The Power mode tile's line: the mode's name, why Performance is slowed ("heat" or "lap", from
+// power-profiles-daemon) and which apps hold a mode (by name): "Performance · slowed, too hot".
+function note(name, slowed, holders) {
+    const parts = [name];
+    if (slowed === "heat")
+        parts.push("slowed, too hot");
+    else if (slowed === "lap")
+        parts.push("slowed, on your lap");
+    if (holders.length > 0)
+        parts.push("held by " + holders.join(", "));
+    return parts.join(" · ");
+}

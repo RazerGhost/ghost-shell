@@ -117,6 +117,12 @@ Column {
     }
 
     StatRow {
+        visible: Battery.present && Battery.details !== ""
+        title: "Battery"
+        detail: Battery.details
+    }
+
+    StatRow {
         visible: SystemStats.disk !== null
         title: "Disk"
         detail: SystemStats.disk ? SystemStats.amount(SystemStats.disk.used, SystemStats.disk.total) : ""

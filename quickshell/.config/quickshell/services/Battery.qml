@@ -17,6 +17,12 @@ Singleton {
                                   || device.state === UPowerDeviceState.FullyCharged
     readonly property bool low: !charging && level <= Theme.battery.low
 
+    // The laptop's own battery (displayDevice reports no health), for the System page: its
+    // health (0-100, -1 when not reported) and the watts flowing in or out.
+    readonly property UPowerDevice battery: UPower.devices.values.find(d => d.isLaptopBattery) ?? null
+    readonly property real health: battery?.healthSupported ? battery.healthPercentage : -1
+    readonly property string details: BatteryTime.details(health, Math.abs(device.changeRate), charging)
+
     // Horizontal Android-style icons: battery_android_frame_1 ... _6, then _full. There's no
     // _0, so an almost empty battery still shows one bar.
     readonly property string icon: charging ? "battery_android_frame_bolt"

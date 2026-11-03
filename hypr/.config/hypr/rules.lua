@@ -14,6 +14,14 @@ hl.window_rule({
     center = true,
 })
 
+-- Password managers are drawn black in screen shares and recordings of the screen, with their
+-- pop-ups (Proton Pass, the proton module).
+hl.window_rule({
+    name            = "no-share-passwords",
+    match           = { class = "^(?i)proton[ -]?pass" },
+    no_screen_share = true,
+})
+
 -- The windows editor's animation sample (customize/WindowsEditor.qml) floats in the middle, so
 -- playing an animation doesn't rearrange the example windows tiled behind it.
 hl.window_rule({
@@ -120,6 +128,13 @@ local panels = {
     { "qs-wallpaper-picker", "slide top" },    -- the strip under the island
 }
 
+-- The volume and brightness pop-up also shows over the lock screen (the keys work there), not
+-- taking input. The password prompt never shows in a screen share.
+local extra = {
+    ["qs-osd"]    = { above_lock = 1 },
+    ["qs-polkit"] = { no_screen_share = true },
+}
+
 for _, panel in ipairs(panels) do
     local namespace, animation = panel[1], panel[2]
     local rule = { name = namespace, match = { namespace = "^" .. namespace .. "$" } }
@@ -127,6 +142,9 @@ for _, panel in ipairs(panels) do
         rule.animation = animation
     else
         rule.no_anim = true
+    end
+    for key, value in pairs(extra[namespace] or {}) do
+        rule[key] = value
     end
     hl.layer_rule(rule)
 end

@@ -1677,6 +1677,23 @@ frozen screen, three screen mode sets, a black flash between the login screen an
   /sys/firmware/acpi/bgrt/status` is 1, logging out shows the login screen, `sudo head -5
   /boot/limine.conf` still has the three options after a kernel update.
 
+### From the platform docs scan (built 2026-11-03)
+User's pick of the full Quickshell 0.3.2 / Hyprland 0.57 docs scan's small items:
+- The volume and brightness pop-up shows over the lock screen (layer rule `above_lock = 1`);
+  the password prompt and Proton Pass are black in screen shares (`no_screen_share`).
+- Settings -> Keyboard and mouse -> Pointer: hide while typing (`cursor.hide_on_key_press`) and
+  hide when still (`cursor.inactive_timeout`, 3-30 s; `HyprlandConfig.cursorLua`, tested).
+- Quick settings' Power mode says why Performance is slowed (too hot, on your lap) and which app
+  holds a mode (`PowerProfiles.degradationReason`, `holds`; `PowerModes.note`, tested); the
+  System page has the battery's health and the watts it uses or charges at
+  (`UPowerDevice.healthPercentage`, `changeRate`; `BatteryTime.details`, tested).
+- The Wi-Fi page says when Wi-Fi is off by the laptop's key (`Networking.wifiHardwareEnabled`).
+- Apps' bell through Hyprland's own sound (see the review above).
+- Not taken: `HyprlandWorkspace.hasFullscreen` (Hyprland's flag likely counts maximized windows,
+  which "quiet while fullscreen" leaves out on purpose; untested). The sign-in hint already used
+  `Networking.checkConnectivity()`. Hyprland 0.57.1 (fixes a lock screen error when a screen is
+  unplugged) comes with the next system update.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

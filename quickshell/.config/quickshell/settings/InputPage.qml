@@ -156,6 +156,29 @@ Column {
                 onPicked: v => Settings.values.cursorSize = v
             }
         }
+
+        SettingRow {
+            title: "Hide while typing"
+            subtitle: "Back when the pointer moves"
+
+            Switch {
+                label: "Hide the pointer while typing"
+                checked: Settings.values.cursorHideTyping
+                onToggled: Settings.values.cursorHideTyping = !checked
+            }
+        }
+
+        SettingRow {
+            title: "Hide when still"
+
+            Stepper {
+                label: "Hide the pointer when it's still"
+                values: HyprlandConfig.cursorHideTimes
+                value: HyprlandConfig.cursorHideAfter(Settings.values.cursorHideAfter)
+                format: v => v === 0 ? "Never" : "After " + v + " s"
+                onPicked: v => Settings.values.cursorHideAfter = v
+            }
+        }
     }
 
     // Cursor themes: icon theme folders with a cursors folder, system-wide or your own.

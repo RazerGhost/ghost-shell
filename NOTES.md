@@ -58,6 +58,16 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - `hyprctl reload` starts a fresh Lua state: globals set with `hyprctl eval` are gone after it,
   and every required file runs again (verified 2026-11-03). Lua layouts are registered again and
   get each workspace's windows one at a time (a recalculate with 1 window, then with 2, ...).
+- Hyprland 0.57 options checked in the wiki (2026-11-03): `misc.bell_sound` ("default" plays the
+  system bell, "none" mutes it; 0.57 plays it by default), `cursor.hide_on_key_press`,
+  `cursor.inactive_timeout` (seconds), layer rules `above_lock` (1 shows the layer over the lock
+  screen, 2 also takes input there) and `no_screen_share` (window and layer rules: drawn black in
+  shares). Window classes in rules are RE2 (`(?i)` works).
+- Quickshell UPower (qmltypes): `PowerProfiles.degradationReason` (PerformanceDegradationReason
+  None / LapDetected / HighTemperature), `PowerProfiles.holds` (each { profile, applicationId }),
+  `UPowerDevice.healthPercentage` (0-100, with `healthSupported`; the display device reports
+  none, the laptop battery in `UPower.devices` does), `changeRate` (W).
+  `Networking.wifiHardwareEnabled` is rfkill's hard block.
 - Hyprland runs Lua 5.5. `hyprctl eval '<lua>'` runs code in the config's state; `hyprctl repl
   'return x'` prints a value, but prints "unknown request" for an empty string.
 - `hyprctl eval 'hl.monitor({ output = "eDP-1", mode = "1920x1080@60", position = "auto", scale = 1,

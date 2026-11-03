@@ -239,6 +239,8 @@ Singleton {
             property var widgetLooks: []
             property string cursorTheme: ""        // "" = Adwaita
             property int cursorSize: 24
+            property bool cursorHideTyping: false // hide the pointer while typing
+            property int cursorHideAfter: 0       // seconds still before it hides; 0 = never
             // Settings -> Appearance -> Size (theme/ThemeScale.js lists the steps).
             property real uiScale: 1
             property real textScale: 1

@@ -229,7 +229,11 @@ Column {
         horizontalAlignment: Text.AlignHCenter
         topPadding: Theme.spacing.m
         bottomPadding: Theme.spacing.m
-        text: Networking.wifiEnabled ? "Searching for networks…" : "Wi-Fi is off"
+        // Switched off by the laptop's key or a hardware switch (rfkill's hard block): the switch
+        // above can't turn it on, so say so.
+        text: Networking.wifiEnabled ? "Searching for networks…"
+            : Networking.wifiHardwareEnabled ? "Wi-Fi is off"
+            : "Wi-Fi is off with the laptop's key or switch"
         color: Colors.m3onSurfaceVariant
         font.family: Theme.font.sans
         font.pixelSize: Theme.font.normal

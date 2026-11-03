@@ -129,4 +129,10 @@ TestCase {
         verify(HyprlandConfig.lua({}, false, false, false).includes('bell_sound = "none"'));
         verify(HyprlandConfig.lua({}, false, false).includes('bell_sound = "none"'));
     }
+
+    function test_cursorHiding() {
+        verify(HyprlandConfig.lua({ cursorHideTyping: true, cursorHideAfter: 5 }).includes("hide_on_key_press = true, inactive_timeout = 5"));
+        verify(HyprlandConfig.lua({}).includes("hide_on_key_press = false, inactive_timeout = 0"));
+        verify(HyprlandConfig.lua({ cursorHideAfter: "5; os.exit()" }).includes("inactive_timeout = 0 "));
+    }
 }

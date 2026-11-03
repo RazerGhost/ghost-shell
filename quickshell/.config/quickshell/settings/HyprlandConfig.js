@@ -84,12 +84,22 @@ function cursorTheme(name) {
     return typeof name === "string" && /^[A-Za-z0-9 ._-]+$/.test(name) ? name : "Adwaita";
 }
 
+// Seconds without moving before the pointer hides (0: never).
+const cursorHideTimes = [0, 3, 5, 10, 30];
+
+function cursorHideAfter(value) {
+    return cursorHideTimes.includes(value) ? value : 0;
+}
+
 function cursorLua(v) {
     const theme = cursorTheme(v.cursorTheme);
     const size = cursorSize(v.cursorSize);
-    return ["-- The pointer (Settings -> Keyboard and mouse).",
+    return ["-- The pointer (Settings -> Keyboard and mouse): its look, and hiding it while typing",
+            "-- or after it's been still a while (like macOS).",
             `hl.env("XCURSOR_THEME", "${theme}")`, `hl.env("XCURSOR_SIZE", "${size}")`,
-            `hl.env("HYPRCURSOR_THEME", "${theme}")`, `hl.env("HYPRCURSOR_SIZE", "${size}")`, ""];
+            `hl.env("HYPRCURSOR_THEME", "${theme}")`, `hl.env("HYPRCURSOR_SIZE", "${size}")`,
+            `hl.config({ cursor = { hide_on_key_press = ${v.cursorHideTyping === true}, `
+                + `inactive_timeout = ${cursorHideAfter(v.cursorHideAfter)} } })`, ""];
 }
 
 // Game mode (services/GameMode.qml): what it switches off, after the settings so it wins.

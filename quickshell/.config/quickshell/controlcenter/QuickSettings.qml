@@ -6,6 +6,7 @@ import qs.settings
 import qs.theme
 import qs.widgets
 import "QuickItems.js" as QuickItems
+import "../services/PowerModes.js" as PowerModes
 import "../widgets/OrderedList.js" as OrderedList
 
 // The quick settings menu: tiles, volume and brightness sliders and the battery.
@@ -152,9 +153,13 @@ Item {
                 : PowerProfiles.profile === PowerProfile.Performance ? "speed"
                 : "balance"
             title: "Power mode"
-            subtitle: PowerProfiles.profile === PowerProfile.PowerSaver ? "Power saver"
-                    : PowerProfiles.profile === PowerProfile.Performance ? "Performance"
-                    : "Balanced"
+            // Why Performance is slowed and which apps hold a mode (power-profiles-daemon).
+            subtitle: PowerModes.note(PowerProfiles.profile === PowerProfile.PowerSaver ? "Power saver"
+                                      : PowerProfiles.profile === PowerProfile.Performance ? "Performance"
+                                      : "Balanced",
+                                      PowerProfiles.degradationReason === PerformanceDegradationReason.HighTemperature ? "heat"
+                                      : PowerProfiles.degradationReason === PerformanceDegradationReason.LapDetected ? "lap" : "",
+                                      PowerProfiles.holds.map(h => DesktopEntries.heuristicLookup(h.applicationId)?.name || h.applicationId))
             active: PowerProfiles.profile !== PowerProfile.Balanced
             onClicked: {
                 const next = (profiles.indexOf(PowerProfiles.profile) + 1) % profiles.length;

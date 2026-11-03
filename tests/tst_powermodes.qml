@@ -43,4 +43,10 @@ TestCase {
         compare(plug.profile, perf); // game mode still on
         compare(PowerModes.gameOff(plug.profile, game.before, false, perf).profile, balanced);
     }
+
+    function test_note() {
+        compare(PowerModes.note("Balanced", "", []), "Balanced");
+        compare(PowerModes.note("Performance", "heat", []), "Performance · slowed, too hot");
+        compare(PowerModes.note("Performance", "lap", ["Steam"]), "Performance · slowed, on your lap · held by Steam");
+    }
 }
