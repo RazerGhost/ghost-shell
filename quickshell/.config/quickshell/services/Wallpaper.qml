@@ -128,7 +128,8 @@ Singleton {
     }
 
     // The slideshow: every wallpaperMinutes minutes (0 = off) a picture of yours picked at
-    // random. Not while the picker is open.
+    // random. Not while you're choosing one yourself: the picker, the desktop editor (whose Done
+    // would keep the slideshow's pick) or the Wallpapers page.
     readonly property int slideshowMinutes: Math.max(0, Number(Settings.values.wallpaperMinutes) || 0)
 
     Timer {
@@ -136,7 +137,7 @@ Singleton {
         running: root.slideshowMinutes > 0
         repeat: true
         onTriggered: {
-            if (root.pickerOpen)
+            if (root.pickerOpen || Editing.desktop || (LauncherState.open && LauncherState.page === "wallpapers"))
                 return;
             const pool = root.pictures.filter(p => p.filePath !== root.path && p.darkPath !== root.path);
             if (pool.length === 0)

@@ -69,11 +69,16 @@ Singleton {
     function remove(entry: var): void {
         entries = entries.filter(e => e !== entry);
         Quickshell.execDetached(["sh", "-c", 'printf "%s\\n" "$1" | cliphist delete', "sh", entry.line]);
+        // Its decoded picture too (the thumbnails live in $XDG_RUNTIME_DIR, i.e. in memory).
+        if (entry.image)
+            Quickshell.execDetached(["sh", "-c", 'rm -f "$1/$2".*', "sh", thumbnailDir, String(entry.id)]);
     }
 
+    // The thumbnails go with the history: they'd take memory, and cliphist may number new
+    // entries from the start again, which would show an old picture for a new one.
     function wipe(): void {
         entries = [];
-        Quickshell.execDetached(["cliphist", "wipe"]);
+        Quickshell.execDetached(["sh", "-c", 'cliphist wipe; rm -rf "$1"', "sh", thumbnailDir]);
     }
 
     LatestProcess {

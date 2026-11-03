@@ -63,14 +63,18 @@ picture=$1
 if [ -n "$picture" ] && [ -f "$picture" ]; then
     target="$shared/picture.${picture##*.}"
     # The pictures can be large (tens of MB): only copy a different one.
+    # Copied before the others go: a failed copy leaves the old picture and its wallpaper.json.
     if ! cmp -s "$picture" "$target"; then
-        rm -f "$shared"/picture.*
         copy "$picture" "$target"
     fi
     printf '{ "path": "%s" }\n' "$target" > "$shared/wallpaper.json.tmp"
     mv -f "$shared/wallpaper.json.tmp" "$shared/wallpaper.json"
+    for old in "$shared"/picture.*; do
+        [ "$old" = "$target" ] || rm -f "$old"
+    done
 else
     # No picture: the login screen shows its plain background color.
+    printf '{ "path": "" }\n' > "$shared/wallpaper.json.tmp"
+    mv -f "$shared/wallpaper.json.tmp" "$shared/wallpaper.json"
     rm -f "$shared"/picture.*
-    printf '{ "path": "" }\n' > "$shared/wallpaper.json"
 fi

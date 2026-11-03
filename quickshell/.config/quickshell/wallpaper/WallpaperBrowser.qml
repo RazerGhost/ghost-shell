@@ -65,7 +65,7 @@ Item {
     }
 
     // Moves a picture of yours to the trash (gio trash: it can be got back), its dark version
-    // with it. Not the wallpaper you have now.
+    // with it. Not the wallpaper you have now; the lock screen's picture goes back to the desktop's.
     function trash(picture: var): void {
         if (!picture?.path || picture.path === Wallpaper.path || picture.darkPath === Wallpaper.path)
             return;
@@ -73,6 +73,9 @@ Item {
         trashing.command = ["gio", "trash", "--"].concat(picture.darkPath ? [picture.path, picture.darkPath] : [picture.path]);
         trashing.next = at;
         trashing.running = true;
+        // The lock screen showing it goes back to the desktop's picture (it would show none).
+        if ([picture.path, picture.darkPath].includes(Settings.values.lockWallpaper))
+            Settings.values.lockWallpaper = "";
     }
 
     Process {

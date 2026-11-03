@@ -13,17 +13,35 @@ local layout = require("layout")
 -- The drag in progress, if any.
 local drag
 
+local function contains(window, pos)
+    return pos.x >= window.at.x and pos.x < window.at.x + window.size.x
+        and pos.y >= window.at.y and pos.y < window.at.y + window.size.y
+end
+
+-- A window drawn on screen now: mapped, not a group's hidden tab, on a shown workspace (a
+-- pinned one shows on every workspace).
+local function shown(window)
+    local ws = window.workspace
+    return window.mapped and not window.hidden and (window.pinned or (ws and ws.visible))
+end
+
 -- The tiled window under `pos`, other than `except` (the one being dragged sits under the
--- pointer too).
+-- pointer too). None where a floating window covers `pos`: floating windows sit above tiled
+-- ones, so the drag is Hyprland's own resize or move of that window, not one for the window
+-- underneath.
 local function tiled_window_at(pos, except)
+    local found
     for _, window in ipairs(hl.get_windows()) do
         local ws = window.workspace
-        if not window.floating and ws and ws.visible and not ws.special and window.address ~= except
-            and pos.x >= window.at.x and pos.x < window.at.x + window.size.x
-            and pos.y >= window.at.y and pos.y < window.at.y + window.size.y then
-            return window
+        if shown(window) and contains(window, pos) then
+            if window.floating then
+                return nil
+            elseif not found and ws and not ws.special and window.address ~= except then
+                found = window
+            end
         end
     end
+    return found
 end
 
 local function follow_pointer()
@@ -44,7 +62,17 @@ local function follow_pointer()
     end
 end
 
+local function end_drag()
+    if drag then
+        drag.timer:set_enabled(false)
+        drag = nil
+    end
+end
+
 local function start_drag()
+    -- A drag whose release never came (Super let go first) would otherwise keep its timer
+    -- running for good once this one replaces it.
+    end_drag()
     local pos = hl.get_cursor_pos()
     local window = pos and tiled_window_at(pos)
     local state, area = layout.workspace(window and window.workspace.id)
@@ -64,13 +92,6 @@ local function start_drag()
         side_y = pos.y > window.at.y + window.size.y / 2 and "bottom" or "top",
         timer = hl.timer(follow_pointer, { timeout = 16, type = "repeat" }),
     }
-end
-
-local function end_drag()
-    if drag then
-        drag.timer:set_enabled(false)
-        drag = nil
-    end
 end
 
 -- The window being moved by Super + left-drag, if it's tiled.

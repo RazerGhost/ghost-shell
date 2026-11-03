@@ -59,7 +59,32 @@ Singleton {
     readonly property list<Notification> history: server.trackedNotifications.values.slice().reverse()
 
     // When each notification arrived (ms since the epoch), by id: notifications carry no time.
+    // Kept across a shell reload (the notifications are), as JSON text (NOTES.md), and only for
+    // notifications still in the history.
     property var received: ({})
+
+    function stamp(id: int): void {
+        const kept = new Set(server.trackedNotifications.values.map(n => String(n.id)));
+        const next = {};
+        for (const key in received)
+            if (kept.has(key))
+                next[key] = received[key];
+        next[id] = Date.now();
+        received = next;
+        times.json = JSON.stringify(next);
+    }
+
+    PersistentProperties {
+        id: times
+        reloadableId: "notificationTimes"
+
+        property string json: ""
+
+        onReloaded: {
+            if (json !== "")
+                root.received = JSON.parse(json);
+        }
+    }
 
     // The current pop-up is done (timed out, dismissed or clicked).
     function next(): void {
@@ -110,7 +135,7 @@ Singleton {
             // Notifications kept through a reload arrive again; they already popped up once.
             if (notification.lastGeneration)
                 return;
-            root.received[notification.id] = Date.now();
+            root.stamp(notification.id);
             const critical = notification.urgency === NotificationUrgency.Critical;
             // Only once settings.json is in: writing to the defaults before then would save
             // them over the user's file.
