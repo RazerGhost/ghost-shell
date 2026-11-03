@@ -1,5 +1,5 @@
 // The notification server: Quickshell receives every app's notifications (there's no other
-// notification daemon). New ones queue up as pop-ups, up to three at once in the top-right corner (bar/PopupStack.qml), and
+// notification daemon). New ones queue up as pop-ups, shown one at a time out of the island (bar/IslandWindow.qml), and
 // stay in the history (the "today" menu) until dismissed. Do Not Disturb skips the pop-ups,
 // except critical ones; the history still collects everything. With a schedule (settings
 // window) it turns on at the start time and off at the end time; toggling in between lasts
@@ -102,9 +102,8 @@ Singleton {
         }
     }
 
-    // The pop-ups shown at once (bar/PopupStack.qml), oldest first; the rest wait their turn.
-    readonly property int popupLimit: 3
-    readonly property list<Notification> popups: queue.filter(n => n !== null).slice(0, popupLimit)
+    // The pop-up the island shows (bar/IslandWindow.qml), the oldest; the rest wait their turn.
+    readonly property Notification current: queue.find(n => n !== null) ?? null
 
     // A pop-up is done (timed out, dismissed or clicked).
     function done(notification: Notification): void {

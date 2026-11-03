@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Services.Notifications
 import Quickshell.Wayland
 import qs.controlcenter
 import qs.services
@@ -16,8 +17,9 @@ import "IslandViews.js" as IslandViews
 // the dots for a moment in the time's place; scrolling over the island steps through them. A
 // shell reload shows "Reloaded" there too, or opens the island with why it failed (it was a card
 // in the corner, among the notifications, for a day: it's the shell's own status, not one).
-// Notifications pop up in the top-right corner (PopupStack.qml). Floating below the top edge, or
-// attached to it (Settings' islandAttached; the dock and island editor).
+// New notifications pop out of it one at a time, then a window asking for attention (user's
+// choice, 2026-11-04: the top-right corner, for a day, didn't fit the one island). Floating
+// below the top edge, or attached to it (Settings' islandAttached; the dock and island editor).
 PanelWindow {
     id: root
 
@@ -31,6 +33,42 @@ PanelWindow {
     // A small view opened by hovering: "media" (the player, over the live activity). Unlike a
     // menu it takes no keyboard and closes when the pointer leaves the island.
     property string peek: ""
+
+    // The notification pop-up, on the focused monitor while no menu is open (it waits for the
+    // menu to close), then a window asking for attention.
+    readonly property bool focusedScreen: Hyprland.focusedMonitor?.name === modelData.name
+    readonly property Notification popup: !open && focusedScreen ? Notifications.current : null
+    readonly property HyprlandToplevel attentionWindow: !open && focusedScreen && !Notifications.current
+                                                        ? Windows.needsAttention : null
+    // How long each stays, from Settings (it offers 3-30 s; kept within 1-60 should the file say
+    // otherwise). Paused while the pointer is on the island; critical notifications stay until
+    // dismissed.
+    readonly property int popupTime: Math.min(60, Math.max(1, Number(Settings.values.notificationSeconds) || 5)) * 1000
+
+    // Each new one gets its full time: `ready` dips for a moment when it changes, restarting the
+    // timer.
+    property bool popupReady: true
+    onPopupChanged: {
+        popupReady = false;
+        Qt.callLater(() => popupReady = true);
+    }
+    Timer {
+        interval: root.popupTime
+        running: root.popupReady && root.popup !== null && !pill.hovered
+                 && root.popup.urgency !== NotificationUrgency.Critical
+        onTriggered: Notifications.done(root.popup)
+    }
+
+    property bool attentionReady: true
+    onAttentionWindowChanged: {
+        attentionReady = false;
+        Qt.callLater(() => attentionReady = true);
+    }
+    Timer {
+        interval: root.popupTime
+        running: root.attentionReady && root.attentionWindow !== null && !pill.hovered
+        onTriggered: Windows.attentionSeen()
+    }
 
     // The workspace dots, for a moment after the workspace changes (and while the pointer is on
     // them, to click one), in the time's place.
@@ -147,7 +185,8 @@ PanelWindow {
     IslandPill {
         id: pill
 
-        shown: IslandViews.shown(root.panel, root.island.reloadShown && root.island.reloadError !== "", root.peek)
+        shown: IslandViews.shown(root.panel, root.island.reloadShown && root.island.reloadError !== "",
+                                 root.popup !== null, root.attentionWindow !== null, root.peek)
         hasFocus: root.open
         // Each menu's own width. Kept while closing, so the menu fading out doesn't reflow.
         onShownChanged: rememberWidth()
@@ -242,6 +281,37 @@ PanelWindow {
 
             IslandAlerts {
                 id: alerts
+            }
+        }
+
+        MenuSlot {
+            shown: pill.shown === "notification"
+            extraHeight: Theme.spacing.s * 2
+
+            NotificationCard {
+                x: Theme.spacing.s
+                y: Theme.spacing.xs
+                width: parent.width - Theme.spacing.s * 2
+                notification: root.popup
+                visible: notification !== null
+                onReplyRequested: root.island.toggle("today", root.modelData.name)
+            }
+        }
+
+        MenuSlot {
+            shown: pill.shown === "attention"
+            extraHeight: Theme.spacing.s * 2
+
+            AttentionCard {
+                x: Theme.spacing.s
+                y: Theme.spacing.xs
+                width: parent.width - Theme.spacing.s * 2
+                window: root.attentionWindow
+                visible: root.attentionWindow !== null
+                onActivated: {
+                    Windows.show(root.attentionWindow);
+                    Windows.attentionSeen();
+                }
             }
         }
 

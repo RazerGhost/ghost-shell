@@ -139,16 +139,13 @@ Singleton {
         readonly property bool attached:  Settings.values.islandAttached === true
         // Floating: the gap above the island.
         readonly property int gap:        attached ? 0 : root.px(6)
-        // The corner pop-ups' distance from the screen's side: the windows' own gap to the edges,
-        // so they line up with them (bar/PopupStack.qml).
-        readonly property int popupMargin: Math.max(root.spacing.s, HyprlandConfig.number(Settings.values.gapsOut, 20))
         // The top band the island takes: what's below it (menus' cards, the OSD at the top, the
         // wallpaper strip, the launcher and editors) starts here, and windows below it.
         readonly property int reserved:   gap + height
         readonly property int openRadius: root.round(32)  // bottom corners when open (closed: half the height)
         // The menus' widths (user's choice, 2026-11-04: each its own, so the island morphs into
         // a shape that fits it): wider for the grids and lists, narrower for the power menu.
-        // panelWidth is the rest's (the hover player, the corner pop-ups).
+        // panelWidth is the rest's (the hover player, notification and attention pop-ups).
         readonly property int panelWidth: root.px(380)
         readonly property var menuWidths: ({
             settings: root.px(460), clipboard: root.px(460), emoji: root.px(460),
@@ -166,8 +163,6 @@ Singleton {
         // How long "Reloaded" shows after a shell reload, and a failed reload's error (ms).
         readonly property int reloaded:       2000
         readonly property int reloadError:    10000
-        // How far the corner pop-ups slide in from the right.
-        readonly property int popupSlide:     root.px(36)
     }
 
     readonly property QtObject tile: QtObject {

@@ -28,7 +28,8 @@ new setup step.
 - **Bar = the island** (user's choice, replacing the floating pills): a small shape under the
   webcam, floating below the top edge or attached to it with concave curves, showing only the time
   (no date; the music's cover while it plays) and alerts (since 2026-11-03, see "One island,
-  notifications in the corner"; it first held workspaces and status icons too). A click morphs it
+  notifications in the corner"; it first held workspaces and status icons too). Notifications pop
+  out of it. A click morphs it
   (Android-style) into "today" (date, calendar, notifications), a right-click into quick settings
   (status icons, tiles, sliders, battery, background apps; Wi-Fi and Bluetooth tiles slide in
   their own page). Categorized pages, not one crowded panel.
@@ -1702,13 +1703,13 @@ User's pick of the full Quickshell 0.3.2 / Hyprland 0.57 docs scan's small items
 
 ### One island, notifications in the corner (built 2026-11-03)
 User's picks from the layout research (the volume pop-up stays where it is):
-- Notifications pop up in the top-right corner of the focused screen, under the island
-  (`bar/PopupStack.qml`): up to three at once, oldest at the top, each with its own time (the
-  pointer over them pauses all, critical ones stay), with the attention card in the same stack.
-  They no longer wait behind an open menu (`Notifications.popups`, `done`). The shell's reload
-  notice was there too for a day; alone in the corner it looked out of place (user's find), so a
-  reload shows "Reloaded" in the time's place, and a failed one opens the island with the error
-  (`IslandViews.shown`, tested).
+- Notifications popped up in the top-right corner of the focused screen for a day
+  (`bar/PopupStack.qml`, removed): up to three at once, with the attention card and the reload
+  notice in the same stack, not waiting for menus. With the island down to the time, the corner
+  didn't fit (user's review, 2026-11-04): notifications pop out of the island again, one at a
+  time, then a window asking for attention (see the decision "Notifications from the island");
+  a reload shows "Reloaded" in the time's place, and a failed one opens the island with the
+  error (`IslandViews.shown`, tested).
 - First built as three pills (workspaces left, time middle, status icons right; the side ones in
   the top corners when attached). The user's review the same day: quick settings belonged in the
   middle, and workspaces, status icons and background apps in the island (or beside it) looked
@@ -1809,8 +1810,8 @@ windows).
   `window.open` they're applied, unless another window of that class is open (dialogs, second
   windows) or the spot is off-screen. Fullscreen and minimized windows aren't saved.
 - **Attention like a flashing taskbar button:** apps can't steal focus (`misc.focus_on_activate`
-  stays false); Hyprland marks them urgent and the corner pop-ups show an `AttentionCard` (icon, title,
-  click to switch) for the notification time (`bar/PopupStack.qml`), below any notifications. `services/Windows.qml` keeps its own
+  stays false); Hyprland marks them urgent and the island shows an `AttentionCard` (icon, title,
+  click to switch) for the notification time, after any notification pop-up. `services/Windows.qml` keeps its own
   list from Hyprland's `urgent` raw events, dropping a window once it's focused or closed:
   `HyprlandToplevel.urgent` didn't follow these events (false for a terminal bell). Opening a
   window also sends `urgent` just before focusing it, which the list ignores.
@@ -1849,16 +1850,17 @@ windows).
   players come first in MPRIS's list, so "the first" took a paused Spotify's place. The media
   keys (`qs ipc call media`) follow it. Spotify (1.3.4) reports a frozen MPRIS position (equal to the
   track length) while playing, so its seek bar reads full; other players are untested.
-- **Notifications in the top-right corner** (user's choice, 2026-11-03; they dropped from the
-  island one at a time before, and waited while a menu was open): up to three at once
-  (`Notifications.popupLimit`), not waiting for menus. A notification leaves the queue when it
-  closes (dismissed, clicked, closed by its app): a destroyed one only turned into null in the
-  list, which didn't notify, and left an empty card. Notifications carry no timestamp, so the service records arrival times; after a shell
+- **Notifications from the island** (user's choice; for a day, 2026-11-03, cards in the top-right
+  corner instead): one at a time on the focused screen, each for Settings' time with a full time
+  of its own (paused while the pointer is on the island; critical ones stay until dismissed),
+  then a window asking for attention. They wait while a menu is open. A notification leaves the
+  queue when it closes (dismissed, clicked, closed by its app): a destroyed one only turned into
+  null in the list, which didn't notify, and left an empty card. Notifications carry no timestamp, so the service records arrival times; after a shell
   restart (not a reload) the history is empty.
 - **Island window height** is 840 px (was 680) so the "today" menu with notifications fits.
 - **Island menu widths** (user's choice, 2026-11-04: each menu its own, over one wider size):
   quick settings, clipboard and emoji 460, today, media and background apps 400, power 340
-  (`Theme.island.menuWidth`); the hover player and the corner pop-ups stay `panelWidth` (380).
+  (`Theme.island.menuWidth`); the hover player and the notification and attention pop-ups stay `panelWidth` (380).
   The island keeps a menu's width while it closes, so the fading menu doesn't reflow. Quick
   settings' round buttons fit six to a row at 460 when there are more than five. The island's
   window spans the screen's width; the wallpaper picker is its own surface.

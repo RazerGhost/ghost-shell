@@ -10,8 +10,8 @@ import qs.theme
 // right-click into "settings" (quick settings). While music plays, a "live activity" (the cover)
 // takes the time's place: hovering it shows a small player (and the time again), clicking it or
 // the player opens the "media" menu. Switching workspaces shows the dots for a moment. New
-// notifications pop up in the top-right corner of the
-// focused monitor (PopupStack.qml). One menu is open at a time, on one monitor; click outside it
+// notifications pop out of the island on the focused monitor, one at a time, then a window
+// asking for attention. One menu is open at a time, on one monitor; click outside it
 // or press Escape to close it. This file holds that shared state; IslandWindow.qml draws the
 // island on each monitor.
 Scope {
@@ -94,11 +94,6 @@ Scope {
             root.panel = "settings";
             root.quickEdit = true;
         }
-    }
-
-    // Notifications and a window asking for attention, in the corner.
-    PopupStack {
-        island: root
     }
 
     // One island per monitor: Variants creates a delegate for each entry in the model

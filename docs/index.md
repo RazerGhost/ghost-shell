@@ -100,7 +100,7 @@ Recovery procedures (lock screen crash, login screen failure) are in ROADMAP Pha
 |---|---|
 | Island: one shape with the time (or music) and alerts, floating or attached to the top edge (`islandAttached`); click for today, right-click for quick settings; morphs into every menu | `bar/Island.qml`, `IslandWindow.qml`, `IslandPill.qml`, `PillShape.qml`, `PillPath.js`, `IslandViews.js`, `IslandButton.qml`, `IslandFade.qml` |
 | Island alerts: recording, timer, microphone, camera, screen sharing, low battery | `bar/IslandAlerts.qml`, `widgets/StatusGlyph.qml` |
-| Pop-ups in the top-right corner: up to three notifications, attention requests | `bar/PopupStack.qml` |
+| Pop-ups out of the island, one at a time: notifications, then attention requests | `bar/IslandWindow.qml`, `IslandViews.js`, `controlcenter/NotificationCard.qml`, `AttentionCard.qml` |
 | Workspace dots (3-10 or only used), shown in the island for a moment after a switch; scroll over the island to step | `bar/Workspaces.qml`, `services/WorkspaceSlots.js` |
 | Clock (day, seconds, 24-hour options) | `bar/Clock.qml` |
 | Status icons in quick settings' top row: Wi-Fi, Bluetooth, VPN, airplane, updates, muted (each hideable), the battery | `controlcenter/StatusIcons.qml`, `BatteryPill.qml`, `widgets/WifiIcon.qml` |
@@ -128,7 +128,7 @@ Recovery procedures (lock screen crash, login screen failure) are in ROADMAP Pha
 
 ### Notifications
 
-Server, pop-ups in the top-right corner (`bar/PopupStack.qml`), history, grouping, progress bars, actions, quick reply, DND
+Server, pop-ups out of the island (`bar/IslandWindow.qml`), history, grouping, progress bars, actions, quick reply, DND
 with schedule, per-app rules (Silent / Pop up / Always), quiet while fullscreen with a summary,
 sounds. `services/Notifications.qml`, `NotificationRules.js`, `controlcenter/NotificationCard.qml`,
 `NotificationGroups.js`, `NotificationProgress.js`, `NotificationTime.js`, `services/Sounds.qml`.
