@@ -54,6 +54,11 @@ Scope {
         id: writeLater
         interval: 400
         onTriggered: {
+            // The login screen's part, as data (HyprlandConfig.greeterData; greeter/sync.sh
+            // copies it). Written first: the sync runs when shell-settings.lua changes.
+            const forGreeter = HyprlandConfig.greeterData(Settings.values);
+            if (greeterFile.text() !== forGreeter)
+                greeterFile.setText(forGreeter);
             if (file.text() === root.text)
                 return;
             file.setText(root.text);
@@ -74,6 +79,14 @@ Scope {
         id: setCursor
         interval: 400
         onTriggered: Quickshell.execDetached(["hyprctl", "setcursor", ...root.cursor.split(/ (?=\d+$)/)])
+    }
+
+    FileView {
+        id: greeterFile
+        path: Quickshell.env("HOME") + "/.config/hypr/greeter-settings"
+        blockLoading: true
+        blockWrites: true
+        printErrors: false
     }
 
     FileView {

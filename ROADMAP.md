@@ -1638,6 +1638,10 @@ the island), findings checked, then the confirmed bugs fixed (user's request):
   Disturb, Keep awake and the low battery alert's state survive a shell reload; a recording
   holds off the idle lock; the lock screen clears the typed password after every try; a
   wallhaven search that never answers fails after 20 s.
+- Fixed after (user's pick): the login screen's Hyprland no longer runs a Lua file your user
+  writes (a copy of shell-settings.lua, as the greeter user): the shell writes what it needs as
+  key=value data (`~/.config/hypr/greeter-settings`, `HyprlandConfig.greeterData`, tested) and
+  the root-owned greetd config checks every line.
 - Fixed after (user's pick): chosen tiling arrangements survive a `hyprctl reload` (see "Tiling
   with our own layout").
 - Game mode and the low battery's power saver (user's pick of the rule): a low battery wins and
@@ -1646,8 +1650,7 @@ the island), findings checked, then the confirmed bugs fixed (user's request):
   goes back to it (or to Performance while game mode is still on), and turning game mode off
   puts your mode back only while it's still in Performance. Before, each restored its own saved
   mode and one undid the other.
-- Not fixed yet (need a decision): the dock reorders running unpinned apps by recent use; the login
-  screen's Hyprland loads a user-writable `shell-settings.lua`; Hyprland 0.57 plays its own bell
+- Not fixed yet (need a decision): the dock reorders running unpinned apps by recent use; Hyprland 0.57 plays its own bell
   sound outside the shell's sound settings and Do Not Disturb.
 
 ### Boot straight to the lock screen (built 2026-11-03; needs `ghost install system`, `ghost greeter` and a reboot to test)

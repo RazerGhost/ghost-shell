@@ -51,15 +51,14 @@ else
     rm -f "$shared/face"
 fi
 
-# The keyboard layout and touchpad settings (written by the shell's Settings); the login
-# screen's Hyprland loads this copy (system/etc/greetd/hypr/hyprland.lua). Without game mode's
-# block (settings/HyprlandConfig.js): logging out with game mode on mustn't leave the login
-# screen without animations; nor the windows editor's rule at the end (HyprlandRuntime.qml).
-if [ -f "$HOME/.config/hypr/shell-settings.lua" ]; then
-    sed -e '/^-- Game mode is on/,/^})$/d' -e '/^-- While the windows editor is open/,$d' \
-        "$HOME/.config/hypr/shell-settings.lua" >"$shared/shell-settings.lua.tmp"
-    mv -f "$shared/shell-settings.lua.tmp" "$shared/shell-settings.lua"
+# The keyboard layout, pointer, touchpad and screens for the login screen's Hyprland, as
+# key=value data the shell's Settings writes (HyprlandConfig.greeterData); its root-owned
+# config (system/etc/greetd/hypr/hyprland.lua) checks every line. No Lua from here runs there:
+# it ran as the greeter user (a copy of shell-settings.lua did until 2026-11-03).
+if [ -f "$HOME/.config/hypr/greeter-settings" ]; then
+    copy "$HOME/.config/hypr/greeter-settings" "$shared/greeter-settings"
 fi
+rm -f "$shared/shell-settings.lua"
 
 # The lock screen's picture, from the shell (lock/LoginScreenSync.qml passes Wallpaper.lockPath;
 # "" for none). Without an argument (modules/core/greeter.sh), the login screen keeps its picture until

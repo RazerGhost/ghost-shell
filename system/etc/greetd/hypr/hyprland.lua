@@ -5,9 +5,45 @@
 require("monitors")
 require("env")
 require("input")
--- Your keyboard layout and touchpad settings from the shell's settings window, kept up to date by
--- greeter/sync.sh (a symlink into /var/lib/qs-greeter/shared, see modules/core/greeter.sh). Optional.
-pcall(require, "shell-settings")
+-- Your keyboard layout, pointer, touchpad and screens from the shell's settings, as key=value
+-- lines greeter/sync.sh keeps in the shared folder (settings/HyprlandConfig.js greeterData). That
+-- folder is yours, so it's read as data and every value is checked here: nothing in it runs.
+local shared = "/var/lib/qs-greeter/shared/"
+local function lines_of(name)
+    local file = io.open(shared .. name)
+    if not file then
+        return function() end
+    end
+    local text = file:read("a")
+    file:close()
+    return text:gmatch("[^\n]+")
+end
+
+local input, touchpad = {}, {}
+for line in lines_of("greeter-settings") do
+    local key, value = line:match("^([%w_]+)=(.*)$")
+    if key == "kb_layout" and value:match("^[a-z0-9_]+[a-z0-9_,]*$") then
+        input.kb_layout = value
+    elseif key == "sensitivity" and tonumber(value) and math.abs(tonumber(value)) <= 1 then
+        input.sensitivity = tonumber(value)
+    elseif (key == "natural_scroll" or key == "tap_to_click") and (value == "true" or value == "false") then
+        touchpad[key] = value == "true"
+    elseif key == "cursor_theme" and value:match("^[%w ._-]+$") then
+        hl.env("XCURSOR_THEME", value)
+        hl.env("HYPRCURSOR_THEME", value)
+    elseif key == "cursor_size" and value:match("^%d%d?$") then
+        hl.env("XCURSOR_SIZE", value)
+        hl.env("HYPRCURSOR_SIZE", value)
+    elseif key == "monitor" then
+        local output, mode, scale, transform, vrr = value:match("^([%w_.-]+) (%d+x%d+@[%d.]+) ([%d.]+) (%d) (%d)$")
+        if output and tonumber(scale) and tonumber(scale) >= 0.5 and tonumber(scale) <= 3 then
+            hl.monitor({ output = output, mode = mode, position = "auto", scale = tonumber(scale),
+                         transform = tonumber(transform), vrr = tonumber(vrr) })
+        end
+    end
+end
+input.touchpad = touchpad
+hl.config({ input = input })
 
 -- Your theme's background color (greeter/sync.sh writes it as rrggbb), so the screen starts on
 -- the color the login screen and your desktop use instead of Hyprland's default. Data, not

@@ -108,4 +108,19 @@ TestCase {
         compare(HyprlandConfig.cursorTheme('a"); os.exit() --'), "Adwaita");
         compare(HyprlandConfig.cursorSize(33), 24);
     }
+
+    function test_greeterData() {
+        const data = HyprlandConfig.greeterData({
+            keyboardLayout: "us,nl", pointerSpeed: 3, naturalScroll: true, tapToClick: false,
+            cursorTheme: "Bibata-Modern-Classic", cursorSize: 32,
+            monitors: { "eDP-1": { mode: "1920x1080@165", scale: 1, transform: 0, vrr: 2 },
+                        "bad name\"": { mode: "1920x1080@60", scale: 1, transform: 0, vrr: 0 } }
+        });
+        compare(data, "kb_layout=us,nl\nsensitivity=1\nnatural_scroll=true\ntap_to_click=false\n"
+                + "cursor_theme=Bibata-Modern-Classic\ncursor_size=32\nmonitor=eDP-1 1920x1080@165 1 0 2\n");
+        // Nothing unsafe gets through: odd values fall back to the defaults.
+        compare(HyprlandConfig.greeterData({ keyboardLayout: "us\nrm -rf", cursorTheme: "a\"b" }),
+                "kb_layout=us\nsensitivity=0\nnatural_scroll=false\ntap_to_click=true\n"
+                + "cursor_theme=Adwaita\ncursor_size=24\n");
+    }
 }
