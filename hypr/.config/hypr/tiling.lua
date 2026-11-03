@@ -428,4 +428,72 @@ function M.empty(state, area)
     return result
 end
 
+-- Every workspace's arrangement as text, one line per workspace:
+--   <workspace> <auto|chosen> <w>:<h>,<h>;<w>:<h> <slot>,<slot>,...
+-- with "-" for an empty cell. layout.lua keeps it in a file so a config reload (which runs the
+-- config again, emptying its tables) doesn't throw away the arrangements you chose.
+function M.encode(states)
+    local lines = {}
+    for ws, state in pairs(states) do
+        local columns, slots = {}, {}
+        for c, column in ipairs(state.columns) do
+            local h = {}
+            for r = 1, column.rows do
+                h[r] = string.format("%.17g", column.h[r])
+            end
+            columns[c] = string.format("%.17g", column.w) .. ":" .. table.concat(h, ",")
+        end
+        for i, id in ipairs(state.slots) do
+            slots[i] = id or "-"
+        end
+        table.insert(lines, string.format("%d %s %s %s", ws, state.auto and "auto" or "chosen",
+            table.concat(columns, ";"), table.concat(slots, ",")))
+    end
+    table.sort(lines)
+    return table.concat(lines, "\n") .. (#lines > 0 and "\n" or "")
+end
+
+-- Reads M.encode's text back. Lines that don't make a whole arrangement (shares outside 0-1,
+-- cells and windows not matching, an id with odd characters) are left out, so a damaged file
+-- only loses those workspaces.
+function M.decode(text)
+    local states = {}
+    for line in (text or ""):gmatch("[^\n]+") do
+        local ws, mode, columns_text, slots_text = line:match("^(%-?%d+) (%a+) (%S+) (%S+)$")
+        local state = ws and (mode == "auto" or mode == "chosen")
+            and { auto = mode == "auto", columns = {}, slots = {} }
+        for column_text in state and columns_text:gmatch("[^;]+") or function() end do
+            local w, hs = column_text:match("^([%d.e+-]+):(%S+)$")
+            local column = { w = tonumber(w), h = {} }
+            for h in (hs or ""):gmatch("[^,]+") do
+                table.insert(column.h, tonumber(h) or -1)
+            end
+            column.rows = #column.h
+            local fine = column.w and column.w > 0 and column.w <= 1 and column.rows > 0
+            for _, h in ipairs(column.h) do
+                fine = fine and h > 0 and h <= 1
+            end
+            if not fine then
+                state = nil
+                break
+            end
+            table.insert(state.columns, column)
+        end
+        for id in state and slots_text:gmatch("[^,]+") or function() end do
+            if id == "-" then
+                table.insert(state.slots, false)
+            elseif id:match("^[%w-]+$") then
+                table.insert(state.slots, id)
+            else
+                state = nil
+                break
+            end
+        end
+        if state and #state.columns > 0 and #state.slots == cell_count(state.columns) then
+            states[tonumber(ws)] = state
+        end
+    end
+    return states
+end
+
 return M

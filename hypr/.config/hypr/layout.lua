@@ -21,6 +21,73 @@ local tiling = require("tiling")
 -- Each workspace's arrangement and its last area, by workspace id.
 local states, areas = {}, {}
 
+-- A config reload runs this file again, which emptied `states`: every workspace went back to
+-- arranging by the number of windows whenever the shell changed a Hyprland setting (game mode,
+-- gaps, the windows editor...). So the arrangements are kept in a file and read back here. In
+-- $XDG_RUNTIME_DIR (gone at logout) and per Hyprland instance: windows are known by their
+-- addresses, which only mean something in this session.
+local saved_path = (os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/hypr-tiling-"
+    .. (os.getenv("HYPRLAND_INSTANCE_SIGNATURE") or "default")
+-- After a reload Hyprland hands each workspace's windows to the layout one at a time, and a
+-- chosen arrangement seeing only its first window would fall back to automatic. So the saved
+-- arrangements wait here until all their windows are back (or a few seconds pass: a window may
+-- have closed meanwhile), and the workspace is placed from a copy until then.
+local restored = {}
+do
+    local file = io.open(saved_path)
+    if file then
+        restored = tiling.decode(file:read("a"))
+        file:close()
+    end
+end
+hl.timer(function() restored = {} end, { timeout = 3000, type = "oneshot" })
+
+local function copy_of(ws, state)
+    return tiling.decode(tiling.encode({ [ws] = state }))[ws]
+end
+
+local function all_back(state, ids)
+    local here = {}
+    for _, id in ipairs(ids) do
+        here[id] = true
+    end
+    for _, id in ipairs(state.slots) do
+        if id and not here[id] then
+            return false
+        end
+    end
+    return true
+end
+
+-- Written at most once a second, only when the text changed (a mouse drag changes the shares
+-- every frame). The timer stops itself if a later load of this file took over, in case a reload
+-- leaves the old one running with its old tables.
+local saved_text, dirty = nil, false
+GhostTilingLoad = (GhostTilingLoad or 0) + 1
+local this_load = GhostTilingLoad
+local save_timer
+save_timer = hl.timer(function()
+    if this_load ~= GhostTilingLoad then
+        save_timer:set_enabled(false)
+        return
+    end
+    if not dirty or next(restored) then
+        return -- nothing new, or windows are still coming back (a copy's placement)
+    end
+    dirty = false
+    local text = tiling.encode(states)
+    if text == saved_text then
+        return
+    end
+    local file = io.open(saved_path .. ".tmp", "w")
+    if file then
+        file:write(text)
+        file:close()
+        os.rename(saved_path .. ".tmp", saved_path)
+        saved_text = text
+    end
+end, { timeout = 1000, type = "repeat" })
+
 -- How far one resize step moves a border, as a share of the screen.
 local resize_step = 0.05
 
@@ -51,8 +118,15 @@ local function current(ctx)
             focused = id
         end
     end
+    local saved = restored[ws]
+    if saved and all_back(saved, ids) then
+        states[ws], restored[ws] = saved, nil
+    elseif saved then
+        states[ws] = copy_of(ws, saved)
+    end
     states[ws] = tiling.sync(states[ws], ids, focused)
     areas[ws] = ctx.area
+    dirty = true
     return states[ws], targets, focused
 end
 

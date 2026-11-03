@@ -1638,10 +1638,10 @@ the island), findings checked, then the confirmed bugs fixed (user's request):
   Disturb, Keep awake and the low battery alert's state survive a shell reload; a recording
   holds off the idle lock; the lock screen clears the typed password after every try; a
   wallhaven search that never answers fails after 20 s.
+- Fixed after (user's pick): chosen tiling arrangements survive a `hyprctl reload` (see "Tiling
+  with our own layout").
 - Not fixed yet (need a decision): game mode and the low battery power saver each restore their
-  own saved power mode and can undo each other; every `hyprctl reload` (any Hyprland setting,
-  game mode, the windows editor) resets the tiling arrangements chosen per workspace (they live
-  in layout.lua's memory); the dock reorders running unpinned apps by recent use; the login
+  own saved power mode and can undo each other; the dock reorders running unpinned apps by recent use; the login
   screen's Hyprland loads a user-writable `shell-settings.lua`; Hyprland 0.57 plays its own bell
   sound outside the shell's sound settings and Do Not Disturb.
 
@@ -1674,7 +1674,12 @@ windows).
   with `lua tests/tiling_test.lua`): by the number of windows (one full, two halves, three as one
   big and two stacked, more in a grid) until a spot is picked, then the chosen arrangement (halves,
   thirds, 1/3 + 2/3, quarters) keeps its shape: new windows fill empty spots or stack in the last
-  column. The window menu's spots and "Arrange automatically", Super+Left/Right, Super+Alt+arrows
+  column. The arrangements are kept in `$XDG_RUNTIME_DIR/hypr-tiling-<instance>` (2026-11-03):
+  every config reload runs layout.lua again, and the shell reloads Hyprland for any of its
+  settings, game mode and the windows editor, so chosen spots kept going back to automatic.
+  After a reload Hyprland gives the layout a workspace's windows one at a time, so a saved
+  arrangement waits until all its windows are back (or 3 s). The window menu's spots and
+  "Arrange automatically", Super+Left/Right, Super+Alt+arrows
   (move the border), Super+Shift+arrows (swap with the neighbour). A tiled app with a minimum
   size is cut off at its box. Dialogs float by themselves; Super+Shift+Space or the window menu's
   Float/Tile floats any window, and floating windows stay above tiled ones (Hyprland can't

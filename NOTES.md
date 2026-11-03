@@ -55,6 +55,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   "configreloaded") when a reload is done: re-apply anything set with `hyprctl eval`, which the
   reload drops (services/Touchpad.qml). Since 0.57 `workspace.created` fires after the workspace
   is set up; the old early one is `workspace.created_early` (release notes, #16221).
+- `hyprctl reload` starts a fresh Lua state: globals set with `hyprctl eval` are gone after it,
+  and every required file runs again (verified 2026-11-03). Lua layouts are registered again and
+  get each workspace's windows one at a time (a recalculate with 1 window, then with 2, ...).
 - Hyprland runs Lua 5.5. `hyprctl eval '<lua>'` runs code in the config's state; `hyprctl repl
   'return x'` prints a value, but prints "unknown request" for an empty string.
 - `hyprctl eval 'hl.monitor({ output = "eDP-1", mode = "1920x1080@60", position = "auto", scale = 1,

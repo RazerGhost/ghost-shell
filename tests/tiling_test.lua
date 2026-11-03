@@ -234,5 +234,38 @@ test("the window menu's spots are the layout's", function()
     eq(menu, spots)
 end)
 
+test("arrangements survive encoding (a config reload)", function()
+    local states = {}
+    states[1] = T.sync(nil, { "0x1", "0x2", "0x3" }, nil)
+    states[2] = T.sync(nil, { "0xa", "0xb" }, nil)
+    T.snap(states[2], "0xa", "left-third")
+    T.resize(states[2], "0xa", "right", 0.05)
+    states[-98] = T.sync(nil, { "0xc" }, nil) -- a special workspace
+    local back = T.decode(T.encode(states))
+    eq(back, states)
+    eq(T.encode(back), T.encode(states))
+end)
+
+test("an empty cell and an empty file", function()
+    local s = T.sync(nil, { "a", "b", "c", "d" }, nil)
+    T.snap(s, "a", "top-left")
+    s.slots[2] = false
+    eq(T.decode(T.encode({ [3] = s }))[3], s)
+    eq(T.decode(""), {})
+    eq(T.decode(nil), {})
+    eq(T.encode({}), "")
+end)
+
+test("damaged lines are left out", function()
+    local good = T.encode({ [1] = T.sync(nil, { "a", "b" }, nil) })
+    local back = T.decode(good
+        .. "2 chosen 0.5:1;0.5:1 a\n"             -- two cells, one window
+        .. "3 chosen 2:1 a\n"                     -- a share over 1
+        .. "4 sideways 1:1 a\n"                   -- not auto or chosen
+        .. "5 auto 1:1 $(rm)\n"                   -- not an id
+        .. "nonsense\n")
+    eq(back, T.decode(good))
+end)
+
 print(string.format("%d passed, %d failed", count - failures, failures))
 os.exit(failures == 0 and 0 or 1)
