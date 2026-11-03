@@ -161,10 +161,11 @@ PanelWindow {
     WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
     // "Keep awake" in quick settings: Hyprland holds off idling while a visible surface asks it
-    // to, and the island is always visible.
+    // to, and the island is always visible. Also while recording the screen: a recording without
+    // input would otherwise dim, lock (recording the lock screen) and on battery suspend.
     IdleInhibitor {
         window: root
-        enabled: KeepAwake.on
+        enabled: KeepAwake.on || Recorder.recording
     }
 
     // Closes the menu when you click any other window or surface.

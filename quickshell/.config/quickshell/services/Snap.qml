@@ -50,15 +50,19 @@ Singleton {
     function askEmpty(window: HyprlandToplevel): void {
         if (!window?.workspace)
             return;
-        empty.window = window;
-        empty.command = ["hyprctl", "repl", `return ShellLayout.empty(${window.workspace.id})`];
-        empty.running = true;
+        empty.nextWindow = window;
+        empty.start(["hyprctl", "repl", `return ShellLayout.empty(${window.workspace.id})`]);
     }
 
-    Process {
+    // A second snap while the first is asked about runs after it (it was dropped); `window` is
+    // the one the running request is for.
+    LatestProcess {
         id: empty
 
         property HyprlandToplevel window
+        property HyprlandToplevel nextWindow
+
+        onStarted: window = nextWindow
 
         stdout: StdioCollector {
             onStreamFinished: {

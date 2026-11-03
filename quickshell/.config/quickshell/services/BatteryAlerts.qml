@@ -14,9 +14,19 @@ Singleton {
     id: root
 
     // The most serious warning given since the battery last charged.
-    property string given: ""
+    property alias given: persist.given
     // The power mode before power saver was switched on for a low battery; -1 if it wasn't.
-    property int modeBefore: -1
+    property alias modeBefore: persist.modeBefore
+
+    // Through a shell reload: otherwise the warning came again and plugging in didn't switch
+    // power saver back off.
+    PersistentProperties {
+        id: persist
+        reloadableId: "batteryAlerts"
+
+        property string given: ""
+        property int modeBefore: -1
+    }
 
     function check(): void {
         if (!Battery.present)

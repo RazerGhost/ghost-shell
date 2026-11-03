@@ -78,8 +78,10 @@ Scope {
         }
 
         // The message first: tried() shakes the field when it's an error.
+        // The typed password isn't kept past its try (PAM may finish without asking for it).
         onCompleted: result => {
             root.busy = false;
+            root.pending = "";
             if (result === PamResult.Success) {
                 root.message = "";
                 root.messageIsError = false;
@@ -93,6 +95,7 @@ Scope {
 
         onError: error => {
             root.busy = false;
+            root.pending = "";
             root.message = "Couldn't check the password (" + PamError.toString(error) + ")";
             root.messageIsError = true;
             root.tried();

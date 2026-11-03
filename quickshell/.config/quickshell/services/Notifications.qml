@@ -27,6 +27,21 @@ Singleton {
     // Assigning doNotDisturb (the tile) breaks its binding, so follow the schedule from here on.
     onScheduledDndChanged: doNotDisturb = scheduledDnd
 
+    // Switched by hand, it stays through a shell reload (`ghost update` reloads it).
+    onDoNotDisturbChanged: dnd.on = doNotDisturb
+
+    PersistentProperties {
+        id: dnd
+        reloadableId: "doNotDisturb"
+
+        property bool on: false
+
+        onReloaded: {
+            if (on !== root.doNotDisturb)
+                root.doNotDisturb = on;
+        }
+    }
+
     // A window fullscreen on the focused screen (a game, a film): pop-ups wait like Do Not
     // Disturb (Settings' dndFullscreen, on by default; Hyprland's fullscreen 2, not maximized).
     readonly property bool fullscreenNow: Settings.values.dndFullscreen

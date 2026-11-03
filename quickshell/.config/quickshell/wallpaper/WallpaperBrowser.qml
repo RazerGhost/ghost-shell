@@ -119,6 +119,15 @@ Item {
         loadMore();
     }
 
+    // A search wallhaven never answers is given up (status 0: "failed", with "Try again") rather
+    // than leaving `loading` set, which kept any more pages from loading until a new search.
+    Timer {
+        id: searchTimeout
+        property var request: null
+        interval: 20 * 1000
+        onTriggered: request?.abort()
+    }
+
     function loadMore(): void {
         if (loading || (page > 0 && page >= lastPage))
             return;
@@ -129,6 +138,7 @@ Item {
         request.onreadystatechange = () => {
             if (request.readyState !== XMLHttpRequest.DONE || asked !== root.searchId)
                 return;
+            searchTimeout.stop();
             root.loading = false;
             // 429: wallhaven's limit of 45 searches a minute.
             if (request.status !== 200) {
@@ -149,6 +159,8 @@ Item {
         request.open("GET", Wallhaven.searchUrl({ words: words.trim().split(/\s+/), style: style, page: page + 1,
                                                   tag: tag?.id ?? "", color: color }));
         request.send();
+        searchTimeout.request = request;
+        searchTimeout.restart();
     }
 
     // More pages while the ones in don't fill the window (nothing to scroll yet, so scrolling to
