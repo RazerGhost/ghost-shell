@@ -1640,8 +1640,13 @@ the island), findings checked, then the confirmed bugs fixed (user's request):
   wallhaven search that never answers fails after 20 s.
 - Fixed after (user's pick): chosen tiling arrangements survive a `hyprctl reload` (see "Tiling
   with our own layout").
-- Not fixed yet (need a decision): game mode and the low battery power saver each restore their
-  own saved power mode and can undo each other; the dock reorders running unpinned apps by recent use; the login
+- Game mode and the low battery's power saver (user's pick of the rule): a low battery wins and
+  each puts back only what it set (`services/PowerModes.js`, tested). Game mode leaves power saver
+  on while the battery is low, the saver remembers your mode from before game mode, plugging in
+  goes back to it (or to Performance while game mode is still on), and turning game mode off
+  puts your mode back only while it's still in Performance. Before, each restored its own saved
+  mode and one undid the other.
+- Not fixed yet (need a decision): the dock reorders running unpinned apps by recent use; the login
   screen's Hyprland loads a user-writable `shell-settings.lua`; Hyprland 0.57 plays its own bell
   sound outside the shell's sound settings and Do Not Disturb.
 

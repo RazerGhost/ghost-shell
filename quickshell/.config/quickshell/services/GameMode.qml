@@ -1,7 +1,8 @@
 // "Game mode" (the round button in quick settings): while on, Hyprland's animations, blur and
 // shadows are off (settings/HyprlandSettings.qml writes them into shell-settings.lua), pop-ups
 // wait in the history like Do Not Disturb (critical ones still show), and the power mode is
-// Performance, back to the previous mode when it's turned off. Kept across shell reloads (else
+// Performance, back to the previous mode when it's turned off; while a low battery holds power
+// saver, the power mode stays (PowerModes.js, shared with BatteryAlerts). Kept across shell reloads (else
 // a reload would leave Performance on with the button off); off again after a restart, like
 // Keep awake.
 pragma Singleton
@@ -9,6 +10,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.UPower
+import "PowerModes.js" as PowerModes
 
 Singleton {
     id: root
@@ -30,12 +32,14 @@ Singleton {
         if (on === saved.applied)
             return;
         saved.applied = on;
-        if (on && PowerProfiles.hasPerformanceProfile && PowerProfiles.profile !== PowerProfile.Performance) {
-            modeBefore = PowerProfiles.profile;
-            PowerProfiles.profile = PowerProfile.Performance;
-        } else if (!on && modeBefore !== -1) {
-            PowerProfiles.profile = modeBefore;
-            modeBefore = -1;
-        }
+        if (!PowerProfiles.hasPerformanceProfile)
+            return;
+        const saverHeld = BatteryAlerts.modeBefore !== -1;
+        const change = on ? PowerModes.gameOn(PowerProfiles.profile, { held: saverHeld, before: BatteryAlerts.modeBefore },
+                                              PowerProfile.Performance)
+                          : PowerModes.gameOff(PowerProfiles.profile, modeBefore, saverHeld, PowerProfile.Performance);
+        modeBefore = change.before;
+        if (change.profile !== null)
+            PowerProfiles.profile = change.profile;
     }
 }

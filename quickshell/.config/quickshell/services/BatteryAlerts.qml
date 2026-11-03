@@ -9,6 +9,7 @@ import Quickshell
 import Quickshell.Services.UPower
 import qs.theme
 import "BatteryAlerts.js" as BatteryAlertsJs
+import "PowerModes.js" as PowerModes
 
 Singleton {
     id: root
@@ -33,10 +34,12 @@ Singleton {
             return;
         if (Battery.charging) {
             given = "";
-            if (modeBefore !== -1) {
-                PowerProfiles.profile = modeBefore;
-                modeBefore = -1;
-            }
+            // Your mode back, or Performance while game mode is still on (PowerModes.js).
+            const back = PowerModes.pluggedIn(modeBefore, GameMode.on && PowerProfiles.hasPerformanceProfile,
+                                              PowerProfile.Performance);
+            modeBefore = back.before;
+            if (back.profile !== null)
+                PowerProfiles.profile = back.profile;
             return;
         }
         const warning = BatteryAlertsJs.warning(Battery.level, false, given, Theme.battery.warn, Theme.battery.critical);
@@ -47,8 +50,11 @@ Singleton {
         const time = Battery.timeLabel ? " · " + Battery.timeLabel : "";
         let body = warning === "critical" ? "Plug in soon: the laptop will suspend when it runs out." : "Plug in to keep going.";
         if (warning === "low" && Settings.values.batterySaver && PowerProfiles.profile !== PowerProfile.PowerSaver) {
-            modeBefore = PowerProfiles.profile;
-            PowerProfiles.profile = PowerProfile.PowerSaver;
+            // The mode from before game mode while it's on, so neither undoes the other.
+            const low = PowerModes.lowBattery(PowerProfiles.profile, { on: GameMode.on, before: GameMode.modeBefore },
+                                              PowerProfile.PowerSaver);
+            modeBefore = low.before;
+            PowerProfiles.profile = low.profile;
             body += " Power saver is on until you plug in.";
         }
         // Its own sound (the low battery switch), not the notification chime.
