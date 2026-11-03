@@ -21,6 +21,13 @@ copy() {
 
 if [ -f "$state/colors.json" ]; then
     copy "$state/colors.json" "$shared/colors.json"
+    # The background color alone, as data (rrggbb), for the login screen's Hyprland to start on
+    # (system/etc/greetd/hypr/hyprland.lua checks it): no Lua from here runs there.
+    surface=$(sed -n 's/^ *"surface": *"#\([0-9a-fA-F]\{6\}\)".*/\1/p' "$state/colors.json")
+    if [ -n "$surface" ]; then
+        printf '%s\n' "$surface" >"$shared/background.tmp"
+        mv -f "$shared/background.tmp" "$shared/background"
+    fi
 fi
 
 # Only the settings the login screen uses: its look (the lock screen's and the login screen's

@@ -30,9 +30,38 @@ Scope {
             pam.start();
     }
 
+    // Logged in automatically at boot (greetd's initial_session sets GHOST_AUTOLOGIN): lock
+    // first, before anything else can be used. Once Hyprland confirms the lock (`secure`), a mark
+    // in $XDG_RUNTIME_DIR says so and a reload loads the keybinds hyprland.lua held back. The mark
+    // also keeps a restart of the shell (after a crash) from locking again.
+    readonly property string lockedOnce: Quickshell.env("XDG_RUNTIME_DIR") + "/ghost-autologin-locked"
+    property bool lockingFirst: false
+
+    Component.onCompleted: {
+        if (Quickshell.env("GHOST_AUTOLOGIN") === "1")
+            firstLockCheck.running = true;
+    }
+
+    Process {
+        id: firstLockCheck
+        command: ["test", "-e", root.lockedOnce]
+        onExited: code => {
+            if (code === 0)
+                return; // locked once already this session
+            root.lockingFirst = true;
+            root.lock(false);
+        }
+    }
+
     WlSessionLock {
         id: sessionLock
         onLockedChanged: Session.locked = locked
+        onSecureChanged: {
+            if (!secure || !root.lockingFirst)
+                return;
+            root.lockingFirst = false;
+            Quickshell.execDetached(["sh", "-c", 'touch "$1" && hyprctl reload', "sh", root.lockedOnce]);
+        }
 
         WlSessionLockSurface {
             color: "black"

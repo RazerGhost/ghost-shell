@@ -10,7 +10,30 @@ require("autostart")
 require("layout") -- before look.lua, which picks it
 require("look")
 require("input")
-require("binds")
+
+-- Logged in automatically at boot (greetd's initial_session sets GHOST_AUTOLOGIN), the session
+-- starts unlocked: the keybinds wait until the shell's lock screen is up (lock/Lock.qml marks
+-- that in $XDG_RUNTIME_DIR and reloads, which loads them), so nobody can open a terminal in
+-- the second before. If the shell hasn't locked within 15 s (it failed to start), hyprlock
+-- locks instead. After a logout the login screen runs the session, without GHOST_AUTOLOGIN.
+local locked_once = (os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/ghost-autologin-locked"
+local marker = io.open(locked_once)
+if marker then
+    marker:close()
+end
+if os.getenv("GHOST_AUTOLOGIN") ~= "1" or marker then
+    require("binds")
+else
+    hl.timer(function()
+        local done = io.open(locked_once)
+        if done then
+            done:close()
+            return
+        end
+        hl.exec_cmd("hyprlock -c /usr/share/hypr/hyprlock.conf & sleep 2; touch '" .. locked_once .. "'; hyprctl reload")
+    end, { timeout = 15000, type = "oneshot" })
+end
+
 require("rules")
 require("windows")
 require("positions")

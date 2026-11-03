@@ -1650,6 +1650,26 @@ the island), findings checked, then the confirmed bugs fixed (user's request):
   screen's Hyprland loads a user-writable `shell-settings.lua`; Hyprland 0.57 plays its own bell
   sound outside the shell's sound settings and Do Not Disturb.
 
+### Boot straight to the lock screen (built 2026-11-03; needs `ghost install system`, `ghost greeter` and a reboot to test)
+User's pick after the review measured the boot (HP logo gone at Limine, ~4 s of a black or
+frozen screen, three screen mode sets, a black flash between the login screen and the desktop):
+- greetd's `initial_session` logs you in at boot straight into your Hyprland (one compositor, no
+  login screen's Hyprland in between) with `GHOST_AUTOLOGIN=1`, and it locks at once: the shell's
+  lock screen comes up first (`lock/Lock.qml`), and hyprland.lua loads no keybinds until it's up
+  (the shell marks `$XDG_RUNTIME_DIR/ghost-autologin-locked` once Hyprland confirms the lock, then
+  reloads). If the shell hasn't locked within 15 s, hyprlock does. The disk isn't encrypted, so the
+  login screen protected nothing more than the lock screen. After a logout the login screen runs
+  as before. The user name is filled in by the system module.
+- Limine (system module, at the top of limine.conf): `firmware_logo: yes` (the HP logo stays when
+  Limine hands over), `quiet: yes` (the menu only on a key during the timeout), `timeout: 1`.
+  `splash` left the kernel line (Plymouth's; unknown to the kernel).
+- The login screen's Hyprland starts on the theme's background color (`greeter/sync.sh` writes it
+  as rrggbb into the shared folder; the root-owned config checks it), and the login screen fades
+  to it before your session starts on the same color.
+- To check after a reboot: the logo stays until the lock screen, `cat
+  /sys/firmware/acpi/bgrt/status` is 1, logging out shows the login screen, `sudo head -5
+  /boot/limine.conf` still has the three options after a kernel update.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

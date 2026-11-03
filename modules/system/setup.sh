@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # System setup for this laptop (needs sudo): the GPU udev rule, early KMS and no Plymouth,
-# greetd, one mDNS service, and the services the shell reads.
+# Limine's boot menu, greetd (logging in at boot, then locking), one mDNS service, and the
+# services the shell reads.
 # Run by `ghost install`; alone: `ghost install system`. Safe to re-run.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
@@ -76,6 +77,12 @@ if [[ -n $plymouth ]]; then
     rebuild_boot=true
 fi
 
+# `splash` is Plymouth's, which is gone: the kernel only logs it as an unknown option.
+if grep -Eq '^KERNEL_CMDLINE.* splash( |")' /etc/default/limine; then
+    sudo sed -i -E '/^KERNEL_CMDLINE/ s/ splash( |")/\1/' /etc/default/limine
+    rebuild_boot=true
+fi
+
 if $rebuild_boot; then
     # limine-mkinitcpio (CachyOS) rebuilds the initramfs and rewrites the Limine boot entries.
     sudo limine-mkinitcpio
@@ -84,8 +91,33 @@ fi
 sudo grep -rqs --include=limine.conf 'plymouth.enable=0' /boot \
     || fail "plymouth.enable=0 is not in /boot's limine.conf; check /etc/default/limine and run sudo limine-mkinitcpio"
 
+step "Boot menu: the HP logo stays, the menu only on a key"
+# Limine's own options, at the top of its config (limine-entry-tool, which rewrites the boot
+# entries, keeps them): firmware_logo puts the firmware's logo back when Limine hands over, so
+# it stays on screen until Hyprland draws; quiet hides the menu unless a key is pressed during
+# the timeout (to pick Windows or a snapshot).
+esp=$(. /etc/default/limine; echo "${ESP_PATH:-/boot}")
+limine_conf=$esp/limine.conf
+sudo test -f "$limine_conf" || fail "$limine_conf is missing; check ESP_PATH in /etc/default/limine"
+for option in "timeout: 1" "quiet: yes" "firmware_logo: yes"; do
+    key=${option%%:*}
+    if sudo grep -q "^$key:" "$limine_conf"; then
+        sudo sed -i "s/^$key:.*/$option/" "$limine_conf"
+    else
+        sudo sed -i "1i $option" "$limine_conf"
+    fi
+done
+# A config enrolled into Limine's binary must be enrolled again after a change, or it won't
+# boot (off by default on CachyOS).
+if grep -qs '^ENABLE_ENROLL_LIMINE_CONFIG=yes' /etc/default/limine /etc/limine-entry-tool.conf; then
+    sudo limine-enroll-config
+fi
+
 step "Login manager (greetd)"
-sudo install -Dm644 system/etc/greetd/config.toml /etc/greetd/config.toml
+# Your user for the automatic login at boot (config.toml's initial_session).
+sed "s/@USER@/$USER/" system/etc/greetd/config.toml >"${TMPDIR:-/tmp}/ghost-greetd.toml"
+sudo install -Dm644 "${TMPDIR:-/tmp}/ghost-greetd.toml" /etc/greetd/config.toml
+rm -f "${TMPDIR:-/tmp}/ghost-greetd.toml"
 sudo install -Dm644 system/etc/systemd/system/greetd.service.d/after-plymouth.conf \
     /etc/systemd/system/greetd.service.d/after-plymouth.conf
 sudo systemctl daemon-reload

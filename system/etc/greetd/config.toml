@@ -1,5 +1,7 @@
-# greetd: login manager. Shows a greeter on tty1 at boot; after login it runs Hyprland.
-# The system module installs this file; the core module's greeter.sh sets up the greeter.
+# greetd: login manager. At boot it logs you in straight into Hyprland, which locks at once
+# (initial_session); after a logout it shows the greeter, which runs Hyprland once you log in.
+# The system module installs this file (filling in your user name); the core module's
+# greeter.sh sets up the greeter.
 #
 # The greeter is Quickshell's login screen inside a small Hyprland (/etc/greetd/hypr/), run as
 # the "greeter" user with /var/lib/qs-greeter as its home (copies of your colors and wallpaper).
@@ -14,3 +16,11 @@ command = "env HOME=/var/lib/qs-greeter systemd-cat --identifier=greeter-hyprlan
 # ROADMAP.md): swap the comment on these two lines, then sudo systemctl restart greetd.
 # command = "tuigreet --time --remember --asterisks --cmd start-hyprland"
 user = "greeter"
+
+# Boot: your session at once, without the login screen's own Hyprland in between (one screen
+# setup, no black flash). It locks before anything else (GHOST_AUTOLOGIN: hyprland.lua holds
+# the keybinds back until the shell's lock screen is up). The disk isn't encrypted, so the login
+# screen protected nothing more than the lock screen does. greetd runs this once per boot.
+[initial_session]
+command = "env GHOST_AUTOLOGIN=1 systemd-cat --identifier=hyprland start-hyprland"
+user = "@USER@"

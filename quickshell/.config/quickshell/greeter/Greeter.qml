@@ -5,6 +5,7 @@ import Quickshell.Services.Greetd
 import Quickshell.Wayland
 import qs.lock
 import qs.services
+import qs.theme
 
 // The login screen, run by greetd at boot (see greeter.qml and system/etc/greetd/). It looks
 // like the lock screen: type the password and Enter starts Hyprland for that user.
@@ -21,6 +22,9 @@ Scope {
     property bool busy
     // The password waiting for greetd to ask for it.
     property string pending
+    // Logged in: the screen fades to the theme's background color before your session starts,
+    // the color your session's Hyprland starts on (colors.lua's background_color), so there's no jump.
+    property bool leaving: false
 
     signal tried()
 
@@ -90,7 +94,8 @@ Scope {
         // Hyprland's output goes to the journal (journalctl -t hyprland), not onto tty1, where it
         // showed between the login screen and the desktop, and again at logout and shutdown.
         function onReadyToLaunch(): void {
-            Greetd.launch(["systemd-cat", "--identifier=hyprland", "start-hyprland"], [], true);
+            root.leaving = true;
+            launchAfterFade.start();
         }
 
         function onError(error: string): void {
@@ -99,6 +104,12 @@ Scope {
             root.messageIsError = true;
             root.tried();
         }
+    }
+
+    Timer {
+        id: launchAfterFade
+        interval: Theme.anim.normal
+        onTriggered: Greetd.launch(["systemd-cat", "--identifier=hyprland", "start-hyprland"], [], true)
     }
 
     Variants {
@@ -134,6 +145,17 @@ Scope {
                     function onTried(): void {
                         content.clear(root.messageIsError);
                     }
+                }
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                color: Colors.m3surface
+                opacity: root.leaving ? 1 : 0
+                visible: opacity > 0
+
+                Behavior on opacity {
+                    NumberAnimation { duration: Theme.anim.normal; easing.type: Easing.OutCubic }
                 }
             }
         }

@@ -219,7 +219,7 @@ with snapping or a grid, keyboard nudges, zoom with the shell's size.
 |---|---|
 | Lock screen (PAM, blur, clock styles, widgets, media, grace period, shake on error, hints) | `lock/Lock.qml`, `LockContent.qml`, `LockClock.qml/.js`, `LockWidget.qml`, `LockWidgets.js`, `LockStatus.qml` |
 | Movable parts with outlines in the editor | `lock/PartShift.qml`, `PartOutline.qml`, `GlideTranslate.qml` |
-| Quickshell greeter under greetd, synced settings through a shared folder | `greeter.qml`, `greeter/Greeter.qml`, `greeter/sync.sh`, `lock/LoginScreenSync.qml`, `system/etc/greetd/` |
+| Boot logs in and locks at once (greetd `initial_session`, `GHOST_AUTOLOGIN`); the Quickshell greeter after a logout, synced settings through a shared folder | `greeter.qml`, `greeter/Greeter.qml`, `greeter/sync.sh`, `lock/LoginScreenSync.qml`, `system/etc/greetd/` |
 | Idle: dim, lock, screen off, suspend (battery / plugged in) | `idle/Idle.qml`, `hypridle.conf` |
 | Polkit agent | `polkit/PolkitPrompt.qml` |
 
