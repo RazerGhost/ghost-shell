@@ -1,5 +1,5 @@
 // The notification server: Quickshell receives every app's notifications (there's no other
-// notification daemon). New ones queue up as pop-ups, shown one at a time by the island, and
+// notification daemon). New ones queue up as pop-ups, up to three at once in the top-right corner (bar/PopupStack.qml), and
 // stay in the history (the "today" menu) until dismissed. Do Not Disturb skips the pop-ups,
 // except critical ones; the history still collects everything. With a schedule (settings
 // window) it turns on at the start time and off at the end time; toggling in between lasts
@@ -65,8 +65,10 @@ Singleton {
         precision: SystemClock.Minutes
     }
 
-    // Pop-ups still to show, oldest first. A notification that's dismissed meanwhile turns
-    // into null here (its object is destroyed), so readers skip nulls.
+    // Pop-ups still to show, oldest first. A notification closed meanwhile (dismissed, clicked,
+    // closed by its app) leaves when it closes (onNotification): a destroyed one only turned into
+    // null here without the list changing, so the corner kept an empty card. Readers still skip
+    // nulls, in case.
     property list<Notification> queue: []
 
     // Newest first.
@@ -161,6 +163,7 @@ Singleton {
             const mode = Rules.mode(Settings.values.notificationApps, notification.appName);
             if (Rules.popsUp(mode, root.quiet, critical)) {
                 root.queue = [...root.queue, notification];
+                notification.closed.connect(() => root.queue = root.queue.filter(n => n !== null && n !== notification));
                 Sounds.playNotification(notification.hints, critical);
             } else if (mode !== "silent") {
                 root.missed++;

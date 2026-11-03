@@ -150,7 +150,13 @@ PanelWindow {
         shown: IslandViews.shown(root.panel, root.island.reloadShown && root.island.reloadError !== "", root.peek)
         hasFocus: root.open
         // Each menu's own width. Kept while closing, so the menu fading out doesn't reflow.
-        onShownChanged: if (shown !== "") openWidth = Theme.island.menuWidth(shown)
+        onShownChanged: rememberWidth()
+        // Also at the start: a menu kept open across a shell reload is already shown then.
+        Component.onCompleted: rememberWidth()
+        function rememberWidth(): void {
+            if (shown !== "")
+                openWidth = Theme.island.menuWidth(shown);
+        }
         onCloseRequested: root.island.panel = ""
 
         // The time, the music, the workspace dots or "Reloaded", and the alerts beside them.
@@ -172,11 +178,10 @@ PanelWindow {
                 implicitWidth: root.showReloaded ? reloaded.implicitWidth
                              : root.showDots ? workspaces.implicitWidth
                              : root.showMedia ? activity.implicitWidth : clock.implicitWidth
+                // Not animated here: the island's own width follows it with its morph (IslandPill),
+                // and animating both made the island restart its morph every frame, trailing and
+                // cutting off what grew.
                 implicitHeight: Theme.island.height
-
-                Behavior on implicitWidth {
-                    MorphAnimation {}
-                }
 
                 Clock {
                     id: clock

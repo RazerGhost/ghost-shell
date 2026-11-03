@@ -23,7 +23,8 @@ PanelWindow {
     readonly property list<Notification> notifications: Notifications.popups
     readonly property HyprlandToplevel attention: Windows.needsAttention
     readonly property bool hasAny: notifications.length > 0 || attention !== null
-    // How long a pop-up stays, from Settings (1-60 s).
+    // How long a pop-up stays, from Settings (it offers 3-30 s; kept within 1-60 should the file
+    // say otherwise).
     readonly property int popupTime: Math.min(60, Math.max(1, Number(Settings.values.notificationSeconds) || 5)) * 1000
 
     screen: Quickshell.screens.find(s => s.name === monitorName) ?? null
@@ -34,9 +35,10 @@ PanelWindow {
     margins.top: Theme.island.reserved + Theme.spacing.s
     margins.right: Theme.island.popupMargin
     // A fixed size, so the window doesn't resize as cards come and go; only the stack takes
-    // input (mask), the rest lets clicks through.
+    // input (mask), the rest lets clicks through. As tall as the island's window: three cards with
+    // actions or pictures and the attention card ran past half of it, cut off.
     implicitWidth: Theme.island.panelWidth
-    implicitHeight: Theme.island.maxHeight / 2
+    implicitHeight: Theme.island.maxHeight
     color: "transparent"
     exclusionMode: ExclusionMode.Ignore
     mask: Region { item: stack }
@@ -110,12 +112,15 @@ PanelWindow {
                 width: parent.width
                 window: root.attention
                 visible: root.attention !== null
+                // Another window asking straight after: its own full time.
+                onWindowChanged: attentionTimer.restart()
                 onActivated: {
                     Windows.show(root.attention);
                     Windows.attentionSeen();
                 }
 
                 Timer {
+                    id: attentionTimer
                     interval: root.popupTime
                     running: attentionCard.visible && !stack.hovered
                     onTriggered: Windows.attentionSeen()
