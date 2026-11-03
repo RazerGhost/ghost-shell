@@ -25,11 +25,13 @@ new setup step.
 
 ## Look and architecture
 
-- **Bar = the island** (user's choice, replacing the floating pills): a small shape attached to the
-  top edge, with concave curves into the screen edge, showing workspaces, the time (no date) and tiny
-  status icons. Clicking the time or the status icons morphs it (Android-style) into a menu: "today"
-  (date, calendar, media; notifications in Phase 3) or quick settings (tiles, sliders, battery, tray;
-  Wi-Fi and Bluetooth tiles slide in their own page). Categorized pages, not one crowded panel.
+- **Bar = the island** (user's choice, replacing the floating pills): a small shape under the
+  webcam, floating below the top edge or attached to it with concave curves, showing only the time
+  (no date; the music's cover while it plays) and alerts (since 2026-11-03, see "One island,
+  notifications in the corner"; it first held workspaces and status icons too). A click morphs it
+  (Android-style) into "today" (date, calendar, notifications), a right-click into quick settings
+  (status icons, tiles, sliders, battery, background apps; Wi-Fi and Bluetooth tiles slide in
+  their own page). Categorized pages, not one crowded panel.
   Aesthetic reference: saneAspect's Hyprland/Quickshell builds (clean, rounded, Material-ish, subtle
   animations).
 - **Colors:** matugen from the wallpaper is the single source of truth for Quickshell, Hyprland borders,
@@ -65,6 +67,8 @@ new setup step.
 
 ### Phase 2: Island + control center + launcher + OSD (done, verified on the laptop 2026-10-28,
   except the media card: untested until Spotify is installed)
+The island as first built; since 2026-11-03 it shows only the time and alerts, see "One island,
+notifications in the corner".
 - Island (`bar/Island.qml` for the state, `IslandWindow.qml` per monitor, `IslandShape.qml`): closed = workspaces, clock, `StatusIcons`; the
   three parts are evenly spaced
   (user's choice, 2026-10-28: with the clock forced into the exact middle it sat 20 px from the
@@ -320,7 +324,8 @@ tag, Material-Theme at a commit; the user's own Ghost repos follow their main br
   `pacman-contrib`; checks a copy of the database, no root) and `paru -Qua` (AUR), parsed by
   `Updates.js` (tested). Counted a minute after login, every hour, and a few seconds after
   `/var/log/pacman.log` changes (any install or update, whoever ran it; watched without reading
-  it). A download icon in the island's status icons while there are some; quick settings shows
+  it). A download icon in the status icons while there are some (quick settings' top row since
+  2026-11-03); quick settings shows
   "12 updates · 3 from the AUR" with an Update button that runs `paru` in the default terminal
   (user's choice over `cachy-update`). `qs ipc call updates check|summary`.
 
@@ -722,7 +727,8 @@ shell's cost, features and customization), checked before acting. Done so far:
   the attention card too) and the volume and brightness pop-up's place (bottom, or top under the
   island) and time (1-5 s).
 - Settings -> Appearance -> Status icons: Wi-Fi, Bluetooth, VPN, airplane mode, timer, updates,
-  muted and battery can each be hidden (`hiddenStatusIcons`). The privacy icons (recording,
+  muted and battery can each be hidden (`hiddenStatusIcons`; since 2026-11-03 in quick settings,
+  and the battery always shows there with its percentage). The privacy icons (recording,
   microphone, camera, screen sharing) always show.
 - Settings -> Windows -> Dock: at the edge (as before), always (it reserves its space, so windows
   tile above it), or off. Pins move left or right from the dock's right-click menu
@@ -1787,7 +1793,7 @@ windows).
   menu on the window itself (`snap/WindowMenu.qml`, Alt+Space or Super+Z; user's choice
   2026-10-28, it used to be an island menu next to a separate snap picker): minimize, maximize,
   fullscreen, float or tile, close, move to workspace 1-5, and the snap layouts. Minimized windows are restored
-  from the workspace dots' hover.
+  from the overview's list, the dock or Alt+Tab.
 - **Minimize:** Hyprland has none (since 0.57 it tells Lua when an app or a taskbar-style tool
   asks: `windows.lua` sends those requests to the same hidden workspace. GTK's minimize button
   stays greyed out, tested: Hyprland 0.57 only advertises fullscreen and maximize to windows
@@ -1795,16 +1801,16 @@ windows).
   workspace (Super+Down, the window menu, the dock); the next most recent window on that workspace
   gets the focus, and `Windows.active` ignores minimized windows (Hyprland can still report one as
   active, which made a second dock click minimize again instead of restoring). Restoring moves
-  it to the current workspace and focuses it (`services/Windows.qml`). Hovering the workspace dots shows the minimized windows
-  under the workspace numbers (`MinimizedList`, also in the window menu); no separate indicator, to keep the island
-  consistent (user's choice).
+  it to the current workspace and focuses it (`services/Windows.qml`). The overview lists the minimized windows in its
+  bottom-left corner (`overview/MinimizedList.qml`; until 2026-11-03 under the island's workspace numbers on hover); no
+  indicator in the island, to keep it consistent (user's choice).
 - **Apps reopen where they were** (`hypr/positions.lua`): on `window.close` a floating window's
   position and size are saved per class in `~/.local/state/hypr/window-positions`; on
   `window.open` they're applied, unless another window of that class is open (dialogs, second
   windows) or the spot is off-screen. Fullscreen and minimized windows aren't saved.
 - **Attention like a flashing taskbar button:** apps can't steal focus (`misc.focus_on_activate`
-  stays false); Hyprland marks them urgent and the island shows an `AttentionCard` (icon, title,
-  click to switch) for 5 s, after any notification pop-up. `services/Windows.qml` keeps its own
+  stays false); Hyprland marks them urgent and the corner pop-ups show an `AttentionCard` (icon, title,
+  click to switch) for the notification time (`bar/PopupStack.qml`), below any notifications. `services/Windows.qml` keeps its own
   list from Hyprland's `urgent` raw events, dropping a window once it's focused or closed:
   `HyprlandToplevel.urgent` didn't follow these events (false for a terminal bell). Opening a
   window also sends `urgent` just before focusing it, which the list ignores.
@@ -1823,7 +1829,7 @@ windows).
   binds run `qs ipc call brightness refresh` after `brightnessctl`. Volume and mic need nothing:
   the OSD watches PipeWire.
 - **Island window:** fixed at the open menu's maximum size (resizing a layer surface every frame
-  would stutter); `mask: Region { item: island }` limits input to the shape and `exclusiveZone`
+  would stutter); `mask: Region { item: pill }` limits input to the shape and `exclusiveZone`
   reserves only the closed height. The shape is one `ShapePath` (no seams between body and curves).
 - **Island keyboard focus: `OnDemand` while a menu is open, `None` while closed.** Always
   `OnDemand` stole the keyboard: Hyprland gives the keyboard to a layer surface that accepts it as
@@ -1838,10 +1844,16 @@ windows).
   closes when the pointer leaves the island) and brings the time back in the middle. Clicking the
   activity or the small player opens the media menu (`controlcenter/MediaPanel.qml`: cover, track,
   seek bar, controls); clicking the middle opens whatever it shows. Player choice
-  lives in `services/Media.qml`. Spotify (1.3.4) reports a frozen MPRIS position (equal to the
+  lives in `services/Media.qml` (`MediaPlayers.js`, tested): the one playing, else the one that
+  played last, else the music app heard last (`lastMediaApp`), else the first; KDE Connect's phone
+  players come first in MPRIS's list, so "the first" took a paused Spotify's place. The media
+  keys (`qs ipc call media`) follow it. Spotify (1.3.4) reports a frozen MPRIS position (equal to the
   track length) while playing, so its seek bar reads full; other players are untested.
-- **Notifications from the island** (user's choice over corner cards). Pop-ups wait while a menu
-  is open. Notifications carry no timestamp, so the service records arrival times; after a shell
+- **Notifications in the top-right corner** (user's choice, 2026-11-03; they dropped from the
+  island one at a time before, and waited while a menu was open): up to three at once
+  (`Notifications.popupLimit`), not waiting for menus. A notification leaves the queue when it
+  closes (dismissed, clicked, closed by its app): a destroyed one only turned into null in the
+  list, which didn't notify, and left an empty card. Notifications carry no timestamp, so the service records arrival times; after a shell
   restart (not a reload) the history is empty.
 - **Island window height** is 840 px (was 680) so the "today" menu with notifications fits.
 - **Island menu widths** (user's choice, 2026-11-04: each menu its own, over one wider size):

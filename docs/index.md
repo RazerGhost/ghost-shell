@@ -72,7 +72,7 @@ updated) · Boy Scout Rule within touched lines · end each change with a summar
 | Windows | Own tiling layout (`layout.lua`, `tiling.lua`); dialogs float; floating stays above tiled |
 | Focus | Click to focus, raise on focus (`input.follow_mouse = 2`, `windows.lua`); apps can't steal focus, urgent shows an `AttentionCard` |
 | Keybinds | Windows-style (Super launcher, Alt+Tab, Super+Left/Right snap, ...); app binds go through the shell with a fallback |
-| Minimize | `special:minimized` workspace; restored from the workspace dots' hover, dock, window menu |
+| Minimize | `special:minimized` workspace; restored from the overview's list (`overview/MinimizedList.qml`), the dock or Alt+Tab |
 | Positions | Floating windows reopen where they were (`positions.lua`) |
 | Island | Fixed-size window with an input mask; keyboard `OnDemand` while a menu is open, `None` closed |
 | Switcher / overview | Keyboard `OnDemand`, not `Exclusive` (focus race) |
@@ -98,13 +98,13 @@ Recovery procedures (lock screen crash, login screen failure) are in ROADMAP Pha
 
 | Feature | Files |
 |---|---|
-| Island: one shape with the time (or music) and alerts, floating or attached to the top edge (`islandAttached`); click for today, right-click for quick settings; morphs into every menu | `bar/Island.qml`, `IslandWindow.qml`, `IslandPill.qml`, `PillShape.qml`, `PillPath.js`, `IslandViews.js`, `IslandButton.qml` |
-| Island alerts: recording, timer, microphone, camera, screen sharing, low battery | `bar/IslandAlerts.qml` |
+| Island: one shape with the time (or music) and alerts, floating or attached to the top edge (`islandAttached`); click for today, right-click for quick settings; morphs into every menu | `bar/Island.qml`, `IslandWindow.qml`, `IslandPill.qml`, `PillShape.qml`, `PillPath.js`, `IslandViews.js`, `IslandButton.qml`, `IslandFade.qml` |
+| Island alerts: recording, timer, microphone, camera, screen sharing, low battery | `bar/IslandAlerts.qml`, `widgets/StatusGlyph.qml` |
 | Pop-ups in the top-right corner: up to three notifications, attention requests | `bar/PopupStack.qml` |
 | Workspace dots (3-10 or only used), shown in the island for a moment after a switch; scroll over the island to step | `bar/Workspaces.qml`, `services/WorkspaceSlots.js` |
 | Clock (day, seconds, 24-hour options) | `bar/Clock.qml` |
 | Status icons in quick settings' top row: Wi-Fi, Bluetooth, VPN, airplane, updates, muted (each hideable), the battery | `controlcenter/StatusIcons.qml`, `BatteryPill.qml`, `widgets/WifiIcon.qml` |
-| Media "live activity" (cover replaces the clock), small player on hover | `bar/MediaActivity.qml`, `controlcenter/MediaCard.qml` |
+| Media "live activity" (cover replaces the clock), small player on hover; which player (also for the media keys) | `bar/MediaActivity.qml`, `controlcenter/MediaCard.qml`, `services/Media.qml`, `MediaPlayers.js` |
 | Shell reloads: "Reloaded" in the island's time place, a failed reload's error opened out of the island | `bar/IslandWindow.qml`, `bar/ReloadNotice.qml` |
 | Recording dot, timer countdown in the island | `services/Recorder.qml`, `services/Countdown.qml` |
 
@@ -128,7 +128,7 @@ Recovery procedures (lock screen crash, login screen failure) are in ROADMAP Pha
 
 ### Notifications
 
-Server, pop-ups from the island, history, grouping, progress bars, actions, quick reply, DND
+Server, pop-ups in the top-right corner (`bar/PopupStack.qml`), history, grouping, progress bars, actions, quick reply, DND
 with schedule, per-app rules (Silent / Pop up / Always), quiet while fullscreen with a summary,
 sounds. `services/Notifications.qml`, `NotificationRules.js`, `controlcenter/NotificationCard.qml`,
 `NotificationGroups.js`, `NotificationProgress.js`, `NotificationTime.js`, `services/Sounds.qml`.
@@ -149,7 +149,7 @@ while recording; each can be turned off. `osd/Osd.qml`, `services/Keyboard.qml`.
 | Window menu (Alt+Space / Super+Z): actions, move to workspace, snap layouts | `snap/WindowMenu.qml`, `WindowActions.qml`, `SnapLayouts.qml` |
 | Snap Assist | `snap/SnapAssist.qml`, `services/WindowGrid.js` |
 | Alt+Tab switcher with live previews | `switcher/Switcher.qml`, `widgets/WindowPreview.qml` |
-| Overview (Super+Tab, swipe, hot corner), drag windows between workspaces | `overview/Overview.qml`, `HotCorner.qml` |
+| Overview (Super+Tab, swipe, hot corner), drag windows between workspaces, the minimized windows | `overview/Overview.qml`, `HotCorner.qml`, `MinimizedList.qml` |
 | Minimize, restore, attention | `services/Windows.qml`, `windows.lua` |
 | Window tabs (Hyprland groups) | `binds.lua`, `Windows.toggleTabs` |
 | Reopen floating apps where they were | `positions.lua` |
@@ -194,7 +194,7 @@ Cancel / Done, full keyboard control. `customize/Customize.qml`, `EditorChrome.q
 |---|---|---|
 | Lock screen | Looks, Clock (style, font, place, size, quiet side), Widgets, Picture; drag every part | `customize/LockEditor.qml` |
 | Desktop | Themes (save, rename, export/import), Looks + widget layouts, Wallpaper, Colors, Widgets (grid), Style, Size and text | `customize/DesktopEditor.qml`, `Themes.js`, `LooksFile.js` |
-| Dock and island | Looks, island (dots, clock, status icons), dock (when, icon size) | `customize/DockIslandEditor.qml` |
+| Dock and island | Looks, island (style, dots, clock, status icons in quick settings), dock (when, icon size) | `customize/DockIslandEditor.qml` |
 | Windows | Looks, Borders, Space, Motion (with Play samples) on example windows | `customize/WindowsEditor.qml`, `ExampleWindow.qml` |
 | Quick settings | Edit mode on the panel itself | `controlcenter/QuickSettings.qml` |
 
@@ -269,7 +269,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 
 | Target | Functions |
 |---|---|
-| `island` | `toggle <settings\|today\|clipboard\|emoji\|power>`, `close`, `editQuickSettings` |
+| `island` | `toggle <settings\|today\|media\|clipboard\|emoji\|power\|tray>`, `close`, `editQuickSettings` |
 | `launcher` | `toggle` |
 | `apps` | `open <kind>`, `terminal <command>` |
 | `settings` | `open`, `page <id>` |
