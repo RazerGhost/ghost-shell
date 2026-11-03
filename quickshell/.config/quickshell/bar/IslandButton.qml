@@ -3,8 +3,9 @@ import qs.theme
 import qs.widgets
 
 // The closed island's clickable middle: a click opens its menu, a right-click another
-// (`secondaryActivated`, quick settings). It fills the closed island, so hover and an open menu
-// highlight the whole shape, not just the time.
+// (`secondaryActivated`, quick settings). It fills the closed island, so hover highlights the
+// whole shape, not just the time. Not while a menu is open (`active`): the time alone lit up at
+// the top of the menu looked odd (user's find).
 MouseArea {
     id: root
 
@@ -36,8 +37,7 @@ MouseArea {
         // Attached, the island's top runs into the screen's edge: square there too.
         topLeftRadius: Theme.island.attached ? 0 : radius
         topRightRadius: Theme.island.attached ? 0 : radius
-        hovered: root.containsMouse
-        active: root.active
+        hovered: root.containsMouse && !root.active
     }
 
     Row {
