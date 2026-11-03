@@ -3,15 +3,25 @@
 .pragma library
 
 // The dock's items: pinned apps in the order they were pinned, then apps that are running but not
-// pinned, in the order their first window appears. Each item is { id, pinned, windows }.
-//   windows: the open windows, each with an `appId` (Wayland app id)
+// pinned, in the order they opened (a taskbar's order: focusing one doesn't move it). Each item
+// is { id, pinned, windows }.
+//   windows: the open windows, most recently used first, each with an `appId` (Wayland app id);
+//            each item's windows keep that order (a click goes to the most recent)
 //   pinned:  desktop entry ids ("zen", "com.mitchellh.ghostty")
 //   resolve: appId -> desktop entry id, or "" when no .desktop file matches; such apps get
 //            the id "app:<appId>" so their windows still group together
-function items(windows, pinned, resolve) {
+//   opened:  the app ids of the open windows in the order they opened (optional; without it,
+//            the order of `windows`)
+function items(windows, pinned, resolve, opened) {
     const byId = new Map();
+    const idOf = appId => resolve(appId) || "app:" + appId;
     for (const id of pinned)
         byId.set(id, { id: id, pinned: true, windows: [] });
+    for (const appId of opened ?? []) {
+        const id = idOf(appId);
+        if (!byId.has(id))
+            byId.set(id, { id: id, pinned: false, windows: [] });
+    }
     for (const window of windows) {
         const id = resolve(window.appId) || "app:" + window.appId;
         if (!byId.has(id))

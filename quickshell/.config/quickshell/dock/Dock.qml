@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
 import qs.services
 import "DockApps.js" as DockApps
@@ -22,7 +23,9 @@ Scope {
         void DesktopEntries.applications.values;
         return DockApps.items(Windows.recent.map(t => ({ appId: t.wayland.appId, window: t })),
                               pinned,
-                              appId => DesktopEntries.heuristicLookup(appId)?.id ?? "");
+                              appId => DesktopEntries.heuristicLookup(appId)?.id ?? "",
+                              // Hyprland's window list is in the order they opened.
+                              (Hyprland.toplevels?.values ?? []).filter(t => t.wayland !== null).map(t => t.wayland.appId));
     }
 
     function movePin(id: string, by: int): void {

@@ -21,6 +21,15 @@ TestCase {
         compare(items[1].windows.length, 0);
     }
 
+    // Running apps keep the order they opened, whichever was used last (windows come most
+    // recently used first; each app's windows keep that order).
+    function test_runningOrderIsStable() {
+        const g1 = { appId: "com.mitchellh.ghostty" }, z1 = { appId: "zen" }, z2 = { appId: "zen" }, q = { appId: "qs.test" };
+        const items = DockApps.items([q, z2, g1, z1], [], resolve, ["zen", "com.mitchellh.ghostty", "zen", "qs.test"]);
+        compare(items.map(i => i.id), ["zen", "com.mitchellh.ghostty", "app:qs.test"]);
+        compare(items[0].windows, [z2, z1]);
+    }
+
     function test_unknownAppsGroupByAppId() {
         const windows = [{ appId: "qs.test" }, { appId: "qs.test" }];
         const items = DockApps.items(windows, [], resolve);

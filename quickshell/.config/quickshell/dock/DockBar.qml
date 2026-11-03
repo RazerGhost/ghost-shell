@@ -164,8 +164,8 @@ PanelWindow {
                 height: parent.height
 
                 Repeater {
-                    // Recomputed every second (window positions); ScriptModel keeps the icons
-                    // whose app didn't change instead of rebuilding them all.
+                    // Recomputed on window events (opened, closed, focused); ScriptModel keeps
+                    // the icons whose app didn't change instead of rebuilding them all.
                     model: ScriptModel { values: window.dock.items }
 
                     Row {
