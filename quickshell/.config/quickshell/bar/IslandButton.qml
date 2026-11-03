@@ -3,7 +3,8 @@ import qs.theme
 import qs.widgets
 
 // The closed island's clickable middle: a click opens its menu, a right-click another
-// (`secondaryActivated`, quick settings). Highlighted on hover, and while a menu is open.
+// (`secondaryActivated`, quick settings). It fills the closed island, so hover and an open menu
+// highlight the whole shape, not just the time.
 MouseArea {
     id: root
 
@@ -18,8 +19,8 @@ MouseArea {
     signal secondaryActivated()
 
     anchors.verticalCenter: parent.verticalCenter
-    implicitWidth: row.implicitWidth + Theme.spacing.m * 2
-    implicitHeight: Theme.island.height - Theme.spacing.xs * 2
+    implicitWidth: row.implicitWidth + (Theme.island.padding + Theme.spacing.m) * 2
+    implicitHeight: Theme.island.height
     hoverEnabled: true
     cursorShape: Qt.PointingHandCursor
     acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -31,7 +32,10 @@ MouseArea {
     onClicked: mouse => mouse.button === Qt.RightButton ? root.secondaryActivated() : root.activated()
 
     StateLayer {
-        radius: Theme.radius.full
+        radius: height / 2
+        // Attached, the island's top runs into the screen's edge: square there too.
+        topLeftRadius: Theme.island.attached ? 0 : radius
+        topRightRadius: Theme.island.attached ? 0 : radius
         hovered: root.containsMouse
         active: root.active
     }

@@ -21,7 +21,8 @@ Item {
 
     readonly property bool expanded: shown !== ""
     readonly property bool hovered: content.containsMouse
-    readonly property real closedWidth: row.implicitWidth + Theme.island.padding * 2
+    // The row's button carries the island's padding itself, so its highlight fills the shape.
+    readonly property real closedWidth: row.implicitWidth
     readonly property string mode: Theme.island.attached ? "top" : "float"
     // Blur behind exactly the shape (ext-background-effect): the body with its round corners, and
     // the fillets (squares with the fillet's circle cut out).
