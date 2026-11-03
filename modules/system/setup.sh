@@ -96,7 +96,9 @@ step "Boot menu: the HP logo stays, the menu only on a key"
 # entries, keeps them): firmware_logo puts the firmware's logo back when Limine hands over, so
 # it stays on screen until Hyprland draws; quiet hides the menu unless a key is pressed during
 # the timeout (to pick Windows or a snapshot).
-esp=$(. /etc/default/limine; echo "${ESP_PATH:-/boot}")
+# The file is bash written for limine-entry-tool, which declares KERNEL_CMDLINE as a named
+# (associative) array first; sourced bare, `[default]` is read as an unset variable under set -u.
+esp=$(declare -A KERNEL_CMDLINE; . /etc/default/limine; echo "${ESP_PATH:-/boot}")
 limine_conf=$esp/limine.conf
 sudo test -f "$limine_conf" || fail "$limine_conf is missing; check ESP_PATH in /etc/default/limine"
 for option in "timeout: 1" "quiet: yes" "firmware_logo: yes"; do
