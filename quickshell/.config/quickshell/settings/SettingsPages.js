@@ -7,7 +7,7 @@
 // search matches a page's title and these words, so it finds the page for any setting on it.
 const pages = [
     { id: "appearance", section: "Personalize", icon: "palette", title: "Appearance",
-      words: "customize desktop editor wallpaper wallpapers find download wallhaven anime art slideshow folder rotate change every colors theme light dark mode sunset night accent style contrast vibrant monochrome matugen fonts font typeface icon theme colloid folder color status icons island wifi bluetooth battery glass blur style frost acrylic transparent see-through border corners rounding desktop widgets clock weather media glow turning spinning animation opening closing slide workspaces floating pinned" },
+      words: "customize desktop editor wallpaper wallpapers find download wallhaven anime art slideshow folder rotate change every colors theme light dark mode sunset night accent style contrast vibrant monochrome matugen fonts font typeface icon theme colloid folder color glass blur style frost acrylic transparent see-through border corners rounding desktop widgets clock weather media glow turning spinning animation opening closing slide workspaces floating pinned" },
     { id: "display", section: "Personalize", icon: "brightness_6", title: "Display",
       words: "night light warm blue light schedule screen monitor resolution refresh rate hz scale rotation rotate vrr adaptive sync" },
     { id: "lock", section: "Personalize", icon: "lock", title: "Lock screen",

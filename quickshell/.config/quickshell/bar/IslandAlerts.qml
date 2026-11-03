@@ -7,15 +7,23 @@ import qs.widgets
 // other status icons are in quick settings, controlcenter/StatusIcons.qml): a screen recording with its time,
 // the timer's time left, the microphone, camera or screen in use (like Android's privacy dots),
 // and a low battery. Each shows only while it's going on. The glyph is the information, so each
-// says what it means to screen readers (MaterialIcon hides its glyph by default).
+// says what it means to screen readers (MaterialIcon hides its glyph by default); `summary` is all
+// of them, for the island's button, which they sit inside.
 Row {
     id: root
 
     readonly property bool timerShown: Countdown.active && !Array.from(Settings.values.hiddenStatusIcons ?? []).includes("timer")
     readonly property bool lowBattery: Battery.present && Battery.low
-    // Something shows (the island keeps a gap before it only then).
-    readonly property bool any: Recorder.recording || timerShown || Audio.recordingApps.length > 0
-                                || Privacy.cameraInUse || Privacy.screenShared || lowBattery
+
+    readonly property string recordingText: Recorder.recording ? "Recording the screen, " + Recorder.time : ""
+    readonly property string timerText: timerShown ? "Timer, " + Countdown.label + " left" : ""
+    readonly property string micText: Audio.recordingApps.length === 0 ? ""
+        : (Audio.micMuted ? "Microphone muted, but in use by " : "Microphone in use by ") + Audio.recordingApps.join(", ")
+    readonly property string cameraText: Privacy.cameraInUse ? "Camera in use" : ""
+    readonly property string screenText: Privacy.screenShared ? "Your screen is being shared" : ""
+    readonly property string batteryText: lowBattery ? "Battery low, " + Math.round(Battery.level * 100) + "%" : ""
+    readonly property string summary: [recordingText, timerText, micText, cameraText, screenText, batteryText]
+        .filter(text => text !== "").join(". ")
 
     anchors.verticalCenter: parent.verticalCenter
     spacing: Theme.spacing.xs
@@ -44,7 +52,7 @@ Row {
         }
 
         Accessible.role: Accessible.StaticText
-        Accessible.name: "Recording the screen, " + Recorder.time
+        Accessible.name: root.recordingText
     }
 
     // The today menu's timer is running: the time left.
@@ -69,7 +77,7 @@ Row {
         }
 
         Accessible.role: Accessible.StaticText
-        Accessible.name: "Timer, " + Countdown.label + " left"
+        Accessible.name: root.timerText
     }
 
     // An app is recording from the microphone; red and crossed out while it's muted (talking
@@ -80,7 +88,7 @@ Row {
         icon: Audio.micMuted ? "mic_off" : "mic"
         color: Audio.micMuted ? Colors.m3error : Colors.m3primary
         font.pixelSize: Theme.icon.small
-        Accessible.name: (Audio.micMuted ? "Microphone muted, but in use by " : "Microphone in use by ") + Audio.recordingApps.join(", ")
+        Accessible.name: root.micText
         Accessible.ignored: false
         Accessible.role: Accessible.StaticText
     }
@@ -91,7 +99,7 @@ Row {
         icon: "videocam"
         color: Colors.m3primary
         font.pixelSize: Theme.icon.small
-        Accessible.name: "Camera in use"
+        Accessible.name: root.cameraText
         Accessible.ignored: false
         Accessible.role: Accessible.StaticText
     }
@@ -102,7 +110,7 @@ Row {
         icon: "screen_share"
         color: Colors.m3primary
         font.pixelSize: Theme.icon.small
-        Accessible.name: "Your screen is being shared"
+        Accessible.name: root.screenText
         Accessible.ignored: false
         Accessible.role: Accessible.StaticText
     }
@@ -113,7 +121,7 @@ Row {
         icon: Battery.icon
         color: Colors.m3error
         font.pixelSize: Theme.icon.small
-        Accessible.name: "Battery low, " + Math.round(Battery.level * 100) + "%"
+        Accessible.name: root.batteryText
         Accessible.ignored: false
         Accessible.role: Accessible.StaticText
     }

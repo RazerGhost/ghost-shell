@@ -32,7 +32,7 @@ PanelWindow {
     anchors.top: true
     anchors.right: true
     margins.top: Theme.island.reserved + Theme.spacing.s
-    margins.right: Math.max(Theme.island.side, Theme.spacing.s)
+    margins.right: Theme.island.popupMargin
     // A fixed size, so the window doesn't resize as cards come and go; only the stack takes
     // input (mask), the rest lets clicks through.
     implicitWidth: Theme.island.panelWidth

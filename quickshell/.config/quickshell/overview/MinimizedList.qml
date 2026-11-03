@@ -1,10 +1,12 @@
 import QtQuick
 import Quickshell.Hyprland
+import qs.controlcenter
 import qs.services
 import qs.theme
 
-// The minimized windows, in the window menu and when hovering the workspace dots. Click one to
-// bring it back to the current workspace.
+// The minimized windows, in the overview's bottom-left corner (Overview.qml; until 2026-11-03
+// under the island's workspace numbers on hover). Click one to bring it back to the current
+// workspace.
 Column {
     id: root
 

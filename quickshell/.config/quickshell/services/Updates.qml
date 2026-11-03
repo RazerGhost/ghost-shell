@@ -1,4 +1,4 @@
-// Waiting system updates, for the island's status icons and quick settings: packages from the
+// Waiting system updates, for quick settings' status icons and its updates line: packages from the
 // repositories (`checkupdates`, which checks a copy of pacman's database, so no root needed) and
 // from the AUR (`paru -Qua`). Counted a minute after login, every hour, and after anything changes
 // the installed packages (pacman's log changes). update() opens paru in a terminal.

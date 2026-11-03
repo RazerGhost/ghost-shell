@@ -23,19 +23,18 @@ Item {
     readonly property bool hovered: content.containsMouse
     // The row's button carries the island's padding itself, so its highlight fills the shape.
     readonly property real closedWidth: row.implicitWidth
-    readonly property string mode: Theme.island.attached ? "top" : "float"
     // Blur behind exactly the shape (ext-background-effect): the body with its round corners, and
     // the fillets (squares with the fillet's circle cut out).
     readonly property Region blur: Region {
         item: content
-        topLeftRadius: pill.mode === "float" ? shape.drawnRadius : 0
-        topRightRadius: pill.mode === "float" ? shape.drawnRadius : 0
+        topLeftRadius: Theme.island.attached ? 0 : shape.drawnRadius
+        topRightRadius: Theme.island.attached ? 0 : shape.drawnRadius
         bottomLeftRadius: shape.drawnRadius
         bottomRightRadius: shape.drawnRadius
 
         // The fillet into the top edge on the left (attached).
         Region {
-            readonly property bool used: pill.mode === "top"
+            readonly property bool used: Theme.island.attached
             x: pill.x
             y: pill.y
             width: used ? shape.fillet : 0
@@ -53,7 +52,7 @@ Item {
 
         // The fillet into the top edge on the right (attached).
         Region {
-            readonly property bool used: pill.mode === "top"
+            readonly property bool used: Theme.island.attached
             x: pill.x + shape.bodyX + shape.bodyWidth
             y: pill.y
             width: used ? shape.fillet : 0
@@ -80,7 +79,7 @@ Item {
     PillShape {
         id: shape
 
-        mode: pill.mode
+        attached: Theme.island.attached
         color: Colors.surfaceTranslucent
         edgeColor: Colors.glassEdge
         bodyWidth: pill.expanded ? Math.max(pill.closedWidth, pill.openWidth) : pill.closedWidth

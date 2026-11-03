@@ -68,7 +68,6 @@ Singleton {
     // Pop-ups still to show, oldest first. A notification that's dismissed meanwhile turns
     // into null here (its object is destroyed), so readers skip nulls.
     property list<Notification> queue: []
-    readonly property Notification current: queue.find(n => n !== null) ?? null
 
     // Newest first.
     readonly property list<Notification> history: server.trackedNotifications.values.slice().reverse()
@@ -110,10 +109,6 @@ Singleton {
         // Transient notifications are meant for the pop-up only, not the history.
         if (notification?.transient)
             notification.expire();
-    }
-
-    function next(): void {
-        done(current);
     }
 
     // Sends a notification from the shell itself, through notify-send, so it arrives like any

@@ -4,9 +4,9 @@ import Quickshell.Services.SystemTray
 import qs.theme
 import qs.widgets
 
-// The "Background apps" menu (system tray, StatusNotifierItem), opened by the arrow next to the
-// island's status icons (user's choice 2026-10-29, after chips in quick settings looked
-// cluttered): a row per app with its icon and name. Click activates the app (and closes the
+// The "Background apps" menu (system tray, StatusNotifierItem), opened from quick settings'
+// bottom row (its own menu since 2026-10-29, after chips in quick settings looked cluttered): a
+// row per app with its icon and name. Click activates the app (and closes the
 // menu), middle click is its secondary action, right click or ⋮ opens its own menu.
 Column {
     id: root

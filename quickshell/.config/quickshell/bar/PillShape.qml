@@ -3,14 +3,14 @@ import QtQuick.Shapes
 import qs.theme
 import "PillPath.js" as PillPath
 
-// The island's outline (bar/IslandPill.qml): floating, or attached to the top edge (`mode`, see
-// PillPath.js). The body is bodyWidth x bodyHeight and starts at bodyX in the shape (the fillets
+// The island's outline (bar/IslandPill.qml): floating, or attached to the top edge (`attached`,
+// see PillPath.js). The body is bodyWidth x bodyHeight and starts at bodyX in the shape (the fillets
 // stick out of it). Animating
 // bodyWidth, bodyHeight and radius morphs it; the path follows every frame.
 Shape {
     id: root
 
-    property string mode: "float"
+    property bool attached: false
     property real bodyWidth
     property real bodyHeight
     property real radius
@@ -19,7 +19,7 @@ Shape {
     property color edgeColor: "transparent"
 
     readonly property real fillet: Theme.island.fillet
-    readonly property var geometry: PillPath.size(mode, bodyWidth, bodyHeight, fillet)
+    readonly property var geometry: PillPath.size(attached, bodyWidth, bodyHeight, fillet)
     readonly property real bodyX: geometry.bodyX
     // The radius actually drawn (it never exceeds what the body has room for).
     readonly property real drawnRadius: PillPath.radius(bodyWidth, bodyHeight, radius)
@@ -36,7 +36,7 @@ Shape {
         strokeWidth: root.edgeColor.a > 0 ? Theme.glass.edge : -1
 
         PathSvg {
-            path: PillPath.path(root.mode, root.bodyWidth, root.bodyHeight, root.radius, root.fillet)
+            path: PillPath.path(root.attached, root.bodyWidth, root.bodyHeight, root.radius, root.fillet)
         }
     }
 }

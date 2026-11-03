@@ -51,7 +51,7 @@ hl.bind(mainMod .. " + W", hl.dsp.window.close(), { description = "Windows: Clos
 hl.bind("ALT + F4",        hl.dsp.window.close(), { description = "Windows: Close window" })
 hl.bind(mainMod .. " + up",   hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }), { description = "Windows: Maximize" })
 -- Super+Down minimizes (Hyprland has no minimize, so the window goes to a hidden special
--- workspace that the island lists; see quickshell's services/Windows.qml).
+-- workspace; the overview lists them, see quickshell's services/Windows.qml).
 hl.bind(mainMod .. " + down", hl.dsp.exec_cmd("qs ipc call snap down"), { description = "Windows: Minimize" })
 -- Window menu on the window (like Windows' Alt+Space): minimize, maximize, fullscreen, close,
 -- the snap layouts and moving it to another workspace. Super+Z opens the same menu.

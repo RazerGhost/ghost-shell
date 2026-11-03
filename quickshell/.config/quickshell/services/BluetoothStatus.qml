@@ -1,4 +1,4 @@
-// Bluetooth adapter state, shared by the island's status icons and quick settings.
+// Bluetooth adapter state, shared by quick settings' status icons and tiles.
 // (Not named Bluetooth.qml: that would shadow Quickshell's Bluetooth singleton.)
 pragma Singleton
 

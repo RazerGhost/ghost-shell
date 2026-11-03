@@ -1,4 +1,4 @@
-// Network state from NetworkManager, shared by the island's status icons and quick settings.
+// Network state from NetworkManager, shared by quick settings' status icons and tiles.
 pragma Singleton
 
 import QtQuick

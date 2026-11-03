@@ -76,8 +76,8 @@ PanelWindow {
         }
     }
 
-    // The window spans the top of the screen as tall as a pill can get, and stays that size:
-    // resizing a layer surface every animation frame would stutter. Only the pills take input
+    // The window spans the top of the screen as tall as the island can get, and stays that size:
+    // resizing a layer surface every animation frame would stutter. Only the island takes input
     // (mask); the rest is transparent and clicks go to the windows below.
     anchors.top: true
     anchors.left: true
@@ -160,7 +160,8 @@ PanelWindow {
             readonly property string menu: root.showMedia ? "media" : "today"
 
             label: root.showMedia ? "Media" : "Calendar"
-            secondaryLabel: "Quick settings"
+            secondaryLabel: "Quick settings (Super+N)"
+            details: alerts.summary
             active: root.open
             onActivated: root.island.toggle(menu, root.modelData.name)
             onSecondaryActivated: root.island.toggle("settings", root.modelData.name)
@@ -227,12 +228,14 @@ PanelWindow {
                     }
                 }
 
-                // Kept, not hidden, so it follows the workspace while it's out of sight.
+                // Always built (only invisible), so it follows the workspace while out of sight.
                 Workspaces {
                     id: workspaces
                     anchors.horizontalCenter: parent.horizontalCenter
                     screen: root.modelData
                     opacity: root.showDots ? 1 : 0
+                    // Out of screen readers' list while hidden; still follows the workspace.
+                    visible: opacity > 0
                     enabled: root.showDots
 
                     Behavior on opacity {
@@ -241,7 +244,9 @@ PanelWindow {
                 }
             }
 
-            IslandAlerts {}
+            IslandAlerts {
+                id: alerts
+            }
         }
 
         // Why the shell couldn't reload (the old shell keeps running).

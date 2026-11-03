@@ -14,8 +14,9 @@ import "../services/WindowGrid.js" as WindowGrid
 // the hot corner (HotCorner.qml).
 // The current workspace's windows as live previews; click one (or pick it with the arrow keys and
 // Enter) to switch to it, hover for × to close it. A strip at the bottom shows every workspace in use as a miniature: click one to go
-// there, drag a window onto one to move it there, + for a new one. Escape, Super+Tab again, a
-// swipe down or a click on the background closes it.
+// there, drag a window onto one to move it there, + for a new one. The minimized windows are a
+// list in the bottom-left corner, click one to bring it back. Escape, Super+Tab again, a swipe
+// down or a click on the background closes it.
 Scope {
     id: root
 
@@ -269,6 +270,25 @@ Scope {
                         }
                     }
                 }
+            }
+        }
+
+        // The minimized windows, in the bottom-left corner beside the strip.
+        Surface {
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+            anchors.margins: Theme.spacing.l
+            width: Theme.overview.minimized
+            height: minimized.implicitHeight + Theme.spacing.m * 2
+            radius: Theme.radius.xl
+            visible: root.open && Windows.minimized.length > 0
+
+            MinimizedList {
+                id: minimized
+                x: Theme.spacing.m
+                y: Theme.spacing.m
+                width: parent.width - Theme.spacing.m * 2
+                onRestored: root.open = false
             }
         }
 

@@ -95,7 +95,7 @@ Scope {
         }
     }
 
-    // Notifications, a window asking for attention and the reload notice, in the corner.
+    // Notifications and a window asking for attention, in the corner.
     PopupStack {
         island: root
     }

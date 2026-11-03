@@ -81,8 +81,8 @@ Scope {
                 onCancelled: root.cancel()
                 onFinished: root.close()
 
-                // Looks: the island and dock in each look, small on your wallpaper: the dots, the
-                // clock as it would read, and the dock (faint when it waits at the edge).
+                // Looks: the island and dock in each look, small on your wallpaper: the clock as it
+                // would read, and the dock (faint when it waits at the edge).
                 SheetTiles {
                     visible: chrome.tab === "looks"
 

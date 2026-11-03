@@ -137,10 +137,11 @@ Singleton {
         readonly property int fillet:     root.px(14)  // radius of the concave joins to the screen edge
         // Floating (the default) or attached to the top edge (Settings' islandAttached).
         readonly property bool attached:  Settings.values.islandAttached === true
-        // Floating: the gap above the island, and the corner pop-ups' distance from the screen's
-        // side, the windows' own gap to the edges, so they line up with them.
+        // Floating: the gap above the island.
         readonly property int gap:        attached ? 0 : root.px(6)
-        readonly property int side:       attached ? 0 : Math.max(gap, HyprlandConfig.number(Settings.values.gapsOut, 20))
+        // The corner pop-ups' distance from the screen's side: the windows' own gap to the edges,
+        // so they line up with them (bar/PopupStack.qml).
+        readonly property int popupMargin: Math.max(root.spacing.s, HyprlandConfig.number(Settings.values.gapsOut, 20))
         // The top band the island takes: what's below it (menus' cards, the OSD at the top, the
         // wallpaper strip, the launcher and editors) starts here, and windows below it.
         readonly property int reserved:   gap + height
@@ -189,7 +190,6 @@ Singleton {
         // Dots always shown, empty or not (Settings; 0 = only the workspaces in use).
         readonly property int minimum: ThemeScale.pick(Settings.values.workspaceDots, ThemeScale.workspaceDots, 5)
         readonly property int menu:      5  // the window menu's "move to workspace" buttons
-        readonly property int number:    root.px(28) // a number on hover (WorkspaceNumbers.qml)
     }
 
     // Media in the island: the live activity, the hover player and the media menu.
@@ -249,6 +249,7 @@ Singleton {
         readonly property int label:      root.px(32)  // app icon and title under each preview
         readonly property int workspace:  root.px(168) // width of a workspace in the strip (16:9)
         readonly property int stripSpace: root.px(140) // height of the strip at the bottom
+        readonly property int minimized:  root.px(280) // width of the minimized windows' list
     }
 
     readonly property QtObject snap: QtObject {

@@ -25,7 +25,7 @@ Scope {
           text: "Tap Super and type: apps and open windows. \"/ name\" finds files, \"> command\" runs one in the terminal, and sums and conversions work too: try \"5 km in miles\".",
           keys: [["Super"], ["Super", "Space"]] },
         { icon: "page_header", title: "The island",
-          text: "The shape at the top of the screen. Click the time for the calendar, notifications, a to-do list, a note and a timer; click the icons next to it for quick settings: Wi-Fi, sound, game mode and more. The arrow at the far right shows apps running in the background.",
+          text: "The shape at the top of the screen. Click it for the calendar, notifications, a to-do list, a note and a timer; right-click it for quick settings: Wi-Fi, sound, game mode, apps running in the background and more. Switching workspaces shows them in it for a moment.",
           keys: [["Super", "C"], ["Super", "N"]] },
         { icon: "view_quilt", title: "Windows arrange themselves",
           text: "New windows tile side by side. The window menu picks a layout or makes tabs; Alt + Tab switches, Super + Tab shows everything at once.",

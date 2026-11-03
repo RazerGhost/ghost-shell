@@ -15,6 +15,8 @@ MouseArea {
 
     // What a right-click does, for screen readers ("" for nothing).
     property string secondaryLabel
+    // More for screen readers (what the content inside says), read before the right-click.
+    property string details
 
     signal activated()
     signal secondaryActivated()
@@ -28,7 +30,8 @@ MouseArea {
 
     Accessible.role: Accessible.Button
     Accessible.name: label
-    Accessible.description: secondaryLabel ? "Right-click: " + secondaryLabel : ""
+    Accessible.description: [details, secondaryLabel ? "Right-click: " + secondaryLabel : ""]
+        .filter(text => text !== "").join(". ")
     Accessible.onPressAction: root.activated()
     onClicked: mouse => mouse.button === Qt.RightButton ? root.secondaryActivated() : root.activated()
 
