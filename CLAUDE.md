@@ -17,6 +17,7 @@ Arch Linux + Hyprland dotfiles, deployed with GNU Stow; on GitHub as RazerGhost/
 - Files use LF line endings (enforced in `.gitattributes`), even when edited on Windows.
 - `ROADMAP.md` has the phase plan, decisions and open issues. Update it when a phase finishes or a decision changes.
 - `NOTES.md` has the verified Quickshell/Hyprland API facts and how to test on the laptop. Read it before using an API it might cover, and add facts you verify.
+- `docs/index.md` maps every feature and rule to its files, plus the `ghost` commands, IPC targets and Settings pages. Look there first to find where something lives, and update it when a feature, IPC function, Settings page, module or rule is added, moved or removed.
 
 @ENGINEERING_PRINCIPLES.md
 @ROADMAP.md
