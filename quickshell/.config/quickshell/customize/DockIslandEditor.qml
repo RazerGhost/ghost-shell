@@ -184,6 +184,19 @@ Scope {
                 SheetTiles {
                     visible: chrome.tab === "island"
 
+                    // Floating pills, or attached to the top edge (the side ones in its corners).
+                    SheetTile {
+                        title: "Style"
+                        subtitle: Theme.island.attached ? "Grows out of the top edge and corners" : "Floats below the top edge"
+
+                        Segmented {
+                            anchors.centerIn: parent
+                            options: [{ value: false, label: "Floating" }, { value: true, label: "Attached" }]
+                            current: Theme.island.attached
+                            onPicked: v => Settings.values.islandAttached = v
+                        }
+                    }
+
                     SheetTile {
                         title: "Workspace dots"
                         subtitle: Settings.values.workspaceDots === 0 ? "Only the ones in use" : "Always this many, more when in use"

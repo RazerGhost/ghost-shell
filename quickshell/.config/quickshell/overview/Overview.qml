@@ -72,7 +72,7 @@ Scope {
         readonly property var rows: WindowGrid.grid(
             windows.map(t => ({ width: t.lastIpcObject.size[0], height: t.lastIpcObject.size[1] })),
             width - Theme.overview.margin * 2,
-            height - Theme.island.height - Theme.overview.stripSpace - Theme.overview.margin * 2,
+            height - Theme.island.reserved - Theme.overview.stripSpace - Theme.overview.margin * 2,
             Theme.overview.gap, Theme.overview.label)
 
         // The workspaces in the strip: the ones in use and the current one (like the island).
@@ -157,8 +157,8 @@ Scope {
         // The windows, a centered grid between the island and the strip.
         Column {
             anchors.horizontalCenter: parent.horizontalCenter
-            y: Theme.island.height + Theme.overview.margin
-               + (parent.height - Theme.island.height - Theme.overview.stripSpace - Theme.overview.margin * 2 - implicitHeight) / 2
+            y: Theme.island.reserved + Theme.overview.margin
+               + (parent.height - Theme.island.reserved - Theme.overview.stripSpace - Theme.overview.margin * 2 - implicitHeight) / 2
             spacing: Theme.overview.gap
 
             Text {

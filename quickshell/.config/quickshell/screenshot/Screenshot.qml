@@ -313,7 +313,7 @@ Scope {
         Surface {
             visible: frozen.hasContent && !capture.immediate
             anchors.horizontalCenter: parent.horizontalCenter
-            y: Theme.island.height + Theme.spacing.l
+            y: Theme.island.reserved + Theme.spacing.l
             width: bar.implicitWidth + Theme.spacing.s * 2
             height: bar.implicitHeight + Theme.spacing.s * 2
             radius: Theme.radius.full

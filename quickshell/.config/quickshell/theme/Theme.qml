@@ -135,6 +135,15 @@ Singleton {
         // sits a pixel right of the panel's exact middle (the user lined it up by eye).
         readonly property int offset:     1
         readonly property int fillet:     root.px(14)  // radius of the concave joins to the screen edge
+        // Floating (the default) or attached to the top edge (Settings' islandAttached).
+        readonly property bool attached:  Settings.values.islandAttached === true
+        // Floating: the gap above the pills, and the side pills' distance from the screen's sides,
+        // the windows' own gap to the edges, so the pills line up with them.
+        readonly property int gap:        attached ? 0 : root.px(6)
+        readonly property int side:       attached ? 0 : Math.max(gap, HyprlandConfig.number(Settings.values.gapsOut, 20))
+        // The top band the island takes: what's below it (menus' cards, the OSD at the top, the
+        // wallpaper strip, the launcher and editors) starts here, and windows below it.
+        readonly property int reserved:   gap + height
         readonly property int openRadius: root.round(32)  // bottom corners when open (closed: half the height)
         readonly property int panelWidth: root.px(380) // width of the open menus
         // Height of the island's window. The open island never grows past this; the rest of

@@ -247,7 +247,7 @@ Scope {
             ? Qt.size(Math.max(Theme.launcher.width, Theme.wallpaper.browserThumb * 2), Math.min(screenHeight - gap * 2, Theme.launcher.pageHeight))
             : LauncherState.size === "large"
             ? Qt.size(Math.min(screenWidth - gap * 2, Theme.launcher.pageWidth), Math.min(screenHeight - gap * 2, Theme.launcher.pageHeight))
-            : Qt.size(screenWidth - gap * 2, screenHeight - Theme.island.height - gap * 2)
+            : Qt.size(screenWidth - gap * 2, screenHeight - Theme.island.reserved - gap * 2)
 
         Surface {
             id: panel
@@ -256,7 +256,7 @@ Scope {
             width: paged ? window.pageSize.width : Theme.launcher.width
             height: paged ? window.pageSize.height : column.implicitHeight + Theme.spacing.m * 2
             x: (window.screenWidth - width) / 2
-            y: paged && LauncherState.size === "full" ? Theme.island.height + window.gap : (window.screenHeight - height) / 2
+            y: paged && LauncherState.size === "full" ? Theme.island.reserved + window.gap : (window.screenHeight - height) / 2
             radius: Theme.radius.m * 2
             clip: true
 

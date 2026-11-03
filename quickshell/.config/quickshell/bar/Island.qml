@@ -4,14 +4,15 @@ import Quickshell.Hyprland
 import Quickshell.Io
 import qs.services
 
-// The bar: an "island" attached to the top edge of each monitor with the workspaces, the
-// time and status icons. Clicking the time or the status icons morphs it into a menu:
-// "today" (calendar) or "settings" (quick settings). While music plays, a "live activity"
-// (cover and bars) takes the time's place: hovering it shows a small player (and the time
-// again), clicking it or the player opens the "media" menu. Hovering the workspace dots shows
-// the minimized windows. New notifications pop up from it on the focused monitor, one at a
-// time. One menu is open at a time, on one monitor; click outside it or press Escape to close it.
-// This file holds that shared state; IslandWindow.qml draws the island on each monitor.
+// The bar: an "island" of three pills at the top of each monitor (floating, or attached to the
+// edge): the workspaces, the time and the status icons. Clicking the time or the status icons
+// morphs that pill into a menu: "today" (calendar) or "settings" (quick settings). While music
+// plays, a "live activity" (the cover) takes the time's place: hovering it shows a small player
+// (and the time again), clicking it or the player opens the "media" menu. Hovering the workspace
+// dots shows the minimized windows. New notifications pop up in the top-right corner of the
+// focused monitor (PopupStack.qml). One menu is open at a time, on one monitor; click outside it
+// or press Escape to close it. This file holds that shared state; IslandWindow.qml draws the
+// island on each monitor.
 Scope {
     id: root
 
@@ -92,6 +93,11 @@ Scope {
             root.panel = "settings";
             root.quickEdit = true;
         }
+    }
+
+    // Notifications, a window asking for attention and the reload notice, in the corner.
+    PopupStack {
+        island: root
     }
 
     // One island per monitor: Variants creates a delegate for each entry in the model

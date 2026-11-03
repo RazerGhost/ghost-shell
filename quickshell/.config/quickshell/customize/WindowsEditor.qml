@@ -75,7 +75,7 @@ Scope {
 
     // The space bars already reserve on the screen ([left, top, right, bottom]: the island, an
     // always-shown dock), which the workspace's gaps stack on.
-    property var reserved: [0, Theme.island.height, 0, 0]
+    property var reserved: [0, Theme.island.reserved, 0, 0]
 
     Process {
         id: reservedRead
@@ -223,7 +223,7 @@ Scope {
                 tabs: [{ value: "looks", label: "Looks" }, { value: "borders", label: "Borders" }, { value: "space", label: "Space" },
                        { value: "motion", label: "Motion" }]
                 glass: true
-                cardTop: Theme.island.height + Theme.spacing.l * 2
+                cardTop: Theme.island.reserved + Theme.spacing.l * 2
                 onCancelled: root.cancel()
                 onFinished: root.close()
 

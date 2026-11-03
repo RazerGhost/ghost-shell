@@ -20,7 +20,7 @@ Scope {
         anchors.top: true
         anchors.left: true
         anchors.right: true
-        margins.top: Theme.island.height + Theme.spacing.s
+        margins.top: Theme.island.reserved + Theme.spacing.s
         margins.left: Theme.spacing.l
         margins.right: Theme.spacing.l
         implicitHeight: panel.implicitHeight

@@ -154,7 +154,7 @@ Scope {
         anchors.bottom: !top
         anchors.top: top
         margins.bottom: DockState.shownOn !== "" && DockState.shownOn === screen?.name ? Theme.osd.gap : Theme.osd.gapLow
-        margins.top: Theme.island.height + Theme.osd.below
+        margins.top: Theme.island.reserved + Theme.osd.below
         implicitWidth: Theme.osd.width
         implicitHeight: Theme.osd.height
 

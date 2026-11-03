@@ -13,8 +13,9 @@ machine can take what it needs.
 
 ## What's in it
 
-- **The island**: the bar, a shape growing out of the top edge with workspaces, the time (or the
-  playing song's cover) and status icons. It opens into menus: quick settings (Wi-Fi, Bluetooth,
+- **The island**: the bar, three pills floating below the top edge (or attached to it): the
+  workspaces, the time (or the playing song's cover) and status icons. Notifications pop up in the
+  top-right corner. The pills open into menus: quick settings (Wi-Fi, Bluetooth,
   sound, power mode, game mode, system stats), today (date, weather, calendar and its events, to-do, note, timer,
   notifications), background apps, media, clipboard, emoji.
 - **Windows**: a tiling layout of its own (halves, thirds, quarters from the window menu, or by

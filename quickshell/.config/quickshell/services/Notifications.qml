@@ -101,13 +101,19 @@ Singleton {
         }
     }
 
-    // The current pop-up is done (timed out, dismissed or clicked).
-    function next(): void {
-        const done = current;
-        queue = queue.filter(n => n !== null && n !== done);
+    // The pop-ups shown at once (bar/PopupStack.qml), oldest first.
+    readonly property list<Notification> popups: queue.filter(n => n !== null).slice(0, 3)
+
+    // A pop-up is done (timed out, dismissed or clicked).
+    function done(notification: Notification): void {
+        queue = queue.filter(n => n !== null && n !== notification);
         // Transient notifications are meant for the pop-up only, not the history.
-        if (done?.transient)
-            done.expire();
+        if (notification?.transient)
+            notification.expire();
+    }
+
+    function next(): void {
+        done(current);
     }
 
     // Sends a notification from the shell itself, through notify-send, so it arrives like any

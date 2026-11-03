@@ -118,7 +118,7 @@ const desktopKeys = ["colorScheme", "colorStyle", "colorContrast", "accentColor"
 
 // Every setting the dock and island editor changes, for its Cancel.
 const dockIslandKeys = ["dockMode", "dockIconSize", "workspaceDots", "hiddenStatusIcons",
-                        "clockDate", "clockSeconds", "islandMedia", "dockLooks"];
+                        "clockDate", "clockSeconds", "islandMedia", "islandAttached", "dockLooks"];
 
 // Every setting the windows editor changes, for its Cancel.
 const windowsKeys = ["borderSize", "rounding", "borderSpin", "windowGlow", "windowKindBorders",

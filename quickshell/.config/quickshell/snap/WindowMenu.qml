@@ -66,7 +66,7 @@ Scope {
         anchors.left: true
         margins.left: Math.max(Theme.spacing.m, Math.min((screen?.width ?? 0) - width - Theme.spacing.m,
                       root.at[0] - (root.monitor?.x ?? 0) + (root.size[0] - width) / 2))
-        margins.top: Math.max(Theme.island.height + Theme.spacing.s, root.at[1] - (root.monitor?.y ?? 0) + Theme.spacing.m)
+        margins.top: Math.max(Theme.island.reserved + Theme.spacing.s, root.at[1] - (root.monitor?.y ?? 0) + Theme.spacing.m)
         implicitWidth: card.implicitWidth
         implicitHeight: card.implicitHeight
         exclusionMode: ExclusionMode.Ignore

@@ -165,6 +165,9 @@ Singleton {
             property bool clockDate: false
             property bool clockSeconds: false
             property bool islandMedia: true
+            // The island's three pills float below the top edge; attached, the middle one grows
+            // out of the edge and the side ones out of the top corners (the dock and island editor).
+            property bool islandAttached: false
             // The town for the weather in the today menu (services/Weather.qml); "" = no weather.
             property string weatherLocation: ""
             property string temperatureUnit: "celsius" // or "fahrenheit"
