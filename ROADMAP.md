@@ -1616,6 +1616,35 @@ sizes, the customize tiles under the empty search, the old windows replaced).
   editor opens. Checked on screen: the tiles, Settings large and compact, Wallpapers large and
   full.
 
+### Review of the whole shell (2026-11-03)
+Eight read-only reviews (the island and menus; windows and Hyprland; launcher, Settings, editors
+and wallpaper; lock, login, setup and capture; the seams between features; a full scan of the
+Quickshell 0.3.2, Hyprland 0.57 and Wayland docs; the boot to the desktop; the screen's layout and
+the island), findings checked, then the confirmed bugs fixed (user's request):
+- Setup: the gaming, Spotify and Zen modules' "Skipped" messages ran `ghost install` again
+  (unescaped backticks), recursing forever on a new machine.
+- Bluetooth: the adapter stays pairable only while the Bluetooth page pairs (bt-agent accepts
+  every pairing; it was left pairable for good).
+- Editors: switching straight from one to another kept the empty workspace as "home".
+- Touchpad off with a mouse: turned off again after every Hyprland reload.
+- Colors: a color scheme run waits for a wallpaper run in progress (the old colors could win).
+- Screenshots: a changed folder is made, a failed save says so. Screen time doesn't count
+  while locked. Weather retries after a failed first lookup. A late cover download can't
+  replace the playing track's. Emoji picked quickly are all pasted. The island's status icons
+  reach screen readers. Super+drag over a floating window no longer acts on the tiled window
+  under it. Pictures named with # ? or % show (`services/FileUrl.js`, tested). Trashing the lock
+  screen's picture puts it back to the desktop's; the slideshow waits in the editors and the
+  Wallpapers page; clipboard thumbnails go with their entries; notification times, Do Not
+  Disturb, Keep awake and the low battery alert's state survive a shell reload; a recording
+  holds off the idle lock; the lock screen clears the typed password after every try; a
+  wallhaven search that never answers fails after 20 s.
+- Not fixed yet (need a decision): game mode and the low battery power saver each restore their
+  own saved power mode and can undo each other; every `hyprctl reload` (any Hyprland setting,
+  game mode, the windows editor) resets the tiling arrangements chosen per workspace (they live
+  in layout.lua's memory); the dock reorders running unpinned apps by recent use; the login
+  screen's Hyprland loads a user-writable `shell-settings.lua`; Hyprland 0.57 plays its own bell
+  sound outside the shell's sound settings and Do Not Disturb.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

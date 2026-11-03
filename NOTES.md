@@ -51,6 +51,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   group is one target for a Lua layout (our layout gave it one spot, verified); the tab bar
   takes its height from the top of that spot. Options: `hyprctl descriptions -j` lists every
   `group:` / `group:groupbar:` option (the wiki's variables page wasn't reachable).
+- Hyprland's socket2 sends `configreloaded` (Quickshell: `Hyprland.rawEvent`, name
+  "configreloaded") when a reload is done: re-apply anything set with `hyprctl eval`, which the
+  reload drops (services/Touchpad.qml). Since 0.57 `workspace.created` fires after the workspace
+  is set up; the old early one is `workspace.created_early` (release notes, #16221).
 - Hyprland runs Lua 5.5. `hyprctl eval '<lua>'` runs code in the config's state; `hyprctl repl
   'return x'` prints a value, but prints "unknown request" for an empty string.
 - `hyprctl eval 'hl.monitor({ output = "eDP-1", mode = "1920x1080@60", position = "auto", scale = 1,
