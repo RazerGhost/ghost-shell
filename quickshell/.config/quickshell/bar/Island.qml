@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 import qs.services
+import qs.theme
 
 // The bar: an "island" at the top of each monitor (floating, or attached to the edge) showing the
 // time and what needs attention. A click morphs it into the "today" menu (calendar), a
@@ -59,7 +60,7 @@ Scope {
 
     Timer {
         id: reloadTimer
-        interval: root.reloadError ? 10000 : 2000
+        interval: root.reloadError ? Theme.island.reloadError : Theme.island.reloaded
         onTriggered: root.reloadShown = false
     }
 

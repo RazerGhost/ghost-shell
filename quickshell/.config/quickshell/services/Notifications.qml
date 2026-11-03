@@ -102,8 +102,9 @@ Singleton {
         }
     }
 
-    // The pop-ups shown at once (bar/PopupStack.qml), oldest first.
-    readonly property list<Notification> popups: queue.filter(n => n !== null).slice(0, 3)
+    // The pop-ups shown at once (bar/PopupStack.qml), oldest first; the rest wait their turn.
+    readonly property int popupLimit: 3
+    readonly property list<Notification> popups: queue.filter(n => n !== null).slice(0, popupLimit)
 
     // A pop-up is done (timed out, dismissed or clicked).
     function done(notification: Notification): void {

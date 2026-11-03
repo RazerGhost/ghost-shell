@@ -7,7 +7,7 @@ import qs.widgets
 // other status icons are in quick settings, controlcenter/StatusIcons.qml): a screen recording with its time,
 // the timer's time left, the microphone, camera or screen in use (like Android's privacy dots),
 // and a low battery. Each shows only while it's going on. The glyph is the information, so each
-// says what it means to screen readers (MaterialIcon hides its glyph by default); `summary` is all
+// says what it means to screen readers (StatusGlyph); `summary` is all
 // of them, for the island's button, which they sit inside.
 Row {
     id: root
@@ -82,47 +82,31 @@ Row {
 
     // An app is recording from the microphone; red and crossed out while it's muted (talking
     // into a call that can't hear you).
-    MaterialIcon {
-        anchors.verticalCenter: parent.verticalCenter
+    StatusGlyph {
         visible: Audio.recordingApps.length > 0
         icon: Audio.micMuted ? "mic_off" : "mic"
         color: Audio.micMuted ? Colors.m3error : Colors.m3primary
-        font.pixelSize: Theme.icon.small
-        Accessible.name: root.micText
-        Accessible.ignored: false
-        Accessible.role: Accessible.StaticText
+        label: root.micText
     }
 
-    MaterialIcon {
-        anchors.verticalCenter: parent.verticalCenter
+    StatusGlyph {
         visible: Privacy.cameraInUse
         icon: "videocam"
         color: Colors.m3primary
-        font.pixelSize: Theme.icon.small
-        Accessible.name: root.cameraText
-        Accessible.ignored: false
-        Accessible.role: Accessible.StaticText
+        label: root.cameraText
     }
 
-    MaterialIcon {
-        anchors.verticalCenter: parent.verticalCenter
+    StatusGlyph {
         visible: Privacy.screenShared
         icon: "screen_share"
         color: Colors.m3primary
-        font.pixelSize: Theme.icon.small
-        Accessible.name: root.screenText
-        Accessible.ignored: false
-        Accessible.role: Accessible.StaticText
+        label: root.screenText
     }
 
-    MaterialIcon {
-        anchors.verticalCenter: parent.verticalCenter
+    StatusGlyph {
         visible: root.lowBattery
         icon: Battery.icon
         color: Colors.m3error
-        font.pixelSize: Theme.icon.small
-        Accessible.name: root.batteryText
-        Accessible.ignored: false
-        Accessible.role: Accessible.StaticText
+        label: root.batteryText
     }
 }

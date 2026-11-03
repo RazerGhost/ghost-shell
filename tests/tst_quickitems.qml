@@ -38,6 +38,16 @@ TestCase {
         compare(QuickItems.fullRow([], ["phone"]), []);
     }
 
+    function test_columns() {
+        // Five buttons: five places, even with room for six.
+        compare(QuickItems.columns(5, 428, 52, 16), 5);
+        // More buttons: as many as fit.
+        compare(QuickItems.columns(7, 428, 52, 16), 6);
+        compare(QuickItems.columns(9, 348, 52, 16), 5);
+        // Fewer than five keep five places.
+        compare(QuickItems.columns(3, 428, 52, 16), 5);
+    }
+
     function test_toggled() {
         compare(QuickItems.toggled([], "phone"), ["phone"]);
         compare(QuickItems.toggled(["phone", "wifi"], "phone"), ["wifi"]);

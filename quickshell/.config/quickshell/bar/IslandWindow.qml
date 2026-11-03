@@ -183,68 +183,59 @@ PanelWindow {
                 // cutting off what grew.
                 implicitHeight: Theme.island.height
 
-                Clock {
-                    id: clock
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    opacity: root.showMedia || root.showDots || root.showReloaded ? 0 : 1
-                    visible: opacity > 0
+                IslandFade {
+                    shown: !root.showMedia && !root.showDots && !root.showReloaded
 
-                    Behavior on opacity {
-                        NumberAnimation { duration: Theme.anim.normal }
+                    Clock {
+                        id: clock
+                        anchors.horizontalCenter: parent.horizontalCenter
                     }
                 }
 
-                MediaActivity {
-                    id: activity
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    opacity: root.showMedia ? 1 : 0
-                    visible: opacity > 0
+                IslandFade {
+                    shown: root.showMedia
 
-                    Behavior on opacity {
-                        NumberAnimation { duration: Theme.anim.normal }
+                    MediaActivity {
+                        id: activity
+                        anchors.horizontalCenter: parent.horizontalCenter
                     }
                 }
 
-                Row {
-                    id: reloaded
-                    anchors.centerIn: parent
-                    spacing: Theme.spacing.xs
-                    opacity: root.showReloaded ? 1 : 0
-                    visible: opacity > 0
+                IslandFade {
+                    shown: root.showReloaded
 
-                    Behavior on opacity {
-                        NumberAnimation { duration: Theme.anim.normal }
-                    }
+                    Row {
+                        id: reloaded
+                        anchors.centerIn: parent
+                        spacing: Theme.spacing.xs
 
-                    MaterialIcon {
-                        anchors.verticalCenter: parent.verticalCenter
-                        icon: "check_circle"
-                        font.pixelSize: Theme.icon.small
-                        color: Colors.m3primary
-                    }
+                        MaterialIcon {
+                            anchors.verticalCenter: parent.verticalCenter
+                            icon: "check_circle"
+                            font.pixelSize: Theme.icon.small
+                            color: Colors.m3primary
+                        }
 
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "Reloaded"
-                        color: Colors.m3onSurface
-                        font.family: Theme.font.sans
-                        font.pixelSize: Theme.font.normal
-                        font.weight: Font.DemiBold
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: "Reloaded"
+                            color: Colors.m3onSurface
+                            font.family: Theme.font.sans
+                            font.pixelSize: Theme.font.normal
+                            font.weight: Font.DemiBold
+                        }
                     }
                 }
 
                 // Always built (only invisible), so it follows the workspace while out of sight.
-                Workspaces {
-                    id: workspaces
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    screen: root.modelData
-                    opacity: root.showDots ? 1 : 0
-                    // Out of screen readers' list while hidden; still follows the workspace.
-                    visible: opacity > 0
-                    enabled: root.showDots
+                IslandFade {
+                    shown: root.showDots
 
-                    Behavior on opacity {
-                        NumberAnimation { duration: Theme.anim.normal }
+                    Workspaces {
+                        id: workspaces
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        screen: root.modelData
+                        enabled: root.showDots
                     }
                 }
             }

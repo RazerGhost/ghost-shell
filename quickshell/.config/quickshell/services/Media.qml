@@ -7,19 +7,24 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Services.Mpris
+import "MediaPlayers.js" as MediaPlayers
 
 Singleton {
     id: root
 
-    // The player that's playing, otherwise the one that played last (paused music), otherwise the
-    // first one. null without any. Not simply the first: KDE Connect's phone players come first,
-    // so a paused Spotify lost the island and the media keys to the phone.
-    readonly property MprisPlayer player: Mpris.players.values.find(p => p.isPlaying)
-                                          ?? lastPlaying ?? Mpris.players.values[0] ?? null
+    // The player that's playing, otherwise the one that played last, otherwise the first one
+    // (MediaPlayers.js). null without any.
+    readonly property MprisPlayer player: MediaPlayers.chosen(Mpris.players.values, lastPlaying,
+                                                              Settings.values.lastMediaApp ?? "")
     readonly property bool playing: player?.isPlaying ?? false
-    // Cleared by itself when that player goes away.
+    // Cleared by itself when that player goes away. Kept when a paused player plays again
+    // (onPlayingChanged) and when another one takes over while music plays (here).
     property MprisPlayer lastPlaying: null
-    onPlayerChanged: if (playing) lastPlaying = player
+    function rememberPlaying(): void {
+        if (playing)
+            lastPlaying = player;
+    }
+    onPlayerChanged: rememberPlaying()
 
     // The music app last heard (Settings' lastMediaApp), for the desktop's media widget to open
     // while no player is running; before one has been heard, the first installed music app
@@ -34,8 +39,7 @@ Singleton {
         return entry.categories.includes("Music"); // not every audio tool (a mixer, a video player)
     }
     onPlayingChanged: {
-        if (playing)
-            lastPlaying = player;
+        rememberPlaying();
         const entry = playing ? DesktopEntries.heuristicLookup(player.desktopEntry || player.identity || "") : null;
         if (entry && isMusic(entry) && Settings.values.lastMediaApp !== entry.id)
             Settings.values.lastMediaApp = entry.id;

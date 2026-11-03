@@ -57,3 +57,11 @@ function fullRow(shown, large) {
 function toggled(list, id) {
     return list.includes(id) ? removed(list, id) : added(list, id);
 }
+
+// How many round buttons to a row: five, or more when there are more and they fit `width` with a
+// gap of at least `gap` (six at 460 px). Never more than there are buttons, so five buttons in a
+// row that has room for six still spread across it; fewer than five keep five places.
+function columns(count, width, button, gap) {
+    const fit = Math.floor((width + gap) / (button + gap));
+    return Math.max(5, Math.min(count, fit));
+}

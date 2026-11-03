@@ -163,6 +163,11 @@ Singleton {
         readonly property int maxHeight:  root.px(840)
         // How long the workspace dots stay in the time's place after the workspace changes (ms).
         readonly property int workspaceFlash: 1200
+        // How long "Reloaded" shows after a shell reload, and a failed reload's error (ms).
+        readonly property int reloaded:       2000
+        readonly property int reloadError:    10000
+        // How far the corner pop-ups slide in from the right.
+        readonly property int popupSlide:     root.px(36)
     }
 
     readonly property QtObject tile: QtObject {

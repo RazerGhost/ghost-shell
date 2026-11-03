@@ -60,7 +60,7 @@ PanelWindow {
         radius: Theme.island.openRadius
         opacity: root.hasAny ? 1 : 0
         // Slides in from the right edge.
-        x: root.hasAny ? 0 : Theme.island.height
+        x: root.hasAny ? 0 : Theme.island.popupSlide
 
         Behavior on height {
             MorphAnimation {}
