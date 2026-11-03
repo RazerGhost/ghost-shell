@@ -283,6 +283,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 | `screenshot` | `region`, `screen`, `record` |
 | `recorder` | `stop`, `recording` |
 | `brightness` | `refresh` |
+| `media` | `playPause`, `next`, `previous` (the media keys) |
 | `updates` | `check`, `summary` |
 | `welcome` | `show` |
 

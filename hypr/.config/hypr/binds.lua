@@ -166,8 +166,10 @@ hl.bind("XF86AudioMicMute",      hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_
 hl.bind("XF86MonBrightnessUp",   hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+ && qs ipc call brightness refresh"), { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%- && qs ipc call brightness refresh"), { locked = true, repeating = true })
 
--- Media (requires playerctl)
-hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = true })
-hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   { locked = true })
+-- Media keys (Fn + F8 / F9 / F10 on the Omen): the shell's player (services/Media.qml: the one
+-- playing, else the one that played last), the same the island shows. playerctl alone took the
+-- first player, KDE Connect's phone; it's the fallback while the shell is down.
+hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("qs ipc call media next || playerctl next"),           { locked = true })
+hl.bind("XF86AudioPause", hl.dsp.exec_cmd("qs ipc call media playPause || playerctl play-pause"), { locked = true })
+hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("qs ipc call media playPause || playerctl play-pause"), { locked = true })
+hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("qs ipc call media previous || playerctl previous"),   { locked = true })

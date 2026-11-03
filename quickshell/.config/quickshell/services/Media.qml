@@ -11,10 +11,15 @@ import Quickshell.Services.Mpris
 Singleton {
     id: root
 
-    // The player that's playing, otherwise the first one (e.g. paused music). null without any.
+    // The player that's playing, otherwise the one that played last (paused music), otherwise the
+    // first one. null without any. Not simply the first: KDE Connect's phone players come first,
+    // so a paused Spotify lost the island and the media keys to the phone.
     readonly property MprisPlayer player: Mpris.players.values.find(p => p.isPlaying)
-                                          ?? Mpris.players.values[0] ?? null
+                                          ?? lastPlaying ?? Mpris.players.values[0] ?? null
     readonly property bool playing: player?.isPlaying ?? false
+    // Cleared by itself when that player goes away.
+    property MprisPlayer lastPlaying: null
+    onPlayerChanged: if (playing) lastPlaying = player
 
     // The music app last heard (Settings' lastMediaApp), for the desktop's media widget to open
     // while no player is running; before one has been heard, the first installed music app
@@ -29,6 +34,8 @@ Singleton {
         return entry.categories.includes("Music"); // not every audio tool (a mixer, a video player)
     }
     onPlayingChanged: {
+        if (playing)
+            lastPlaying = player;
         const entry = playing ? DesktopEntries.heuristicLookup(player.desktopEntry || player.identity || "") : null;
         if (entry && isMusic(entry) && Settings.values.lastMediaApp !== entry.id)
             Settings.values.lastMediaApp = entry.id;
@@ -89,5 +96,24 @@ Singleton {
             Windows.show(window);
         else if (player?.canRaise)
             player.raise();
+    }
+
+    // The keyboard's media keys (hypr/binds.lua): `qs ipc call media playPause|next|previous`,
+    // acting on `player` like the island's controls.
+    IpcHandler {
+        target: "media"
+
+        function playPause(): void {
+            if (root.player?.canTogglePlaying)
+                root.player.togglePlaying();
+        }
+        function next(): void {
+            if (root.player?.canGoNext)
+                root.player.next();
+        }
+        function previous(): void {
+            if (root.player?.canGoPrevious)
+                root.player.previous();
+        }
     }
 }
