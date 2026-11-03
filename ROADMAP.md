@@ -1653,6 +1653,13 @@ the island), findings checked, then the confirmed bugs fixed (user's request):
 - The dock (user's pick): running apps that aren't pinned keep the order they opened, like a
   taskbar (they moved left whenever one was focused); each app's windows stay most recently used
   first for its clicks (`DockApps.items`' `opened`, tested).
+- Apps' bell (user's pick: Hyprland's own sound): Hyprland 0.57 plays the system bell itself;
+  `misc.bell_sound` is "default" only while the shell's sounds would play (Settings -> Sound,
+  notifications on) and "none" during Do Not Disturb and game mode (`HyprlandConfig.bellLua`).
+
+### Boot straight to the lock screen (built 2026-11-03; needs `ghost install system`, `ghost greeter` and a reboot to test)
+User's pick after the review measured the boot (HP logo gone at Limine, ~4 s of a black or
+frozen screen, three screen mode sets, a black flash between the login screen and the desktop):
 - greetd's `initial_session` logs you in at boot straight into your Hyprland (one compositor, no
   login screen's Hyprland in between) with `GHOST_AUTOLOGIN=1`, and it locks at once: the shell's
   lock screen comes up first (`lock/Lock.qml`), and hyprland.lua loads no keybinds until it's up
