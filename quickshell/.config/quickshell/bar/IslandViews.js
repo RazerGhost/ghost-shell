@@ -2,10 +2,12 @@
 // JavaScript, so it can be tested on its own (tests/tst_islandviews.qml).
 .pragma library
 
-// The pill a menu opens from: quick settings, background apps and power from the status icons
-// on the right; today, media, clipboard and emoji from the middle. "" for none.
+// The pill a menu opens from: background apps from the arrow on the right; everything else from
+// the middle, quick settings and power too (user's choice: opened by the status icons, but in the
+// middle like before). "" for none.
 const menus = {
-    settings: "right", tray: "right", power: "right",
+    tray: "right",
+    settings: "center", power: "center",
     today: "center", media: "center", clipboard: "center", emoji: "center"
 };
 

@@ -98,7 +98,7 @@ Recovery procedures (lock screen crash, login screen failure) are in ROADMAP Pha
 
 | Feature | Files |
 |---|---|
-| Island: three pills (workspaces, clock, status icons), floating or attached to the top edge and corners (`islandAttached`); each morphs into its menus | `bar/Island.qml`, `IslandWindow.qml`, `IslandPill.qml`, `PillShape.qml`, `PillPath.js`, `IslandViews.js` |
+| Island: three pills (workspaces, clock, status icons), floating or attached to the top edge and corners (`islandAttached`); each morphs into its menus (quick settings and power from the middle one, opened by the status icons) | `bar/Island.qml`, `IslandWindow.qml`, `IslandPill.qml`, `PillShape.qml`, `PillPath.js`, `IslandViews.js` |
 | Pop-ups in the top-right corner: up to three notifications, attention requests, the reload notice | `bar/PopupStack.qml` |
 | Workspace dots (3-10 or only used), hover numbers with minimized windows, scroll to step | `bar/Workspaces.qml`, `WorkspaceNumbers.qml`, `services/WorkspaceSlots.js` |
 | Clock (day, seconds, 24-hour options) | `bar/Clock.qml` |

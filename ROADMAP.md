@@ -1699,13 +1699,14 @@ User's picks from the layout research (the volume pop-up stays where it is):
 - Notifications pop up in the top-right corner of the focused screen, under the island
   (`bar/PopupStack.qml`): up to three at once, oldest at the top, each with its own time (the
   pointer over them pauses all, critical ones stay), with the attention card and the reload
-  notice in the same stack. They wait only while the right pill's menu is open there (it sits in
-  that corner), not behind every menu as before (`Notifications.popups`, `done`).
+  notice in the same stack. They wait only while the right pill's menu (background apps) is
+  open there (it sits in that corner), not behind every menu as before (`Notifications.popups`, `done`).
 - The island is three pills (`bar/IslandPill.qml`, one window per screen across the top): the
   workspaces on the left (hover: the numbers and minimized windows), the time or the music in
   the middle (today, media, clipboard, emoji; still under the webcam), the status icons on the
-  right (quick settings, background apps, power). Each morphs into its menus; the left grows
-  right, the right grows left. `IslandViews.side`/`shown` (tested) say which pill shows what.
+  right (background apps). Each morphs into its menus; the left grows right, the right grows
+  left. Quick settings and power open from the middle pill, though the status icons ask for them
+  (user's choice, the same day: tried in the right pill first). `IslandViews.side`/`shown` (tested) say which pill shows what.
   The symmetric widths of the one-shape island are gone.
 - Floating by default: a gap above, rounded all round, the side pills as far from the screen's
   sides as the windows are (gaps_out), so they line up. Attached (the dock and island editor's

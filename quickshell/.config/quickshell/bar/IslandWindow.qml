@@ -11,8 +11,9 @@ import "IslandViews.js" as IslandViews
 
 // The island on one monitor (see Island.qml), as three pills (user's choice, 2026-11-03; it was
 // one shape with everything in it): the workspaces on the left, the time (or the playing music)
-// in the middle, the status icons on the right. The middle one opens today, media, clipboard and
-// emoji; the right one quick settings, background apps and power; the left one shows every
+// in the middle, the status icons on the right. The middle one opens today, media, clipboard,
+// emoji, and quick settings and power (asked for by the status icons); the right one background
+// apps; the left one shows every
 // workspace and the minimized windows while hovered. Notifications pop up in the top-right
 // corner instead (PopupStack.qml). Floating below the top edge, or attached to it (Settings'
 // islandAttached; the dock and island editor).
@@ -272,6 +273,40 @@ PanelWindow {
         }
 
         MenuSlot {
+            shown: middle.shown === "power"
+            content: Component {
+                PowerPanel {
+                    width: parent.width
+                    onDone: root.island.panel = ""
+                }
+            }
+        }
+
+        MenuSlot {
+            shown: middle.shown === "settings"
+            content: Component {
+                QuickSettings {
+                    width: parent.width
+                    onOpenMenu: menu => root.island.panel = menu
+                    // Asked for edit mode (the customize menu): built now or already open.
+                    function takeEdit(): void {
+                        if (root.island.quickEdit) {
+                            editing = true;
+                            root.island.quickEdit = false;
+                        }
+                    }
+                    Component.onCompleted: takeEdit()
+                    Connections {
+                        target: root.island
+                        function onQuickEditChanged(): void {
+                            takeEdit();
+                        }
+                    }
+                }
+            }
+        }
+
+        MenuSlot {
             shown: middle.shown === "today"
             content: Component {
                 TodayPanel {
@@ -281,8 +316,8 @@ PanelWindow {
         }
     }
 
-    // The status icons (quick settings) and, while apps run in the background, an arrow at the
-    // outer end that opens their menu.
+    // The status icons (they open quick settings in the middle pill) and, while apps run in the
+    // background, an arrow at the outer end that opens their menu.
     IslandPill {
         id: right
 
@@ -337,38 +372,5 @@ PanelWindow {
             }
         }
 
-        MenuSlot {
-            shown: right.shown === "power"
-            content: Component {
-                PowerPanel {
-                    width: parent.width
-                    onDone: root.island.panel = ""
-                }
-            }
-        }
-
-        MenuSlot {
-            shown: right.shown === "settings"
-            content: Component {
-                QuickSettings {
-                    width: parent.width
-                    onOpenMenu: menu => root.island.panel = menu
-                    // Asked for edit mode (the customize menu): built now or already open.
-                    function takeEdit(): void {
-                        if (root.island.quickEdit) {
-                            editing = true;
-                            root.island.quickEdit = false;
-                        }
-                    }
-                    Component.onCompleted: takeEdit()
-                    Connections {
-                        target: root.island
-                        function onQuickEditChanged(): void {
-                            takeEdit();
-                        }
-                    }
-                }
-            }
-        }
     }
 }

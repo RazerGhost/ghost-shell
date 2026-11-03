@@ -14,8 +14,8 @@ import "IslandViews.js" as IslandViews
 // open): "Shell reloaded" (see Island.qml), up to three notifications at once, oldest at the
 // top, and a window asking for attention. Each notification stays Settings' notificationSeconds,
 // the attention card the same; the pointer over the stack pauses them, critical notifications
-// stay until dismissed. They wait while quick settings (or another menu of the island's right
-// pill) is open on that screen, which sits in the same corner.
+// stay until dismissed. They wait while the island's right pill has a menu open on that screen
+// (background apps), which sits in the same corner.
 PanelWindow {
     id: root
 
