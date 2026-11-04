@@ -624,7 +624,8 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   Vesktop share showed no screen icon (user's find): xdph 1.5 had renamed its node; matched now,
   checked with a stand-in node of that name. The same share asked in the portal's picker three
   times (Vesktop opens three portal sessions for one share): `hypr/xdph.conf` ticks the picker's
-  restore token by default, so the sessions after the first reuse the choice.
+  restore token by default, so the sessions after the first reuse the choice. Verified by the
+  user: one question, and the screen icon shows during the share.
 
 ### Light mode (done, verified on the laptop 2026-10-29)
 - Settings -> Appearance -> Light or dark: Dark (default), Light or At sunset (dark from sunset
