@@ -1890,7 +1890,7 @@ User's picks.
   picked last (`focusMinutes`). (A right-click on the button was the first idea: not reachable by
   keyboard or a screen reader.) When a session's time is up, a notification offers "Take a
   5-minute break" (its own timer, "Break" with a cup in the island) or "Focus again"; a break's
-  end offers another session (`Focus.timeUp`, through notify-send's actions; Countdown leaves
+  end offers another session (`Focus.timeUp`, `services/focus-notify.sh` through notify-send's actions; Countdown leaves
   its own "Time's up" to it). Normal urgency: critical's error red read as a failure. Checked: a
   1-minute session ran in the island and ended with the notification and its two buttons.
   Since the review below the notification waits in a process of its own and answers through

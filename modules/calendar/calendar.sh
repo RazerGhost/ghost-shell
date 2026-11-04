@@ -159,7 +159,8 @@ cmd_add() {
     # in the process list).
     if [[ -n $copied && ( $copied == "$link" || $copied == "webcal://${link#https://}" ) ]]; then
         wl-copy --clear
-        cliphist list | start="${copied:0:90}" awk -F'\t' 'index($2, ENVIRON["start"]) == 1' | cliphist delete || true
+        cliphist list | start="${copied:0:90}" awk -F'\t' 'index($2, ENVIRON["start"]) == 1' | cliphist delete \
+            || echo "warning: couldn't take the link out of the clipboard history (Super+V: remove it there)" >&2
     fi
     mkdir -p "$(dirname "$list")" "$data/$name"
     (umask 077; printf '%s\t%s\n' "$name" "$link" >>"$list")
