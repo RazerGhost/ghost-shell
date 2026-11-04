@@ -157,16 +157,13 @@ hl.bind(mainMod .. " + equal",  zoom(1.5),     { repeating = true, description =
 hl.bind(mainMod .. " + minus",  zoom(1 / 1.5), { repeating = true, description = "Zoom: Zoom out (magnifier)" })
 hl.bind(mainMod .. " + Escape", zoom(nil),     { description = "Zoom: Zoom back to normal" })
 
--- Move/resize windows with mouse. Hyprland's own drag and resize only reach floating windows;
--- for tiled ones drag.lua follows the pointer while the button is held (it does nothing over a
--- floating window): left-drag swaps the window with the tiled one it's dropped on, right-drag
--- moves the borders nearest the pointer. The left press is bound before Hyprland's drag: that
--- drag takes a tiled window out of the tiling at once, and after it drag.lua found none there.
-local drag = require("drag")
-hl.bind(mainMod .. " + mouse:272", drag.start_move, { non_consuming = true })
+-- Move/resize windows with mouse. Hyprland's own drag carries any window; a tiled one floats while
+-- it's carried and layout.lua tiles it again where it's let go (as when an app's title bar drags it).
+-- Hyprland's resize only reaches floating windows: for tiled ones drag.lua moves the borders nearest
+-- the pointer while the button is held.
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true, description = "Windows: Move window" })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true, description = "Windows: Resize window" })
-hl.bind(mainMod .. " + mouse:272", drag.stop_move, { release = true, non_consuming = true })
+local drag = require("drag")
 hl.bind(mainMod .. " + mouse:273", drag.start, { non_consuming = true })
 hl.bind(mainMod .. " + mouse:273", drag.stop, { release = true, non_consuming = true })
 -- Super + Shift + left-drag: a tiled window comes out of the tiling and floats under the pointer;

@@ -12,7 +12,6 @@
 --                           top-left, left-third, right-two-thirds... (tiling.spots)
 --   resize <direction>      move the focused window's border: left, right, up, down
 --   move <direction>        swap the focused window with its neighbour that way
---   swap <address> <address>  swap two windows (dragging one onto the other)
 --   auto                    back to arranging by the number of windows
 --   place                   place the windows again (after a mouse drag changed the shares)
 -- e.g. hyprctl dispatch 'hl.dsp.layout("snap left")'.
@@ -109,6 +108,20 @@ local function id_of(target)
     return target.window and target.window.address or ("target-" .. target.index)
 end
 
+-- Tiled windows that left the tiling but stayed on their workspace, by address. Every drag of a
+-- tiled window (Super + drag, or an app's own title bar, which asks Hyprland to move it) floats it
+-- while it's carried and tiles it again where it's let go, and Hyprland tells Lua nothing else
+-- about the drag; so a window that comes back under the pointer (as a carried one is) takes the
+-- place of the window under it. (It doesn't read as floating yet when it leaves; a window restored
+-- or tiled by key comes back away from the pointer and goes in as before.)
+local floated = {}
+
+local function under_pointer(id, pointer)
+    local window = hl.get_window("address:" .. id)
+    return window and pointer.x >= window.at.x and pointer.x < window.at.x + window.size.x
+        and pointer.y >= window.at.y and pointer.y < window.at.y + window.size.y
+end
+
 -- The workspace's state, brought up to date with its windows. Returns the state, the targets
 -- by id and the focused window's id.
 local function current(ctx)
@@ -131,7 +144,28 @@ local function current(ctx)
     elseif saved then
         states[ws] = copy_of(ws, saved)
     end
+    local back
+    local before = states[ws] and states[ws].slots or {}
+    local present = {}
+    for _, id in ipairs(ids) do
+        present[id] = true
+        if floated[id] == ws then
+            back, floated[id] = id, nil
+        end
+    end
+    for _, id in ipairs(before) do
+        if id and not present[id] then
+            local window = hl.get_window("address:" .. id)
+            if window and key_of(window.workspace) == ws then
+                floated[id] = ws
+            end
+        end
+    end
     states[ws] = tiling.sync(states[ws], ids, focused)
+    local pointer = back and hl.get_cursor_pos()
+    if pointer and under_pointer(back, pointer) then
+        tiling.drop(states[ws], ctx.area, back, pointer)
+    end
     areas[ws] = ctx.area
     dirty = true
     return states[ws], targets, focused
@@ -163,15 +197,13 @@ hl.layout.register("shell", {
             return tiling.resize(state, focused, arg, resize_step) or "shell layout: nothing to resize that way"
         elseif command == "move" then
             return tiling.move(state, focused, arg, ctx.area) or "shell layout: no window that way"
-        elseif command == "swap" then
-            return tiling.swap(state, arg, address) or "shell layout: not two tiled windows here"
         elseif command == "auto" then
             tiling.reset(state)
             return true
         elseif command == "place" then
             return true -- the shares changed (a mouse drag); Hyprland places the windows again
         end
-        return "shell layout: expected snap, resize, move, swap, auto or place"
+        return "shell layout: expected snap, resize, move, auto or place"
     end,
 })
 

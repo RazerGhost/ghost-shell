@@ -6,10 +6,11 @@
 -- - Super + right-drag moves the borders nearest the pointer: while the button is held a timer
 --   changes the arrangement's shares (tiling.drag) and asks the layout (layout.lua) to place the
 --   windows again.
--- - Super + left-drag swaps the window with the tiled one it's dropped on.
+-- - Super + left-drag is Hyprland's own: it carries a tiled window out of the tiling and back in,
+--   and layout.lua puts it where it's let go.
 -- - Super + Shift + left-drag takes a tiled window out of the tiling: it floats at its size where
---   it is and follows the pointer (a timer, as above); dropped over a tiled window, a floating one goes back
---   into the tiling in that window's place (the two swap), dropped anywhere else it stays floating.
+--   it is and follows the pointer (a timer, as above); dropped over a tiled window, a floating one
+--   goes back into the tiling in that window's place, dropped anywhere else it stays floating.
 local tiling = require("tiling")
 local layout = require("layout")
 
@@ -97,37 +98,6 @@ local function start_drag()
     }
 end
 
--- The window being moved by Super + left-drag, if it's tiled.
-local moving
-
-local function start_move()
-    local pos = hl.get_cursor_pos()
-    local window = pos and tiled_window_at(pos)
-    moving = window and window.address
-    if moving then
-        -- The layout message goes to the focused workspace.
-        hl.dispatch(hl.dsp.focus({ window = "address:" .. moving }))
-    end
-end
-
--- Hyprland's own drag (bound beside this) takes the tiled window out of the layout while it's
--- carried and gives it back when it's let go, after this release bind; the layout adds a window
--- that comes back at the end (the right). So the swap waits until it's back, then puts it in the
--- place of whichever tiled window is under the pointer (none where it already is).
-local function end_move()
-    local pos, address = hl.get_cursor_pos(), moving
-    moving = nil
-    if not (pos and address) then
-        return
-    end
-    hl.timer(function()
-        local target = tiled_window_at(pos, address)
-        if target then
-            hl.dispatch(hl.dsp.layout("swap " .. address .. " " .. target.address))
-        end
-    end, { timeout = 50, type = "oneshot" })
-end
-
 -- The topmost window under `pos`: a floating one before the tiled one under it.
 local function window_at(pos)
     local tiled
@@ -172,20 +142,13 @@ local function end_pop()
     pop.timer:set_enabled(false)
     local address, pos = pop.address, hl.get_cursor_pos()
     pop = nil
-    if not (pos and tiled_window_at(pos, address)) then
-        return -- let go over no tiled window: it stays floating there
+    if pos and tiled_window_at(pos, address) then
+        -- Back into the tiling: it's under the pointer, so the layout puts it in the place of the
+        -- window there (layout.lua).
+        local target = "address:" .. address
+        hl.dispatch(hl.dsp.window.float({ window = target, action = "disable" }))
+        hl.dispatch(hl.dsp.focus({ window = target }))
     end
-    -- Back into the tiling; once the layout has placed it, it swaps with whichever tiled window is
-    -- under the pointer then, so it ends up where it was let go.
-    local target = "address:" .. address
-    hl.dispatch(hl.dsp.window.float({ window = target, action = "disable" }))
-    hl.dispatch(hl.dsp.focus({ window = target }))
-    hl.timer(function()
-        local over = tiled_window_at(pos, address)
-        if over then
-            hl.dispatch(hl.dsp.layout("swap " .. address .. " " .. over.address))
-        end
-    end, { timeout = 50, type = "oneshot" })
 end
 
 local function start_pop()
@@ -206,5 +169,4 @@ local function start_pop()
     }
 end
 
-return { start = start_drag, stop = end_drag, start_move = start_move, stop_move = end_move,
-         start_pop = start_pop, stop_pop = end_pop }
+return { start = start_drag, stop = end_drag, start_pop = start_pop, stop_pop = end_pop }

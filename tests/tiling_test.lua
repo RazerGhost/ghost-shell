@@ -151,6 +151,15 @@ test("boxes", function()
     eq(boxes[3], { id = "c", box = { x = 600, y = 300, w = 600, h = 300 } })
 end)
 
+test("a dropped window takes the place of the one under the pointer", function()
+    local s = T.sync(nil, { "a", "b", "c" }, nil) -- a left, b top right, c bottom right
+    eq(T.drop(s, area, "a", { x = 900, y = 450 }), true)
+    eq(s.slots, { "c", "b", "a" })
+    eq(T.drop(s, area, "a", { x = 900, y = 450 }), false) -- over its own cell
+    eq(T.drop(s, area, "a", { x = 1300, y = 100 }), false) -- outside the area
+    eq(s.slots, { "c", "b", "a" })
+end)
+
 test("resize moves the border on the window's side, or the other one at the edge", function()
     local s = T.sync(nil, { "a", "b", "c" }, nil)
     T.resize(s, "c", "right", 0.1) -- c is in the right column: its left border moves right

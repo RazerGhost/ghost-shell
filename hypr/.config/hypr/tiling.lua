@@ -417,6 +417,19 @@ function M.swap(state, a, b)
     return true
 end
 
+-- Window `id`, back in the tiling after a drag, takes the place of the window whose cell holds
+-- `pos` (the pointer where it was let go); the two swap. False when `pos` is in no other window's
+-- cell (its own, an empty one, outside the area).
+function M.drop(state, area, id, pos)
+    for _, cell in ipairs(M.boxes(state, area)) do
+        local b = cell.box
+        if pos.x >= b.x and pos.x < b.x + b.w and pos.y >= b.y and pos.y < b.y + b.h then
+            return cell.id ~= id and cell.id and M.swap(state, id, cell.id) or false
+        end
+    end
+    return false
+end
+
 -- Empty cells' rectangles (Snap Assist fills them).
 function M.empty(state, area)
     local result = {}
