@@ -1864,7 +1864,7 @@ and light mode:
   line, the time left; the timer's filled while it runs), which unfold their part below as the
   buttons did, then the notifications.
 
-### Clipboard widget, focus mode, "up next" (built 2026-11-04; checked on the laptop)
+### Clipboard widget, focus mode, "up next" (built 2026-11-04; verified on the laptop)
 User's picks.
 - A medium clipboard widget (`desktop/ClipboardWidget.qml`): your pinned texts, then the last
   copies (the clipboard menu's history), as many as fit; a click copies one again
@@ -1891,6 +1891,7 @@ User's picks.
   right edge while there's more (`desktop/ScrollMark.qml`). The to-do lists show every open task
   (no "+N more") and keep their place when one is ticked off; the note follows the cursor while
   typing and isn't dragged (a drag selects text); the clipboard lists its whole history.
+  Verified by the user (scrolling, a clip copied and pasted, a long note typed into).
 
 ### Ending and starting the session (built 2026-11-04)
 User's find after the lock screen work: logging out and shutting down gave no feedback, and being
