@@ -4,12 +4,15 @@ A complete desktop on Arch (CachyOS) built from Hyprland and a Quickshell shell,
 wallpaper. Made for an HP Omen 16 (AMD iGPU + NVIDIA RTX), but split into modules so another
 machine can take what it needs.
 
-![The desktop](docs/screenshots/desktop.png)
+![The desktop](docs/screenshots/desktop.jpg)
 
 | | |
 |:---:|:---:|
-| ![Quick settings](docs/screenshots/quick-settings.png) **Quick settings** | ![Launcher](docs/screenshots/launcher.png) **Launcher** |
-| ![Settings](docs/screenshots/settings.png) **Settings** | ![The desktop editor](docs/screenshots/customize.png) **Customizing the desktop** |
+| ![Quick settings](docs/screenshots/quick-settings.jpg) **Quick settings** | ![Launcher](docs/screenshots/launcher.jpg) **Launcher** |
+| ![Settings](docs/screenshots/settings.jpg) **Settings** | ![The desktop editor](docs/screenshots/customize.jpg) **Customizing the desktop** |
+
+![The lock screen](docs/screenshots/lock.jpg)
+**The lock screen**: your desktop, locked; the island asks for the password.
 
 ## What's in it
 
