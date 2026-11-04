@@ -14,5 +14,5 @@ Rectangle {
     height: flickable.visibleArea.heightRatio * flickable.height
     radius: width / 2
     color: Colors.m3onSurfaceVariant
-    opacity: 0.5
+    opacity: Theme.desktop.scrollMarkOpacity
 }

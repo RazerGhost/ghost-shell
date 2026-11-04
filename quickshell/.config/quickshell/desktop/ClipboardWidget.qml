@@ -81,7 +81,7 @@ WidgetSurface {
 
     Timer {
         id: relist
-        interval: 300
+        interval: Theme.desktop.clipboardSettle
         onTriggered: Clipboard.refresh()
     }
 

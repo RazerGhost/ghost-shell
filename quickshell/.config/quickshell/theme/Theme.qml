@@ -245,6 +245,9 @@ Singleton {
         readonly property int eventBar: root.px(3)  // the accent bar beside a calendar event
         readonly property int copiedFor: 1500        // ms the clipboard widget says "Copied"
         readonly property int scrollMark: root.px(3) // the bar beside a list that scrolls
+        readonly property real scrollMarkOpacity: 0.5
+        readonly property int wheelLines: 3          // lines one wheel notch scrolls the note
+        readonly property int clipboardSettle: 300   // ms for cliphist to store a copy before listing
     }
 
     readonly property QtObject dock: QtObject {

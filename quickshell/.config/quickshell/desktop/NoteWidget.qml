@@ -54,7 +54,7 @@ WidgetSurface {
         id: page
 
         function scroll(event: var): void {
-            const step = event.pixelDelta.y !== 0 ? event.pixelDelta.y : event.angleDelta.y / 120 * Theme.font.normal * 3;
+            const step = event.pixelDelta.y !== 0 ? event.pixelDelta.y : event.angleDelta.y / 120 * Theme.font.normal * Theme.desktop.wheelLines;
             contentY = Math.max(0, Math.min(contentY - step, contentHeight - height));
         }
 
