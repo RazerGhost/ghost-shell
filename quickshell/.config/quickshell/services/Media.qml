@@ -20,9 +20,15 @@ Singleton {
     // Cleared by itself when that player goes away. Kept when a paused player plays again
     // (onPlayingChanged) and when another one takes over while music plays (here).
     property MprisPlayer lastPlaying: null
+    // A moment later, not inside `player`'s own change: setting lastPlaying there re-evaluated
+    // `player` while it was still being evaluated ("Binding loop detected" each time a player
+    // started).
     function rememberPlaying(): void {
-        if (playing)
-            lastPlaying = player;
+        if (playing && lastPlaying !== player)
+            Qt.callLater(() => {
+                if (root.playing)
+                    root.lastPlaying = root.player;
+            });
     }
     onPlayerChanged: rememberPlaying()
 

@@ -44,7 +44,9 @@ Singleton {
 
     // A window fullscreen on the focused screen (a game, a film): pop-ups wait like Do Not
     // Disturb (Settings' dndFullscreen, on by default; Hyprland's fullscreen 2, not maximized).
-    readonly property bool fullscreenNow: Settings.values.dndFullscreen
+    // `=== true`: while settings.json loads the value is undefined, and `undefined && ...` can't
+    // be a bool (a warning at every reload).
+    readonly property bool fullscreenNow: Settings.values.dndFullscreen === true
         && (Hyprland.focusedMonitor?.activeWorkspace?.toplevels.values ?? []).some(t => t.lastIpcObject?.fullscreen === 2)
     // Pop-ups held back: Do Not Disturb, game mode or a fullscreen window.
     readonly property bool quiet: doNotDisturb || GameMode.on || fullscreenNow

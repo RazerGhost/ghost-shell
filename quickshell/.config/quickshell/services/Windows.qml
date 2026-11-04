@@ -30,7 +30,8 @@ Singleton {
         const window = Hyprland.activeToplevel
             ?? (Hyprland.toplevels?.values ?? []).find(t => t.wayland !== null && t.wayland === ToplevelManager.activeToplevel)
             ?? null;
-        return window?.workspace?.name === minimizedWorkspace ? null : window;
+        // Never undefined (a warning at every reload, while Hyprland's lists fill in).
+        return !window || window.workspace?.name === minimizedWorkspace ? null : window;
     }
 
     // Windows that asked for attention (an app can't take the focus by itself, like on Windows,
