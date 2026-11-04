@@ -15,6 +15,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "FocusRules.js" as FocusRules
 
 Singleton {
     id: root
@@ -24,18 +25,19 @@ Singleton {
     readonly property var lengths: [15, 25, 50]
     readonly property int breakMinutes: 5
     // The running timer is a break started from the notification.
-    readonly property bool onBreak: Countdown.active && saved.breakTimer === Countdown.runs
+    readonly property bool onBreak: FocusRules.onBreak(saved, { active: Countdown.active, runs: Countdown.runs })
     // The running timer is this session's own (Countdown.runs of it), for Countdown: its end is
     // announced here instead.
     function owns(runs: int): bool {
-        return (saved.on && saved.timer === runs) || saved.breakTimer === runs;
+        return FocusRules.owns(saved, runs);
     }
 
     function start(length: int): void {
-        if (saved.on)
-            return; // already in a session (an old "Focus again" from the history)
+        const plan = FocusRules.start(saved, { active: Countdown.active, runs: Countdown.runs });
+        if (plan === "ignore")
+            return;
         Settings.values.focusMinutes = length;
-        if (!Countdown.active || onBreak) {
+        if (plan === "run") {
             Countdown.run(length);
             saved.timer = Countdown.runs;
         } else {
@@ -47,8 +49,7 @@ Singleton {
 
     function stop(): void {
         saved.on = false;
-        // Only the timer it started: not one already running, or one started over it since.
-        if (Countdown.active && Countdown.runs === saved.timer)
+        if (FocusRules.stopCancels(saved, { active: Countdown.active, runs: Countdown.runs }))
             Countdown.cancel();
         saved.timer = -1;
     }
