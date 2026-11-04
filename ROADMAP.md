@@ -1827,7 +1827,7 @@ let in was just the desktop appearing.
   or Hyprland's exit). An app still open after 6 s is listed with "Show it" (stops and brings it
   forward to be answered), beside "Shut down anyway" and Cancel (Escape). The hyprshutdown call
   (never installed here) is gone. Checked on screen with the closing and the shutdown stubbed
-  out: both states. Not checked: a real shutdown, and Escape.
+  out: both states.
 - Being let in: a right password closes the lock island with the lock open in the accent color
   for a moment (`Lock.letIn`, `Theme.lock.opening`; the preview shows it on Enter), then the
   desktop's island greets you (`bar/WelcomeCard.qml`, `Greeting.js`, tested): "Good morning,
@@ -1836,6 +1836,9 @@ let in was just the desktop appearing.
   notifications, the next event, open tasks and a running timer. 4.5 s, or a click for the
   today menu; pop-ups wait for it (`IslandViews.shown`'s "welcome", tested). Checked on screen
   by firing the unlock signal; a real unlock needs your password.
+- Hyprland's splash (a random sentence at the bottom of its background, seen for a moment at
+  login before the lock screen covers it; user's find) is off: `misc.disable_splash_rendering`
+  in look.lua. Verified by the user: the unlock, the greeting and Cancel work.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

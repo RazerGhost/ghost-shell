@@ -87,6 +87,9 @@ hl.config({
         vrr = 2,
         force_default_wallpaper = -1,
         disable_hyprland_logo   = false,
+        -- Hyprland's random sentence at the bottom of its background, seen for a moment at
+        -- login before the lock screen covers it (user's find, 2026-11-04).
+        disable_splash_rendering = true,
         -- If the lock screen (Quickshell) crashes, the session stays locked; this lets a new
         -- lock screen take over (see "Lock screen recovery" in ROADMAP.md).
         allow_session_lock_restore = true,
