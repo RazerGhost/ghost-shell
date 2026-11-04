@@ -17,7 +17,7 @@ import qs.theme
 Scope {
     id: root
 
-    // "", "today", "settings", "media", "power", "tray", "clipboard" or "emoji"
+    // "", "today", "settings", "media", "power", "clipboard" or "emoji"
     property alias panel: persist.panel
     property alias screenName: persist.screenName // the monitor the menu is open on
 
@@ -110,6 +110,11 @@ Scope {
         target: "island"
 
         function toggle(panel: string): void {
+            // Background apps is a page of quick settings now.
+            if (panel === "tray") {
+                page("apps");
+                return;
+            }
             root.toggle(panel, Hyprland.focusedMonitor?.name ?? "");
         }
 

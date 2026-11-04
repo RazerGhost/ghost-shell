@@ -453,14 +453,5 @@ PanelWindow {
             }
         }
 
-        MenuSlot {
-            shown: pill.shown === "tray"
-            content: Component {
-                Tray {
-                    width: parent.width
-                    onDone: root.island.panel = ""
-                }
-            }
-        }
     }
 }

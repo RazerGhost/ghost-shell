@@ -4,27 +4,24 @@ import Quickshell.Services.SystemTray
 import qs.theme
 import qs.widgets
 
-// The "Background apps" menu (system tray, StatusNotifierItem), opened from quick settings'
-// bottom row (its own menu since 2026-10-29, after chips in quick settings looked cluttered): a
-// row per app with its icon and name. Click activates the app (and closes the
-// menu), middle click is its secondary action, right click or ⋮ opens its own menu.
+// Quick settings' "Background apps" page (the system tray, StatusNotifierItem), opened from its
+// bottom row; a page like Wi-Fi's since 2026-11-04 (it was its own island menu): a row per app with
+// its icon and name. Click activates the app (and closes quick settings), middle click is its
+// secondary action, right click or ⋮ opens its own menu.
 Column {
     id: root
 
-    // An app was activated; the island closes the menu.
+    signal back()
+    // An app was activated; quick settings closes.
     signal done()
 
-    padding: Theme.spacing.l
-    topPadding: Theme.spacing.s
     spacing: Theme.spacing.xs
 
-    Text {
-        leftPadding: Theme.spacing.s
-        bottomPadding: Theme.spacing.xs
-        text: "Running in the background"
-        color: Colors.m3onSurfaceVariant
-        font.family: Theme.font.sans
-        font.pixelSize: Theme.font.small
+    PageHeader {
+        width: parent.width
+        title: "Background apps"
+        hasSwitch: false
+        onBack: root.back()
     }
 
     Repeater {
@@ -52,7 +49,7 @@ Column {
             // The button of the click being handled (ListRow only says it was activated).
             property int button: Qt.LeftButton
 
-            width: root.width - root.leftPadding - root.rightPadding
+            width: root.width
             appIcon: trayIcon
             title: name
             subtitle: modelData.tooltipDescription || ""

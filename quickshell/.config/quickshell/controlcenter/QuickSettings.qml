@@ -15,7 +15,7 @@ import "../widgets/OrderedList.js" as OrderedList
 Item {
     id: root
 
-    property string page: "main" // "main", "wifi", "bluetooth", "sound", "phone" or "system"
+    property string page: "main" // "main", "wifi", "bluetooth", "sound", "phone", "system" or "apps"
 
     // A button here opens another island menu ("power"), or closes the island ("").
     signal openMenu(string menu)
@@ -51,7 +51,7 @@ Item {
     // The island grows and shrinks to fit the current page.
     implicitHeight: (page === "wifi" ? wifiPage : page === "bluetooth" ? bluetoothPage
                      : page === "sound" ? soundPage : page === "phone" ? phonePage
-                     : page === "system" ? systemPage : mainPage).implicitHeight
+                     : page === "system" ? systemPage : page === "apps" ? appsPage : mainPage).implicitHeight
                     + padding
     clip: true // pages slide in from the side
 
@@ -677,7 +677,7 @@ Item {
                     visible: SystemTray.items.values.length > 0
                     icon: "apps"
                     label: "Background apps"
-                    onClicked: root.openMenu("tray")
+                    onClicked: root.page = "apps"
                 }
 
                 IconButton {
@@ -775,6 +775,19 @@ Item {
             property: "active"
             value: root.visible && (root.page === "phone" || root.tileList.includes("phone"))
         }
+
+        Behavior on x {
+            NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }
+        }
+    }
+
+    Tray {
+        id: appsPage
+        x: root.page === "apps" ? root.padding : root.width
+        width: root.width - root.padding * 2
+        visible: x < root.width
+        onBack: root.page = "main"
+        onDone: root.openMenu("")
 
         Behavior on x {
             NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }
