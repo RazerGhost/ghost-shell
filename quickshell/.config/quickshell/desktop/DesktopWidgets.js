@@ -6,7 +6,7 @@
 // Every widget: its name (its key in desktopWidgets, DesktopCard's `name`), the setting that
 // turns it on, and whether it's medium (twice as wide) or small. The desktop editor's Cancel,
 // themes and widget layouts take their keys from here; adding a widget also means its card in
-// DesktopWidgets.qml, its setting and the editor's gallery.
+// WidgetStage.qml, its regions in DesktopWidgets.qml, its setting and the editor's gallery.
 const kinds = [
     { name: "clock",    key: "desktopClock",    medium: true },
     { name: "weather",  key: "desktopWeather",  medium: false },
@@ -14,7 +14,8 @@ const kinds = [
     { name: "calendar", key: "desktopCalendar", medium: true },
     { name: "battery",  key: "desktopBattery",  medium: false },
     { name: "todo",     key: "desktopTodo",     medium: true },
-    { name: "timer",    key: "desktopTimer",    medium: false }
+    { name: "timer",    key: "desktopTimer",    medium: false },
+    { name: "notifications", key: "desktopNotifications", medium: false }
 ];
 const keys = kinds.map(k => k.key);
 
@@ -27,7 +28,8 @@ const defaults = {
     calendar: { x: 0.24, y: 0.08 },
     battery:  { x: 0.24, y: 0.26 },
     todo:     { x: 0.24, y: 0.44 },
-    timer:    { x: 0.34, y: 0.26 }
+    timer:    { x: 0.34, y: 0.26 },
+    notifications: { x: 0.04, y: 0.62 }
 };
 
 function fraction(value, fallback) {

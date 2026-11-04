@@ -19,7 +19,9 @@ Item {
     readonly property alias batteryCard: batteryCard
     readonly property alias todoCard: todoCard
     readonly property alias timerCard: timerCard
-    readonly property var cards: [clockCard, weatherCard, mediaCard, calendarCard, batteryCard, todoCard, timerCard]
+    readonly property alias notificationsCard: notificationsCard
+    readonly property var cards: [clockCard, weatherCard, mediaCard, calendarCard, batteryCard, todoCard, timerCard,
+                                  notificationsCard]
 
     // Where each widget showing goes at the shell's size, groups kept together
     // (DesktopWidgets.arrange); DesktopCard reads its own.
@@ -129,5 +131,13 @@ Item {
         shown: Settings.values.desktopTimer
 
         TimerWidget {}
+    }
+
+    DesktopCard {
+        id: notificationsCard
+        name: "notifications"
+        shown: Settings.values.desktopNotifications
+
+        NotificationsWidget {}
     }
 }

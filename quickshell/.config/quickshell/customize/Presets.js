@@ -46,7 +46,8 @@ const desktopWidgets = [
     // All of them in three rows across the top left, keeping to the upper half (pictures often
     // have the ground and their subject lower down).
     { name: "Everything", values: widgetLayout({ clock: [80, 80], calendar: [448, 80], media: [80, 264], todo: [448, 264],
-                                                weather: [80, 448], battery: [264, 448], timer: [448, 448] }) },
+                                                weather: [80, 448], battery: [264, 448], timer: [448, 448],
+                                                notifications: [632, 448] }) },
     // A column on the left, centred top to bottom: the time, the sky and battery, the player
     { name: "Side", values: widgetLayout({ clock: [80, 272], weather: [80, 456], battery: [264, 456], media: [80, 640] }) }
 ];

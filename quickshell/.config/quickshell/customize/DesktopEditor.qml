@@ -666,6 +666,7 @@ Scope {
                                 { key: "desktopCalendar", title: "Calendar", widget: calendarWidget },
                                 { key: "desktopTodo", title: "To-do", widget: todoWidget },
                                 { key: "desktopTimer", title: "Timer", widget: timerWidget },
+                                { key: "desktopNotifications", title: "Notifications", widget: notificationsWidget },
                                 { key: "desktopBattery", title: "Battery", widget: batteryWidget },
                                 { key: "desktopMedia", title: "Media", widget: mediaWidget }
                             ].filter(w => w.key !== "desktopBattery" || Battery.present)
@@ -776,6 +777,7 @@ Scope {
                         Component { id: todoWidget; TodoWidget {} }
                         Component { id: batteryWidget; BatteryWidget {} }
                         Component { id: timerWidget; TimerWidget {} }
+                        Component { id: notificationsWidget; NotificationsWidget {} }
                         Component { id: mediaWidget; MediaWidget {} }
 
                         // More to the right: it fades out there (the tile's shade over the sheet).

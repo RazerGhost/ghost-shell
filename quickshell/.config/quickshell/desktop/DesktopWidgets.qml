@@ -8,8 +8,8 @@ import "DesktopWidgets.js" as DesktopWidgetsJs
 
 // Widgets on the wallpaper (the desktop editor's Widgets tab): a clock, the weather, the
 // media player (with nothing playing, it offers the music app last heard), the calendar's next events, the battery, the to-do list
-// and the timer (ClockWidget, WeatherWidget, MediaWidget, CalendarWidget, BatteryWidget,
-// TodoWidget, TimerWidget: one family of sizes; the list of them is DesktopWidgets.js's
+// the timer and how many notifications wait (ClockWidget, WeatherWidget, MediaWidget,
+// CalendarWidget, BatteryWidget, TodoWidget, TimerWidget, NotificationsWidget: one family of sizes; the list of them is DesktopWidgets.js's
 // `kinds`). On the first screen, on the layer just above the wallpaper, so windows cover them.
 // Each can be dragged by its handle (DesktopCard.qml). The widgets themselves are WidgetStage.qml,
 // which the lock screen draws too.
@@ -41,6 +41,7 @@ Scope {
                 WidgetRegion { stage: widgetStage; widget: widgetStage.batteryCard }
                 WidgetRegion { stage: widgetStage; widget: widgetStage.todoCard }
                 WidgetRegion { stage: widgetStage; widget: widgetStage.timerCard }
+                WidgetRegion { stage: widgetStage; widget: widgetStage.notificationsCard }
             }
 
             BackgroundEffect.blurRegion: Region {
@@ -51,6 +52,7 @@ Scope {
                 WidgetRegion { stage: widgetStage; widget: widgetStage.batteryCard; corner: Theme.desktop.radius }
                 WidgetRegion { stage: widgetStage; widget: widgetStage.todoCard; corner: Theme.desktop.radius }
                 WidgetRegion { stage: widgetStage; widget: widgetStage.timerCard; corner: Theme.desktop.radius }
+                WidgetRegion { stage: widgetStage; widget: widgetStage.notificationsCard; corner: Theme.desktop.radius }
                 // Never empty: Hyprland 0.57 blurs the whole surface for an empty region (NOTES).
                 Region { width: 1; height: 1 }
             }
