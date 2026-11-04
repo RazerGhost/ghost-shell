@@ -1844,7 +1844,10 @@ let in was just the desktop appearing.
 
 ### The HP logo through the boot (built 2026-11-04; needs `ghost install system` and a reboot)
 User's pick after the black screen between the firmware and the session: Plymouth back, with its
-`bgrt` theme (see the decision "Plymouth's bgrt splash"). Next, once this is verified: a theme of
+`bgrt` theme (see the decision "Plymouth's bgrt splash"). Verified by the user: the logo shows
+through the boot. The first boot with it crashed Hyprland once (`--retain-splash`, see the
+decision); the RTX was also missing from the PCI bus that boot (its slot empty, a warm restart),
+which Hyprland skips ("Explicit device ... not found"), so that's harmless. Next, once this is verified: a theme of
 our own in the wallpaper's background color, so the boot hands over to the lock screen without a
 change of color.
 
@@ -1865,9 +1868,12 @@ windows).
   firmware's HP logo with a spinner from when the graphics driver takes over until Hyprland draws,
   and at shutdown (`modules/system/packages.txt`; the system module sets the theme and adds
   `splash`). It was off because it left tty1 in graphics mode, which hid the text greeter of the
-  first days; there's no login screen now. Plymouth quits with `--retain-splash`
-  (`plymouth-quit.service.d/retain-splash.conf`), so Hyprland draws over the logo instead of after
-  a black screen; greetd already waits for it (`after-plymouth.conf`). The firmware reports BGRT
+  first days; there's no login screen now. Plymouth quits the normal way before greetd starts
+  (`after-plymouth.conf`), leaving a short black screen until Hyprland's first frame. Tried and
+  dropped the same day: `plymouth quit --retain-splash`, to keep the logo up until Hyprland drew
+  over it; Plymouth still held the graphics card when Hyprland started, logind refused it
+  ("Device or resource busy"), Hyprland crashed and greetd started the session again a second
+  later (a longer black screen; the crash report's log tail showed it). The firmware reports BGRT
   status 0; Plymouth reads only the rotation bits from it, so the logo still shows (checked in its
   code). A theme of our own in the wallpaper's background color is planned next.
 - **Early KMS:** CachyOS's chwd removes the `kms` mkinitcpio hook on NVIDIA laptops, so

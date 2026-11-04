@@ -242,6 +242,11 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   keeps it until a click elsewhere. An item's `activeFocus` is true before the layer has the
   keyboard (`forceActiveFocus()` sets it anyway); the attached `Window.active` tells (the desktop's
   to-do list, `desktop/TasksWidget.qml`).
+- `plymouth quit --retain-splash` before greetd starts Hyprland makes Hyprland crash at boot
+  (verified 2026-11-04): logind's TakeDevice on the card answers "Device or resource busy",
+  aquamarine finds no GPU ("CBackend::create() failed"), and greetd starts the session again. The
+  crash report in ~/.cache/hyprland/ has the log tail; the instance's hyprland.log stays empty.
+  Use a plain `plymouth quit`.
 - Writing settings.json in place while the shell runs (`open(..., "w")`) can be read half
   written: the shell then keeps it as settings.json.bad and stops saving. Write a copy and `mv`
   it over (atomic), and Settings reloads it.

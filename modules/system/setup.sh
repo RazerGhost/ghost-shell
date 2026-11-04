@@ -70,9 +70,14 @@ if [[ $(plymouth-set-default-theme) != bgrt ]]; then
     sudo plymouth-set-default-theme bgrt
     rebuild_boot=true
 fi
-# Plymouth quits leaving the logo on screen for Hyprland to draw over (not a black screen).
-retain=system/etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
-sudo install -Dm644 "$retain" /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
+# Plymouth quits the normal way. With `quit --retain-splash` (installed here on 2026-11-04) it
+# still held the graphics card when Hyprland started: logind refused it ("Device or resource
+# busy"), Hyprland crashed and greetd started the session again a second later. Undo that.
+if [[ -e /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf ]]; then
+    sudo rm /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
+    sudo rmdir --ignore-fail-on-non-empty /etc/systemd/system/plymouth-quit.service.d
+    sudo systemctl daemon-reload
+fi
 
 # A quiet console: tty1 shows before the desktop, and at logout and
 # shutdown, so no kernel or boot messages below errors, no systemd status unless something is

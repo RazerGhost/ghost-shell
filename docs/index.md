@@ -68,7 +68,7 @@ updated) · Boy Scout Rule within touched lines · end each change with a summar
 | Area | Decision |
 |---|---|
 | GPU | iGPU first, RTX second in `AQ_DRM_DEVICES`; no global NVIDIA env vars, `prime-run` per app (`env.lua`, udev rule `61-gpu-symlinks.rules`) |
-| Boot | Plymouth's `bgrt` splash (the HP logo until Hyprland draws, `plymouth quit --retain-splash`); early KMS adds `amdgpu`; quiet kernel line; Hyprland output to the journal |
+| Boot | Plymouth's `bgrt` splash (the HP logo until just before Hyprland draws); early KMS adds `amdgpu`; quiet kernel line; Hyprland output to the journal |
 | Windows | Own tiling layout (`layout.lua`, `tiling.lua`); dialogs float; floating stays above tiled |
 | Focus | Click to focus, raise on focus (`input.follow_mouse = 2`, `windows.lua`); apps can't steal focus, urgent shows an `AttentionCard` |
 | Keybinds | Windows-style (Super launcher, Alt+Tab, Super+Left/Right snap, ...); app binds go through the shell with a fallback |
