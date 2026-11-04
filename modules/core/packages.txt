@@ -21,6 +21,8 @@ qt6-imageformats
 # Sound: PipeWire with its PulseAudio and ALSA sides (apps like Spotify, Vesktop and Zen talk
 # PulseAudio) and pw-play (the shell's sound events)
 pipewire-audio
+# The limiter at the end of the equalizer (ghost-equalizer.conf, LSP's limiter_mono)
+lsp-plugins-lv2
 pipewire-pulse
 pipewire-alsa
 wireplumber

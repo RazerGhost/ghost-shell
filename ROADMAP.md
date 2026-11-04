@@ -1952,6 +1952,11 @@ bands (`sp_*` nodes in ghost-equalizer.conf), set per output by the shell (`Equa
 `outputProfiles`, tested): the laptop speakers get it, headphones and anything else neutral
 values. The speakers' own equalizer setting went to Off (its old "Laptop speakers" preset cut the
 bass the profile now gives). Checked: after a restart of the filter the shell puts it back.
+Then a limiter (user's pick): LSP's `limiter_mono` (lsp-plugins-lv2, core module) last in the
+filter, once per channel like the bands. Neutral on other outputs; on the speakers it gives back
+the profile's headroom (1.65x in) with peaks held under -1 dB, so they're as loud as before the
+profile without clipping. Found on the way: after a shell reload the equalizer sent nothing (the
+filter was already running, no change to react to); it applies once at start now.
 
 ### The recording's notification beside the screenshots' (2026-11-04)
 User's pick from the ideas: the shell's notifications with buttons the same way. Looked at first:

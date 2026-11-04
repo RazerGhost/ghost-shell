@@ -24,10 +24,10 @@ TestCase {
 
     function test_props() {
         compare(Equalizer.props([6, -1.5, 0, 2, 1], "bluez_output.headphones"),
-                '{ params = [ "bass:Gain" 6.0 "low_mids:Gain" -1.5 "mids:Gain" 0.0 "presence:Gain" 2.0 "treble:Gain" 1.0 "sp_preamp:Mult" 1.00 "sp_rumble:Freq" 10.0 "sp_punch:Gain" 0.0 "sp_body:Gain" 0.0 "sp_honk:Gain" 0.0 "sp_clarity:Gain" 0.0 "sp_air:Gain" 0.0 ] }');
+                '{ params = [ "bass:Gain" 6.0 "low_mids:Gain" -1.5 "mids:Gain" 0.0 "presence:Gain" 2.0 "treble:Gain" 1.0 "sp_preamp:Mult" 1.00 "sp_rumble:Freq" 10.0 "sp_punch:Gain" 0.0 "sp_body:Gain" 0.0 "sp_honk:Gain" 0.0 "sp_clarity:Gain" 0.0 "sp_air:Gain" 0.0 "sp_limit:g_in" 1.00 "sp_limit:th" 1.00 ] }');
         // Anything odd is sent as flat rather than as broken text.
         compare(Equalizer.props(["x"], ""),
-                '{ params = [ "bass:Gain" 0.0 "low_mids:Gain" 0.0 "mids:Gain" 0.0 "presence:Gain" 0.0 "treble:Gain" 0.0 "sp_preamp:Mult" 1.00 "sp_rumble:Freq" 10.0 "sp_punch:Gain" 0.0 "sp_body:Gain" 0.0 "sp_honk:Gain" 0.0 "sp_clarity:Gain" 0.0 "sp_air:Gain" 0.0 ] }');
+                '{ params = [ "bass:Gain" 0.0 "low_mids:Gain" 0.0 "mids:Gain" 0.0 "presence:Gain" 0.0 "treble:Gain" 0.0 "sp_preamp:Mult" 1.00 "sp_rumble:Freq" 10.0 "sp_punch:Gain" 0.0 "sp_body:Gain" 0.0 "sp_honk:Gain" 0.0 "sp_clarity:Gain" 0.0 "sp_air:Gain" 0.0 "sp_limit:g_in" 1.00 "sp_limit:th" 1.00 ] }');
     }
 
     function test_outputProfile() {
@@ -36,6 +36,7 @@ TestCase {
         verify(speakers.includes('"sp_preamp:Mult" 0.60'));
         verify(speakers.includes('"sp_honk:Gain" -5.0'));
         verify(speakers.includes('"sp_rumble:Freq" 90.0'));
+        verify(speakers.includes('"sp_limit:g_in" 1.65 "sp_limit:th" 0.89'));
         compare(Equalizer.profileFor("something else").rumble, 10);
     }
 }

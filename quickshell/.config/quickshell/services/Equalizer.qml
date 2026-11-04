@@ -42,5 +42,7 @@ Singleton {
     onGainsChanged: apply()
     // Another output has its own profile, even with the same five gains.
     onDeviceChanged: apply()
+    // A shell reload starts with the filter already running: no change to react to.
+    Component.onCompleted: apply()
     onRunningChanged: apply()
 }
