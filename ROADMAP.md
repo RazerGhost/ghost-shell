@@ -1918,6 +1918,14 @@ Escape then, Super+D again or a click elsewhere goes back to your workspace. Key
 the foot of the screen. Not while locked, in focus mode or in the desktop editor. Checked with
 wtype: moving, the ring, typing into the note and back, Escape home.
 
+### Welcome tour brought up to date (2026-11-04)
+The tour's cards were last updated 2026-10-29. Now: the island card says what the island shows
+today (the time and what needs you, notifications popping out of it, today's weather, events,
+note, timer; focus mode in quick settings), a new "Your desktop" card (the widgets, Super+D, the
+lock screen as the desktop locked) and Settings opening out of the search bar. Found on the way:
+`qs ipc call welcome show` never reached the tour (qs reads `show` as its own `ipc show`), so
+Settings' "Show the welcome tour" did nothing; the function is `open` now. Checked on screen.
+
 ### Ending and starting the session (built 2026-11-04)
 User's find after the lock screen work: logging out and shutting down gave no feedback, and being
 let in was just the desktop appearing.

@@ -397,6 +397,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   8 px under the island showed through its glass as light streaks. The `xray` layer rule makes a
   layer blur only the wallpaper, and it applies to ext-background-effect's blur too (checked
   2026-11-04 with a white window under the island).
+- `qs ipc call <target> show` never reaches an IPC function named `show`: qs reads it as its own
+  `qs ipc show` and prints the target's functions, exit 0 (`-- show` works). The welcome tour's
+  function was `show`, so Settings' "Show the welcome tour" did nothing; it's `open` now.
 - `wl-paste --watch <command>` runs the command at every clipboard change (cliphist records
   that way too), so a Process with `["wl-paste", "--watch", "echo"]` and a SplitParser follows
   the clipboard; list cliphist a moment later (300 ms), after it has stored the new entry.

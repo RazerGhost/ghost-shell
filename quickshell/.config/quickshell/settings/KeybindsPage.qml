@@ -128,7 +128,7 @@ Column {
 
     TextButton {
         text: "Show the welcome tour"
-        onClicked: Quickshell.execDetached(["qs", "ipc", "call", "welcome", "show"])
+        onClicked: Quickshell.execDetached(["qs", "ipc", "call", "welcome", "open"])
     }
 
     Text {

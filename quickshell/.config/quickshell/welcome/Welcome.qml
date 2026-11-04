@@ -9,7 +9,7 @@ import qs.widgets
 
 // The welcome tour: a few cards over the dimmed screen on how this desktop works, shown the first
 // time the shell starts (`welcomeSeen` in settings.json), and again from Settings -> Keybinds or
-// `qs ipc call welcome show`. Right / Enter for the next card, Left for the previous, Escape skips.
+// `qs ipc call welcome open`. Right / Enter for the next card, Left for the previous, Escape skips.
 Scope {
     id: root
 
@@ -25,8 +25,11 @@ Scope {
           text: "Tap Super and type: apps and open windows. \"/ name\" finds files, \"> command\" runs one in the terminal, and sums and conversions work too: try \"5 km in miles\".",
           keys: [["Super"], ["Super", "Space"]] },
         { icon: "page_header", title: "The island",
-          text: "The shape at the top of the screen. Click it for the calendar, notifications, a to-do list, a note and a timer; right-click it for quick settings: Wi-Fi, sound, game mode, apps running in the background and more. Switching workspaces shows them in it for a moment.",
+          text: "The shape at the top of the screen: the time, and what needs you. Notifications pop out of it. Click it for today: the weather, your next events, a note, a timer and your notifications; right-click it for quick settings: Wi-Fi, sound, focus mode (a timer that keeps pop-ups away), game mode and more. Switching workspaces shows them in it for a moment.",
           keys: [["Super", "C"], ["Super", "N"]] },
+        { icon: "widgets", title: "Your desktop",
+          text: "Widgets live on the wallpaper: the time, weather, a to-do list, a note, your clipboard and more (add them with Super + U). Super + D shows the desktop and lets you use them with the keyboard. When the screen locks, it's this desktop, locked: just start typing your password.",
+          keys: [["Super", "D"], ["Super", "U"]] },
         { icon: "view_quilt", title: "Windows arrange themselves",
           text: "New windows tile side by side. The window menu picks a layout or makes tabs; Alt + Tab switches, Super + Tab shows everything at once.",
           keys: [["Super", "Z"], ["Alt", "Tab"], ["Super", "Tab"]] },
@@ -37,10 +40,10 @@ Scope {
           text: "Super + ` brings a terminal down over everything and hides it again. Super + Shift + ` tucks any window away there, and brings it back.",
           keys: [["Super", "`"], ["Super", "Shift", "`"]] },
         { icon: "palette", title: "Make it yours",
-          text: "Super + U picks what to customize: the desktop (wallpaper, colors, widgets, themes; the lock screen is your desktop, locked), the dock and island, how windows look, or quick settings. You change them on the screen itself and see each change at once; each starts with ready-made looks, and the keyboard works throughout.",
+          text: "Super + U picks what to customize: the desktop (wallpaper, colors, widgets, themes), the dock and island, how windows look, or quick settings. You change them on the screen itself and see each change at once; each starts with ready-made looks, and the keyboard works throughout.",
           keys: [["Super", "U"]] },
         { icon: "settings", title: "Everything else is in Settings",
-          text: "Display, sound, notifications per app, power and sleep, every keybind, and this tour again (under Keybinds). Each Customize button opens its editor.",
+          text: "It opens out of the search bar: display, sound, notifications per app, power and sleep, every keybind, and this tour again (under Keybinds). Each Customize button opens its editor.",
           keys: [["Super", "I"]] }
     ]
     readonly property var current: steps[step]
@@ -81,7 +84,8 @@ Scope {
     IpcHandler {
         target: "welcome"
 
-        function show(): void {
+        // Not "show": `qs ipc call welcome show` is read as qs's own `ipc show` (NOTES).
+        function open(): void {
             root.show();
         }
     }

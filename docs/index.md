@@ -295,7 +295,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 | `brightness` | `refresh` |
 | `media` | `playPause`, `next`, `previous` (the media keys) |
 | `updates` | `check`, `summary` |
-| `welcome` | `show` |
+| `welcome` | `open` |
 | `focus` | `toggle` (focus mode) |
 | `widgets` | `browse` (the desktop widgets' keyboard mode, Super+D) |
 
