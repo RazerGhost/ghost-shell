@@ -17,7 +17,19 @@ hl.env("QS_ICON_THEME", "Colloid-Dark")
 -- system/etc/udev/rules.d/61-gpu-symlinks.rules in this repo. cardN numbers can change
 -- between boots, and /dev/dri/by-path/ can't be used because this list is colon-separated.
 -- Only read when Hyprland starts: log out and back in after changing it.
-hl.env("AQ_DRM_DEVICES", "/dev/dri/amd-igpu:/dev/dri/nvidia-dgpu")
+-- Only the ones that exist: the RTX sometimes misses a boot, and another machine (a desktop
+-- with one card) has neither or one; with none listed Hyprland picks the card itself.
+local gpus = {}
+for _, device in ipairs({ "/dev/dri/amd-igpu", "/dev/dri/nvidia-dgpu" }) do
+    local file = io.open(device, "r")
+    if file then
+        file:close()
+        table.insert(gpus, device)
+    end
+end
+if #gpus > 0 then
+    hl.env("AQ_DRM_DEVICES", table.concat(gpus, ":"))
+end
 
 -- The wiki's NVIDIA page sets LIBVA_DRIVER_NAME=nvidia and __GLX_VENDOR_LIBRARY_NAME=nvidia.
 -- Those are for setups where NVIDIA renders the desktop; here they would push iGPU apps onto
