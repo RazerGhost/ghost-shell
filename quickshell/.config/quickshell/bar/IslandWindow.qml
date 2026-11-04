@@ -208,7 +208,8 @@ PanelWindow {
 
             readonly property string menu: root.showMedia ? "media" : "today"
 
-            label: root.showMedia ? "Media" : "Calendar"
+            // The time first, so a screen reader says what the island shows.
+            label: root.showMedia ? "Media" : clock.text + ", calendar"
             secondaryLabel: "Quick settings (Super+N)"
             details: alerts.summary
             active: root.open

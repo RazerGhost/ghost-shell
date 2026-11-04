@@ -15,6 +15,8 @@ WidgetSurface {
             + (apps > 1 ? " from " + apps + " apps" : "") + ". Enter opens the today menu";
     }
 
+    // On the lock screen: plain text, no action (the card takes no clicks there).
+    property bool hidesTitles: false
     readonly property int count: Notifications.history.length
     readonly property int apps: new Set(Notifications.history.map(n => Notifications.appOf(n))).size
 
@@ -33,8 +35,8 @@ WidgetSurface {
         onClicked: widget.openToday()
 
         // A button on the desktop; on the lock screen (disabled) plain text with no action.
-        Accessible.role: enabled ? Accessible.Button : Accessible.StaticText
-        Accessible.name: (widget.count === 1 ? "1 notification" : widget.count + " notifications") + (enabled ? ": open the today menu" : "")
+        Accessible.role: !widget.hidesTitles ? Accessible.Button : Accessible.StaticText
+        Accessible.name: (widget.count === 1 ? "1 notification" : widget.count + " notifications") + (!widget.hidesTitles ? ": open the today menu" : "")
         Accessible.onPressAction: widget.openToday()
     }
 

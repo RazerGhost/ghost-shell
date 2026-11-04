@@ -470,6 +470,7 @@ Scope {
                     boundsBehavior: Flickable.StopAtBounds
 
                     Accessible.role: Accessible.List
+                    Accessible.name: "Results"
 
                     highlight: Rectangle {
                         radius: Theme.radius.m

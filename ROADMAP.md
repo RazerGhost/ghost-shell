@@ -1924,6 +1924,19 @@ Escape then, Super+D again or a click elsewhere goes back to your workspace. Key
 the foot of the screen. Not while locked, in focus mode or in the desktop editor. Checked with
 wtype: moving, the ring, typing into the note and back, Escape home.
 
+### The shell with a screen reader (checked 2026-11-04)
+User's request after Orca joined: how the whole shell reads. The accessibility tree (what Orca
+reads, over AT-SPI) of the desktop, the island's menus, the launcher, Settings, the overview,
+the welcome tour and the lock screen, read with a small script (Atspi from Python), not by ear.
+Fixed: quick settings read every tile and round button twice (the edit-mode wrapper spoke outside
+edit mode too); the island's button said "Calendar", never the time ("18:56, calendar" now);
+today's header read the weekday in capitals and left the temperature out; quick settings'
+battery had no role; the launcher's results and the clipboard history were unnamed lists; on the
+lock screen the calendar, month and notifications widgets claimed to be buttons ("open the today
+menu"): a child's own `enabled` stays true under a disabled card, so they go by `hidesTitles`.
+Qt leaves a password field's name out over AT-SPI, so the lock's field says "Password" in its
+description too. Read fine: the power and emoji menus, Settings, the overview, the welcome tour.
+
 ### What Hyprland 0.57.1 changed (checked 2026-11-04)
 After the drop-down terminal (see "Magnifier and drop-down terminal"), a check of everything
 reading workspace ids. Hyprland's Lua: only the layout keyed by id; the rest uses the active

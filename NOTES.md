@@ -405,6 +405,11 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `j/workspaces` read; a fresh `qs -p` with `Hyprland.refreshWorkspaces()` showed 1 and 3 as -1)
   and gets the real ids from the first workspace event (a switch). Special workspaces stay -1.
   `WorkspaceSlots.idOf` takes a numbered workspace's id from its name meanwhile.
+- The shell's accessibility tree can be read without a screen reader: Python's `gi` with
+  `Atspi` 2.0 (at-spi2-core), the app named "quickshell" on `Atspi.get_desktop(0)`; filter on the
+  SHOWING state (Qt Quick's tree is flat under each window, hidden items included) and call
+  `clear_cache()` before reading roles. A child's `enabled` stays true under a disabled parent
+  for `Accessible.role` bindings; a password field's `Accessible.name` doesn't reach AT-SPI.
 - `qs ipc call <target> show` never reaches an IPC function named `show`: qs reads it as its own
   `qs ipc show` and prints the target's functions, exit 0 (`-- show` works). The welcome tour's
   function was `show`, so Settings' "Show the welcome tour" did nothing; it's `open` now.

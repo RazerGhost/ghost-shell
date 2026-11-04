@@ -130,7 +130,9 @@ Item {
 
                         Accessible.role: Accessible.EditableText
                         Accessible.name: "Password"
-                        Accessible.description: "Screen locked"
+                        // Qt leaves a password field's name out over AT-SPI (checked with the tree): the
+                        // description says it too.
+                        Accessible.description: "Password. The screen is locked"
                         Accessible.passwordEdit: true
 
                         onAccepted: {

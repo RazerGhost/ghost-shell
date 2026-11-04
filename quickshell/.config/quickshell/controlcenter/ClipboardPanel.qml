@@ -85,6 +85,7 @@ Column {
         model: root.shown
 
         Accessible.role: Accessible.List
+        Accessible.name: "Clipboard history"
 
         highlight: Rectangle {
             radius: Theme.radius.m

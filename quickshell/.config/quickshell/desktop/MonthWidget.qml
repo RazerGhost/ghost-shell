@@ -43,9 +43,9 @@ WidgetSurface {
         onClicked: widget.openToday()
 
         // A button on the desktop; on the lock screen (disabled) plain text with no action.
-        Accessible.role: enabled ? Accessible.Button : Accessible.StaticText
+        Accessible.role: !widget.hidesTitles ? Accessible.Button : Accessible.StaticText
         Accessible.name: Qt.locale(Qt.uiLanguage).toString(clock.date, "dddd d MMMM")
-                         + (enabled ? ": open the today menu" : "")
+                         + (!widget.hidesTitles ? ": open the today menu" : "")
         Accessible.onPressAction: widget.openToday()
     }
 

@@ -337,7 +337,9 @@ Item {
         name: "notifications"
         shown: Settings.values.desktopNotifications
 
-        NotificationsWidget {}
+        NotificationsWidget {
+            hidesTitles: stage.locked
+        }
     }
 
     DesktopCard {

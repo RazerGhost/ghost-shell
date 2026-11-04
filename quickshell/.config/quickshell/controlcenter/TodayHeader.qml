@@ -39,7 +39,8 @@ Column {
             anchors.verticalCenter: parent.verticalCenter
 
             Accessible.role: Accessible.Heading
-            Accessible.name: day.text + ", " + full.text
+            // The weekday as written, not in capitals (a screen reader may spell those out).
+            Accessible.name: Qt.locale(Qt.uiLanguage).toString(clock.date, "dddd") + ", " + full.text
 
             Text {
                 id: day
@@ -103,7 +104,7 @@ Column {
                 color: Colors.m3onSurfaceVariant
                 font.family: Theme.font.sans
                 font.pixelSize: Theme.font.small
-                Accessible.name: root.now ? `${root.now.label}, high ${root.now.high}°, low ${root.now.low}°` : ""
+                Accessible.name: root.now ? `${root.now.temperature}°, ${root.now.label}, high ${root.now.high}°, low ${root.now.low}°` : ""
             }
 
             // The town; click to change it.

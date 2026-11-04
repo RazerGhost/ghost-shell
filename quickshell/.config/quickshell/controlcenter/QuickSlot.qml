@@ -71,6 +71,8 @@ Item {
         }
     }
 
+    // Outside edit mode only the tile or button inside speaks (Orca read each one twice).
+    Accessible.ignored: !slot.editing
     Accessible.role: Accessible.Button
     Accessible.name: !slot.editing ? slot.title
         : slot.title + ": Shift and arrow keys move it, Delete removes it"

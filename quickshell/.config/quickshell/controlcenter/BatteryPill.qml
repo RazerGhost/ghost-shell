@@ -16,7 +16,7 @@ Item {
     implicitWidth: body.width + Theme.battery.nub
     implicitHeight: Theme.battery.height
 
-    Accessible.role: Accessible.Indicator
+    Accessible.role: Accessible.StaticText
     Accessible.name: "Battery " + Math.round(Battery.level * 100) + "%" + (Battery.charging ? ", charging" : "")
 
     Item {
