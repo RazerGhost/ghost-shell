@@ -1831,6 +1831,13 @@ and light mode:
   a click elsewhere ends it) is `desktop/WidgetKeyboard.qml` now, for the three fields, and the
   stage lets one type at a time (`WidgetStage.only`). Checked live: typing saved, and starting
   the to-do field took the keyboard over from the note at once.
+- The today menu redesigned (user's pick, 2026-11-04), now that the month and the to-do list left:
+  a header with the weekday in the accent over the date and the weather beside it
+  (`controlcenter/TodayHeader.qml`, replacing `WeatherRow.qml`: the sky's icon and temperature,
+  the sky with high and low, the town as a small button that changes it), the next events, then
+  the note and the timer as quick settings' wide tiles showing what they hold (the note's first
+  line, the time left; the timer's filled while it runs), which unfold their part below as the
+  buttons did, then the notifications.
 
 ### Ending and starting the session (built 2026-11-04)
 User's find after the lock screen work: logging out and shutting down gave no feedback, and being

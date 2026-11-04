@@ -119,7 +119,7 @@ Recovery procedures (lock screen crash, a session that can't start) are in ROADM
 | System page: CPU, memory, GPUs, disk, busiest apps with End task | `controlcenter/SystemPage.qml`, `services/SystemStats.qml`, `system-stats.sh` |
 | Phone page: ring, send files, clipboard, browse | `controlcenter/PhonePage.qml`, `services/Phone.qml`, `phone.sh` |
 | Background apps (tray), from quick settings' bottom row | `controlcenter/Tray.qml` |
-| Today: date, weather, agenda, note, timer, grouped notifications (the month and the to-do list are desktop widgets) | `controlcenter/TodayPanel.qml`, `TodayTools.qml`, `WeatherRow.qml`, `AgendaList.qml` |
+| Today: a header (weekday, date, the weather with its town to change), agenda, the note and timer as tiles, grouped notifications (the month and the to-do list are desktop widgets) | `controlcenter/TodayPanel.qml`, `TodayHeader.qml`, `TodayTools.qml`, `AgendaList.qml` |
 | Media menu: cover colors, seek, shuffle/repeat | `controlcenter/MediaPanel.qml`, `MediaAccent.js` |
 | Clipboard: history, images, search, pins, paste into the previous window | `controlcenter/ClipboardPanel.qml`, `services/Clipboard.qml`, `ClipboardEntries.js` |
 | Emoji picker | `controlcenter/EmojiPanel.qml`, `services/EmojiData.js` |

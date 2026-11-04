@@ -33,21 +33,8 @@ Column {
         precision: SystemClock.Minutes
     }
 
-    // The date (the month is a desktop widget of its own: desktop/MonthWidget.qml).
-    Text {
-        width: parent.width - root.leftPadding - root.rightPadding
-        text: Qt.formatDate(clock.date, "dddd, d MMMM")
-        color: Colors.m3onSurface
-        font.family: Theme.font.sans
-        font.pixelSize: Theme.font.title
-        font.weight: Font.DemiBold
-        elide: Text.ElideRight
-        Accessible.role: Accessible.Heading
-        Accessible.name: text
-    }
-
-    // The weather where you are.
-    WeatherRow {
+    // The date and the weather (the month is a desktop widget of its own: desktop/MonthWidget.qml).
+    TodayHeader {
         width: parent.width - root.leftPadding - root.rightPadding
     }
 

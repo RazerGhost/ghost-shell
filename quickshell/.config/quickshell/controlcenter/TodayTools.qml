@@ -3,8 +3,9 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// The today menu's note and timer (services/Planner.qml, services/Countdown.qml): a button for
-// each, which opens its part below (one at a time). The to-do list is a desktop widget.
+// The today menu's note and timer (services/Planner.qml, services/Countdown.qml): a tile for
+// each showing what it holds, which opens its part below (one at a time). The to-do list is a
+// desktop widget; the note is one too (desktop/NoteWidget.qml).
 Column {
     id: root
 
@@ -17,20 +18,29 @@ Column {
         open = open === tool ? "" : tool;
     }
 
+    // The note and the timer as tiles that show what they hold (the note's first line, the time
+    // left); a click unfolds the one below (again folds it).
     Row {
-        spacing: Theme.spacing.xs
+        width: parent.width
+        spacing: Theme.spacing.s
 
-        TextButton {
-            text: "Note"
-            filled: root.open === "note"
+        Tile {
+            width: (parent.width - parent.spacing) / 2
+            icon: "edit_note"
+            title: "Note"
+            subtitle: Planner.note.trim() === "" ? "Write something down" : Planner.note.trim().split("\n")[0]
+            active: root.open === "note"
             Accessible.checkable: true
             Accessible.checked: root.open === "note"
             onClicked: root.toggle("note")
         }
 
-        TextButton {
-            text: Countdown.active ? "Timer · " + Countdown.label : "Timer"
-            filled: root.open === "timer"
+        Tile {
+            width: (parent.width - parent.spacing) / 2
+            icon: "timer"
+            title: "Timer"
+            subtitle: Countdown.active ? Countdown.label + (Countdown.paused ? " · paused" : " left") : "Not running"
+            active: Countdown.active || root.open === "timer"
             Accessible.checkable: true
             Accessible.checked: root.open === "timer"
             onClicked: root.toggle("timer")
