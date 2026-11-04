@@ -33,8 +33,14 @@ hl.bind(mainMod .. " + SHIFT + Z", app("editor", "zeditor"), { description = "Ap
 hl.bind(mainMod .. " + I",       hl.dsp.exec_cmd("qs ipc call settings open"), { description = "Apps: Settings" })
 
 -- Island menus
-hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("qs ipc call island toggle settings"), { description = "Menus: Quick settings" })
-hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("qs ipc call island toggle today"), { description = "Menus: Calendar and notifications" })
+-- Windows 11's keys (user's choice, 2026-11-04): Super+A quick settings, Super+N notifications
+-- and the calendar (it was the other way round, with Super+C for the calendar).
+hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("qs ipc call island toggle settings"), { description = "Menus: Quick settings" })
+hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("qs ipc call island toggle today"), { description = "Menus: Notifications and calendar" })
+hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("qs ipc call wallpaper picker"), { description = "Menus: Wallpapers" })
+hl.bind(mainMod .. " + SHIFT + F", hl.dsp.exec_cmd("qs ipc call focus toggle"), { description = "Menus: Focus mode (a timer, no pop-ups)" })
+-- Like Windows' Ctrl+Shift+Esc: the task manager is quick settings' System page (End task).
+hl.bind("CTRL + SHIFT + Escape", hl.dsp.exec_cmd("qs ipc call island page system"), { description = "Menus: System and apps (task manager)" })
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("qs ipc call island toggle clipboard"), { description = "Menus: Clipboard history" })
 hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("qs ipc call island toggle emoji"), { description = "Menus: Emoji" })
 hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("qs ipc call customize menu"), { description = "Menus: Customize (desktop, dock and island, windows, quick settings)" })
@@ -46,14 +52,18 @@ hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("qs ipc call lock lock || " .. fallba
 hl.bind(mainMod .. " + SHIFT + L", hl.dsp.exec_cmd(fallbackLock), { description = "Session: Lock (fallback lock screen)" })
 -- Power menu in the island: lock, suspend, log out, restart, shut down.
 hl.bind("CTRL + ALT + Delete", hl.dsp.exec_cmd("qs ipc call island toggle power"), { description = "Session: Power menu" })
+hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("qs ipc call island toggle power"), { description = "Session: Power menu" })
 
 -- Windows
 hl.bind(mainMod .. " + W", hl.dsp.window.close(), { description = "Windows: Close window" })
 hl.bind("ALT + F4",        hl.dsp.window.close(), { description = "Windows: Close window" })
-hl.bind(mainMod .. " + up",   hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }), { description = "Windows: Maximize" })
+-- Super+Up maximizes; on a window snapped to a half it goes to that half's top quarter, and from a
+-- bottom quarter back to the half (Windows 11; services/SnapLayout.js nextSpot). Without the shell,
+-- plain maximize.
+hl.bind(mainMod .. " + up", hl.dsp.exec_cmd("qs ipc call snap up || hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = \"maximized\", action = \"toggle\" })'"), { description = "Windows: Maximize (snapped: top quarter)" })
 -- Super+Down minimizes (Hyprland has no minimize, so the window goes to a hidden special
 -- workspace; the overview lists them, see quickshell's services/Windows.qml).
-hl.bind(mainMod .. " + down", hl.dsp.exec_cmd("qs ipc call snap down"), { description = "Windows: Minimize" })
+hl.bind(mainMod .. " + down", hl.dsp.exec_cmd("qs ipc call snap down"), { description = "Windows: Minimize (snapped: bottom quarter)" })
 -- Window menu on the window (like Windows' Alt+Space): minimize, maximize, fullscreen, close,
 -- the snap layouts and moving it to another workspace. Super+Z opens the same menu.
 hl.bind("ALT + space", hl.dsp.exec_cmd("qs ipc call snap picker"), { description = "Windows: Window menu and snap layouts" })
@@ -91,8 +101,10 @@ hl.bind("ALT + SHIFT + Tab", hl.dsp.exec_cmd("qs ipc call switcher previous"), {
 hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("qs ipc call overview toggle"), { description = "Windows: Overview" })
 
 -- Focus with arrow keys
-hl.bind(mainMod .. " + CTRL + left",  hl.dsp.focus({ direction = "left" }), { description = "Windows: Move focus" })
-hl.bind(mainMod .. " + CTRL + right", hl.dsp.focus({ direction = "right" }), { description = "Windows: Move focus" })
+-- Super+Ctrl+Left/Right switch workspaces like Windows' desktops (user's choice, 2026-11-04; they
+-- moved the focus); Up/Down still move the focus.
+hl.bind(mainMod .. " + CTRL + left",  hl.dsp.focus({ workspace = "e-1" }), { description = "Workspaces: Previous or next workspace" })
+hl.bind(mainMod .. " + CTRL + right", hl.dsp.focus({ workspace = "e+1" }), { description = "Workspaces: Previous or next workspace" })
 hl.bind(mainMod .. " + CTRL + up",    hl.dsp.focus({ direction = "up" }), { description = "Windows: Move focus" })
 hl.bind(mainMod .. " + CTRL + down",  hl.dsp.focus({ direction = "down" }), { description = "Windows: Move focus" })
 

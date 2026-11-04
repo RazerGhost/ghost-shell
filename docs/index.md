@@ -281,7 +281,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 
 | Target | Functions |
 |---|---|
-| `island` | `toggle <settings\|today\|media\|clipboard\|emoji\|power\|tray>`, `close`, `editQuickSettings`, `state` (what decides whether a pop-up shows, as JSON) |
+| `island` | `toggle <settings\|today\|media\|clipboard\|emoji\|power\|tray>`, `close`, `page <system\|wifi\|...>` (quick settings on a page), `editQuickSettings`, `state` (what decides whether a pop-up shows, as JSON) |
 | `launcher` | `toggle` |
 | `apps` | `open <kind>`, `terminal <command>` |
 | `settings` | `open`, `page <id>` |
@@ -291,7 +291,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 | `lock` | `lock`, `isLocked`, `preview` |
 | `switcher` | `next`, `previous` |
 | `overview` | `toggle`, `open`, `close` |
-| `snap` | `active <layout>`, `down`, `picker` |
+| `snap` | `active <layout>`, `up`, `down` (a snapped half's quarters, else maximize / minimize), `picker` |
 | `screenshot` | `region`, `screen`, `record` |
 | `recorder` | `stop`, `recording` |
 | `brightness` | `refresh` |

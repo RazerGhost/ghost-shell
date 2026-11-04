@@ -6,6 +6,7 @@ import Quickshell.Wayland
 import qs.services
 import qs.theme
 import qs.widgets
+import "../services/SnapLayout.js" as SnapLayout
 
 // The window menu (Alt+Space or Super+Z), a card at the top of the focused window, so it's clear
 // which window it's about: its title bar actions and workspace (WindowActions.qml), and the snap
@@ -43,10 +44,26 @@ Scope {
             Snap.snap(Windows.active, layout);
         }
 
-        // qs ipc call snap down (Super+Down): minimize the focused window.
+        // qs ipc call snap up (Super+Up): a window snapped to a half goes to its top quarter, a
+        // bottom quarter back to its half (Windows 11); anything else maximizes.
+        function up(): void {
+            const window = Windows.active;
+            const next = SnapLayout.nextSpot(Snap.spotOf(window), "up");
+            if (next)
+                Snap.snap(window, next);
+            else if (window)
+                Windows.run(window, "fullscreen", `mode = "maximized", action = "toggle"`);
+        }
+
+        // qs ipc call snap down (Super+Down): a half to its bottom quarter, a top quarter back to
+        // its half; anything else minimizes.
         function down(): void {
-            if (Windows.active)
-                Windows.minimize(Windows.active);
+            const window = Windows.active;
+            const next = SnapLayout.nextSpot(Snap.spotOf(window), "down");
+            if (next)
+                Snap.snap(window, next);
+            else if (window)
+                Windows.minimize(window);
         }
 
         // qs ipc call snap picker: show or hide the window menu for the focused window.

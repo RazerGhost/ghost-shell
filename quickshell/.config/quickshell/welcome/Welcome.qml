@@ -26,7 +26,7 @@ Scope {
           keys: [["Super"], ["Super", "Space"]] },
         { icon: "page_header", title: "The island",
           text: "The shape at the top of the screen: the time, and what needs you. Notifications pop out of it. Click it for today: the weather, your next events, a note, a timer and your notifications; right-click it for quick settings: Wi-Fi, sound, focus mode (a timer that keeps pop-ups away), game mode and more. Switching workspaces shows them in it for a moment.",
-          keys: [["Super", "C"], ["Super", "N"]] },
+          keys: [["Super", "N"], ["Super", "A"]] },
         { icon: "widgets", title: "Your desktop",
           text: "Widgets live on the wallpaper: the time, weather, a to-do list, a note, your clipboard and more (add them with Super + U). Super + D shows the desktop and lets you use them with the keyboard. When the screen locks, it's this desktop, locked: just start typing your password.",
           keys: [["Super", "D"], ["Super", "U"]] },

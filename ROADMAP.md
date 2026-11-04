@@ -1924,6 +1924,18 @@ Escape then, Super+D again or a click elsewhere goes back to your workspace. Key
 the foot of the screen. Not while locked, in focus mode or in the desktop editor. Checked with
 wtype: moving, the ring, typing into the note and back, Escape home.
 
+### Keybinds reworked (2026-11-04)
+User's request: list them all and see what to rework; user's picks, following Windows 11:
+Super+A quick settings and Super+N notifications and the calendar (were Super+N and Super+C);
+Super+Ctrl+Left/Right the previous or next workspace like Windows' desktops (they moved the
+focus; Up/Down still do); Super+Up/Down on a window snapped to a half make it that half's top or
+bottom quarter and back (`SnapLayout.nextSpot`, tested; `Snap.spots` remembers each window's
+spot), else maximize or minimize as before; new: Super+Shift+W the wallpaper strip (it had no
+key), Super+Shift+F focus mode, Super+X the power menu (besides Ctrl+Alt+Delete), Ctrl+Shift+Esc
+quick settings' System page with End task (`qs ipc call island page <name>`, new). The welcome tour
+and the island's tooltip name the new keys. Checked: every bind loads, none twice; the quarters
+on a test window (left, top-left, left, bottom-left); the System page opens.
+
 ### Terminal greeting (2026-11-04)
 User's question about the system summary a new terminal showed: CachyOS's fish config runs
 fastfetch (its defaults: the big CachyOS logo, every line). User's pick: fastfetch with the Ghost
@@ -2188,7 +2200,10 @@ windows).
   Super+Enter terminal, Super+E files, Super+B browser, Super+W / Alt+F4 close, Super+Up maximize,
   Super+Down minimize, Alt+Space or Super+Z window menu (with snap layouts), Alt+Tab switcher,
   Super+Tab overview, Super+Left/Right snap, Super+Alt+arrows resize, Super+Shift+arrows swap,
-  Super+Shift+Space float or tile, Super+N quick settings, Super+C calendar,
+  Super+Shift+Space float or tile, Super+A quick settings, Super+N notifications and calendar
+  (Windows 11's keys since 2026-11-04; they were Super+N and Super+C), Super+X power menu,
+  Ctrl+Shift+Esc the System page (task manager), Super+Shift+W wallpapers, Super+Shift+F focus
+  mode, Super+Ctrl+Left/Right workspaces, Super+Up/Down on a snapped half its quarters,
   Super+Shift+S screenshot (Print: whole screen), Super+V clipboard, Super+. emoji, Super+U
   customize, Super+L lock
   (Super+Shift+L hyprlock fallback), Ctrl+Alt+Delete power menu, Super+Ctrl+arrows focus, Super+I

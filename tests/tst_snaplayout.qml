@@ -22,4 +22,14 @@ TestCase {
         }
         verify(threw);
     }
+
+    function test_nextSpot() {
+        compare(SnapLayout.nextSpot("left", "up"), "top-left");
+        compare(SnapLayout.nextSpot("right", "down"), "bottom-right");
+        compare(SnapLayout.nextSpot("top-left", "down"), "left");
+        compare(SnapLayout.nextSpot("bottom-right", "up"), "right");
+        compare(SnapLayout.nextSpot("top-left", "up"), null); // a top quarter: Up maximizes
+        compare(SnapLayout.nextSpot("", "up"), null);
+        compare(SnapLayout.nextSpot("left-third", "down"), null);
+    }
 }

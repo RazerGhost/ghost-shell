@@ -19,6 +19,16 @@ const layouts = {
     "right-two-thirds": { cols: 3, rows: 1, col: 1, row: 0, span: 2 },
 };
 
+// Super+Up / Super+Down on a snapped window, like Windows 11: a half goes to its top or bottom
+// quarter, a quarter back to its half. null: not from this spot (Up maximizes, Down minimizes).
+function nextSpot(spot, direction) {
+    const steps = {
+        up:   { left: "top-left", right: "top-right", "bottom-left": "left", "bottom-right": "right" },
+        down: { left: "bottom-left", right: "bottom-right", "top-left": "left", "top-right": "right" }
+    };
+    return steps[direction]?.[spot] ?? null;
+}
+
 function layout(name) {
     const l = layouts[name];
     if (!l)

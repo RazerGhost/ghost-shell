@@ -210,7 +210,7 @@ PanelWindow {
 
             // The time first, so a screen reader says what the island shows.
             label: root.showMedia ? "Media" : clock.text + ", calendar"
-            secondaryLabel: "Quick settings (Super+N)"
+            secondaryLabel: "Quick settings (Super+A)"
             details: alerts.summary
             active: root.open
             onActivated: root.island.toggle(menu, root.modelData.name)
@@ -420,11 +420,24 @@ PanelWindow {
                             root.island.quickEdit = false;
                         }
                     }
-                    Component.onCompleted: takeEdit()
+                    // Asked for one of its pages (`island page`): the same, for the page.
+                    function takePage(): void {
+                        if (root.island.quickPage !== "") {
+                            page = root.island.quickPage;
+                            root.island.quickPage = "";
+                        }
+                    }
+                    Component.onCompleted: {
+                        takeEdit();
+                        takePage();
+                    }
                     Connections {
                         target: root.island
                         function onQuickEditChanged(): void {
                             takeEdit();
+                        }
+                        function onQuickPageChanged(): void {
+                            takePage();
                         }
                     }
                 }

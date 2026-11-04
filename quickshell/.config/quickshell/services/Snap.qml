@@ -24,11 +24,19 @@ Singleton {
     // Puts `window` in `spot` (left, right, top-left, left-third, ... see hypr/tiling.lua). A
     // floating window starts tiling. The layout message acts on the focused workspace, so the
     // window is focused first.
+    // The spot each window was last snapped to, by address (Super+Up / Down step from it).
+    property var spots: ({})
+
+    function spotOf(window: HyprlandToplevel): string {
+        return window ? (spots[window.address] ?? "") : "";
+    }
+
     function snap(window: HyprlandToplevel, spot: string): void {
         if (!window) {
             console.warn("Snap: no window to snap");
             return;
         }
+        spots = Object.assign({}, spots, { [window.address]: spot });
         Windows.run(window, "fullscreen", `mode = "maximized", action = "unset"`);
         Windows.run(window, "fullscreen", `mode = "fullscreen", action = "unset"`);
         Windows.run(window, "float", `action = "disable"`);
@@ -39,11 +47,21 @@ Singleton {
 
     // Back to arranging the window's workspace by the number of windows.
     function arrangeAutomatically(window: HyprlandToplevel): void {
+        forget(window);
         Windows.focus(window);
         Hyprland.dispatch(`hl.dsp.layout("auto")`);
     }
 
+    function forget(window: HyprlandToplevel): void {
+        if (window && spots[window.address] !== undefined) {
+            const next = Object.assign({}, spots);
+            delete next[window.address];
+            spots = next;
+        }
+    }
+
     function toggleFloating(window: HyprlandToplevel): void {
+        forget(window);
         Windows.run(window, "float", `action = "toggle"`);
     }
 

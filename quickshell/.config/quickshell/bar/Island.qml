@@ -33,6 +33,8 @@ Scope {
     // Quick settings opens in its edit mode when it's next shown, or at once if it's open
     // (editQuickSettings below, for the customize menu).
     property bool quickEdit: false
+    // Quick settings is to open on one of its pages ("system", "apps", ...; `island page`).
+    property string quickPage: ""
 
     // After the shell reloads (a file in its folder changed), the island says so instead of
     // Quickshell's own pop-up: briefly when it worked, longer with the error when it didn't (the
@@ -134,6 +136,14 @@ Scope {
                 gameMode: GameMode.on,
                 fullscreen: Notifications.fullscreenNow
             });
+        }
+
+        // Quick settings on one of its pages: qs ipc call island page system (Ctrl+Shift+Esc, the
+        // task manager) or apps (background apps).
+        function page(name: string): void {
+            root.screenName = Hyprland.focusedMonitor?.name ?? "";
+            root.panel = "settings";
+            root.quickPage = name;
         }
 
         // Quick settings in its edit mode (the customize menu's Quick settings).

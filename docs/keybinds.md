@@ -20,8 +20,11 @@ Generated from Hyprland's binds with `ghost keybinds`, by category; every bind i
 
 | Keys | What it does |
 |---|---|
-| `Super` + `N` | Quick settings |
-| `Super` + `C` | Calendar and notifications |
+| `Super` + `A` | Quick settings |
+| `Super` + `N` | Notifications and calendar |
+| `Super` + `Shift` + `W` | Wallpapers |
+| `Super` + `Shift` + `F` | Focus mode (a timer, no pop-ups) |
+| `Ctrl` + `Shift` + `Esc` | System and apps (task manager) |
 | `Super` + `V` | Clipboard history |
 | `Super` + `.` | Emoji |
 | `Super` + `U` | Customize (desktop, dock and island, windows, quick settings) |
@@ -33,15 +36,15 @@ Generated from Hyprland's binds with `ghost keybinds`, by category; every bind i
 |---|---|
 | `Super` + `L` | Lock |
 | `Super` + `Shift` + `L` | Lock (fallback lock screen) |
-| `Ctrl` + `Alt` + `Delete` | Power menu |
+| `Ctrl` + `Alt` + `Delete` or `Super` + `X` | Power menu |
 
 ## Windows
 
 | Keys | What it does |
 |---|---|
 | `Super` + `W` or `Alt` + `F4` | Close window |
-| `Super` + `↑` | Maximize |
-| `Super` + `↓` | Minimize |
+| `Super` + `↑` | Maximize (snapped: top quarter) |
+| `Super` + `↓` | Minimize (snapped: bottom quarter) |
 | `Alt` + `Space` or `Super` + `Z` | Window menu and snap layouts |
 | `Super` + `F` | Fullscreen |
 | `Super` + `←` | Snap left |
@@ -53,13 +56,24 @@ Generated from Hyprland's binds with `ghost keybinds`, by category; every bind i
 | `Super` + `Shift` + `G` | Take the window out of its tab group |
 | `Alt` + ``` | Next tab |
 | `Alt` + `Shift` + ``` | Previous tab |
-| `Super` + `Ctrl` + `Shift` + `↑` or `Super` + `Ctrl` + `Shift` + `←` or `Super` + `Ctrl` + `Shift` + `↓` or `Super` + `Ctrl` + `Shift` + `→` | Move into the tab group next to it |
+| `Super` + `Ctrl` + `Shift` + `←` or `Super` + `Ctrl` + `Shift` + `↓` or `Super` + `Ctrl` + `Shift` + `→` or `Super` + `Ctrl` + `Shift` + `↑` | Move into the tab group next to it |
 | `Alt` + `Tab` | Switch windows |
 | `Alt` + `Shift` + `Tab` | Switch windows, backwards |
 | `Super` + `Tab` | Overview |
-| `Super` + `Ctrl` + `←` or `Super` + `Ctrl` + `→` or `Super` + `Ctrl` + `↑` or `Super` + `Ctrl` + `↓` | Move focus |
+| `Super` + `Ctrl` + `↑` or `Super` + `Ctrl` + `↓` | Move focus |
 | `Super` + `Left drag` | Move window |
 | `Super` + `Right drag` | Resize window |
+
+## Workspaces
+
+| Keys | What it does |
+|---|---|
+| `Super` + `Ctrl` + `←` or `Super` + `Ctrl` + `→` | Previous or next workspace |
+| `Super` + `1–0` | Go to workspace 1-10 |
+| `Super` + `Shift` + `1–0` | Move window to workspace 1-10 |
+| `Super` + ``` | Show or hide the scratchpad (a terminal when empty) |
+| `Super` + `Shift` + ``` | Move window to or from the scratchpad |
+| `Super` + `Scroll down` or `Super` + `Scroll up` | Next or previous workspace |
 
 ## Capture
 
@@ -68,16 +82,6 @@ Generated from Hyprland's binds with `ghost keybinds`, by category; every bind i
 | `Super` + `Shift` + `S` | Screenshot (region, window or screen) |
 | `Super` + `Shift` + `R` | Record the screen (again: stop) |
 | `Print Screen` | Screenshot of the screen |
-
-## Workspaces
-
-| Keys | What it does |
-|---|---|
-| `Super` + `1–0` | Go to workspace 1-10 |
-| `Super` + `Shift` + `1–0` | Move window to workspace 1-10 |
-| `Super` + ``` | Show or hide the scratchpad (a terminal when empty) |
-| `Super` + `Shift` + ``` | Move window to or from the scratchpad |
-| `Super` + `Scroll down` or `Super` + `Scroll up` | Next or previous workspace |
 
 ## Zoom
 
