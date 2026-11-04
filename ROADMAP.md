@@ -661,19 +661,22 @@ Since 2026-11-04 the to-do list is a desktop widget (see "Desktop widgets polish
   to keep up to date, and it's fast enough for the home folder (~10 ms). The last results stay
   up while a new search runs (emptying them on every key made the list flicker).
 
-### Calendar events (built 2026-10-29; waiting on the user's share link to test)
-- User's choice: no Google; Proton Calendar through its read-only share link ("Share with
-  anyone"; Proton has no CalDAV). The `calendar` module (vdirsyncer and khal, `extra`) and
-  `ghost calendar add [name]`, which takes the link from the clipboard (then clears it there and
-  from the clipboard history; 2026-11-04, user's find: pasting into the hidden prompt looked like
-  nothing happened) or asks for it without echoing it, and keeps it only in
-  `~/.config/ghost/calendars` and vdirsyncer's config (both mode 600, outside the repo), then
-  writes vdirsyncer's config (http -> filesystem, `a wins`) and khal's (fixed ISO formats).
-  `services/Agenda.qml` runs `vdirsyncer sync` at start and every 15 minutes once khal's config
-  exists, and asks khal for the shown month and the coming week. The today menu lists the next
-  four events under the weather and dots the days with events in the month calendar
-  (`CalendarEvents.js`, tested). Read-only: events are made in Proton's app or site. khal gives
-  an all-day event's last day as its end date (its `AllDayEvent.end` is DTEND minus a day).
+### Calendar events (built 2026-10-29; a Proton calendar synced on the laptop 2026-11-04)
+- Any calendar with an iCal (.ics) link, read-only: Google Calendar's "Secret address in iCal
+  format" (user's choice 2026-11-04, after first choosing Proton and no Google), a Proton
+  Calendar share link ("Share with anyone"; Proton has no CalDAV). The `calendar` module
+  (vdirsyncer and khal, `extra`) and `ghost calendar add [name]`, which takes the link from the
+  clipboard (then clears it there and from the clipboard history; user's find: pasting into the
+  hidden prompt looked like nothing happened) or asks for it without echoing it, and keeps it
+  only in `~/.config/ghost/calendars` and vdirsyncer's config (both mode 600, outside the repo),
+  then writes vdirsyncer's config (http -> filesystem, `a wins`), syncs, and only then writes
+  khal's (fixed ISO formats): the shell starts on khal's config, and its own first sync raced
+  the setup's and failed. `services/Agenda.qml` runs `vdirsyncer sync` at start, every 15
+  minutes once khal's config exists, and when that config changes, and asks khal for the shown
+  month and the coming week. The today menu lists the next events under the date, the month and
+  calendar widgets show them (`CalendarEvents.js`, tested). Events are made in the calendar's own
+  app or site. khal gives an all-day event's last day as its end date (its `AllDayEvent.end` is
+  DTEND minus a day). A Proton link that's been turned off answers 422 "Link not found".
 
 ### Optimization review (done, verified on the laptop 2026-10-29)
 Four read-only reviews (code against ENGINEERING_PRINCIPLES.md, packages and system, the running

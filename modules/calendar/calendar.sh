@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Subscribed calendars for the today menu (read-only): a Proton Calendar share link ("Share with
-# anyone"), or any .ics address. vdirsyncer downloads each into ~/.local/share/calendars/<name>/
+# Subscribed calendars for the today menu (read-only): Google Calendar's "Secret address in
+# iCal format" (Settings -> the calendar -> Integrate calendar), a Proton Calendar share link
+# ("Share with anyone"), or any .ics address. vdirsyncer downloads each into ~/.local/share/calendars/<name>/
 # (the shell runs `vdirsyncer sync` every 15 minutes) and khal reads them. `ghost calendar` runs
 # this.
 #
@@ -11,7 +12,7 @@
 #   ghost calendar list
 #   ghost calendar sync         download them now
 #
-# The links are secrets (a Proton link carries the key to the events), so they're kept in
+# The links are secrets (anyone with one can read the events), so they're kept in
 # ~/.config/ghost/calendars and vdirsyncer's config, both readable only by you, never in the
 # repo.
 set -euo pipefail
@@ -32,6 +33,11 @@ names() {
 
 # vdirsyncer's and khal's configs from the list (both written whole: they're ours).
 cmd_configure() {
+    configure_vdirsyncer
+    configure_khal
+}
+
+configure_vdirsyncer() {
     local name link
     [[ -s $list ]] || return 0
     command -v vdirsyncer >/dev/null && command -v khal >/dev/null \
@@ -64,6 +70,14 @@ EOT
             done <"$list"
         } >"$HOME/.config/vdirsyncer/config"
     )
+}
+
+# The shell starts using the calendars when khal's config lists them (services/Agenda.qml), so
+# a new calendar's goes in after its first sync: before, the shell's own sync raced discover's
+# and failed ("Couldn't update the calendar" until the next one, 15 minutes later).
+configure_khal() {
+    local name
+    [[ -s $list ]] || return 0
     {
         echo "# Written by ghost calendar (modules/calendar/calendar.sh); don't edit: it's overwritten."
         echo "[calendars]"
@@ -113,13 +127,14 @@ cmd_add() {
     mkdir -p "$(dirname "$list")" "$data/$name"
     (umask 077; printf '%s\t%s\n' "$name" "$link" >>"$list")
     chmod 600 "$list"
-    # Out of the clipboard and its history: the link is the key to the events.
+    # Out of the clipboard and its history: anyone with the link can read the events.
     if [[ $copied == "$link" ]]; then
         wl-copy --clear
         cliphist delete-query "$link" 2>/dev/null || true
     fi
-    cmd_configure
+    configure_vdirsyncer
     cmd_sync
+    configure_khal
     echo "Added $name: its events show in the today menu and the calendar widgets."
 }
 

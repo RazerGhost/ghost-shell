@@ -72,7 +72,7 @@ After the first install, `ghost` (in `~/.local/bin`) does everything:
 | `ghost update` | pull the repo, then install again (new packages, new setup steps) |
 | `ghost install [module...]` | packages and setup for some or all modules |
 | `ghost theme <wallpaper \| "#rrggbb">` | a new wallpaper and the colors from it |
-| `ghost calendar add [name]` | subscribe to a calendar (it asks for the link: a Proton Calendar share link or any .ics address; `remove <name>`, `list`, `sync`) |
+| `ghost calendar add [name]` | subscribe to a calendar (copy the link first: Google Calendar's secret iCal address, a Proton share link or any .ics address; `remove <name>`, `list`, `sync`) |
 | `ghost webapp add <name> <url> [icon]` | a site in its own window, in the launcher and the dock (`remove <name>`, `list`) |
 | `ghost doctor` | check that everything is set up; each problem says what fixes it |
 | `ghost modules` | list the modules and which ones this machine uses |
@@ -96,7 +96,7 @@ its setup (`setup.sh`).
 | `capture` | screen recording, color picker, text and QR codes from the screen |
 | `phone` | KDE Connect |
 | `proton` | Proton Mail, Pass and VPN |
-| `calendar` | calendar events in the today menu, from a Proton Calendar share link (`ghost calendar add`) |
+| `calendar` | calendar events in the today menu, from a calendar's iCal link (`ghost calendar add`) |
 | `llm` | local coding LLM on the NVIDIA GPU: Ollama, OpenCode, Aider (setup and decisions in the ghost-llm repo) |
 | `wave3` | the Elgato Wave:3 microphone with openxlr and a voice chain ([its README](modules/wave3/README.md)) |
 

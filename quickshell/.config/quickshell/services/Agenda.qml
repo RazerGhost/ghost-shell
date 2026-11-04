@@ -68,6 +68,12 @@ Singleton {
         watchChanges: true
         printErrors: false // missing until a calendar is added
         onFileChanged: reload()
+        // A calendar added or removed while one was already there: sync (which clears an old
+        // error) and list again.
+        onLoaded: {
+            if (root.enabled)
+                sync.running = true;
+        }
     }
 
     Timer {

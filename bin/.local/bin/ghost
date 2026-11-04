@@ -10,7 +10,7 @@
 #   ghost webapp add <name> <url> [icon] | remove <name> | list
 #                     a site in its own window, in the launcher and the dock (modules/apps/webapp.sh)
 #   ghost calendar add [name] | remove <name> | list | sync
-#                     a subscribed calendar (a Proton Calendar share link) in the today menu
+#                     a subscribed calendar (Google's secret iCal address, any .ics link) in the today menu
 #                     (modules/calendar/calendar.sh)
 #   ghost wallpapers get [--style sky|lofi|painterly|minimal] [search words] [--count N] [--general]
 #                     art from wallhaven.cc (anime by default, safe for work only) into your
@@ -53,7 +53,7 @@ declare -A about=(
     [capture]="screen recording, color picker, text and QR codes from the screen"
     [phone]="KDE Connect: your phone's notifications, clipboard and files"
     [proton]="Proton Mail, Pass and VPN"
-    [calendar]="calendar events in the today menu, from a Proton Calendar share link"
+    [calendar]="calendar events in the today menu, from a calendar's iCal link (Google, Proton)"
     [llm]="local coding LLM on the NVIDIA GPU: Ollama, OpenCode, Aider (only where it has the GPU)"
     [wave3]="the Elgato Wave:3 with openxlr and a voice chain (only where it's plugged in)"
 )

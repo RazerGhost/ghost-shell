@@ -313,7 +313,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 | capture | Recording, color picker, OCR and QR |
 | phone | KDE Connect (opens its ufw ports) |
 | proton | Proton Mail, Pass, VPN |
-| calendar | Calendar events from a share link |
+| calendar | Calendar events from an iCal link (Google, Proton) |
 | llm (opt-in) | Ollama, OpenCode, Aider on the NVIDIA GPU |
 | wave3 (opt-in) | Elgato Wave:3 with openxlr and a voice chain |
 
