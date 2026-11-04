@@ -1,5 +1,5 @@
 # The desktop itself: Hyprland, the Quickshell shell and everything it runs or reads, fonts
-# and themes, the login screen, and the tools the setup uses.
+# and themes, logging in at boot, and the tools the setup uses.
 # pacman packages; # lines and blank lines are skipped.
 
 # Hyprland and its helpers
@@ -57,9 +57,8 @@ breeze-icons
 # The keyring apps keep logins in (Chromium web apps, Vesktop, Proton Pass)
 gnome-keyring
 
-# Login screen (greetd; tuigreet is the fallback)
+# Logs you in at boot and after a logout, straight into the locked session (system/etc/greetd)
 greetd
-greetd-tuigreet
 
 # The login shell (the fish/ Stow package)
 fish

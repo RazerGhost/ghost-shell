@@ -30,11 +30,13 @@ Scope {
             pam.start();
     }
 
-    // Logged in automatically at boot (greetd's initial_session sets GHOST_AUTOLOGIN): lock
+    // Logged in automatically at boot and after a logout (greetd sets GHOST_AUTOLOGIN): lock
     // first, before anything else can be used. Once Hyprland confirms the lock (`secure`), a mark
     // in $XDG_RUNTIME_DIR says so and a reload loads the keybinds hyprland.lua held back. The mark
-    // also keeps a restart of the shell (after a crash) from locking again.
-    readonly property string lockedOnce: Quickshell.env("XDG_RUNTIME_DIR") + "/ghost-autologin-locked"
+    // also keeps a restart of the shell (after a crash) from locking again. It's per Hyprland
+    // instance, like hyprland.lua's: the next session after a logout must not find it.
+    readonly property string lockedOnce: Quickshell.env("XDG_RUNTIME_DIR") + "/ghost-autologin-locked-"
+        + (Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE") || "default")
     property bool lockingFirst: false
 
     Component.onCompleted: {

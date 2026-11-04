@@ -31,7 +31,6 @@ ShellRoot {
     Launcher {}
     Lock {}
     Customize {}
-    LoginScreenSync {}
     PolkitPrompt {}
     Welcome {}
     Screenshot {}

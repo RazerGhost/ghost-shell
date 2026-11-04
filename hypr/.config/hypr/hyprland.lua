@@ -11,12 +11,14 @@ require("layout") -- before look.lua, which picks it
 require("look")
 require("input")
 
--- Logged in automatically at boot (greetd's initial_session sets GHOST_AUTOLOGIN), the session
--- starts unlocked: the keybinds wait until the shell's lock screen is up (lock/Lock.qml marks
--- that in $XDG_RUNTIME_DIR and reloads, which loads them), so nobody can open a terminal in
--- the second before. If the shell hasn't locked within 15 s (it failed to start), hyprlock
--- locks instead. After a logout the login screen runs the session, without GHOST_AUTOLOGIN.
-local locked_once = (os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/ghost-autologin-locked"
+-- Logged in automatically at boot and after a logout (greetd sets GHOST_AUTOLOGIN), the
+-- session starts unlocked: the keybinds wait until the shell's lock screen is up (lock/Lock.qml
+-- marks that in $XDG_RUNTIME_DIR and reloads, which loads them), so nobody can open a terminal
+-- in the second before. If the shell hasn't locked within 15 s (it failed to start), hyprlock
+-- locks instead. The mark is per Hyprland instance: the runtime folder outlives a logout for a
+-- few seconds, and the next session must not find the last one's mark.
+local locked_once = (os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/ghost-autologin-locked-"
+    .. (os.getenv("HYPRLAND_INSTANCE_SIGNATURE") or "default")
 local marker = io.open(locked_once)
 if marker then
     marker:close()

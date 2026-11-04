@@ -54,7 +54,7 @@ if ! grep -qxF "$no_splash" /etc/default/limine; then
     rebuild_boot=true
 fi
 
-# A quiet console: tty1 shows between the login screen and the desktop, and at logout and
+# A quiet console: tty1 shows before the desktop, and at logout and
 # shutdown, so no kernel or boot messages below errors, no systemd status unless something is
 # slow or fails, and no blinking text cursor (a recovery login on Ctrl+Alt+F2 has none either;
 # `setterm --cursor on` brings it back there).
@@ -115,8 +115,9 @@ if grep -qs '^ENABLE_ENROLL_LIMINE_CONFIG=yes' /etc/default/limine /etc/limine-e
     sudo limine-enroll-config
 fi
 
-step "Login manager (greetd)"
-# Your user for the automatic login at boot (config.toml's initial_session).
+step "Logging in (greetd)"
+# Your user for the automatic login at boot and after a logout (config.toml's default_session):
+# the session locks at once, there's no separate login screen.
 sed "s/@USER@/$USER/" system/etc/greetd/config.toml >"${TMPDIR:-/tmp}/ghost-greetd.toml"
 sudo install -Dm644 "${TMPDIR:-/tmp}/ghost-greetd.toml" /etc/greetd/config.toml
 rm -f "${TMPDIR:-/tmp}/ghost-greetd.toml"
@@ -126,6 +127,9 @@ sudo systemctl daemon-reload
 # Enable only, don't start: starting it now would take over tty1 under the running session.
 # It takes effect on the next boot.
 sudo systemctl enable greetd.service
+# The login screen that ran after a logout until 2026-11-04 (Quickshell as the greeter user):
+# its copy of the shell, its Hyprland config and its home folder.
+sudo rm -rf /etc/greetd/quickshell /etc/greetd/hypr /var/lib/qs-greeter
 
 step "Name lookup: one mDNS service (Avahi)"
 mdns=system/etc/systemd/resolved.conf.d/50-no-mdns.conf

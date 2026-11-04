@@ -7,7 +7,6 @@
 #   ghost update      pull the repo, then install again
 #   ghost theme <wallpaper | "#rrggbb">
 #                     the wallpaper and the colors from it (the same as the shell's picker)
-#   ghost greeter     copy the shell to the login screen (needed after changing the shell's code)
 #   ghost webapp add <name> <url> [icon] | remove <name> | list
 #                     a site in its own window, in the launcher and the dock (modules/apps/webapp.sh)
 #   ghost calendar add [name] | remove <name> | list | sync
@@ -41,8 +40,8 @@ all_modules=(core system snapshots apps dev gaming discord spotify zen haunt cap
 # that's plugged into one machine.
 opt_in=(llm wave3)
 declare -A about=(
-    [core]="Hyprland, the shell, fonts and themes, the login screen, the colors"
-    [system]="this laptop's GPU rule, boot options, greetd and services (sudo)"
+    [core]="Hyprland, the shell, fonts and themes, the colors"
+    [system]="this laptop's GPU rule, boot options, logging in at boot (greetd) and services (sudo)"
     [snapshots]="Btrfs snapshots: the system's at every update, your home hourly (sudo)"
     [apps]="terminal, editor, files, pictures, video, music, browser, web apps"
     [dev]="languages, package managers and Docker"
@@ -214,13 +213,6 @@ cmd_doctor() {
     if [[ -f $HOME/.local/state/quickshell/colors.json ]]; then ok "colors generated"
     else bad "no colors yet (ghost theme <wallpaper>)"; fi
 
-    step "Login screen"
-    if [[ -d /etc/greetd/quickshell ]] && diff -rq --exclude=.qmlls.ini quickshell/.config/quickshell /etc/greetd/quickshell >/dev/null 2>&1; then
-        ok "its copy of the shell is up to date"
-    else
-        bad "its copy of the shell is out of date (ghost greeter)"
-    fi
-
     step "Services"
     if machine | grep -qx system; then
         for unit in greetd.service NetworkManager.service bluetooth.service power-profiles-daemon.service; do
@@ -258,7 +250,6 @@ case ${1:-help} in
     install) shift; cmd_install "$@" ;;
     update) shift; cmd_update "$@" ;;
     theme) shift; cmd_theme "$@" ;;
-    greeter) modules/core/greeter.sh ;;
     webapp) shift; modules/apps/webapp.sh "$@" ;;
     calendar) shift; modules/calendar/calendar.sh "$@" ;;
     looks) shift; modules/core/looks.sh "$@" ;;

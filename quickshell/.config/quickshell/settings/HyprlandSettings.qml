@@ -7,7 +7,7 @@ import "HyprlandConfig.js" as HyprlandConfig
 // Applies the settings that are Hyprland options (keyboard, touchpad, pointer, gaps, borders,
 // corners, animation styles, apps reopening where they were) and game mode's overrides: writes ~/.config/hypr/shell-settings.lua, which hyprland.lua
 // loads last, and reloads Hyprland. Only when the file's content changes, so starting the shell
-// doesn't reload Hyprland. The login screen gets a copy too (greeter/sync.sh).
+// doesn't reload Hyprland.
 Scope {
     id: root
 
@@ -56,11 +56,6 @@ Scope {
         id: writeLater
         interval: 400
         onTriggered: {
-            // The login screen's part, as data (HyprlandConfig.greeterData; greeter/sync.sh
-            // copies it). Written first: the sync runs when shell-settings.lua changes.
-            const forGreeter = HyprlandConfig.greeterData(Settings.values);
-            if (greeterFile.text() !== forGreeter)
-                greeterFile.setText(forGreeter);
             if (file.text() === root.text)
                 return;
             file.setText(root.text);
@@ -81,14 +76,6 @@ Scope {
         id: setCursor
         interval: 400
         onTriggered: Quickshell.execDetached(["hyprctl", "setcursor", ...root.cursor.split(/ (?=\d+$)/)])
-    }
-
-    FileView {
-        id: greeterFile
-        path: Quickshell.env("HOME") + "/.config/hypr/greeter-settings"
-        blockLoading: true
-        blockWrites: true
-        printErrors: false
     }
 
     FileView {

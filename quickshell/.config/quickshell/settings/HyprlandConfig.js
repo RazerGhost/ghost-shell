@@ -169,24 +169,3 @@ function lua(v, gameMode, wallpaperChosen, bell) {
         ""
     ].join("\n");
 }
-
-// What the login screen's Hyprland takes from your settings, as data rather than Lua: it runs
-// as the greeter user, and Lua from your home folder would run there as that user. key=value
-// lines (one monitor= per screen set up in the Display page), checked here and again by the
-// root-owned system/etc/greetd/hypr/hyprland.lua, which reads it (through greeter/sync.sh).
-function greeterData(v) {
-    const speed = Math.max(-1, Math.min(1, number(v.pointerSpeed, 0)));
-    const monitors = Object.entries(v.monitors || {})
-        .filter(([output, setup]) => DisplayModes.lua(output, setup) !== "")
-        .map(([output, setup]) => `monitor=${output} ${setup.mode} ${setup.scale} ${setup.transform} ${setup.vrr}`);
-    return [
-        `kb_layout=${layoutCode(v.keyboardLayout)}`,
-        `sensitivity=${speed}`,
-        `natural_scroll=${v.naturalScroll === true}`,
-        `tap_to_click=${v.tapToClick !== false}`,
-        `cursor_theme=${cursorTheme(v.cursorTheme)}`,
-        `cursor_size=${cursorSize(v.cursorSize)}`,
-        ...monitors,
-        ""
-    ].join("\n");
-}

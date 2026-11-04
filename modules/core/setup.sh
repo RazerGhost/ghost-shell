@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# The desktop: links the configs (stow), GTK's look, the wallpaper folder, the colors, and the
-# login screen's copy of the shell.
+# The desktop: links the configs (stow), GTK's look, the wallpaper folder and the colors.
 # Usage: ghost install core [--theme <wallpaper | "#rrggbb">]
 # Run by `ghost install`; alone: `ghost install core`. Safe to re-run.
 set -euo pipefail
@@ -43,8 +42,3 @@ step "Colors (matugen)"
 # everything is colored from it; with "#rrggbb": colors from that seed; without either: colors
 # again from the current wallpaper (or the default seed on the first run).
 sh matugen/.config/matugen/wallpaper.sh "$@"
-
-step "Login screen (Quickshell greeter)"
-# After the colors, so the login screen gets the current ones. Settings, colors and the wallpaper
-# reach it by themselves afterwards; after changing the shell's code, `ghost greeter` updates it.
-modules/core/greeter.sh

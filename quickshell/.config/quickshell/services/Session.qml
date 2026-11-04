@@ -1,5 +1,4 @@
-// Locking and ending the session: the power menu, the idle steps and the login screen's power
-// buttons all go through here.
+// Locking and ending the session: the power menu and the idle steps go through here.
 pragma Singleton
 
 import QtQuick
