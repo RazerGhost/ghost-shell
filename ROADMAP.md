@@ -1924,6 +1924,20 @@ Escape then, Super+D again or a click elsewhere goes back to your workspace. Key
 the foot of the screen. Not while locked, in focus mode or in the desktop editor. Checked with
 wtype: moving, the ring, typing into the note and back, Escape home.
 
+### The laptop's bass speakers (2026-11-04)
+User's question: what can be done for the Bang & Olufsen speakers. First the hardware: Linux
+drove only one of the Realtek ALC245's speaker pins; the BIOS marks the second (0x17) unused and
+the kernel has no HP quirk for this board (8BCA). Switched on by hand, the user heard the sound
+get fuller (A/B with pink noise and a bass line): the bass speakers had been silent. Made
+permanent in the system module, only on board 8BCA: an ALSA patch file
+(`system/usr/lib/firmware/ghost-hp-8bca-speakers.fw`: pin 0x17 as an internal speaker and the
+kernel's `alc285-speaker2-to-dac1` fixup, so they share the main speakers' DAC and volume; on the
+DAC the kernel picks by itself they'd have had no volume control) loaded through
+`/etc/modprobe.d/ghost-hp-8bca-speakers.conf`. Checked by reloading the sound driver with it:
+"picked fixup alc285-speaker2-to-dac1", "Speaker" and "Bass Speaker" controls, 0x17 on DAC 0x02.
+Next, if wanted: a speaker profile (parametric EQ or a measured curve) for all four, a limiter
+and loudness. Windows' B&O tuning is HP's own processing, which Linux doesn't have.
+
 ### The recording's notification beside the screenshots' (2026-11-04)
 User's pick from the ideas: the shell's notifications with buttons the same way. Looked at first:
 the screenshot's ("Open", "Draw on it") and the recording's ("Play") already wait for their

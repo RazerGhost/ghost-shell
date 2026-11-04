@@ -89,7 +89,7 @@ its setup (`setup.sh`).
 | Module | |
 |---|---|
 | `core` | Hyprland, the shell, fonts and themes, the colors |
-| `system` | this laptop's GPU rule, boot options, logging in at boot (greetd) and services |
+| `system` | this laptop's GPU rule, boot options, its bass speakers, logging in at boot (greetd) and services |
 | `snapshots` | Btrfs snapshots: the system's before and after every update (bootable), your home folder hourly |
 | `apps` | terminal, editor, files, pictures, video, music, browser, web apps |
 | `dev` | languages, package managers and Docker |

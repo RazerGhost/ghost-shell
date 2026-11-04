@@ -405,6 +405,16 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `j/workspaces` read; a fresh `qs -p` with `Hyprland.refreshWorkspaces()` showed 1 and 3 as -1)
   and gets the real ids from the first workspace event (a switch). Special workspaces stay -1.
   `WorkspaceSlots.idOf` takes a numbered workspace's id from its name meanwhile.
+- The Omen 16-xf0's speakers (Realtek ALC245, HP board 8BCA): the kernel picks no fixup ("PCI
+  SSID 103c:0000") and drives only pin 0x14; its bass speakers are on pin 0x17, which the BIOS
+  marks unused (0x411111f0). Switched on by hand they made the sound fuller (user's A/B, pink
+  noise and a bass line; laptop speakers can't play an 80 Hz tone audibly). As a speaker pin the
+  generic parser gives 0x17 DAC 0x06, which has no amp: full level at any volume. The
+  `alc285-speaker2-to-dac1` fixup restricts 0x17 to DAC 0x02. Fixups are picked only when the
+  driver loads: `modelname` + `reconfig` in sysfs re-parses pins but keeps the first fixup, so
+  test with `modprobe -r snd_hda_intel` and `modprobe snd_hda_intel patch=<file>,<file>` (PipeWire
+  stopped). hda-verb needs root (CAP_SYS_RAWIO), not just the audio group. Patch files skip
+  `#` lines.
 - The shell's accessibility tree can be read without a screen reader: Python's `gi` with
   `Atspi` 2.0 (at-spi2-core), the app named "quickshell" on `Atspi.get_desktop(0)`; filter on the
   SHOWING state (Qt Quick's tree is flat under each window, hidden items included) and call

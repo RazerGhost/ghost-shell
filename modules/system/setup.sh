@@ -158,6 +158,17 @@ if ! cmp -s "$mdns" "/etc/systemd/resolved.conf.d/$(basename "$mdns")"; then
     sudo systemctl try-restart systemd-resolved.service
 fi
 
+step "Speakers: the HP Omen 16-xf0's bass speakers"
+# Only on that laptop (board 8BCA): the kernel leaves its bass speakers off (the patch file
+# says why). Takes effect when the sound driver loads next: at the next boot.
+if [[ $(cat /sys/class/dmi/id/board_name 2>/dev/null) == 8BCA ]]; then
+    for file in system/usr/lib/firmware/ghost-hp-8bca-speakers.fw system/etc/modprobe.d/ghost-hp-8bca-speakers.conf; do
+        sudo install -Dm644 "$file" "/${file#system/}"
+    done
+else
+    echo "Not an HP Omen 16-xf0 (board 8BCA): skipped"
+fi
+
 step "Services the Quickshell bar reads"
 # Network, Bluetooth and power profile modules talk to these over D-Bus.
 # UPower (battery) is started on demand by D-Bus, so it needs no enabling.

@@ -1,0 +1,14 @@
+# The HP Omen 16-xf0 (board 8BCA) has bass speakers on the Realtek ALC245's pin 0x17, which
+# the BIOS marks unused and the kernel has no quirk for (it picks no fixup: "PCI SSID 103c:0000").
+# Pin 0x17 as an internal speaker, and the fixup that gives it the main speakers' DAC (0x02),
+# so the system volume covers it (on DAC 0x06 it has no volume and would play at full level).
+# Loaded by snd-hda-intel's `patch` option (/etc/modprobe.d/ghost-hp-8bca-speakers.conf);
+# the [codec] line limits it to this chip in this laptop. Installed by modules/system/setup.sh.
+[codec]
+0x10ec0245 0x103c8bca 0
+
+[model]
+alc285-speaker2-to-dac1
+
+[pincfg]
+0x17 0x90170111
