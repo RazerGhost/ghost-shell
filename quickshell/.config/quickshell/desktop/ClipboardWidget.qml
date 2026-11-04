@@ -3,6 +3,7 @@ import Quickshell.Io
 import qs.services
 import qs.theme
 import qs.widgets
+import "ListPick.js" as ListPick
 import "../services/ClipboardEntries.js" as ClipboardEntries
 
 // The clipboard widget (medium): your pinned texts, then what you copied last
@@ -26,7 +27,7 @@ WidgetSurface {
     // The list changed (a copy anywhere, cliphist storing it again at the top): the pick stays
     // on the list, and in view (a new list scrolls the view back to the top).
     onClipsChanged: {
-        pick = Math.min(pick, clips.length - 1);
+        pick = ListPick.kept(pick, clips.length);
         if (pick >= 0)
             Qt.callLater(() => list.positionViewAtIndex(pick, ListView.Contain));
     }
@@ -42,8 +43,8 @@ WidgetSurface {
         if (hidesTitles || clips.length === 0)
             return false;
         if (event.key === Qt.Key_Down || event.key === Qt.Key_Up) {
-            const next = pick + (event.key === Qt.Key_Down ? 1 : -1);
-            if (next < -1 || next >= clips.length)
+            const next = ListPick.step(pick, clips.length, event.key === Qt.Key_Down);
+            if (next === null)
                 return false;
             pick = next;
             if (pick >= 0)

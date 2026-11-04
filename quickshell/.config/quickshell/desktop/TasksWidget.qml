@@ -2,6 +2,7 @@ import QtQuick
 import qs.services
 import qs.theme
 import qs.widgets
+import "ListPick.js" as ListPick
 
 // The to-do widgets, a to-do list of their own (the medium "To-do" and the large "To-do list",
 // `large`): the open tasks (services/Planner.qml), a list that scrolls with the wheel or
@@ -24,7 +25,7 @@ WidgetSurface {
     property int pick: -1
     onChosenChanged: pick = -1
     // Tasks ticked or added elsewhere (the other to-do widget): the pick stays on the list.
-    onOpenChanged: pick = Math.min(pick, open.length - 1)
+    onOpenChanged: pick = ListPick.kept(pick, open.length)
 
     function startTyping(): void {
         keyboard.start();
@@ -37,8 +38,8 @@ WidgetSurface {
         if (hidesTitles)
             return false;
         if (event.key === Qt.Key_Down || event.key === Qt.Key_Up) {
-            const next = pick + (event.key === Qt.Key_Down ? 1 : -1);
-            if (next < -1 || next >= open.length)
+            const next = ListPick.step(pick, open.length, event.key === Qt.Key_Down);
+            if (next === null)
                 return false;
             pick = next;
             if (pick >= 0)
