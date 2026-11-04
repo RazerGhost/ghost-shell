@@ -5,6 +5,7 @@ import qs.desktop
 import qs.services
 import qs.theme
 import "../services/FileUrl.js" as FileUrl
+import "LockMotion.js" as LockMotion
 
 // What the lock screen shows on each monitor: your desktop, locked (user's choice, 2026-11-04:
 // not a screen of its own). The desktop's wallpaper, its widgets where you placed them (on the
@@ -55,7 +56,7 @@ Item {
             const p = point.position;
             if (root.pointerStart.x < 0) {
                 root.pointerStart = p;
-            } else if (Math.abs(p.x - root.pointerStart.x) + Math.abs(p.y - root.pointerStart.y) > Theme.lock.moved) {
+            } else if (LockMotion.moved(root.pointerStart, p, Theme.lock.moved)) {
                 root.activity();
                 island.wake();
             }
@@ -70,9 +71,13 @@ Item {
     Image {
         id: picture
         anchors.fill: parent
-        source: FileUrl.of(root.wallpaper)
+        // Only once it has its size: decoded at 0 x 0 it was read at full size first, then again.
+        source: width > 0 ? FileUrl.of(root.wallpaper) : ""
         fillMode: Image.PreserveAspectCrop
         sourceSize: Qt.size(width, height)
+        // A live wallpaper's still frame is always video-frame.jpg: a cached copy could be an
+        // older video's.
+        cache: false
     }
 
     // The glass: the wallpaper blurred, only behind the island and the widgets' cards.
@@ -83,6 +88,9 @@ Item {
         blurEnabled: true
         blur: 1
         blurMax: Theme.lock.blur
+        // No padding around the blur: padded, the mask was stretched over a larger area than the
+        // picture, and the glass sat off its cards.
+        autoPaddingEnabled: false
         maskEnabled: true
         maskSource: glass
     }
@@ -94,7 +102,7 @@ Item {
         layer.enabled: true
 
         PillShape {
-            x: island.pill.x + island.pill.outline.x
+            x: island.pill.x + island.pill.outline.x + island.shake
             y: island.pill.y + island.pill.outline.y
             attached: Theme.island.attached
             bodyWidth: island.pill.outline.bodyWidth
@@ -114,6 +122,7 @@ Item {
                 height: modelData.height
                 visible: modelData.visible
                 opacity: modelData.opacity
+                scale: modelData.scale // a card lifts a little under the pointer
                 radius: Theme.desktop.radius
                 color: "white"
             }

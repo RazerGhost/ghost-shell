@@ -29,8 +29,9 @@ WidgetSurface {
             Quickshell.execDetached(["qs", "ipc", "call", "island", "toggle", "today"]);
         }
 
-        Accessible.role: Accessible.Button
-        Accessible.name: "Calendar: open the today menu"
+        // A button on the desktop; on the lock screen (disabled) plain text with no action.
+        Accessible.role: enabled ? Accessible.Button : Accessible.StaticText
+        Accessible.name: enabled ? "Calendar: open the today menu" : "Calendar"
         Accessible.onPressAction: openToday()
     }
 

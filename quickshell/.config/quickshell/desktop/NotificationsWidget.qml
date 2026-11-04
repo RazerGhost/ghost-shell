@@ -21,8 +21,9 @@ WidgetSurface {
             Quickshell.execDetached(["qs", "ipc", "call", "island", "toggle", "today"]);
         }
 
-        Accessible.role: Accessible.Button
-        Accessible.name: (widget.count === 1 ? "1 notification" : widget.count + " notifications") + ": open the today menu"
+        // A button on the desktop; on the lock screen (disabled) plain text with no action.
+        Accessible.role: enabled ? Accessible.Button : Accessible.StaticText
+        Accessible.name: (widget.count === 1 ? "1 notification" : widget.count + " notifications") + (enabled ? ": open the today menu" : "")
         Accessible.onPressAction: openToday()
     }
 

@@ -22,8 +22,9 @@ Item {
     signal typed()
 
     readonly property alias field: password
-    // Its shape, for the lock screen's glass behind it (LockContent.qml).
+    // Its shape and how far it's shaken, for the lock screen's glass behind it (LockContent.qml).
     readonly property alias pill: pill
+    readonly property real shake: shakeOffset.x
 
     // Opens it for a while (a key, a pointer move, the lock screen appearing).
     function wake(): void {
@@ -127,6 +128,7 @@ Item {
 
                         Accessible.role: Accessible.EditableText
                         Accessible.name: "Password"
+                        Accessible.description: "Screen locked"
                         Accessible.passwordEdit: true
 
                         onAccepted: {
@@ -149,6 +151,7 @@ Item {
                         Text {
                             visible: password.text === ""
                             anchors.verticalCenter: parent.verticalCenter
+                            Accessible.ignored: true // the field's own name already says it
                             text: "Password"
                             color: Colors.m3onSurfaceVariant
                             font: password.font
@@ -173,6 +176,10 @@ Item {
                             visible: modelData.shown
                             spacing: Theme.spacing.xs
 
+                            // Said aloud when it appears.
+                            Accessible.role: Accessible.AlertMessage
+                            Accessible.name: modelData.text
+
                             MaterialIcon {
                                 anchors.verticalCenter: parent.verticalCenter
                                 icon: parent.modelData.icon
@@ -191,10 +198,12 @@ Item {
                     }
                 }
 
-                // "Wrong password", or PAM's own messages.
+                // "Wrong password", or PAM's own messages; said aloud when it appears.
                 Text {
                     width: parent.width
                     visible: root.message !== ""
+                    Accessible.role: Accessible.AlertMessage
+                    Accessible.name: root.message
                     text: root.message
                     color: root.messageIsError ? Colors.m3error : Colors.m3onSurfaceVariant
                     font.family: Theme.font.sans

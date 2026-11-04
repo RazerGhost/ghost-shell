@@ -62,6 +62,7 @@ Rectangle {
         Text {
             anchors.verticalCenter: parent.verticalCenter
             visible: input.text === ""
+            Accessible.ignored: true // the field's own name already says it
             text: root.placeholder
             color: Colors.m3onSurfaceVariant
             font: input.font

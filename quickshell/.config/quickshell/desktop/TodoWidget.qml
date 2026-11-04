@@ -28,8 +28,9 @@ WidgetSurface {
             Quickshell.execDetached(["qs", "ipc", "call", "island", "toggle", "today"]);
         }
 
-        Accessible.role: Accessible.Button
-        Accessible.name: "To-do, " + widget.open.length + " open: open the today menu"
+        // A button on the desktop; on the lock screen (disabled) plain text with no action.
+        Accessible.role: enabled ? Accessible.Button : Accessible.StaticText
+        Accessible.name: "To-do, " + widget.open.length + " open" + (enabled ? ": open the today menu" : "")
         Accessible.onPressAction: openToday()
 
         Text {

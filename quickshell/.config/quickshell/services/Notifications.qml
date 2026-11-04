@@ -70,6 +70,23 @@ Singleton {
     // null here without the list changing, so the corner kept an empty card. Readers still skip
     // nulls, in case.
     property list<Notification> queue: []
+    // Kept across a shell reload (the notifications themselves are, the queue isn't): the ids
+    // waiting, and the notifications that come back, put in line again by requeue().
+    property var pendingIds: []
+    property list<Notification> carried: []
+    onQueueChanged: times.pending = JSON.stringify(queue.filter(n => n !== null).map(n => n.id))
+
+    function requeue(): void {
+        const ids = pendingIds;
+        const back = carried.filter(n => n !== null && ids.includes(n.id) && !queue.includes(n))
+            .sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id));
+        if (back.length > 0)
+            queue = [...back, ...queue.filter(n => n !== null)];
+    }
+
+    function leaves(notification: Notification): void {
+        notification.closed.connect(() => root.queue = root.queue.filter(n => n !== null && n !== notification));
+    }
 
     // Newest first.
     readonly property list<Notification> history: server.trackedNotifications.values.slice().reverse()
@@ -95,15 +112,24 @@ Singleton {
         reloadableId: "notificationTimes"
 
         property string json: ""
+        property string pending: "[]"
 
         onReloaded: {
             if (json !== "")
                 root.received = JSON.parse(json);
+            root.pendingIds = JSON.parse(pending);
+            root.requeue();
         }
     }
 
     // The pop-up the island shows (bar/IslandWindow.qml), the oldest; the rest wait their turn.
     readonly property Notification current: queue.find(n => n !== null) ?? null
+
+    // A critical pop-up stays until dismissed, but doesn't hold the others up: while more wait, it
+    // goes to the back of the line after its time and comes round again.
+    function later(notification: Notification): void {
+        queue = [...queue.filter(n => n !== null && n !== notification), notification];
+    }
 
     // A pop-up is done (timed out, dismissed or clicked).
     function done(notification: Notification): void {
@@ -150,9 +176,14 @@ Singleton {
 
         onNotification: notification => {
             notification.tracked = true; // keep it, or it's discarded right away
-            // Notifications kept through a reload arrive again; they already popped up once.
-            if (notification.lastGeneration)
+            // Notifications kept through a reload arrive again: back in line if they were waiting
+            // (requeue), never popping up a second time otherwise.
+            if (notification.lastGeneration) {
+                root.carried = [...root.carried.filter(n => n !== null), notification];
+                root.leaves(notification);
+                root.requeue();
                 return;
+            }
             root.stamp(notification.id);
             const critical = notification.urgency === NotificationUrgency.Critical;
             // Only once settings.json is in: writing to the defaults before then would save
@@ -163,7 +194,7 @@ Singleton {
             const mode = Rules.mode(Settings.values.notificationApps, notification.appName);
             if (Rules.popsUp(mode, root.quiet, critical)) {
                 root.queue = [...root.queue, notification];
-                notification.closed.connect(() => root.queue = root.queue.filter(n => n !== null && n !== notification));
+                root.leaves(notification);
                 Sounds.playNotification(notification.hints, critical);
             } else if (mode !== "silent") {
                 root.missed++;

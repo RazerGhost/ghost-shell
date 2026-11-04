@@ -34,15 +34,16 @@ PanelWindow {
     // menu it takes no keyboard and closes when the pointer leaves the island.
     property string peek: ""
 
-    // The notification pop-up, on the focused monitor while no menu is open (it waits for the
-    // menu to close), then a window asking for attention.
-    readonly property bool focusedScreen: Hyprland.focusedMonitor?.name === modelData.name
-    readonly property Notification popup: !open && focusedScreen ? Notifications.current : null
-    readonly property HyprlandToplevel attentionWindow: !open && focusedScreen && !Notifications.current
-                                                        ? Windows.needsAttention : null
+    // The notification pop-up, on the focused monitor (the first one until Hyprland says which)
+    // while no menu is open and the screen isn't locked (they wait, and show once it's unlocked),
+    // then a window asking for attention.
+    readonly property bool focusedScreen: (Hyprland.focusedMonitor?.name ?? Quickshell.screens[0]?.name) === modelData.name
+    readonly property bool canPop: !open && focusedScreen && !Session.locked
+    readonly property Notification popup: canPop ? Notifications.current : null
+    readonly property HyprlandToplevel attentionWindow: canPop && !Notifications.current ? Windows.needsAttention : null
     // How long each stays, from Settings (it offers 3-30 s; kept within 1-60 should the file say
     // otherwise). Paused while the pointer is on the island; critical notifications stay until
-    // dismissed.
+    // dismissed, going to the back of the line after their time while others wait.
     readonly property int popupTime: Math.min(60, Math.max(1, Number(Settings.values.notificationSeconds) || 5)) * 1000
 
     // Each new one gets its full time: `ready` dips for a moment when it changes, restarting the
@@ -52,11 +53,12 @@ PanelWindow {
         popupReady = false;
         Qt.callLater(() => popupReady = true);
     }
+    readonly property bool popupCritical: popup?.urgency === NotificationUrgency.Critical
     Timer {
         interval: root.popupTime
         running: root.popupReady && root.popup !== null && !pill.hovered
-                 && root.popup.urgency !== NotificationUrgency.Critical
-        onTriggered: Notifications.done(root.popup)
+                 && (!root.popupCritical || Notifications.queue.filter(n => n !== null).length > 1)
+        onTriggered: root.popupCritical ? Notifications.later(root.popup) : Notifications.done(root.popup)
     }
 
     property bool attentionReady: true
