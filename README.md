@@ -53,11 +53,12 @@ The full plan and every decision behind it: [ROADMAP.md](ROADMAP.md). Keybinds:
 
 ## Install
 
-On Arch or CachyOS, one command (it installs git if needed, clones the repo to
-`~/Projects/ghost-shell` and runs the install):
+On Arch or CachyOS, log in to GitHub once (the repo is private), then one command (it installs
+git if needed, clones the repo to `~/Projects/ghost-shell` and runs the install):
 
 ```sh
-bash <(curl -fsSL https://raw.githubusercontent.com/RazerGhost/ghost-shell/main/bootstrap.sh) desktop
+sudo pacman -S --needed github-cli && gh auth login
+bash <(gh api repos/RazerGhost/ghost-shell/contents/bootstrap.sh -H "Accept: application/vnd.github.raw") desktop
 ```
 
 `desktop` or `laptop` picks the machine's modules from `machines/` (they become
