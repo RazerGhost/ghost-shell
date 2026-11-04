@@ -1891,6 +1891,7 @@ User's picks.
   its own "Time's up" to it). Normal urgency: critical's error red read as a failure. Checked: a
   1-minute session ran in the island and ended with the notification and its two buttons. The
   buttons only work while the shell that sent it runs: a reload in between leaves them dead.
+  Verified by the user: a session from the today menu, ended with the break offer.
 - Up next: a timed calendar event starting within 15 minutes shows in the island as an event
   icon and "in 12 min" (`CalendarEvents.soon`, tested); not its title, which anyone at the
   screen would see (the today menu has it). Checked with a stand-in event (no calendar
@@ -1902,7 +1903,7 @@ User's picks.
   typing and isn't dragged (a drag selects text); the clipboard lists its whole history.
   Verified by the user (scrolling, a clip copied and pasted, a long note typed into).
 
-### The desktop widgets by keyboard (built 2026-11-04; checked on the laptop)
+### The desktop widgets by keyboard (built 2026-11-04; verified by the user)
 User's pick (a gap the review found: the note, to-do and clipboard widgets took no keyboard
 without a click first). Super+D (`qs ipc call widgets browse`), like Windows' "show desktop":
 from a workspace with windows it goes to an empty one (`Editing`'s trip), and the widgets'
