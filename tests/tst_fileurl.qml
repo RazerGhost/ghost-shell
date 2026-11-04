@@ -30,5 +30,8 @@ TestCase {
         compare(FileUrl.pathOf(FileUrl.of("/p/a #b/c?d%e.png")), "/p/a #b/c?d%e.png");
         compare(FileUrl.pathOf("https://example.com/a.png"), "");
         compare(FileUrl.pathOf(""), "");
+        compare(FileUrl.pathOf("file://localhost/home/me/a.png"), "/home/me/a.png");
+        compare(FileUrl.pathOf("file:///p/bad%E0.png"), ""); // a broken escape
+        compare(FileUrl.pathOf("file://otherhost/a.png"), "");
     }
 }

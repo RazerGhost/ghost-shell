@@ -24,6 +24,43 @@ Scope {
     readonly property var size: target?.lastIpcObject?.size ?? [0, 0]
     readonly property HyprlandMonitor monitor: target?.monitor ?? null
 
+    // Super+Up / Down: from the spot the window was snapped to, if it's still there (a window
+    // swapped, dragged or floated since isn't: SnapLayout.holds); Hyprland's view of the window is
+    // asked for first, a moment before (its last answer can be old).
+    function step(direction: string): void {
+        const window = Windows.active;
+        if (!window)
+            return;
+        Hyprland.refreshToplevels();
+        stepLater.window = window;
+        stepLater.direction = direction;
+        stepLater.restart();
+    }
+
+    Timer {
+        id: stepLater
+        property HyprlandToplevel window: null
+        property string direction
+        interval: Theme.snap.refreshWait
+        onTriggered: {
+            const ipc = window?.lastIpcObject;
+            const monitor = window?.monitor;
+            if (!ipc || !monitor)
+                return;
+            const box = ipc.floating ? null : { x: ipc.at[0], y: ipc.at[1], w: ipc.size[0], h: ipc.size[1] };
+            const area = { x: monitor.x, y: monitor.y, w: monitor.width / monitor.scale, h: monitor.height / monitor.scale };
+            const spot = Snap.spotOf(window);
+            const next = SnapLayout.holds(spot, box, area) ? SnapLayout.nextSpot(spot, direction) : null;
+            if (next)
+                Snap.snap(window, next);
+            else if (direction === "up")
+                Windows.run(window, "fullscreen", `mode = "maximized", action = "toggle"`);
+            else
+                Windows.minimize(window);
+            window = null;
+        }
+    }
+
     function toggle(): void {
         if (open) {
             open = false;
@@ -47,23 +84,13 @@ Scope {
         // qs ipc call snap up (Super+Up): a window snapped to a half goes to its top quarter, a
         // bottom quarter back to its half (Windows 11); anything else maximizes.
         function up(): void {
-            const window = Windows.active;
-            const next = SnapLayout.nextSpot(Snap.spotOf(window), "up");
-            if (next)
-                Snap.snap(window, next);
-            else if (window)
-                Windows.run(window, "fullscreen", `mode = "maximized", action = "toggle"`);
+            root.step("up");
         }
 
         // qs ipc call snap down (Super+Down): a half to its bottom quarter, a top quarter back to
         // its half; anything else minimizes.
         function down(): void {
-            const window = Windows.active;
-            const next = SnapLayout.nextSpot(Snap.spotOf(window), "down");
-            if (next)
-                Snap.snap(window, next);
-            else if (window)
-                Windows.minimize(window);
+            root.step("down");
         }
 
         // qs ipc call snap picker: show or hide the window menu for the focused window.

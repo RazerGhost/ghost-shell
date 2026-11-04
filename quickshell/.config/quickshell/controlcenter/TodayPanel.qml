@@ -21,14 +21,20 @@ Column {
     topPadding: Theme.spacing.s
     spacing: Theme.spacing.m
 
-    // Unfolds one of the note and timer parts ("note", "timer"), when it's opened on it.
+    // Unfolds one of the note and timer parts ("note", "timer"), when it's opened on it: at once if
+    // it's showing, else as it shows (showing folds them).
+    property string startPart: ""
     function openPart(part: string): void {
-        tools.open = part;
+        if (visible)
+            tools.open = part;
+        else
+            startPart = part;
     }
 
     onVisibleChanged: {
         if (visible) {
-            tools.open = "";
+            tools.open = startPart;
+            startPart = "";
             expandedApps = [];
         }
     }

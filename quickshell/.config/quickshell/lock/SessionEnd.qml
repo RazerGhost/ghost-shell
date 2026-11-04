@@ -84,8 +84,9 @@ Scope {
         patience.restart();
     }
 
-    // Everything closed: a moment more, so the screen is seen, then go ahead.
-    readonly property bool allClosed: active && remaining.length === 0
+    // Everything closed (once the countdown is over: with no windows open it would otherwise go
+    // ahead at once, under "Shutting down in 5"): a moment more, so the screen is seen, then go ahead.
+    readonly property bool allClosed: active && !counting && remaining.length === 0
     onAllClosedChanged: {
         if (allClosed)
             go.restart();

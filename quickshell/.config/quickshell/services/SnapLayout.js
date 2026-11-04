@@ -29,6 +29,21 @@ function nextSpot(spot, direction) {
     return steps[direction]?.[spot] ?? null;
 }
 
+// Whether a window at `box` ({ x, y, w, h }) is still in `spot` of `area` (the screen): its middle
+// inside the spot's cell. A window swapped, dragged elsewhere or floated since it was snapped isn't,
+// and Super+Up / Down then treat it as not snapped.
+function holds(spot, box, area) {
+    const l = layouts[spot];
+    if (!l || !box || !area || area.w <= 0 || area.h <= 0)
+        return false;
+    const cx = box.x + box.w / 2, cy = box.y + box.h / 2;
+    const left = area.x + area.w * l.col / l.cols;
+    const right = area.x + area.w * (l.col + (l.span ?? 1)) / l.cols;
+    const top = area.y + area.h * l.row / l.rows;
+    const bottom = area.y + area.h * (l.row + 1) / l.rows;
+    return cx >= left && cx < right && cy >= top && cy < bottom;
+}
+
 function layout(name) {
     const l = layouts[name];
     if (!l)

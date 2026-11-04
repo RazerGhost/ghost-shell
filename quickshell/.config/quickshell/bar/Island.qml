@@ -54,6 +54,8 @@ Scope {
     // The wallpaper picker is an island menu; Wallpaper.pickerOpen (the IPC, quick settings'
     // button, the slideshow's pause) follows it both ways.
     onPanelChanged: Wallpaper.pickerOpen = panel === "wallpaper"
+    // Also after a reload, which brings the open menu back (PersistentProperties).
+    Component.onCompleted: Wallpaper.pickerOpen = panel === "wallpaper"
     Connections {
         target: Wallpaper
         function onPickerOpenChanged(): void {

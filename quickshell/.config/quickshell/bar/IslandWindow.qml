@@ -113,7 +113,8 @@ PanelWindow {
     }
 
     // The wheel on the island (user's choice): the volume; with Shift the brightness; over the
-    // workspace dots or with Ctrl the workspaces; over the music's cover the tracks, a notch each.
+    // workspace dots or with Ctrl the workspaces; over the music's cover (or the time beside the
+    // hover player) the tracks, a notch each.
     // A touchpad's natural scrolling (`inverted`) is turned back for the levels, so swiping up
     // turns them up.
     property real trackScroll: 0
@@ -124,7 +125,7 @@ PanelWindow {
             workspaces.scroll(delta);
         } else if (wheel.modifiers & Qt.ShiftModifier) {
             Brightness.change(level * Theme.island.brightnessStep);
-        } else if (root.showMedia && coverHover.hovered) {
+        } else if (centerHover.hovered && (root.showMedia || root.peek === "media")) {
             trackScroll += delta;
             if (Math.abs(trackScroll) >= 120) {
                 if (trackScroll > 0)
@@ -273,9 +274,11 @@ PanelWindow {
         onShownChanged: rememberWidth()
         // Also at the start: a menu kept open across a shell reload is already shown then.
         Component.onCompleted: rememberWidth()
+        // Never wider than the screen, less a margin each side (the wallpaper row at 1200 px on a
+        // small screen, or at a larger shell size).
         function rememberWidth(): void {
             if (shown !== "")
-                openWidth = Theme.island.menuWidth(shown);
+                openWidth = Math.min(Theme.island.menuWidth(shown), root.width - Theme.spacing.l * 2);
         }
         onCloseRequested: root.island.panel = ""
 
@@ -338,13 +341,14 @@ PanelWindow {
                     }
                 }
 
+                // The wheel here steps through the tracks while music shows: the cover, or the time
+                // that takes its place while the hover player is open.
+                HoverHandler {
+                    id: centerHover
+                }
+
                 IslandFade {
                     shown: root.showMedia
-
-                    // The wheel over the cover steps through the tracks.
-                    HoverHandler {
-                        id: coverHover
-                    }
 
                     MediaActivity {
                         id: activity
@@ -592,15 +596,17 @@ PanelWindow {
                     width: parent.width
                     onOpenMenu: menu => root.island.panel = menu
                     // Asked for edit mode (the customize menu): built now or already open.
+                    // Only quick settings on the screen it's opened on: one still fading out on
+                    // another screen would take it.
                     function takeEdit(): void {
-                        if (root.island.quickEdit) {
+                        if (root.island.quickEdit && root.panel === "settings") {
                             editing = true;
                             root.island.quickEdit = false;
                         }
                     }
                     // Asked for one of its pages (`island page`): the same, for the page.
                     function takePage(): void {
-                        if (root.island.quickPage !== "") {
+                        if (root.island.quickPage !== "" && root.panel === "settings") {
                             page = root.island.quickPage;
                             root.island.quickPage = "";
                         }
@@ -629,12 +635,10 @@ PanelWindow {
                     id: today
                     width: parent.width
                     // Asked for one of its parts (the island's timer): built now or already open.
-                    // Later, so its own folding when it's shown comes first.
                     function takePart(): void {
-                        if (root.island.todayPart !== "") {
-                            const part = root.island.todayPart;
+                        if (root.island.todayPart !== "" && root.panel === "today") {
+                            today.openPart(root.island.todayPart);
                             root.island.todayPart = "";
-                            Qt.callLater(() => today.openPart(part));
                         }
                     }
                     Component.onCompleted: takePart()

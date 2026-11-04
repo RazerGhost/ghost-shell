@@ -6,12 +6,16 @@
 .pragma library
 
 // The other way: a file:// URL (a file dropped from a file manager) as its path; "" for
-// anything that isn't a local file.
+// anything that isn't a local file (or a broken % escape).
 function pathOf(url) {
-    const text = String(url || "");
-    if (!text.startsWith("file://"))
+    const match = /^file:\/\/(localhost)?(\/[^?#]*)/.exec(String(url || ""));
+    if (!match)
         return "";
-    return decodeURIComponent(text.slice("file://".length).split(/[?#]/)[0]);
+    try {
+        return decodeURIComponent(match[2]);
+    } catch (error) {
+        return "";
+    }
 }
 
 function of(path) {

@@ -293,6 +293,8 @@ Singleton {
 
     readonly property QtObject snap: QtObject {
         readonly property int width: root.px(56) // one layout picture in the snap picker (16:9)
+        // How long Super+Up / Down wait for Hyprland's fresh view of the window (ms).
+        readonly property int refreshWait: 60
     }
 
     readonly property QtObject welcome: QtObject {

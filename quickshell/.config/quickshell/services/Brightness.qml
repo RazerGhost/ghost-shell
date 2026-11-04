@@ -25,8 +25,10 @@ Singleton {
     // A drag sends many values while brightnessctl is still running; only the latest is
     // applied once the current run exits.
     function set(level: real): void {
-        root.level = level; // move the slider now instead of after brightnessctl finishes
-        pending = Math.round(Math.max(0.01, Math.min(1, level)) * 100);
+        // Kept within what brightnessctl is given: the island's wheel would otherwise take it
+        // past 100 % or below 0 (where change() stops).
+        root.level = Math.max(0.01, Math.min(1, level)); // the slider moves now, not once brightnessctl finishes
+        pending = Math.round(root.level * 100);
         if (!write.running)
             apply();
     }

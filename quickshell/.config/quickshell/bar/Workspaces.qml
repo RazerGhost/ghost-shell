@@ -93,7 +93,10 @@ Item {
 
                 Accessible.role: root.clickable ? Accessible.Button : Accessible.StaticText
                 Accessible.name: "Workspace " + modelData + (isActive ? ", current" : occupied ? "" : ", empty")
-                Accessible.onPressAction: root.go(modelData)
+                Accessible.onPressAction: {
+                    if (root.clickable)
+                        root.go(modelData);
+                }
 
                 Behavior on implicitWidth {
                     NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }
