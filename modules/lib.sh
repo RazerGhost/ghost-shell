@@ -56,6 +56,6 @@ stow_packages() {
     local pkg
     for pkg in */; do
         pkg=${pkg%/}
-        [[ $pkg == system || $pkg == tests || $pkg == modules || $pkg == docs ]] || echo "$pkg"
+        [[ $pkg == system || $pkg == tests || $pkg == modules || $pkg == docs || $pkg == machines ]] || echo "$pkg"
     done
 }

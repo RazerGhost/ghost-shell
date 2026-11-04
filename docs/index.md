@@ -21,12 +21,12 @@ the reasons and history are in [ROADMAP.md](../ROADMAP.md), verified API facts i
 
 | Rule | Where |
 |---|---|
-| Every top-level folder except `modules/`, `system/`, `tests/`, `docs/` is a GNU Stow package mirroring `$HOME` | `ghost install`, `stow_packages` in `modules/lib.sh` |
+| Every top-level folder except `modules/`, `system/`, `tests/`, `docs/`, `machines/` is a GNU Stow package mirroring `$HOME` | `ghost install`, `stow_packages` in `modules/lib.sh` |
 | Never move or rename a Stow package while the desktop runs from it (links break; Hyprland once lost hyprland.lua) | |
 | One module per part of the setup: `packages.txt` (pacman), `aur.txt` (paru), re-runnable `setup.sh`; new ones go in `all_modules` and `about` | `modules/`, `bin/.local/bin/ghost` |
 | Opt-in modules (`llm`, `wave3`) only install where `~/.config/ghost/modules` lists them | `opt_in` in `ghost` |
 | A machine picks its modules in `~/.config/ghost/modules` (not in git); without it, all | |
-| `install.sh` only bootstraps `ghost install` | `install.sh` |
+| `install.sh` only bootstraps `ghost install` (`[machine] [wallpaper] [--yes]`); `bootstrap.sh` clones and runs it in one command; machine profiles (module lists) | `install.sh`, `bootstrap.sh`, `machines/` |
 | `ghost update` refuses with uncommitted changes; never stash with the live config | `cmd_update` |
 | Wallpaper and colors always go through `wallpaper.sh`; matugen hooks only deliver colors, app setup belongs in its module | `matugen/.config/matugen/wallpaper.sh` |
 | No login screen: greetd logs in at boot and after a logout, and the session locks at once | `system/etc/greetd/config.toml`, `lock/Lock.qml`, `hypr/hyprland.lua` |

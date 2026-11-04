@@ -2,16 +2,26 @@
 # First-time setup from the dotfiles repo (afterwards, `ghost install` or `ghost update` does the
 # same). Runs bin/.local/bin/ghost from the repo, since it isn't linked into ~/.local/bin yet.
 #
-# Usage: ./install.sh [wallpaper | "#rrggbb"]
+# Usage: ./install.sh [machine] [wallpaper | "#rrggbb"] [--yes]
+#   machine    a profile from machines/ (laptop, desktop): which modules this machine gets
 #   wallpaper  image to make the wallpaper and generate the colors from
 #   #rrggbb    seed color to generate them from instead (quote it: # starts a comment)
-#   Without either: colors again from the current wallpaper (a default seed on the first run).
+#   --yes      no questions from pacman and paru (paru then skips showing the PKGBUILDs)
+#   Without a machine: this machine's modules (~/.config/ghost/modules, or all of them but the
+#   opt-in ones). Without a wallpaper: colors again from the current one (a default seed at first).
 #
-# It sets up this machine's modules (all of them unless ~/.config/ghost/modules lists some; see
-# `ghost help`). Run `git pull` before this script, not from it: pulling can change it mid-run.
+# Run `git pull` before this script, not from it: pulling can change it mid-run. bootstrap.sh
+# clones the repo and runs this in one go.
 set -euo pipefail
 cd "$(dirname "$0")"
-if (($#)); then
-    exec ./bin/.local/bin/ghost install --theme "$1"
-fi
-exec ./bin/.local/bin/ghost install
+args=()
+for arg in "$@"; do
+    if [[ $arg == --yes ]]; then
+        args+=(--yes)
+    elif [[ $arg != */* && -f machines/$arg ]]; then
+        args+=(--machine "$arg")
+    else
+        args+=(--theme "$arg")
+    fi
+done
+exec ./bin/.local/bin/ghost install "${args[@]}"

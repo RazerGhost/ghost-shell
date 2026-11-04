@@ -2,8 +2,11 @@
 # ghost: this machine's setup from the Ghost Shell repo, in one command. Linked into ~/.local/bin by
 # stow (the bin/ package); install.sh runs it from the repo on the first run.
 #
-#   ghost install [module...] [--theme <wallpaper | "#rrggbb">]
-#                     packages and setup for the modules (default: this machine's, see below)
+#   ghost install [module...] [--machine <name>] [--theme <wallpaper | "#rrggbb">] [--yes]
+#                     packages and setup for the modules (default: this machine's, see below).
+#                     --machine: a profile from machines/ (laptop, desktop) becomes this machine's
+#                     module list first. --yes: no questions from pacman and paru (paru then skips
+#                     showing the PKGBUILDs). sudo's password is asked once and kept for the run.
 #   ghost update      pull the repo, then install again
 #   ghost theme <wallpaper | "#rrggbb">
 #                     the wallpaper and the colors from it (the same as the shell's picker)
@@ -26,8 +29,8 @@
 #
 # Modules are the folders in modules/: their packages (packages.txt, aur.txt) and setup
 # (setup.sh). Which ones this machine gets: ~/.config/ghost/modules, one name per line (not in
-# the repo, so each machine has its own); without that file, all of them but the opt-in ones
-# (hardware plugged into one machine, like wave3).
+# the repo, so each machine has its own; machines/ has the profiles to start from); without that
+# file, all of them but the opt-in ones (hardware plugged into one machine, like wave3).
 set -euo pipefail
 
 repo=$(cd "$(dirname "$(readlink -f "$0")")/../../.." && pwd)
@@ -86,11 +89,27 @@ is_module() {
     [[ -n ${about[$1]+set} ]]
 }
 
+# sudo's password once for the whole run: a long AUR build outlasts sudo's few minutes, and it
+# asked again halfway through. Refreshed in the background until this script ends.
+keep_sudo() {
+    sudo -v || fail "sudo is needed to install packages"
+    local parent=$$
+    ( while kill -0 "$parent" 2>/dev/null; do sudo -n -v 2>/dev/null; sleep 50; done ) &
+}
+
 cmd_install() {
-    local theme=() wanted=() m
+    local theme=() wanted=() m yes=0
     while (($#)); do
         case $1 in
             --theme) theme=("${2:?--theme needs a wallpaper or a \"#rrggbb\" color}"); shift 2 ;;
+            --yes) yes=1; shift ;;
+            --machine)
+                local profile=machines/${2:?--machine needs a name: $(ls machines | tr '\n' ' ')}
+                [[ -f $profile && $2 != */* ]] || fail "no machine profile \"$2\" (machines/ has: $(ls machines | tr '\n' ' '))"
+                mkdir -p "$(dirname "$machine_modules")"
+                cp "$profile" "$machine_modules"
+                echo "This machine's modules: $profile (now $machine_modules; edit it there)"
+                shift 2 ;;
             *) is_module "$1" || fail "no module \"$1\" (ghost modules lists them)"; wanted+=("$1"); shift ;;
         esac
     done
@@ -104,6 +123,12 @@ cmd_install() {
         mapfile -t modules < <(machine)
     fi
     echo "Modules: ${modules[*]}"
+    keep_sudo
+    local confirm=() confirm_aur=()
+    if ((yes)); then
+        confirm=(--noconfirm)
+        confirm_aur=(--noconfirm --skipreview)
+    fi
 
     step "Packages"
     local pacman_pkgs=() aur_pkgs=()
@@ -115,7 +140,7 @@ cmd_install() {
     # Several modules may list the same package; --needed skips what's installed.
     if ((${#pacman_pkgs[@]})); then
         mapfile -t pacman_pkgs < <(printf '%s\n' "${pacman_pkgs[@]}" | sort -u)
-        sudo pacman -S --needed "${pacman_pkgs[@]}"
+        sudo pacman -S --needed "${confirm[@]}" "${pacman_pkgs[@]}"
     fi
     if ((${#aur_pkgs[@]})); then
         # rustup installs no toolchain by itself; some AUR packages build with Rust (millennium).
@@ -123,7 +148,9 @@ cmd_install() {
             rustup default stable
         fi
         mapfile -t aur_pkgs < <(printf '%s\n' "${aur_pkgs[@]}" | sort -u)
-        paru -S --needed "${aur_pkgs[@]}"
+        # Built from source (user's choice over -bin packages), then cleaned up: the build-only
+        # dependencies removed and the build folders deleted.
+        paru -S --needed --removemake --cleanafter "${confirm_aur[@]}" "${aur_pkgs[@]}"
     fi
 
     for m in "${modules[@]}"; do

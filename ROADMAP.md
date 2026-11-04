@@ -1924,6 +1924,18 @@ Escape then, Super+D again or a click elsewhere goes back to your workspace. Key
 the foot of the screen. Not while locked, in focus mode or in the desktop editor. Checked with
 wtype: moving, the ring, typing into the note and back, Escape home.
 
+### A quicker install (2026-11-04)
+User's question before setting up the desktop. Packages were already one pacman and one paru run.
+Added: machine profiles (`machines/laptop`, `machines/desktop`: module lists; `ghost install
+--machine <name>` or `./install.sh <name>` makes one this machine's `~/.config/ghost/modules`),
+`bootstrap.sh` (git if needed, clone or pull, then install.sh: one command on a fresh system), sudo's
+password asked once and kept alive for the run (a long AUR build outlasted it), `--yes` for
+pacman's and paru's questions (paru then skips the PKGBUILD review), and paru's
+`--removemake --cleanafter`: AUR packages stay built from source (user's choice over -bin
+packages from other packagers), their build-only dependencies and build folders removed after.
+`machines/` is kept out of Stow. Checked: install.sh's arguments, `--machine` writing the list
+(in a scratch home, stopping at sudo before any package).
+
 ### The laptop's bass speakers (2026-11-04)
 User's question: what can be done for the Bang & Olufsen speakers. First the hardware: Linux
 drove only one of the Realtek ALC245's speaker pins; the BIOS marks the second (0x17) unused and

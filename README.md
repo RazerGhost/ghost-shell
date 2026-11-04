@@ -53,18 +53,24 @@ The full plan and every decision behind it: [ROADMAP.md](ROADMAP.md). Keybinds:
 
 ## Install
 
-On Arch or CachyOS, with `git` installed:
+On Arch or CachyOS, one command (it installs git if needed, clones the repo to
+`~/Projects/ghost-shell` and runs the install):
 
 ```sh
-git clone https://github.com/RazerGhost/ghost-shell ~/ghost-shell
-cd ~/ghost-shell
-./install.sh ~/Pictures/some-wallpaper.jpg   # or "#22d3ee" for colors from one color
+bash <(curl -fsSL https://raw.githubusercontent.com/RazerGhost/ghost-shell/main/bootstrap.sh) desktop
 ```
 
-It installs the packages, links the configs into your home folder (GNU Stow) and sets up the
-system (logging in at boot, services). It asks for your password for pacman and the system parts. Log
-out and back in afterwards. Some app themes need the app started once first; the install says
-so and `ghost install <module>` finishes them later.
+`desktop` or `laptop` picks the machine's modules from `machines/` (they become
+`~/.config/ghost/modules`, which you can edit); leave it out for all of them but the opt-in ones.
+Add a wallpaper (or `"#22d3ee"` for colors from one color), and `--yes` to answer pacman's and
+paru's questions for you (paru then skips showing the PKGBUILDs). From a clone it's the same:
+`./install.sh desktop ~/Pictures/some-wallpaper.jpg`.
+
+It installs the packages (AUR ones are built from source, then their build-only dependencies and
+build folders are removed), links the configs into your home folder (GNU Stow) and sets up the
+system (logging in at boot, services). It asks for your password once. Log out and back in
+afterwards. Some app themes need the app started once first; the install says so and
+`ghost install <module>` finishes them later.
 
 ## The `ghost` command
 

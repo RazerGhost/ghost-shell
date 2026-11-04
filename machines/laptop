@@ -1,0 +1,16 @@
+# The HP Omen 16 (CachyOS): every module but the opt-in ones. `ghost install --machine laptop`
+# (or `./install.sh laptop`) writes this to ~/.config/ghost/modules.
+core
+system
+snapshots
+apps
+dev
+gaming
+discord
+spotify
+zen
+haunt
+capture
+phone
+proton
+calendar
