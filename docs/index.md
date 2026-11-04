@@ -275,7 +275,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 
 | Target | Functions |
 |---|---|
-| `island` | `toggle <settings\|today\|media\|clipboard\|emoji\|power\|tray>`, `close`, `editQuickSettings` |
+| `island` | `toggle <settings\|today\|media\|clipboard\|emoji\|power\|tray>`, `close`, `editQuickSettings`, `state` (what decides whether a pop-up shows, as JSON) |
 | `launcher` | `toggle` |
 | `apps` | `open <kind>`, `terminal <command>` |
 | `settings` | `open`, `page <id>` |

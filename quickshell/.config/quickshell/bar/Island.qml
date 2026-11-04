@@ -107,6 +107,27 @@ Scope {
             root.panel = "";
         }
 
+        // What decides whether a notification pops up, as one line of JSON, to check a pop-up that
+        // didn't show without reloading the shell (which would reset it): the menu open, the
+        // lock, the greeting, the reload notice, the queue, and the quiet reasons.
+        function state(): string {
+            return JSON.stringify({
+                panel: root.panel,
+                panelScreen: root.screenName,
+                focusedScreen: Hyprland.focusedMonitor?.name ?? null,
+                locked: Session.locked,
+                ending: Session.ending,
+                welcome: root.welcomeShown,
+                reloadNotice: root.reloadShown,
+                current: Notifications.current ? (Notifications.current.appName + ": " + Notifications.current.summary) : null,
+                queue: Notifications.queue.length,
+                quiet: Notifications.quiet,
+                doNotDisturb: Notifications.doNotDisturb,
+                gameMode: GameMode.on,
+                fullscreen: Notifications.fullscreenNow
+            });
+        }
+
         // Quick settings in its edit mode (the customize menu's Quick settings).
         function editQuickSettings(): void {
             // The screen first: setting the panel first opened it on the last screen for a moment,
