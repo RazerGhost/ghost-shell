@@ -110,13 +110,22 @@ local function start_move()
     end
 end
 
+-- Hyprland's own drag (bound beside this) takes the tiled window out of the layout while it's
+-- carried and gives it back when it's let go, after this release bind; the layout adds a window
+-- that comes back at the end (the right). So the swap waits until it's back, then puts it in the
+-- place of whichever tiled window is under the pointer (none where it already is).
 local function end_move()
-    local pos = hl.get_cursor_pos()
-    local target = moving and pos and tiled_window_at(pos, moving)
-    if target then
-        hl.dispatch(hl.dsp.layout("swap " .. moving .. " " .. target.address))
-    end
+    local pos, address = hl.get_cursor_pos(), moving
     moving = nil
+    if not (pos and address) then
+        return
+    end
+    hl.timer(function()
+        local target = tiled_window_at(pos, address)
+        if target then
+            hl.dispatch(hl.dsp.layout("swap " .. address .. " " .. target.address))
+        end
+    end, { timeout = 50, type = "oneshot" })
 end
 
 -- The topmost window under `pos`: a floating one before the tiled one under it.
