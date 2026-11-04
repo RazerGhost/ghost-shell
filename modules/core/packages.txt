@@ -14,6 +14,9 @@ nvidia-prime
 
 # The Quickshell shell, and what it runs or reads
 quickshell
+# The screen reader (reads the shell's Accessible names and roles over AT-SPI; start it with
+# `orca`, Orca's own settings with `orca -s`)
+orca
 qt6-imageformats
 # Sound: PipeWire with its PulseAudio and ALSA sides (apps like Spotify, Vesktop and Zen talk
 # PulseAudio) and pw-play (the shell's sound events)
