@@ -40,17 +40,13 @@ Scope {
         + (Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE") || "default")
     property bool lockingFirst: false
 
-    Component.onCompleted: {
-        if (Quickshell.env("GHOST_AUTOLOGIN") === "1")
-            firstLockCheck.running = true;
-    }
-
-    Process {
-        id: firstLockCheck
-        command: ["test", "-e", root.lockedOnce]
-        onExited: code => {
-            if (code === 0)
-                return; // locked once already this session
+    // Read in-process as the shell loads (it used to wait for a `test -e` process, a moment in
+    // which the dock and the island already took clicks). Missing: not locked yet this session.
+    FileView {
+        path: Quickshell.env("GHOST_AUTOLOGIN") === "1" ? root.lockedOnce : ""
+        blockLoading: true
+        printErrors: false
+        onLoadFailed: {
             root.lockingFirst = true;
             root.lock(false);
         }

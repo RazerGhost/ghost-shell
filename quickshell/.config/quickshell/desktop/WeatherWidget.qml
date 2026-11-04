@@ -9,6 +9,8 @@ WidgetSurface {
     id: widget
 
     readonly property var now: Weather.current
+    // On the lock screen: the town is where you live, to anyone at the screen.
+    property bool hidesPlace: false
 
     Row {
         anchors.top: parent.top
@@ -60,7 +62,7 @@ WidgetSurface {
 
         Text {
             width: parent.width
-            visible: widget.now !== null
+            visible: widget.now !== null && !widget.hidesPlace
             text: Weather.place?.name ?? Settings.values.weatherLocation
             color: Colors.m3onSurfaceVariant
             font.family: Theme.font.sans

@@ -395,6 +395,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   fires `loaded`, not `loadFailed`, and the adapter keeps its defaults (verified with a throwaway
   `qs -p`). Only a missing file fails (`FileViewError.FileNotFound`). So check `JSON.parse(text())`
   in `onLoaded` before letting `onAdapterUpdated` write (services/Settings.qml).
+- Whether a file exists, in-process: a plain `FileView { path; blockLoading: true; printErrors:
+  false }` fires `onLoadFailed` for a missing file and `onLoaded` for one that's there, right
+  after the component completes (verified with a throwaway `qs -p`; lock/Lock.qml's first lock).
 
 - `Process.running = true` inside `Component.onCompleted` reads back false until the event loop
   runs (from a Timer it's true at once). `services/LatestProcess.qml` (run once more with the

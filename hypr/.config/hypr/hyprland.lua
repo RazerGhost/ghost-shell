@@ -15,7 +15,8 @@ require("input")
 -- session starts unlocked: the keybinds wait until the shell's lock screen is up (lock/Lock.qml
 -- marks that in $XDG_RUNTIME_DIR and reloads, which loads them), so nobody can open a terminal
 -- in the second before. If the shell hasn't locked within 15 s (it failed to start), hyprlock
--- locks instead. The mark is per Hyprland instance: the runtime folder outlives a logout for a
+-- locks instead, and the keybinds load only once it has been unlocked with the password (its
+-- exit code 0): if hyprlock can't start, they stay held back rather than loading unlocked. The mark is per Hyprland instance: the runtime folder outlives a logout for a
 -- few seconds, and the next session must not find the last one's mark.
 local locked_once = (os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/ghost-autologin-locked-"
     .. (os.getenv("HYPRLAND_INSTANCE_SIGNATURE") or "default")
@@ -32,7 +33,7 @@ else
             done:close()
             return
         end
-        hl.exec_cmd("hyprlock -c /usr/share/hypr/hyprlock.conf & sleep 2; touch '" .. locked_once .. "'; hyprctl reload")
+        hl.exec_cmd("hyprlock -c /usr/share/hypr/hyprlock.conf && touch '" .. locked_once .. "' && hyprctl reload")
     end, { timeout = 15000, type = "oneshot" })
 end
 

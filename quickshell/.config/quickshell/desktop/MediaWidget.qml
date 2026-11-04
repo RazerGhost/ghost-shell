@@ -14,8 +14,13 @@ WidgetSurface {
     readonly property MprisPlayer player: Media.player
     readonly property DesktopEntry app: player ? null : Media.lastApp
 
+    // On the lock screen (desktop/WidgetStage.qml): only previous, play or pause, and next.
+    // Opening the music app or bringing the player's window forward would act on the desktop
+    // behind the lock.
+    property bool locked: false
+
     function open(): void {
-        if (app)
+        if (app && !locked)
             Apps.launch(app);
     }
 
@@ -23,6 +28,7 @@ WidgetSurface {
 
     MouseArea {
         anchors.fill: parent
+        enabled: !widget.locked
         cursorShape: widget.player || widget.app ? Qt.PointingHandCursor : Qt.ArrowCursor
         onClicked: widget.player ? Media.show() : widget.open()
     }
@@ -91,7 +97,7 @@ WidgetSurface {
                 icon: widget.player?.isPlaying ? "pause" : "play_arrow"
                 color: Colors.m3onPrimary
                 label: widget.player ? (widget.player.isPlaying ? "Pause" : "Play") : widget.app ? "Open " + widget.app.name : "Play"
-                enabled: widget.player ? widget.player.canTogglePlaying : widget.app !== null
+                enabled: widget.player ? widget.player.canTogglePlaying : widget.app !== null && !widget.locked
                 onClicked: widget.player ? widget.player.togglePlaying() : widget.open()
             }
         }

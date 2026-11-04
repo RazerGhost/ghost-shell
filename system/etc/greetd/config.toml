@@ -12,6 +12,14 @@
 vt = 1
 
 [default_session]
+# After a logout. greetd runs this slot as a greeter session (logind's Class=greeter), so it's
+# only used then; the boot uses initial_session below, a normal user session.
+# GREETD_SOCK is left out: it would let any of your programs talk to greetd as the greeter.
 # Hyprland's output goes to the journal (journalctl -t hyprland), not onto tty1.
-command = "env GHOST_AUTOLOGIN=1 systemd-cat --identifier=hyprland start-hyprland"
+command = "env -u GREETD_SOCK GHOST_AUTOLOGIN=1 systemd-cat --identifier=hyprland start-hyprland"
+user = "@USER@"
+
+# Boot: the same session, once per boot, as a user session.
+[initial_session]
+command = "env -u GREETD_SOCK GHOST_AUTOLOGIN=1 systemd-cat --identifier=hyprland start-hyprland"
 user = "@USER@"

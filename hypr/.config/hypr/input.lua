@@ -24,22 +24,3 @@ hl.config({
         },
     },
 })
-
--- 3-finger swipe to switch workspaces
-hl.gesture({
-    fingers   = 3,
-    direction = "horizontal",
-    action    = "workspace",
-})
-
--- 3-finger swipe up opens the overview (Quickshell's overview/Overview.qml), down closes it.
-hl.gesture({
-    fingers   = 3,
-    direction = "up",
-    action    = function() hl.exec_cmd("qs ipc call overview open") end,
-})
-hl.gesture({
-    fingers   = 3,
-    direction = "down",
-    action    = function() hl.exec_cmd("qs ipc call overview close") end,
-})

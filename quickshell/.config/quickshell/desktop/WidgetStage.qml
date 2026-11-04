@@ -5,8 +5,9 @@ import "DesktopWidgets.js" as DesktopWidgetsJs
 
 // The desktop widgets at their places (the desktop editor's Widgets tab), drawn by the desktop
 // (DesktopWidgets.qml) and the lock screen (lock/LockContent.qml), which shows the desktop
-// locked. `locked`: no handles or grid, only the media widget takes clicks, and the calendar and
-// to-do widgets keep their titles to themselves (anyone at the locked screen can see it).
+// locked. `locked`: no handles or grid, only the media widget's playback buttons take clicks,
+// the calendar and to-do widgets keep their titles to themselves and the weather your town
+// (anyone at the locked screen can see it).
 Item {
     id: stage
 
@@ -86,7 +87,9 @@ Item {
         name: "weather"
         shown: Settings.values.desktopWeather
 
-        WeatherWidget {}
+        WeatherWidget {
+            hidesPlace: stage.locked
+        }
     }
 
     DesktopCard {
@@ -94,7 +97,9 @@ Item {
         name: "media"
         shown: Settings.values.desktopMedia
 
-        MediaWidget {}
+        MediaWidget {
+            locked: stage.locked
+        }
     }
 
     DesktopCard {

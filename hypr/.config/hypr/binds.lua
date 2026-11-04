@@ -173,3 +173,24 @@ hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("qs ipc call media next || playerctl n
 hl.bind("XF86AudioPause", hl.dsp.exec_cmd("qs ipc call media playPause || playerctl play-pause"), { locked = true })
 hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("qs ipc call media playPause || playerctl play-pause"), { locked = true })
 hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("qs ipc call media previous || playerctl previous"),   { locked = true })
+
+-- Touchpad gestures: here with the keybinds, so they're held back too until the lock screen
+-- is up after an automatic login (hyprland.lua).
+-- 3-finger swipe to switch workspaces
+hl.gesture({
+    fingers   = 3,
+    direction = "horizontal",
+    action    = "workspace",
+})
+
+-- 3-finger swipe up opens the overview (Quickshell's overview/Overview.qml), down closes it.
+hl.gesture({
+    fingers   = 3,
+    direction = "up",
+    action    = function() hl.exec_cmd("qs ipc call overview open") end,
+})
+hl.gesture({
+    fingers   = 3,
+    direction = "down",
+    action    = function() hl.exec_cmd("qs ipc call overview close") end,
+})
