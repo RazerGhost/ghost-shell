@@ -32,6 +32,11 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   recalculates after it; `hl.dsp.layout("msg")` sends one to the focused workspace's layout.
   Mouse-resizing a tiled window only calls `recalculate`, without the drag distance; instead,
   `hl.timer(fn, { timeout = 16, type = "repeat" })` (stop with `:set_enabled(false)`) and
+- Floating a tiled window from a bind (`hl.dsp.window.float({ action = "enable" })`) sets its
+  floating size and place after the bind returns (its last floating size, centred on the pointer),
+  so a `resize`/`move` dispatched in the same bind is undone; from a later call (a timer) they stick.
+  Hyprland's own `hl.dsp.window.drag()` would then carry it from that centred place, so the
+  Super + Shift drag moves the window itself.
   `hl.get_cursor_pos()` can follow the pointer between a press and a `release = true` bind, which
   can share a key with a `mouse = true` bind when marked `non_consuming`. Registering
   a name twice is an error (`hyprctl eval` of the file again fails; `hyprctl reload` works).

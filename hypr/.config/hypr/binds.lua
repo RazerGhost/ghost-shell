@@ -168,6 +168,10 @@ hl.bind(mainMod .. " + mouse:272", drag.start_move, { non_consuming = true })
 hl.bind(mainMod .. " + mouse:272", drag.stop_move, { release = true, non_consuming = true })
 hl.bind(mainMod .. " + mouse:273", drag.start, { non_consuming = true })
 hl.bind(mainMod .. " + mouse:273", drag.stop, { release = true, non_consuming = true })
+-- Super + Shift + left-drag: a tiled window comes out of the tiling and floats under the pointer;
+-- dropped on a tiled window, a floating one goes into its place (drag.lua).
+hl.bind(mainMod .. " + SHIFT + mouse:272", drag.start_pop, { description = "Windows: Take a tiled window out (or drop one into a tiled spot)" })
+hl.bind(mainMod .. " + SHIFT + mouse:272", drag.stop_pop, { release = true, non_consuming = true })
 
 -- Volume & brightness
 -- Quickshell's OSD sees volume changes through PipeWire by itself. It can't watch the backlight,

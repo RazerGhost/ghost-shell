@@ -7,6 +7,9 @@
 --   changes the arrangement's shares (tiling.drag) and asks the layout (layout.lua) to place the
 --   windows again.
 -- - Super + left-drag swaps the window with the tiled one it's dropped on.
+-- - Super + Shift + left-drag takes a tiled window out of the tiling: it floats at its size where
+--   it is and follows the pointer (a timer, as above); dropped over a tiled window, a floating one goes back
+--   into the tiling in that window's place (the two swap), dropped anywhere else it stays floating.
 local tiling = require("tiling")
 local layout = require("layout")
 
@@ -25,7 +28,7 @@ local function shown(window)
     return window.mapped and not window.hidden and (window.pinned or (ws and ws.visible))
 end
 
--- The tiled window under `pos`, other than `except` (the one being dragged sits under the
+-- The tiled window under `pos`, leaving out `except` (the one being dragged sits under the
 -- pointer too). None where a floating window covers `pos`: floating windows sit above tiled
 -- ones, so the drag is Hyprland's own resize or move of that window, not one for the window
 -- underneath.
@@ -33,10 +36,10 @@ local function tiled_window_at(pos, except)
     local found
     for _, window in ipairs(hl.get_windows()) do
         local ws = window.workspace
-        if shown(window) and contains(window, pos) then
+        if window.address ~= except and shown(window) and contains(window, pos) then
             if window.floating then
                 return nil
-            elseif not found and ws and not ws.special and window.address ~= except then
+            elseif not found and ws and not ws.special then
                 found = window
             end
         end
@@ -116,4 +119,83 @@ local function end_move()
     moving = nil
 end
 
-return { start = start_drag, stop = end_drag, start_move = start_move, stop_move = end_move }
+-- The topmost window under `pos`: a floating one before the tiled one under it.
+local function window_at(pos)
+    local tiled
+    for _, window in ipairs(hl.get_windows()) do
+        local ws = window.workspace
+        if shown(window) and contains(window, pos) and ws and not ws.special then
+            if window.floating then
+                return window
+            end
+            tiled = tiled or window
+        end
+    end
+    return tiled
+end
+
+-- The window carried by Super + Shift + left-drag: its address, its size, and where the pointer
+-- holds it (from its top-left corner).
+local pop
+
+-- Floating a window in a bind sets its own size and place after the bind returns (centred on the
+-- pointer at its last floating size), so the size is set from the timer, which also carries it.
+local function follow_pop()
+    local pos = hl.get_cursor_pos()
+    local window = pop and pos and hl.get_window("address:" .. pop.address)
+    if not window then
+        return
+    end
+    local target = "address:" .. pop.address
+    if window.size.x ~= pop.size.x or window.size.y ~= pop.size.y then
+        hl.dispatch(hl.dsp.window.resize({ window = target, x = pop.size.x, y = pop.size.y }))
+    end
+    local x, y = pos.x - pop.grab.x, pos.y - pop.grab.y
+    if window.at.x ~= x or window.at.y ~= y then
+        hl.dispatch(hl.dsp.window.move({ window = target, x = x, y = y }))
+    end
+end
+
+local function end_pop()
+    if not pop then
+        return
+    end
+    pop.timer:set_enabled(false)
+    local address, pos = pop.address, hl.get_cursor_pos()
+    pop = nil
+    if not (pos and tiled_window_at(pos, address)) then
+        return -- let go over no tiled window: it stays floating there
+    end
+    -- Back into the tiling; once the layout has placed it, it swaps with whichever tiled window is
+    -- under the pointer then, so it ends up where it was let go.
+    local target = "address:" .. address
+    hl.dispatch(hl.dsp.window.float({ window = target, action = "disable" }))
+    hl.dispatch(hl.dsp.focus({ window = target }))
+    hl.timer(function()
+        local over = tiled_window_at(pos, address)
+        if over then
+            hl.dispatch(hl.dsp.layout("swap " .. address .. " " .. over.address))
+        end
+    end, { timeout = 50, type = "oneshot" })
+end
+
+local function start_pop()
+    end_pop() -- one whose release never came
+    local pos = hl.get_cursor_pos()
+    local window = pos and window_at(pos)
+    if not window then
+        return
+    end
+    if not window.floating then
+        hl.dispatch(hl.dsp.window.float({ window = "address:" .. window.address, action = "enable" }))
+    end
+    pop = {
+        address = window.address,
+        size = { x = window.size.x, y = window.size.y },
+        grab = { x = pos.x - window.at.x, y = pos.y - window.at.y },
+        timer = hl.timer(follow_pop, { timeout = 16, type = "repeat" }),
+    }
+end
+
+return { start = start_drag, stop = end_drag, start_move = start_move, stop_move = end_move,
+         start_pop = start_pop, stop_pop = end_pop }

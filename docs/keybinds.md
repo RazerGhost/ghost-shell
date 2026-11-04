@@ -63,6 +63,7 @@ Generated from Hyprland's binds with `ghost keybinds`, by category; every bind i
 | `Super` + `Ctrl` + `↑` or `Super` + `Ctrl` + `↓` | Move focus |
 | `Super` + `Left drag` | Move window |
 | `Super` + `Right drag` | Resize window |
+| `Super` + `Shift` + `Left drag` | Take a tiled window out (or drop one into a tiled spot) |
 
 ## Workspaces
 

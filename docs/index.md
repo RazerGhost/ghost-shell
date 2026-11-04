@@ -147,7 +147,7 @@ while recording; each can be turned off. `osd/Osd.qml`, `services/Keyboard.qml`.
 
 | Feature | Files |
 |---|---|
-| Tiling layout (by count, or a picked arrangement), Super+drag borders and swap | `layout.lua`, `tiling.lua`, `drag.lua`, `services/Snap.qml`, `SnapLayout.js` |
+| Tiling layout (by count, or a picked arrangement), Super+drag borders and swap, Super+Shift+drag to float or tile | `layout.lua`, `tiling.lua`, `drag.lua`, `services/Snap.qml`, `SnapLayout.js` |
 | Window menu (Alt+Space / Super+Z): actions, move to workspace, snap layouts | `snap/WindowMenu.qml`, `WindowActions.qml`, `SnapLayouts.qml` |
 | Snap Assist | `snap/SnapAssist.qml`, `services/WindowGrid.js` |
 | Alt+Tab switcher with live previews | `switcher/Switcher.qml`, `widgets/WindowPreview.qml` |
