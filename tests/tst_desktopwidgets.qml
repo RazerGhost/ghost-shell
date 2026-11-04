@@ -5,6 +5,25 @@ import "../quickshell/.config/quickshell/desktop/DesktopWidgets.js" as DesktopWi
 TestCase {
     name: "DesktopWidgets"
 
+    // Turned on, a widget goes where it's clear of the others at 100 % on 1920 x 1080.
+    function test_freePlace() {
+        // Its default place free: kept (the default is 0.04, 0.62 for notifications).
+        compare(DesktopWidgets.freePlace({}, "notifications", [], 1920, 1080).notifications, { x: 0.04, y: 0.62 });
+        // The clock (medium, 352 x 168) moved over its default: beside the clock, 16 px right.
+        const saved = { clock: { x: 80 / 1920, y: 640 / 1080 } };
+        compare(DesktopWidgets.freePlace(saved, "notifications", ["clock"], 1920, 1080).notifications,
+                { x: Math.round((80 + 352 + 16) / 1920 * 10000) / 10000, y: Math.round(640 / 1080 * 10000) / 10000 });
+        // Its own earlier place, still free, wins over the default.
+        const own = { clock: saved.clock, notifications: { x: 0.5, y: 0.3 } };
+        compare(DesktopWidgets.freePlace(own, "notifications", ["clock"], 1920, 1080).notifications, { x: 0.5, y: 0.3 });
+        // The others keep their places, and the saved object isn't changed.
+        const after = DesktopWidgets.freePlace(saved, "todo", ["clock"], 1920, 1080);
+        compare(after.clock, saved.clock);
+        verify(saved.todo === undefined);
+        // Nowhere free (a tiny screen): as it was.
+        compare(DesktopWidgets.freePlace(saved, "todo", ["clock"], 300, 300), saved);
+    }
+
     function test_place() {
         compare(DesktopWidgets.place({}, "clock"), { x: 0.04, y: 0.08 });
         compare(DesktopWidgets.place({ clock: { x: 0.5, y: 0.25 } }, "clock"), { x: 0.5, y: 0.25 });

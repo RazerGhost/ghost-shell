@@ -1751,6 +1751,10 @@ desktop, not a screen of its own, and the login screen and the lock screen edito
   `PartShift`, `PartOutline`, `GlideTranslate`, `MiniClock`, `EditOutline`, `lockLooks` and the
   `lock*` settings). The desktop editor's gallery gained a notifications widget
   (`desktop/NotificationsWidget.qml`: how many wait and from how many apps, never what they say).
+  A widget turned on in the gallery goes where it's clear of the ones showing (user's find: the
+  new one landed on their moved clock): its own earlier place if free, else beside, below, left
+  of or above one of them, else the first free spot from the top left, all at 100 %
+  (`DesktopWidgets.freePlace`, tested; a pixel of slack for rounded fractions).
 - No login screen: greetd's `default_session` is your own session with `GHOST_AUTOLOGIN=1`, at
   boot and after every logout, locked at once (the greeter, its Hyprland, `ghost greeter`, the
   shared folder and `greeter/sync.sh` are gone; the system module removes their copies). The

@@ -115,6 +115,50 @@ function withPlace(saved, name, place) {
     return places;
 }
 
+// Sizes at 100 % (Theme.desktop: a small widget's side, a medium one twice it plus the gap) and
+// the room kept from the screen's edges: the island's band at the top, the dock's at the bottom.
+const unit = { size: 168, gap: 16, side: 32, top: 80, bottom: 100 };
+
+function box(name) {
+    const kind = kinds.find(k => k.name === name);
+    return { w: kind?.medium ? unit.size * 2 + unit.gap : unit.size, h: unit.size };
+}
+
+// Places `name` as it's turned on (the desktop editor's gallery), clear of the widgets already
+// showing (`others`, their names) on a sw x sh screen: at the place you last gave it if that's
+// free, else right beside, below, left of or above one of them (so it joins your arrangement),
+// else the first free spot from the top left; where nothing is free, as it was. All at 100 %
+// (places zoom with the size as a whole, so what's clear at 100 % stays clear). Returns the new
+// desktopWidgets.
+function freePlace(saved, name, others, sw, sh) {
+    const size = box(name);
+    const rects = others.map(n => {
+        const p = place(saved, n);
+        const b = box(n);
+        return { x: p.x * sw, y: p.y * sh, w: b.w, h: b.h };
+    });
+    // A pixel of slack: saved places are rounded fractions, so a widget laid exactly one gap
+    // from another comes back a hair closer.
+    const gap = unit.gap - 1;
+    const fits = c => c.x >= unit.side && c.y >= unit.top
+        && c.x + size.w <= sw - unit.side && c.y + size.h <= sh - unit.bottom
+        && rects.every(r => c.x + size.w + gap <= r.x || r.x + r.w + gap <= c.x
+                         || c.y + size.h + gap <= r.y || r.y + r.h + gap <= c.y);
+    const own = place(saved, name);
+    const candidates = [{ x: own.x * sw, y: own.y * sh }];
+    for (const r of rects)
+        candidates.push({ x: r.x + r.w + unit.gap, y: r.y }, { x: r.x, y: r.y + r.h + unit.gap },
+                        { x: r.x - unit.gap - size.w, y: r.y }, { x: r.x, y: r.y - unit.gap - size.h });
+    for (let y = unit.top; y + size.h <= sh - unit.bottom; y += unit.gap)
+        for (let x = unit.side; x + size.w <= sw - unit.side; x += unit.gap)
+            candidates.push({ x: x, y: y });
+    const spot = candidates.find(fits);
+    if (!spot)
+        return saved ?? {};
+    const round = v => Math.round(v * 10000) / 10000;
+    return withPlace(saved, name, { x: round(spot.x / sw), y: round(spot.y / sh) });
+}
+
 // A widget dropped at (x, y), w x h px, on a sw x sh screen, lines up with what's near it: the
 // screen's edges at `margin`, and the other widgets (rects { x, y, w, h }) by their edges or
 // right next to them at `gap`, when within `reach` px. Each axis on its own; {x, y} in px.

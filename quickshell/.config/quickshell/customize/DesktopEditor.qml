@@ -680,7 +680,19 @@ Scope {
                                 // The widget scaled to the gallery's height, less its name.
                                 readonly property real zoom: preview.item ? (gallery.height - name.height - Theme.spacing.s) / Math.max(preview.item.height, 1) : 1
 
+                                // Turned on, it goes where it's clear of the widgets showing
+                                // (DesktopWidgets.freePlace): beside them rather than over them.
                                 function toggle(): void {
+                                    if (!on) {
+                                        const name = DesktopWidgetsJs.kinds.find(k => k.key === modelData.key).name;
+                                        const others = DesktopWidgetsJs.kinds
+                                            .filter(k => k.name !== name && Settings.values[k.key] && (k.name !== "battery" || Battery.present))
+                                            .map(k => k.name);
+                                        const screen = Quickshell.screens[0];
+                                        if (screen)
+                                            Settings.values.desktopWidgets = DesktopWidgetsJs.freePlace(
+                                                Settings.values.desktopWidgets, name, others, screen.width, screen.height);
+                                    }
                                     Settings.values[modelData.key] = !on;
                                 }
 
