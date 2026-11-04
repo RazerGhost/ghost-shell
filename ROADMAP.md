@@ -685,7 +685,8 @@ Since 2026-11-04 the to-do list is a desktop widget (see "Desktop widgets polish
   again (nothing half added; the review of 2026-11-04). vdirsyncer's messages are shown with
   every address replaced by `<link>`: its errors print the whole address. `webcal://` links
   (Apple, Outlook) are taken as https. Checked with Google's public Dutch holidays calendar in a
-  scratch home folder: add, sync, remove, and a failing link rolled back. `services/Agenda.qml` runs `vdirsyncer sync` at start, every 15
+  scratch home folder: add, sync, remove, and a failing link rolled back. Since then automated:
+  `tests/calendar_test.sh` (stand-in vdirsyncer and clipboard tools in a scratch home). `services/Agenda.qml` runs `vdirsyncer sync` at start, every 15
   minutes once khal's config exists, and when that config changes, and asks khal for the shown
   month and the coming week. The today menu lists the next events under the date, the month and
   calendar widgets show them (`CalendarEvents.js`, tested). Events are made in the calendar's own

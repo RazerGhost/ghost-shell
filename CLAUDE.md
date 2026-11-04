@@ -13,7 +13,7 @@ Arch Linux + Hyprland dotfiles, deployed with GNU Stow; on GitHub as RazerGhost/
 - Browser is Zen (`zen-browser-bin` from the AUR), not Firefox. Use it wherever a browser is launched or set as default.
 - Hyprland and Quickshell run on the laptop (CachyOS). A session on the laptop can run and test changes directly (`qs`, `hyprctl`, `journalctl`); a session on another machine can't, and hands the user a test checklist instead.
 - Commit and push after each phase or fix; the user may pull on another machine.
-- `tests/` holds QML tests (not a Stow package). Run them with `QT_QPA_PLATFORM=offscreen /usr/lib/qt6/bin/qmltestrunner -input tests`, and the tiling layout's Lua test with `lua tests/tiling_test.lua`.
+- `tests/` holds QML tests (not a Stow package). Run them with `QT_QPA_PLATFORM=offscreen /usr/lib/qt6/bin/qmltestrunner -input tests`, the tiling layout's Lua test with `lua tests/tiling_test.lua`, and the calendar setup's with `bash tests/calendar_test.sh` (stand-in tools, a scratch home).
 - Files use LF line endings (enforced in `.gitattributes`), even when edited on Windows.
 - `ROADMAP.md` has the phase plan, decisions and open issues. Update it when a phase finishes or a decision changes.
 - `NOTES.md` has the verified Quickshell/Hyprland API facts and how to test on the laptop. Read it before using an API it might cover, and add facts you verify.
