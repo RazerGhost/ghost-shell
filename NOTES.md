@@ -409,7 +409,14 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   journal of 2026-11-04, boots -7..0: after "System is powering down" the next boot had no
   0000:01:00.0 in 3 of 4 cases, after "System is rebooting" it was there 3 of 3. In such a boot the
   root port 0000:00:01.1 has empty bridge windows (the card was off when the kernel scanned). A
-  restart brings it back. Tried: waking it at shutdown (ghost-wake-dgpu.service).
+  restart brings it back. Tried and dropped: waking it at shutdown (ghost-wake-dgpu.service): it
+  woke ("0000:01:00.0: active") and the next boot still had no RTX. A sibling model's write-up
+  (OMEN 16-ap0xxx, board 8E35, github.com/iammhador/omen16-linux-poweroff): the kernel's
+  device_shutdown() runtime-resumes the dGPU right before S5, and HP's _PTS(5) never cuts its
+  rail (only Windows' path does), so the card stays powered "off". Their fix (omen_s5) calls the
+  firmware's own PEGP._PS3 with OMPR=3 -> PG00._OFF; this laptop's firmware (BIOS F.31) has no
+  OMPR, NVDE or PG00 (strings in the DSDT and SSDTs), so it doesn't apply as is. The card's ACPI
+  node is \_SB.PCI0.GPP0.DEV0 with no power states exposed.
 - The Omen 16-xf0's speakers (Realtek ALC245, HP board 8BCA): the kernel picks no fixup ("PCI
   SSID 103c:0000") and drives only pin 0x14; its bass speakers are on pin 0x17, which the BIOS
   marks unused (0x411111f0). Switched on by hand they made the sound fuller (user's A/B, pink

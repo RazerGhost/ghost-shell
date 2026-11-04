@@ -1924,16 +1924,16 @@ Escape then, Super+D again or a click elsewhere goes back to your workspace. Key
 the foot of the screen. Not while locked, in focus mode or in the desktop editor. Checked with
 wtype: moving, the ring, typing into the note and back, Escape home.
 
-### The RTX missing after a shutdown (2026-11-04; the fix untested)
-The RTX was missing from the PCI bus in some boots (twice noticed that day). The journal's boots
-showed the pattern: after a shutdown the next boot had no RTX in 3 of 4 cases, after a restart it
-was always there; in those boots its root port was empty, the card off before the kernel looked.
-Likely: powered off while the card sleeps in D3cold (runtime power management, whenever idle),
-HP's firmware doesn't switch it on at the next start. `ghost-wake-dgpu.service` (system module,
-board 8BCA only) wakes any NVIDIA graphics card at shutdown (power/control "on", waiting until
-it's active), so the firmware finds it on; while running the card still sleeps when idle.
-Checked on stand-in device folders (only the NVIDIA graphics card woken). To verify: a few
-shutdowns and starts with `lspci | grep -i nvidia` each time. Meanwhile a restart brings it back.
+### The RTX missing after a shutdown (2026-11-04; open)
+The RTX was missing from the PCI bus in some boots. The journal's boots showed the pattern: after
+a shutdown the next boot had no RTX in 3 of 4 cases, after a restart it was always there; in those
+boots its root port was empty, the card off before the kernel looked. A restart brings it back.
+Tried and dropped: `ghost-wake-dgpu.service`, waking the card at shutdown (it woke, the next boot
+still had none; the system module removes it). A sibling model's write-up (NOTES) points the other
+way: Linux's shutdown switches the card on and HP's firmware never cuts its power at "off", which
+Windows' path does; their fix calls a firmware method this BIOS (F.31) doesn't have. Next, if
+wanted: decompile this firmware's tables (iasl, a new package) for its own way to power the card
+off, or an HP BIOS update.
 
 ### Docs and the system module checked for the desktop (2026-11-04)
 User's question: are all the commands in the repo, and how do the docs look. The README lagged
@@ -2355,4 +2355,4 @@ windows).
 
 ## Open issues
 
-None.
+- The RTX missing after a shutdown (see its section): a restart brings it back.

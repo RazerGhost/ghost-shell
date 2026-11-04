@@ -161,6 +161,14 @@ sudo systemctl enable greetd.service
 # its copy of the shell, its Hyprland config and its home folder.
 sudo rm -rf /etc/greetd/quickshell /etc/greetd/hypr /var/lib/qs-greeter
 
+# The service that woke the RTX at shutdown (2026-11-04) didn't help, and pointed the wrong way
+# (ROADMAP: "The RTX missing after a shutdown"): taken out where it was installed.
+if [[ -e /etc/systemd/system/ghost-wake-dgpu.service ]]; then
+    sudo systemctl disable --now ghost-wake-dgpu.service 2>/dev/null || true
+    sudo rm /etc/systemd/system/ghost-wake-dgpu.service
+    sudo systemctl daemon-reload
+fi
+
 step "Name lookup: one mDNS service (Avahi)"
 mdns=system/etc/systemd/resolved.conf.d/50-no-mdns.conf
 if ! cmp -s "$mdns" "/etc/systemd/resolved.conf.d/$(basename "$mdns")"; then
@@ -168,17 +176,13 @@ if ! cmp -s "$mdns" "/etc/systemd/resolved.conf.d/$(basename "$mdns")"; then
     sudo systemctl try-restart systemd-resolved.service
 fi
 
-step "HP Omen 16-xf0: its bass speakers, and the RTX after a shutdown"
-# Only on that laptop (board 8BCA). The kernel leaves its bass speakers off (the patch file says
-# why; it takes effect when the sound driver loads next, at the next boot). And powered off while
-# the RTX sleeps, the next boot often has no RTX: a service wakes it at shutdown (the unit says why).
+step "HP Omen 16-xf0: its bass speakers"
+# Only on that laptop (board 8BCA): the kernel leaves its bass speakers off (the patch file says
+# why; it takes effect when the sound driver loads next, at the next boot).
 if [[ $(cat /sys/class/dmi/id/board_name 2>/dev/null) == 8BCA ]]; then
-    for file in system/usr/lib/firmware/ghost-hp-8bca-speakers.fw system/etc/modprobe.d/ghost-hp-8bca-speakers.conf \
-                system/etc/systemd/system/ghost-wake-dgpu.service; do
+    for file in system/usr/lib/firmware/ghost-hp-8bca-speakers.fw system/etc/modprobe.d/ghost-hp-8bca-speakers.conf; do
         sudo install -Dm644 "$file" "/${file#system/}"
     done
-    sudo systemctl daemon-reload
-    sudo systemctl enable --now ghost-wake-dgpu.service
 else
     echo "Not an HP Omen 16-xf0 (board 8BCA): skipped"
 fi
