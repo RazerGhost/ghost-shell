@@ -5,7 +5,7 @@ import qs.widgets
 
 // The timer widget (small), the today menu's timer (services/Countdown.qml): while it runs, a
 // ring that empties with the time left around the time, with pause or resume and cancel; else
-// four lengths to start.
+// four lengths to start. On the lock screen (disabled there) no buttons: it says whether one runs.
 WidgetSurface {
     id: widget
 
@@ -19,9 +19,18 @@ WidgetSurface {
         font.letterSpacing: 1
     }
 
-    // Not running: the lengths, two by two.
+    // Not running: the lengths, two by two; on the lock screen, that none runs.
+    Text {
+        visible: !Countdown.active && !widget.enabled
+        anchors.bottom: parent.bottom
+        text: "Not running"
+        color: Colors.m3onSurfaceVariant
+        font.family: Theme.font.sans
+        font.pixelSize: Theme.font.normal
+    }
+
     Grid {
-        visible: !Countdown.active
+        visible: !Countdown.active && widget.enabled
         anchors.bottom: parent.bottom
         width: parent.width
         columns: 2
@@ -68,7 +77,7 @@ WidgetSurface {
     }
 
     Row {
-        visible: Countdown.active
+        visible: Countdown.active && widget.enabled
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         spacing: Theme.spacing.s

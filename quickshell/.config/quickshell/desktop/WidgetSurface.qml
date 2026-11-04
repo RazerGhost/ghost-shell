@@ -16,6 +16,7 @@ Surface {
     width: implicitWidth
     height: implicitHeight
     radius: Theme.desktop.radius
+    color: Colors.widgetTranslucent
 
     Item {
         id: inner

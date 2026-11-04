@@ -43,6 +43,11 @@ Singleton {
     Behavior on panelAlpha { NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing } }
     Behavior on edgeAlpha { NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing } }
     readonly property color surfaceTranslucent: Qt.rgba(m3surfaceContainer.r, m3surfaceContainer.g, m3surfaceContainer.b, panelAlpha)
+    // The desktop widgets' glass, thicker than the panels': they sit straight on the wallpaper, and
+    // at the panels' see-through their grey text met a grey card over a busy or dark picture.
+    // A third of the way from the panels' glass to solid.
+    readonly property color widgetTranslucent: Qt.rgba(m3surfaceContainer.r, m3surfaceContainer.g, m3surfaceContainer.b,
+                                                       panelAlpha + (1 - panelAlpha) / 3)
     readonly property color glassEdge: Qt.rgba(m3onSurface.r, m3onSurface.g, m3onSurface.b, edgeAlpha)
 
     // The editors' small drawings of widgets on their preview cards (lock screen looks, widget

@@ -1784,6 +1784,21 @@ desktop, not a screen of its own, and the login screen and the lock screen edito
   for logging in, the lock screen and sudo (sudo asks for your own; a separate root password
   for sudo was offered and not wanted).
 
+### Desktop widgets polish (built 2026-11-04)
+The pass the user asked for after the first widgets (2026-10-30), now that they're also the lock
+screen. Looked at all eight at once (the Everything layout through the lock preview), in dark
+and light mode:
+- One family: every widget's big value (the time, the day, the temperature, the counts) is the
+  same size and weight (`Theme.desktop.clock`; the temperature was lighter and smaller, and
+  shrinks to fit beside the sky's icon now). The to-do on the lock screen shows its count large
+  like the notifications widget instead of a small "1 open" in an empty card.
+- Thicker glass for the widgets (`Colors.widgetTranslucent`: a third of the way from the panels'
+  glass to solid): they sit straight on the wallpaper, and in light mode over a dark picture the
+  grey secondary text met a grey card. Panels keep the glass setting as it is.
+- The timer's four lengths are tinted buttons (bare text looked unfinished); on the lock screen,
+  where widgets take no clicks, it says "Not running" or shows only its ring, no buttons. The
+  calendar there says "Nothing coming up" without the setup steps for adding a calendar.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
