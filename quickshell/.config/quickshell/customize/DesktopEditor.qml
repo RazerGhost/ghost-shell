@@ -224,16 +224,16 @@ Scope {
                                     Rectangle {
                                         required property var modelData
                                         readonly property real unit: layout.width / Math.max(Screen.width, 1)
-                                        readonly property real w: modelData.medium ? Theme.desktop.medium : Theme.desktop.size
+                                        readonly property var box: Theme.desktop.box(modelData.name)
                                         // Where it shows on the screen at the shell's size, shrunk.
                                         readonly property var at: DesktopWidgetsJs.shown(
-                                            DesktopWidgetsJs.place(layout.values.desktopWidgets, modelData.name), w, Theme.desktop.size,
+                                            DesktopWidgetsJs.place(layout.values.desktopWidgets, modelData.name), box.w, box.h,
                                             Screen.width, Screen.height, Theme.desktop.zoom)
 
                                         x: at.x * unit
                                         y: at.y * unit
-                                        width: w * unit
-                                        height: Theme.desktop.size * unit
+                                        width: box.w * unit
+                                        height: box.h * unit
                                         radius: Theme.desktop.radius * unit
                                         color: Colors.sketch
                                     }
@@ -663,8 +663,11 @@ Scope {
                             model: [
                                 { key: "desktopClock", title: "Clock", widget: clockWidget },
                                 { key: "desktopWeather", title: "Weather", widget: weatherWidget },
+                                { key: "desktopForecast", title: "Weather, hourly", widget: forecastWidget },
                                 { key: "desktopCalendar", title: "Calendar", widget: calendarWidget },
+                                { key: "desktopMonth", title: "Month", widget: monthWidget },
                                 { key: "desktopTodo", title: "To-do", widget: todoWidget },
+                                { key: "desktopTasks", title: "To-do list", widget: tasksWidget },
                                 { key: "desktopTimer", title: "Timer", widget: timerWidget },
                                 { key: "desktopNotifications", title: "Notifications", widget: notificationsWidget },
                                 { key: "desktopBattery", title: "Battery", widget: batteryWidget },
@@ -718,8 +721,9 @@ Scope {
                                     const screen = Quickshell.screens[0];
                                     const grid = Settings.values.desktopGrid ? Theme.px(DesktopWidgetsJs.gridSize(Settings.values.desktopGridSize)) : 0;
                                     const { dx, dy } = DesktopWidgetsJs.keyStep(direction, grid, Theme.spacing.l * 2);
+                                    const box = Theme.desktop.box(kind.name);
                                     const place = DesktopWidgetsJs.nudged(DesktopWidgetsJs.place(Settings.values.desktopWidgets, kind.name), dx, dy,
-                                                                          kind.medium ? Theme.desktop.medium : Theme.desktop.size, Theme.desktop.size,
+                                                                          box.w, box.h,
                                                                           screen?.width ?? 1920, screen?.height ?? 1080, grid,
                                                                           Theme.desktop.zoom);
                                     Settings.values.desktopWidgets = DesktopWidgetsJs.withPlace(Settings.values.desktopWidgets, kind.name, place);
@@ -786,6 +790,9 @@ Scope {
                         Component { id: clockWidget; ClockWidget {} }
                         Component { id: weatherWidget; WeatherWidget {} }
                         Component { id: calendarWidget; CalendarWidget {} }
+                        Component { id: forecastWidget; ForecastWidget {} }
+                        Component { id: monthWidget; MonthWidget {} }
+                        Component { id: tasksWidget; TasksWidget {} }
                         Component { id: todoWidget; TodoWidget {} }
                         Component { id: batteryWidget; BatteryWidget {} }
                         Component { id: timerWidget; TimerWidget {} }

@@ -4,7 +4,8 @@
 .pragma library
 
 // Every widget: its name (its key in desktopWidgets, DesktopCard's `name`), the setting that
-// turns it on, and whether it's medium (twice as wide) or small. The desktop editor's Cancel,
+// turns it on, and its size: small (a square), medium (twice as wide) or large (twice as wide
+// and twice as tall, the month and the to-do list with room to add). The desktop editor's Cancel,
 // themes and widget layouts take their keys from here; adding a widget also means its card in
 // WidgetStage.qml, its regions in DesktopWidgets.qml, its setting and the editor's gallery.
 const kinds = [
@@ -15,7 +16,10 @@ const kinds = [
     { name: "battery",  key: "desktopBattery",  medium: false },
     { name: "todo",     key: "desktopTodo",     medium: true },
     { name: "timer",    key: "desktopTimer",    medium: false },
-    { name: "notifications", key: "desktopNotifications", medium: false }
+    { name: "notifications", key: "desktopNotifications", medium: false },
+    { name: "forecast", key: "desktopForecast", medium: true },
+    { name: "month",    key: "desktopMonth",    medium: true, large: true },
+    { name: "tasks",    key: "desktopTasks",    medium: true, large: true }
 ];
 const keys = kinds.map(k => k.key);
 
@@ -29,7 +33,10 @@ const defaults = {
     battery:  { x: 0.24, y: 0.26 },
     todo:     { x: 0.24, y: 0.44 },
     timer:    { x: 0.34, y: 0.26 },
-    notifications: { x: 0.04, y: 0.62 }
+    notifications: { x: 0.04, y: 0.62 },
+    forecast: { x: 0.48, y: 0.08 },
+    month:    { x: 0.48, y: 0.26 },
+    tasks:    { x: 0.68, y: 0.08 }
 };
 
 function fraction(value, fallback) {
@@ -116,13 +123,14 @@ function withPlace(saved, name, place) {
 }
 
 // Sizes at 100 % (Theme.desktop scales these: a small widget's side, a medium one twice it plus
-// the gap) and the room kept from the screen's edges: the island's band at the top (its
+// the gap, a large one that square) and the room kept from the screen's edges: the island's band at the top (its
 // Theme.island.reserved with room to spare), the dock's at the bottom.
 const unit = { size: 168, gap: 16, side: 32, top: 80, bottom: 100 };
 
 function box(name) {
     const kind = kinds.find(k => k.name === name);
-    return { w: kind?.medium ? unit.size * 2 + unit.gap : unit.size, h: unit.size };
+    const wide = unit.size * 2 + unit.gap;
+    return { w: kind?.medium ? wide : unit.size, h: kind?.large ? wide : unit.size };
 }
 
 // Places `name` as it's turned on (the desktop editor's gallery), clear of the widgets already

@@ -7,9 +7,10 @@ import "DesktopWidgets.js" as DesktopWidgetsJs
 
 // Widgets on the wallpaper (the desktop editor's Widgets tab): a clock, the weather, the media
 // player (with nothing playing, it offers the music app last heard), the calendar's next events,
-// the battery, the to-do list, the timer and how many notifications wait (ClockWidget,
-// WeatherWidget, MediaWidget, CalendarWidget, BatteryWidget, TodoWidget, TimerWidget,
-// NotificationsWidget: one family of sizes; the list of them is DesktopWidgets.js's `kinds`). On the first screen, on the layer just above the wallpaper, so windows cover them.
+// the battery, the to-do list, the timer, how many notifications wait, the next hours' weather,
+// the month and a to-do list to add to (ClockWidget, WeatherWidget, MediaWidget, CalendarWidget,
+// BatteryWidget, TodoWidget, TimerWidget, NotificationsWidget, ForecastWidget, MonthWidget,
+// TasksWidget: one family of sizes; the list of them is DesktopWidgets.js's `kinds`). On the first screen, on the layer just above the wallpaper, so windows cover them.
 // Each can be dragged by its handle (DesktopCard.qml). The widgets themselves are WidgetStage.qml,
 // which the lock screen draws too.
 Scope {
@@ -29,7 +30,11 @@ Scope {
             color: "transparent"
             WlrLayershell.layer: WlrLayer.Bottom
             WlrLayershell.namespace: "qs-desktop"
-            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+            // No keyboard, except while the to-do list's field is typed in: Exclusive takes it
+            // (OnDemand alone doesn't until the pointer moves), then OnDemand keeps it until a
+            // click elsewhere (verified on a Bottom layer, NOTES).
+            WlrLayershell.keyboardFocus: widgetStage.keyboard === "take" ? WlrKeyboardFocus.Exclusive
+                                       : widgetStage.keyboard === "keep" ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
             // Input and blur only on the widgets; the rest of the desktop stays click-through.
             mask: Region {
@@ -41,6 +46,9 @@ Scope {
                 WidgetRegion { stage: widgetStage; widget: widgetStage.todoCard }
                 WidgetRegion { stage: widgetStage; widget: widgetStage.timerCard }
                 WidgetRegion { stage: widgetStage; widget: widgetStage.notificationsCard }
+                WidgetRegion { stage: widgetStage; widget: widgetStage.forecastCard }
+                WidgetRegion { stage: widgetStage; widget: widgetStage.monthCard }
+                WidgetRegion { stage: widgetStage; widget: widgetStage.tasksCard }
             }
 
             BackgroundEffect.blurRegion: Region {
@@ -52,6 +60,9 @@ Scope {
                 WidgetRegion { stage: widgetStage; widget: widgetStage.todoCard; corner: Theme.desktop.radius }
                 WidgetRegion { stage: widgetStage; widget: widgetStage.timerCard; corner: Theme.desktop.radius }
                 WidgetRegion { stage: widgetStage; widget: widgetStage.notificationsCard; corner: Theme.desktop.radius }
+                WidgetRegion { stage: widgetStage; widget: widgetStage.forecastCard; corner: Theme.desktop.radius }
+                WidgetRegion { stage: widgetStage; widget: widgetStage.monthCard; corner: Theme.desktop.radius }
+                WidgetRegion { stage: widgetStage; widget: widgetStage.tasksCard; corner: Theme.desktop.radius }
                 // Never empty: Hyprland 0.57 blurs the whole surface for an empty region (NOTES).
                 Region { width: 1; height: 1 }
             }

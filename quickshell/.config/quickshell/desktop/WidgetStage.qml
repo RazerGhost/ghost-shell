@@ -21,8 +21,14 @@ Item {
     readonly property alias todoCard: todoCard
     readonly property alias timerCard: timerCard
     readonly property alias notificationsCard: notificationsCard
+    readonly property alias forecastCard: forecastCard
+    readonly property alias monthCard: monthCard
+    readonly property alias tasksCard: tasksCard
     readonly property var cards: [clockCard, weatherCard, mediaCard, calendarCard, batteryCard, todoCard, timerCard,
-                                  notificationsCard]
+                                  notificationsCard, forecastCard, monthCard, tasksCard]
+    // The to-do list's field is being typed in: the desktop's layer takes the keyboard meanwhile
+    // ("take" until it has it, then "keep"; DesktopWidgets.qml), else "none".
+    readonly property string keyboard: !tasksWidget.wantsKeyboard ? "none" : tasksWidget.hasKeyboard ? "keep" : "take"
 
     // Where each widget showing goes at the shell's size, groups kept together
     // (DesktopWidgets.arrange); DesktopCard reads its own.
@@ -144,5 +150,34 @@ Item {
         shown: Settings.values.desktopNotifications
 
         NotificationsWidget {}
+    }
+
+    DesktopCard {
+        id: forecastCard
+        name: "forecast"
+        shown: Settings.values.desktopForecast
+
+        ForecastWidget {}
+    }
+
+    DesktopCard {
+        id: monthCard
+        name: "month"
+        shown: Settings.values.desktopMonth
+
+        MonthWidget {
+            hidesTitles: stage.locked
+        }
+    }
+
+    DesktopCard {
+        id: tasksCard
+        name: "tasks"
+        shown: Settings.values.desktopTasks
+
+        TasksWidget {
+            id: tasksWidget
+            hidesTitles: stage.locked
+        }
     }
 }

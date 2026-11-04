@@ -55,3 +55,30 @@ function forecast(answer) {
         sunset: minutesOf(day.sunset?.[0])
     };
 }
+
+// The coming hours of a forecast answer (its `hourly` temperature_2m, weather_code and is_day,
+// in local times like "2026-11-04T14:00"), from the hour after the current time
+// (answer.current.time): [{ hour, temperature, icon }] for up to `count` hours, `hour` as "15".
+// Empty when the answer has no hours.
+function hours(answer, count) {
+    const hourly = answer && answer.hourly;
+    const now = answer && answer.current && answer.current.time;
+    if (!hourly || !Array.isArray(hourly.time) || typeof now !== "string")
+        return [];
+    // The first hour after now: times compare as text (the same "YYYY-MM-DDTHH:MM" form).
+    const first = hourly.time.findIndex(t => t > now);
+    if (first < 0)
+        return [];
+    const list = [];
+    for (let i = first; i < hourly.time.length && list.length < count; i++) {
+        const temperature = hourly.temperature_2m?.[i];
+        if (typeof temperature !== "number")
+            break;
+        list.push({
+            hour: hourly.time[i].slice(11, 13),
+            temperature: Math.round(temperature),
+            icon: describe(hourly.weather_code?.[i], hourly.is_day?.[i] === 1).icon
+        });
+    }
+    return list;
+}

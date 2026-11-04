@@ -17,7 +17,7 @@ const desktop = [
 ];
 
 // Desktop widget layouts: a fitting set of widgets, each at its place. Places are laid out in px
-// on a 1920 x 1080 screen (widgets 168 px high, small ones 168 wide, medium 352, 16 apart, clear
+// on a 1920 x 1080 screen (small ones 168 px square, medium 352 x 168, large 352 square, 16 apart, clear
 // of the island and the dock) and kept as fractions, like a dragged widget's.
 function widgetLayout(places) {
     const values = {};
@@ -45,13 +45,16 @@ const desktopWidgets = [
     // sky and battery side by side, so its edges are even.
     { name: "Workday", values: widgetLayout({ clock: [1488, 180], calendar: [1488, 364], todo: [1488, 548],
                                              weather: [1488, 732], battery: [1672, 732] }) },
-    // All of them in three rows across the top left, keeping to the upper half (pictures often
+    // The first eight in three rows across the top left, keeping to the upper half (pictures often
     // have the ground and their subject lower down).
     { name: "Everything", values: widgetLayout({ clock: [80, 80], calendar: [448, 80], media: [80, 264], todo: [448, 264],
                                                 weather: [80, 448], battery: [264, 448], timer: [448, 448],
                                                 notifications: [632, 448] }) },
     // A column on the left, centred top to bottom: the time, the sky and battery, the player.
-    { name: "Side", values: widgetLayout({ clock: [80, 272], weather: [80, 456], battery: [264, 456], media: [80, 640] }) }
+    { name: "Side", values: widgetLayout({ clock: [80, 272], weather: [80, 456], battery: [264, 456], media: [80, 640] }) },
+    // A planner on the right: the month and the to-do list side by side, the time and the next
+    // hours' weather above them.
+    { name: "Planner", values: widgetLayout({ clock: [1120, 172], forecast: [1488, 172], month: [1120, 356], tasks: [1488, 356] }) }
 ];
 
 // The island and dock: how much the island shows and when and how large the dock is.

@@ -34,4 +34,20 @@ TestCase {
         compare(Weather.forecast(answer).sunset, 1041);
         compare(Weather.forecast({ current: {} }), null);
     }
+
+    function test_hours() {
+        const answer = {
+            current: { time: "2026-11-04T22:15" },
+            hourly: { time: ["2026-11-04T22:00", "2026-11-04T23:00", "2026-11-05T00:00", "2026-11-05T01:00"],
+                      temperature_2m: [9.6, 8.4, 7.5, 7.1], weather_code: [0, 3, 61, 0], is_day: [0, 0, 0, 0] }
+        };
+        // From the hour after now, across midnight, up to the count.
+        compare(Weather.hours(answer, 2), [{ hour: "23", temperature: 8, icon: "cloud" },
+                                           { hour: "00", temperature: 8, icon: "rainy" }]);
+        compare(Weather.hours(answer, 10).length, 3);
+        compare(Weather.hours({ current: {} }, 6), []);
+        // Nothing after now.
+        answer.current.time = "2026-11-05T01:30";
+        compare(Weather.hours(answer, 6), []);
+    }
 }

@@ -1798,6 +1798,19 @@ and light mode:
 - The timer's four lengths are tinted buttons (bare text looked unfinished); on the lock screen,
   where widgets take no clicks, it says "Not running" or shows only its ring, no buttons. The
   calendar there says "Nothing coming up" without the setup steps for adding a calendar.
+- Then (user's picks: all four suggestions; the month and the to-do list as widgets of their own,
+  they don't fit in the island): the media widget's cover fills its card, darkened toward the
+  bottom with white text and buttons, like iOS's Now Playing (glass as before without one); a
+  medium "Weather, hourly" (`ForecastWidget.qml`: now, high and low, the next six hours from
+  open-meteo's hourly forecast, `Weather.hours`, tested); a large size (352 px square at 100 %)
+  with "Month" (`MonthWidget.qml`: the month's days, today in the accent, dots on days with an
+  event, the next three events) and "To-do list" (`TasksWidget.qml`: the open tasks as rows,
+  "+N more", "Clear N done", and a field to add one). The desktop's layer takes no keyboard, so a
+  click in the field takes it (`Exclusive` until the window is active, then `OnDemand` until a
+  click elsewhere, see NOTES) and Enter on an empty field or Escape gives it back. On the lock
+  screen both keep titles to themselves like the medium ones. The drag handle shows only in the
+  desktop editor, so the widgets look clean day to day. A "Planner" widget layout (the time, the
+  hourly weather, the month and the to-do list on the right).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

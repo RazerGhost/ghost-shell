@@ -13,6 +13,7 @@ Singleton {
     readonly property string location: Settings.values.weatherLocation
     property var place: null   // { name, latitude, longitude }
     property var current: null // { temperature, high, low, icon, label, sunrise, sunset }
+    property var hours: []     // the coming hours: [{ hour, temperature, icon }] (the hourly widget)
     property string error: ""
 
     function get(url: string, done: var): void {
@@ -58,9 +59,11 @@ Singleton {
             return;
         get(`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}`
             + "&current=temperature_2m,weather_code,is_day&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset"
-            + "&timezone=auto&forecast_days=1"
+            + "&hourly=temperature_2m,weather_code,is_day" // two days, so late in the evening has hours ahead
+            + "&timezone=auto&forecast_days=2"
             + (root.fahrenheit ? "&temperature_unit=fahrenheit" : ""), answer => {
             root.current = WeatherJs.forecast(answer);
+            root.hours = WeatherJs.hours(answer, 6);
             root.error = root.current ? "" : "Unexpected answer from the weather service";
         });
     }

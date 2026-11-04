@@ -236,6 +236,15 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   window (`FocusState.cpp`: "Refusing a keyboard focus to a window because of an exclusive ls").
   A surface that closes and then focuses a window must be `OnDemand` (it still gets the keyboard
   when it appears, unless the pointer is constrained), or the focus call races the unmap.
+- A mapped `Bottom` layer switching its keyboard focus from `None` to `OnDemand` doesn't get the
+  keyboard (verified 2026-11-04: keys typed with wtype went nowhere, the pointer resting on it);
+  switching to `Exclusive` does at once, and switching on to `OnDemand` once the window is active
+  keeps it until a click elsewhere. An item's `activeFocus` is true before the layer has the
+  keyboard (`forceActiveFocus()` sets it anyway); the attached `Window.active` tells (the desktop's
+  to-do list, `desktop/TasksWidget.qml`).
+- Writing settings.json in place while the shell runs (`open(..., "w")`) can be read half
+  written: the shell then keeps it as settings.json.bad and stops saving. Write a copy and `mv`
+  it over (atomic), and Settings reloads it.
 - Quickshell reads its icon theme from `QS_ICON_THEME` (set in `env.lua`), not GTK's setting.
 - `IdleMonitor { enabled; timeout (seconds); respectInhibitors (default true); isIdle }`
   (`Quickshell.Wayland`, ext-idle-notify). `timeout: 0` reports idle at once, so use `enabled:

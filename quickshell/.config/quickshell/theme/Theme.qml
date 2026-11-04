@@ -202,14 +202,19 @@ Singleton {
         readonly property int menuArt:     root.px(160)  // cover in the media menu
     }
 
-    // Desktop widgets (desktop/), a family like iOS's and Android's: a small square and a medium
-    // one twice as wide, the same height, corners and padding.
+    // Desktop widgets (desktop/), a family like iOS's and Android's: a small square, a medium one
+    // twice as wide and a large one twice as tall as that, the same corners and padding.
     readonly property QtObject desktop: QtObject {
         // Through text(), not px(): the widgets are mostly text, and grow with its size too.
         // At 100 % from DesktopWidgets.js's `unit`, which lays them out (and is tested) in those px.
         readonly property int size:    root.text(DesktopWidgetsJs.unit.size) // a small widget's side; every widget's height
         readonly property int gap:     root.px(DesktopWidgetsJs.unit.gap)    // between widgets snapped side by side
         readonly property int medium:  size * 2 + gap
+        // A widget's size by its name (DesktopWidgets.js's kinds): { w, h }.
+        function box(name: string): var {
+            const kind = DesktopWidgetsJs.kinds.find(k => k.name === name);
+            return { w: kind?.medium ? medium : size, h: kind?.large ? medium : size };
+        }
         // How large the widgets are against 100 %: their places zoom by it (DesktopWidgets.js).
         readonly property real zoom:   size / DesktopWidgetsJs.unit.size
         readonly property int padding: root.text(20)
@@ -217,7 +222,7 @@ Singleton {
         readonly property int margin:  root.px(32)  // from the screen's edges, when snapped
         readonly property int reach:   root.px(24)  // how close a drop snaps
         readonly property int clock:   root.text(64) // the big value: the time, the day, the temperature, the counts
-        readonly property int cover:   size - padding * 2 // the media widget's cover
+        readonly property int value:   root.text(40) // a big value sharing its card with a list (the hourly weather, the month)
         readonly property int ring:    root.text(80) // the battery and timer widgets' ring
         readonly property int ringWidth: root.px(8)
         readonly property int icon:    root.px(28)  // the weather's sky and the battery's icon

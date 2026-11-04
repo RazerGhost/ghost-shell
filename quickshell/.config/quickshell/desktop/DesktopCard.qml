@@ -5,10 +5,10 @@ import qs.widgets
 import "DesktopWidgets.js" as DesktopWidgets
 
 // One desktop widget at its saved place (Settings' desktopWidgets, as fractions of the screen).
-// It fades and grows in when shown, and lifts a little under the pointer. Resting the pointer
-// on it (or the desktop editor being open) shows a handle in its top-right corner; drag that to
-// move it, and a drop near the screen's edges or another widget lines up with them, or with the
-// grid while it's on (Settings' desktopGrid). Only the
+// It fades and grows in when shown, and lifts a little under the pointer. While the desktop
+// editor is open a handle shows in its top-right corner (only then, so the widgets look clean
+// day to day); drag that to move it, and a drop near the screen's edges or another widget lines
+// up with them, or with the grid while it's on (Settings' desktopGrid). Only the
 // handle: the media widget's buttons keep their clicks. On the lock screen (the stage's
 // `locked`) there's no handle, and only the media widget takes clicks.
 Item {
@@ -84,8 +84,8 @@ Item {
         height: width
         radius: width / 2
         color: Colors.m3surfaceContainerHighest
-        visible: !root.locked
-        opacity: hover.hovered || drag.active || Editing.desktop ? 1 : 0
+        visible: !root.locked && opacity > 0
+        opacity: Editing.desktop || drag.active ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: Theme.anim.fast } }
 
         // A grip to drag (no press action: dragging is what it does).

@@ -2,17 +2,18 @@ import QtQuick
 import qs.theme
 import qs.widgets
 
-// A desktop widget's card: glass like the shell's panels, small (a square) or medium (twice as
-// wide), every widget the same height, corners and padding (Theme.desktop). The content goes
-// inside the padding.
+// A desktop widget's card: glass like the shell's panels, small (a square), medium (twice as
+// wide) or large (that, twice as tall), every widget the same corners and padding
+// (Theme.desktop). The content goes inside the padding.
 Surface {
     id: root
 
     property bool medium: false
+    property bool large: false
     default property alias content: inner.data
 
-    implicitWidth: medium ? Theme.desktop.medium : Theme.desktop.size
-    implicitHeight: Theme.desktop.size
+    implicitWidth: medium || large ? Theme.desktop.medium : Theme.desktop.size
+    implicitHeight: large ? Theme.desktop.medium : Theme.desktop.size
     width: implicitWidth
     height: implicitHeight
     radius: Theme.desktop.radius
