@@ -48,8 +48,8 @@ Singleton {
     // be a bool (a warning at every reload).
     readonly property bool fullscreenNow: Settings.values.dndFullscreen === true
         && (Hyprland.focusedMonitor?.activeWorkspace?.toplevels.values ?? []).some(t => t.lastIpcObject?.fullscreen === 2)
-    // Pop-ups held back: Do Not Disturb, game mode or a fullscreen window.
-    readonly property bool quiet: doNotDisturb || GameMode.on || fullscreenNow
+    // Pop-ups held back: Do Not Disturb, game mode, focus mode or a fullscreen window.
+    readonly property bool quiet: doNotDisturb || GameMode.on || Focus.on || fullscreenNow
     // How many were held back (apps set to Silent don't count): when the quiet ends, one
     // notification says so.
     property int missed: 0

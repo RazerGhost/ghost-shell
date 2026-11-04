@@ -57,6 +57,24 @@ function days(events) {
     return result;
 }
 
+// The next timed event starting within `within` minutes of `now` (a Date), for the island's
+// "up next" chip: { title, minutes } with the minutes left, rounded up (1 in its last minute),
+// or null. All-day events and ones that have started don't count.
+function soon(events, now, within) {
+    let best = null;
+    for (const e of events) {
+        if (e.allDay || !e.startTime)
+            continue;
+        const starts = new Date(e.start + "T" + e.startTime);
+        const minutes = Math.ceil((starts - now) / 60000);
+        if (starts <= now || minutes > within)
+            continue;
+        if (best === null || minutes < best.minutes)
+            best = { title: e.title, minutes: minutes };
+    }
+    return best;
+}
+
 // The events still to come or going on (ending today or later), by start, at most `limit`.
 function upcoming(events, today, limit) {
     return events.filter(e => e.end >= today)

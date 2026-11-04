@@ -99,7 +99,7 @@ Recovery procedures (lock screen crash, a session that can't start) are in ROADM
 | Feature | Files |
 |---|---|
 | Island: one shape with the time (or music) and alerts, floating or attached to the top edge (`islandAttached`); click for today, right-click for quick settings; morphs into every menu | `bar/Island.qml`, `IslandWindow.qml`, `IslandPill.qml`, `PillShape.qml`, `PillPath.js`, `IslandViews.js`, `IslandButton.qml`, `IslandFade.qml` |
-| Island alerts: recording, timer, microphone, camera, screen sharing, low battery | `bar/IslandAlerts.qml`, `widgets/StatusGlyph.qml` |
+| Island alerts: an event within 15 minutes (`Agenda.soon`), recording, timer (focus mode's own icon), microphone, camera, screen sharing, low battery | `bar/IslandAlerts.qml`, `widgets/StatusGlyph.qml` |
 | Pop-ups out of the island, one at a time: notifications, then attention requests | `bar/IslandWindow.qml`, `IslandViews.js`, `controlcenter/NotificationCard.qml`, `AttentionCard.qml` |
 | Workspace dots (3-10 or only used), shown in the island for a moment after a switch; scroll over the island to step | `bar/Workspaces.qml`, `services/WorkspaceSlots.js` |
 | Clock (day, seconds, 24-hour options) | `bar/Clock.qml` |
@@ -204,7 +204,8 @@ Cancel / Done, full keyboard control. `customize/Customize.qml`, `EditorChrome.q
 Clock, weather, media (the cover as its card), calendar, battery, to-do, timer, notifications,
 the hourly weather (`ForecastWidget`, `Weather.hours`), and two large ones: the month
 (`MonthWidget`) and the to-do list. Both to-do widgets are `TasksWidget` (medium and large), where
-tasks are added, and the note (`NoteWidget`) is written on the desktop; the layer takes the keyboard
+tasks are added, the note (`NoteWidget`) is written on the desktop, and the clipboard
+(`ClipboardWidget`) lists your pins and last copies, a click copying one again; the layer takes the keyboard
 while a field is typed in, one at a time (`WidgetKeyboard.qml`). Small, medium and large (`DesktopWidgets.js` `kinds`, `box`;
 `Theme.desktop.box`); glass cards on a `Bottom` layer, dragged by a handle shown only in the
 desktop editor, snapping or a grid, keyboard nudges, zoom with the shell's size. The lock screen
@@ -251,6 +252,7 @@ recording (gpu-screen-recorder), draw on it (satty), folders and quality setting
 | `Updates` | checkupdates + paru count, Update button |
 | `Weather`, `Agenda` | open-meteo; vdirsyncer + khal calendar |
 | `Planner`, `Countdown` | To-do (the desktop's to-do widgets), note, timer |
+| `Focus` | Focus mode: a 25-minute timer, pop-ups held back, the desktop widgets hidden |
 | `ScreenTime` | Per-app time, 30 days |
 | `Touchpad`, `Keyboard` | Touchpad off with a mouse; layout and caps lock |
 | `Media`, `Sounds`, `Phone`, `Session`, `Windows`, `HyprlandRuntime`, `LatestProcess` | Players, sound events, KDE Connect, session actions, window state, runtime Hyprland rules, process helper |
@@ -293,6 +295,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 | `media` | `playPause`, `next`, `previous` (the media keys) |
 | `updates` | `check`, `summary` |
 | `welcome` | `show` |
+| `focus` | `toggle` (focus mode) |
 
 ---
 

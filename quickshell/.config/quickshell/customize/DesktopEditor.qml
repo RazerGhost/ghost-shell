@@ -669,6 +669,7 @@ Scope {
                                 { key: "desktopTodo", title: "To-do", widget: todoWidget },
                                 { key: "desktopTasks", title: "To-do list", widget: tasksWidget },
                                 { key: "desktopNote", title: "Note", widget: noteWidget },
+                                { key: "desktopClipboard", title: "Clipboard", widget: clipboardWidget },
                                 { key: "desktopTimer", title: "Timer", widget: timerWidget },
                                 { key: "desktopNotifications", title: "Notifications", widget: notificationsWidget },
                                 { key: "desktopBattery", title: "Battery", widget: batteryWidget },
@@ -795,6 +796,7 @@ Scope {
                         Component { id: monthWidget; MonthWidget {} }
                         Component { id: tasksWidget; TasksWidget { large: true } }
                         Component { id: noteWidget; NoteWidget {} }
+                        Component { id: clipboardWidget; ClipboardWidget {} }
                         Component { id: todoWidget; TasksWidget {} }
                         Component { id: batteryWidget; BatteryWidget {} }
                         Component { id: timerWidget; TimerWidget {} }

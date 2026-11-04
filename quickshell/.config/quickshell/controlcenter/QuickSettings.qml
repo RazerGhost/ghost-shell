@@ -44,7 +44,8 @@ Item {
         record: { icon: "radio_button_checked", title: "Record the screen", control: recordToggle },
         screenshot: { icon: "screenshot_region", title: "Screenshot", control: screenshotToggle },
         wallpaper: { icon: "wallpaper", title: "Wallpaper", control: wallpaperToggle },
-        timer: { icon: "timer", title: "Timer", control: timerToggle }
+        timer: { icon: "timer", title: "Timer", control: timerToggle },
+        focus: { icon: "self_improvement", title: "Focus", control: focusToggle }
     })
 
     // The island grows and shrinks to fit the current page.
@@ -236,6 +237,18 @@ Item {
             active: Countdown.active && !Countdown.paused
             onClicked: !Countdown.active ? Countdown.start(Countdown.lastMinutes)
                      : Countdown.paused ? Countdown.resume() : Countdown.pause()
+        }
+    }
+
+    // Focus mode: a 25-minute timer, pop-ups held back, the desktop widgets hidden.
+    Component {
+        id: focusToggle
+
+        RoundToggle {
+            icon: "self_improvement"
+            title: Focus.on ? "Focus, " + Countdown.label + " left: end" : "Focus for " + Focus.minutes + " min"
+            active: Focus.on
+            onClicked: Focus.on ? Focus.stop() : Focus.start()
         }
     }
 

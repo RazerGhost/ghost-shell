@@ -205,6 +205,7 @@ Singleton {
             property bool desktopMonth: false
             property bool desktopTasks: false
             property bool desktopNote: false
+            property bool desktopClipboard: false
             // The music app last heard (its desktop entry id), which the media widget offers to
             // open while nothing plays (services/Media.qml).
             property string lastMediaApp: ""

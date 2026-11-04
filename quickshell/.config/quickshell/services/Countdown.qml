@@ -25,6 +25,11 @@ Singleton {
 
     function start(minutes: int): void {
         saved.minutes = minutes;
+        run(minutes);
+    }
+
+    // Starts without making it the length quick settings' button starts next (focus mode's).
+    function run(minutes: int): void {
         saved.total = minutes * 60000;
         saved.pausedLeft = 0;
         saved.endsAt = Date.now() + minutes * 60000;

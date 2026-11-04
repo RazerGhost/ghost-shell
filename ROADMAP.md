@@ -1854,6 +1854,25 @@ and light mode:
   line, the time left; the timer's filled while it runs), which unfold their part below as the
   buttons did, then the notifications.
 
+### Clipboard widget, focus mode, "up next" (built 2026-11-04; checked on the laptop)
+User's picks.
+- A medium clipboard widget (`desktop/ClipboardWidget.qml`): your pinned texts, then the last
+  copies (the clipboard menu's history), as many as fit; a click copies one again
+  (`Clipboard.copy`, no paste: there's no window to paste into) and says "Copied" for a moment.
+  It follows the clipboard while shown (`wl-paste --watch`, NOTES). On the lock screen "Hidden
+  while locked". Checked: a copy showed in it at once.
+- Focus mode (`services/Focus.qml`; a round button to add in quick settings' edit mode,
+  `qs ipc call focus toggle`): a 25-minute timer (the today menu's, without changing the length
+  the timer button starts; a timer already running is used as it is), pop-ups held back like Do
+  Not Disturb (`Notifications.quiet`, so "N came in while you were busy" follows), and the
+  desktop widgets hidden (not in the desktop editor). It lasts as long as the timer; ending it
+  from the button cancels the timer it started. The island's timer shows a meditating figure
+  for it. Checked: on and off through the IPC, the widgets gone and back.
+- Up next: a timed calendar event starting within 15 minutes shows in the island as an event
+  icon and "in 12 min" (`CalendarEvents.soon`, tested); not its title, which anyone at the
+  screen would see (the today menu has it). Checked with a stand-in event (no calendar
+  connected now).
+
 ### Ending and starting the session (built 2026-11-04)
 User's find after the lock screen work: logging out and shutting down gave no feedback, and being
 let in was just the desktop appearing.

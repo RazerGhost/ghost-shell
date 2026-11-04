@@ -31,6 +31,17 @@ Singleton {
                                 : ["sh", "-c", 'cliphist decode "$1" | wl-copy', "sh", entry.id]);
     }
 
+    // Copies `entry` again without pasting it (the desktop's clipboard widget: there's no window
+    // to paste into).
+    function copy(entry: var): void {
+        copyOnly.start(entry.pinned ? ["sh", "-c", 'printf %s "$1" | wl-copy', "sh", entry.text]
+                                    : ["sh", "-c", 'cliphist decode "$1" | wl-copy', "sh", entry.id]);
+    }
+
+    LatestProcess {
+        id: copyOnly
+    }
+
     // Pins a text entry: its whole text (cliphist's list only has a shortened preview).
     function pin(entry: var): void {
         if (entry.image || entry.pinned)

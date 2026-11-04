@@ -20,7 +20,8 @@ const kinds = [
     { name: "forecast", key: "desktopForecast", medium: true },
     { name: "month",    key: "desktopMonth",    medium: true, large: true },
     { name: "tasks",    key: "desktopTasks",    medium: true, large: true },
-    { name: "note",     key: "desktopNote",     medium: true }
+    { name: "note",     key: "desktopNote",     medium: true },
+    { name: "clipboard", key: "desktopClipboard", medium: true }
 ];
 const keys = kinds.map(k => k.key);
 
@@ -38,7 +39,8 @@ const defaults = {
     forecast: { x: 0.48, y: 0.08 },
     month:    { x: 0.48, y: 0.26 },
     tasks:    { x: 0.68, y: 0.08 },
-    note:     { x: 0.68, y: 0.44 }
+    note:     { x: 0.68, y: 0.44 },
+    clipboard: { x: 0.68, y: 0.62 }
 };
 
 function fraction(value, fallback) {

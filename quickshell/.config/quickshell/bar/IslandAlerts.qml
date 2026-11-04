@@ -16,17 +16,46 @@ Row {
     readonly property bool lowBattery: Battery.present && Battery.low
 
     readonly property string recordingText: Recorder.recording ? "Recording the screen, " + Recorder.time : ""
-    readonly property string timerText: timerShown ? "Timer, " + Countdown.label + " left" : ""
+    readonly property string timerText: timerShown ? (Focus.on ? "Focus, " : "Timer, ") + Countdown.label + " left" : ""
     readonly property string micText: Audio.recordingApps.length === 0 ? ""
         : (Audio.micMuted ? "Microphone muted, but in use by " : "Microphone in use by ") + Audio.recordingApps.join(", ")
     readonly property string cameraText: Privacy.cameraInUse ? "Camera in use" : ""
     readonly property string screenText: Privacy.screenShared ? "Your screen is being shared" : ""
     readonly property string batteryText: lowBattery ? "Battery low, " + Math.round(Battery.level * 100) + "%" : ""
-    readonly property string summary: [recordingText, timerText, micText, cameraText, screenText, batteryText]
+    readonly property string soonLabel: Agenda.soon === null ? "" : "in " + Agenda.soon.minutes + " min"
+    readonly property string soonText: Agenda.soon === null ? "" : Agenda.soon.title + " " + soonLabel
+    readonly property string summary: [soonText, recordingText, timerText, micText, cameraText, screenText, batteryText]
         .filter(text => text !== "").join(". ")
 
     anchors.verticalCenter: parent.verticalCenter
     spacing: Theme.spacing.xs
+
+    // A calendar event starts within 15 minutes: when, beside an event icon (its title is in the
+    // today menu: the island is seen by anyone looking at the screen).
+    Row {
+        anchors.verticalCenter: parent.verticalCenter
+        visible: Agenda.soon !== null
+        spacing: Theme.spacing.xs
+
+        MaterialIcon {
+            anchors.verticalCenter: parent.verticalCenter
+            icon: "event_upcoming"
+            color: Colors.m3primary
+            font.pixelSize: Theme.icon.small
+        }
+
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            text: root.soonLabel
+            color: Colors.m3onSurface
+            font.family: Theme.font.sans
+            font.pixelSize: Theme.font.small
+            font.features: { "tnum": 1 }
+        }
+
+        Accessible.role: Accessible.StaticText
+        Accessible.name: "Up next: " + root.soonText
+    }
 
     // A screen recording is running: a red dot and the time (services/Recorder.qml).
     Row {
@@ -63,7 +92,7 @@ Row {
 
         MaterialIcon {
             anchors.verticalCenter: parent.verticalCenter
-            icon: "timer"
+            icon: Focus.on ? "self_improvement" : "timer"
             font.pixelSize: Theme.icon.small
         }
 

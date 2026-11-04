@@ -397,6 +397,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   8 px under the island showed through its glass as light streaks. The `xray` layer rule makes a
   layer blur only the wallpaper, and it applies to ext-background-effect's blur too (checked
   2026-11-04 with a white window under the island).
+- `wl-paste --watch <command>` runs the command at every clipboard change (cliphist records
+  that way too), so a Process with `["wl-paste", "--watch", "echo"]` and a SplitParser follows
+  the clipboard; list cliphist a moment later (300 ms), after it has stored the new entry.
 - Vesktop opens three portal sessions for one share (a source preview, then the share), so the
   picker asked three times. With `screencopy:allow_token_by_default` (`hypr/xdph.conf`) the picker
   hands out a restore token and Chromium's WebRTC reuses it for the following sessions.

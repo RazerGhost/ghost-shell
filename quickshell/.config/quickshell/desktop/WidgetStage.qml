@@ -25,8 +25,9 @@ Item {
     readonly property alias monthCard: monthCard
     readonly property alias tasksCard: tasksCard
     readonly property alias noteCard: noteCard
+    readonly property alias clipboardCard: clipboardCard
     readonly property var cards: [clockCard, weatherCard, mediaCard, calendarCard, batteryCard, todoCard, timerCard,
-                                  notificationsCard, forecastCard, monthCard, tasksCard, noteCard]
+                                  notificationsCard, forecastCard, monthCard, tasksCard, noteCard, clipboardCard]
     // A to-do widget's field is being typed in: the desktop's layer takes the keyboard meanwhile
     // ("take" until it has it, then "keep"; DesktopWidgets.qml), else "none".
     readonly property var typists: [todoWidget.keyboard, tasksWidget.keyboard, noteWidget.keyboard]
@@ -223,6 +224,16 @@ Item {
 
         NoteWidget {
             id: noteWidget
+            hidesTitles: stage.locked
+        }
+    }
+
+    DesktopCard {
+        id: clipboardCard
+        name: "clipboard"
+        shown: Settings.values.desktopClipboard
+
+        ClipboardWidget {
             hidesTitles: stage.locked
         }
     }

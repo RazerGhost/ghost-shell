@@ -10,7 +10,7 @@ import "DesktopWidgets.js" as DesktopWidgetsJs
 // the battery, the to-do list, the timer, how many notifications wait, the next hours' weather,
 // the month and a larger to-do list (ClockWidget, WeatherWidget, MediaWidget, CalendarWidget,
 // BatteryWidget, TasksWidget for both to-dos, TimerWidget, NotificationsWidget, ForecastWidget,
-// MonthWidget, NoteWidget: one family of sizes; the list of them is DesktopWidgets.js's `kinds`). On the first screen, on the layer just above the wallpaper, so windows cover them.
+// MonthWidget, NoteWidget, ClipboardWidget: one family of sizes; the list of them is DesktopWidgets.js's `kinds`). On the first screen, on the layer just above the wallpaper, so windows cover them.
 // Each can be dragged by its handle (DesktopCard.qml). The widgets themselves are WidgetStage.qml,
 // which the lock screen draws too.
 Scope {
@@ -19,7 +19,8 @@ Scope {
     readonly property bool any: DesktopWidgetsJs.keys.some(key => Settings.values[key])
 
     LazyLoader {
-        active: root.any
+        // Hidden during focus mode (services/Focus.qml), except in the desktop editor.
+        active: root.any && (!Focus.on || Editing.desktop)
 
         PanelWindow {
             id: window
@@ -50,6 +51,7 @@ Scope {
                 WidgetRegion { stage: widgetStage; widget: widgetStage.monthCard }
                 WidgetRegion { stage: widgetStage; widget: widgetStage.tasksCard }
                 WidgetRegion { stage: widgetStage; widget: widgetStage.noteCard }
+                WidgetRegion { stage: widgetStage; widget: widgetStage.clipboardCard }
             }
 
             BackgroundEffect.blurRegion: Region {
@@ -65,6 +67,7 @@ Scope {
                 WidgetRegion { stage: widgetStage; widget: widgetStage.monthCard; corner: Theme.desktop.radius }
                 WidgetRegion { stage: widgetStage; widget: widgetStage.tasksCard; corner: Theme.desktop.radius }
                 WidgetRegion { stage: widgetStage; widget: widgetStage.noteCard; corner: Theme.desktop.radius }
+                WidgetRegion { stage: widgetStage; widget: widgetStage.clipboardCard; corner: Theme.desktop.radius }
                 // Never empty: Hyprland 0.57 blurs the whole surface for an empty region (NOTES).
                 Region { width: 1; height: 1 }
             }
