@@ -125,7 +125,6 @@ local panels = {
     { "qs-osd",              "popin 90%" },    -- volume / brightness pop-up, at the bottom or top
     { "qs-polkit",           "fade" },         -- apps' password prompt
     { "qs-overview",         "fade" },         -- Super+Tab
-    { "qs-wallpaper-picker", "slide top" },    -- the strip under the island
 }
 
 -- The island's glass blurs only the wallpaper (`xray`): its blur reaches past its edge, so a

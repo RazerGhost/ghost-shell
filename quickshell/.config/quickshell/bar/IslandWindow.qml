@@ -6,6 +6,7 @@ import Quickshell.Wayland
 import qs.controlcenter
 import qs.services
 import qs.theme
+import qs.wallpaper
 import qs.widgets
 import "IslandViews.js" as IslandViews
 
@@ -371,6 +372,16 @@ PanelWindow {
                         root.island.panel = "";
                         Emoji.type(emoji);
                     }
+                }
+            }
+        }
+
+        MenuSlot {
+            shown: pill.shown === "wallpaper"
+            content: Component {
+                WallpaperPanel {
+                    width: parent.width
+                    active: true
                 }
             }
         }

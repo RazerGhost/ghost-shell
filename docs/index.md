@@ -218,7 +218,7 @@ draws the same stage, locked. `desktop/DesktopWidgets.qml/.js`, `WidgetStage.qml
 | Feature | Files |
 |---|---|
 | Wallpaper layer (stills and live videos, paused when hidden) | `wallpaper/WallpaperLayer.qml` |
-| Picker strip under the island | `wallpaper/WallpaperPicker.qml`, `WallpaperPanel.qml` |
+| Wallpaper picker: a row of your pictures in the island (Super+Shift+W) | `wallpaper/WallpaperPanel.qml`, its slot in `bar/IslandWindow.qml` |
 | Wallpapers browser (wallhaven SFW search, styles, colors, tags, Yours with delete) | `wallpaper/WallpaperBrowser.qml`, `services/Wallhaven.js` |
 | Folder scan, dark/light pairs, slideshow | `services/Wallpaper.qml`, `Wallpapers.js`, `wallpapers.sh` |
 | Light / dark / at sunset, style, contrast, accent, smooth recolor | `services/ColorScheme.qml/.js`, `theme/Colors.qml` |

@@ -25,7 +25,6 @@ import qs.welcome
 ShellRoot {
     WallpaperLayer {}
     DesktopWidgets {}
-    WallpaperPicker {}
     Island {}
     Dock {}
     Launcher {}

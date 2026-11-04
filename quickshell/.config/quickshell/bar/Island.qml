@@ -17,7 +17,7 @@ import qs.theme
 Scope {
     id: root
 
-    // "", "today", "settings", "media", "power", "clipboard" or "emoji"
+    // "", "today", "settings", "media", "power", "clipboard", "emoji" or "wallpaper"
     property alias panel: persist.panel
     property alias screenName: persist.screenName // the monitor the menu is open on
 
@@ -46,6 +46,21 @@ Scope {
     // (WelcomeCard.qml); pop-ups wait for it. `welcomeFirst`: the login's unlock.
     property bool welcomeShown: false
     property bool welcomeFirst: false
+
+    // The wallpaper picker is an island menu; Wallpaper.pickerOpen (the IPC, quick settings'
+    // button, the slideshow's pause) follows it both ways.
+    onPanelChanged: Wallpaper.pickerOpen = panel === "wallpaper"
+    Connections {
+        target: Wallpaper
+        function onPickerOpenChanged(): void {
+            if (Wallpaper.pickerOpen && root.panel !== "wallpaper") {
+                root.screenName = Hyprland.focusedMonitor?.name ?? "";
+                root.panel = "wallpaper";
+            } else if (!Wallpaper.pickerOpen && root.panel === "wallpaper") {
+                root.panel = "";
+            }
+        }
+    }
 
     Connections {
         target: Session

@@ -6,13 +6,14 @@ import qs.theme
 import qs.widgets
 import "../services/FileUrl.js" as FileUrl
 
-// The wallpaper picker's contents (WallpaperPicker.qml is the strip): one row of
-// pictures, scrolling sideways (the mouse wheel too): yours, from your wallpaper folder. Click
-// one to use it; the colors follow the picture.
+// The wallpaper picker: one row of pictures in the island, scrolling sideways (the mouse wheel
+// too): yours, from your wallpaper folder. Click one (or Left/Right and Enter) to use it; the colors
+// follow the picture. An island menu since 2026-11-04 (Super+Shift+W, quick settings' wallpaper
+// button, `qs ipc call wallpaper picker`); before, a strip of its own under the island.
 Column {
     id: root
 
-    // The strip is open (WallpaperPicker.qml).
+    // Shown in the island.
     property bool active
     // Thumbnails only load once the picker has been opened: pictures are large (up to 5K), and
     // decoding them all at login would keep the CPU busy for nothing.
@@ -26,8 +27,16 @@ Column {
     topPadding: Theme.spacing.s
     spacing: Theme.spacing.s
 
-    onActiveChanged: {
+    onActiveChanged: open()
+    // Built when the island opens it (menus are built only while shown), already active.
+    Component.onCompleted: open()
+    // It takes the keyboard for the arrow keys; Escape is the island's (it closes the menu).
+    focus: true
+    Keys.onPressed: event => handleKey(event)
+
+    function open(): void {
         if (active) {
+            forceActiveFocus();
             opened = true;
             Wallpaper.rescan();
             // Start on the current wallpaper.
@@ -36,7 +45,7 @@ Column {
         }
     }
 
-    // From the strip (WallpaperPicker.qml): Left/Right move the selection, Enter uses it.
+    // Left/Right move the selection, Enter uses it.
     function handleKey(event: var): void {
         switch (event.key) {
         case Qt.Key_Left:

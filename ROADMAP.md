@@ -1934,6 +1934,11 @@ User's picks from a look at every menu and modal:
   ring emptying; Cancel or Escape, "Shut down now" or Enter) before the apps are asked to close
   (`Theme.session.countdown`). A shell reload meanwhile counts again. Checked with the closing and
   the shutdown stubbed: the countdown, then Cancel.
+- The wallpaper strip is an island menu (user's request: keep the strip, but as part of the
+  island): the island grows into the row of pictures like its other menus (1200 px wide), and
+  `Wallpaper.pickerOpen` follows its "wallpaper" menu both ways (quick settings' button, the IPC,
+  the slideshow's pause). Its own surface (`WallpaperPicker.qml`) and layer rule are gone; its key
+  is Super+Shift+W (it had none). Checked on screen.
 
 ### Keybinds reworked (2026-11-04)
 User's request: list them all and see what to rework; user's picks, following Windows 11:

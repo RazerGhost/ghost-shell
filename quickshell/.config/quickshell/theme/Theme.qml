@@ -166,7 +166,9 @@ Singleton {
         readonly property var menuWidths: ({
             settings: root.px(460), clipboard: root.px(460), emoji: root.px(460),
             today: root.px(400), media: root.px(400),
-            power: root.px(340)
+            power: root.px(340),
+            // The wallpaper row: wide like the strip it was, within a 1920 px screen's width.
+            wallpaper: root.px(1200)
         })
         function menuWidth(name: string): int {
             return menuWidths[name] ?? panelWidth;
