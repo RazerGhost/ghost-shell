@@ -230,6 +230,14 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   unlike wtype's. Move the pointer with small `REL_X`/`REL_Y` steps checked against `hyprctl
   cursorpos -j` (libinput accelerates them): Hyprland's own drags follow only real motion, not
   `hl.dsp.cursor.move`. Test on workspace 9; the keys go to the focused window.
+- Taking a PCI sound device away (`echo 1 > .../remove`, or unbinding snd_hda_intel) waits in
+  `snd_card_free` until every program has closed the card: with PipeWire holding it, the write
+  hangs for good (the task in D state). Check `fuser /dev/snd/*C<n>D* /dev/snd/controlC<n>` first.
+  The RTX removed with its sound device, the root port (`power/control` auto) goes to D3cold and
+  its ACPI power resource (`firmware_node/power_resources_D3hot/*/resource_in_use`) to 0 in ~3 s.
+- At shutdown a unit's ExecStop runs in the reverse of the start order: a oneshot started
+  `Before=systemd-user-sessions.service` stops after every user's `user@.service` (they start
+  `After=` it). `systemctl list-jobs` inside it shows `poweroff.target` on a power-off.
 - snd-hda-intel's `patch=` is given out per card in probe order (`patch[0]` to the first card,
   ...): list a patch once per possible card, as the RTX's HDMI codec comes and goes.
 - wtype: Hyprland doesn't run its binds for wtype's virtual keyboard, so binds can't be tested

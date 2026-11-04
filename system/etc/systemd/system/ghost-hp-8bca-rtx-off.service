@@ -1,0 +1,19 @@
+# The HP Omen 16-xf0 (board 8BCA): switches the RTX fully off at a power-off, so the next boot
+# finds it (/usr/local/lib/ghost-hp-8bca-rtx-off.sh says why). Nothing happens at start; its stop
+# step does it. Stops run in the reverse of the start order, so being started before these makes
+# it stop after them: the sessions (and with them your PipeWire, which holds the RTX's HDMI sound
+# card open), the sound card state being saved, and what uses CUDA. Installed by
+# modules/system/setup.sh on that laptop only.
+[Unit]
+Description=Switch the RTX fully off before powering off (HP Omen 16-xf0)
+Before=systemd-user-sessions.service greetd.service alsa-restore.service ollama.service nvidia-persistenced.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/true
+ExecStop=/usr/local/lib/ghost-hp-8bca-rtx-off.sh
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

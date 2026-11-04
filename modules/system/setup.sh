@@ -176,13 +176,20 @@ if ! cmp -s "$mdns" "/etc/systemd/resolved.conf.d/$(basename "$mdns")"; then
     sudo systemctl try-restart systemd-resolved.service
 fi
 
-step "HP Omen 16-xf0: its bass speakers"
+step "HP Omen 16-xf0: its bass speakers, and the RTX after a power-off"
 # Only on that laptop (board 8BCA): the kernel leaves its bass speakers off (the patch file says
-# why; it takes effect when the sound driver loads next, at the next boot).
+# why; it takes effect when the sound driver loads next, at the next boot), and powered off with
+# the RTX on, the next boot often had none (ghost-hp-8bca-rtx-off.sh says why; from the next
+# power-off on).
 if [[ $(cat /sys/class/dmi/id/board_name 2>/dev/null) == 8BCA ]]; then
-    for file in system/usr/lib/firmware/ghost-hp-8bca-speakers.fw system/etc/modprobe.d/ghost-hp-8bca-speakers.conf; do
+    for file in system/usr/lib/firmware/ghost-hp-8bca-speakers.fw system/etc/modprobe.d/ghost-hp-8bca-speakers.conf \
+                system/etc/systemd/system/ghost-hp-8bca-rtx-off.service; do
         sudo install -Dm644 "$file" "/${file#system/}"
     done
+    sudo install -Dm755 system/usr/local/lib/ghost-hp-8bca-rtx-off.sh /usr/local/lib/ghost-hp-8bca-rtx-off.sh
+    sudo systemctl daemon-reload
+    # Started now too: it does nothing at start, and its stop step needs it running at shutdown.
+    sudo systemctl enable --now ghost-hp-8bca-rtx-off.service
 else
     echo "Not an HP Omen 16-xf0 (board 8BCA): skipped"
 fi

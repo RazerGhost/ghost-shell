@@ -2077,10 +2077,21 @@ Windows' path does; their fix calls a firmware method this BIOS (F.31) doesn't h
   it open for outputs on the RTX, so it never runtime-suspends), and the firmware's power-on
   skips sequencing a card it finds enabled; a restart resets the card properly. Windows switches
   the card off when idle, so it's off at shutdown.
-- Next (user's test): stop the desktop, switch the card off through `PG00` (`~/rtx-off.sh`, outside
-  the repo: waits for the driver to do it, else unbinds the drivers and lets runtime power
-  management), power off, count the boots with the RTX. If it holds, a shutdown step does the
-  same after the session ends, only for a power-off.
+- The test (a script outside the repo, run from a text console with the desktop stopped): letting
+  the card sleep wasn't enough, the shutdown woke it again (the sound card state being saved
+  opens the RTX's HDMI sound card, and the user's PipeWire and Ollama had it open). Taking the
+  card and its sound device off the device list (`remove`) does it: the slot went to D3cold with
+  its power switch unused in 3 s, and the power-off that followed kept the RTX. The first try hung
+  there, removing the sound card while PipeWire still held it (`snd_card_free` waits for every
+  user), so the user's sound services stop first and a card still in use is left on.
+- Built (user's pick, 2026-11-04): `ghost-hp-8bca-rtx-off.service` (system module, board 8BCA
+  only) does that at every power-off, never at a restart (it checks for `poweroff.target`'s job):
+  nothing at start, its stop step after the sessions, PipeWire, `alsa-restore` and Ollama
+  (started before them, so stopped after; the user's services start after
+  `systemd-user-sessions.service`). It never waits on a card still in use, and logs to the
+  journal (`journalctl -b -1 -t ghost-rtx-off`). Checked here: the script's dry run (no
+  power-off: nothing done) and the unit's verify. To watch: the RTX after each power-off; the
+  open issue closes once a few in a row keep it.
 
 ### Docs and the system module checked for the desktop (2026-11-04)
 User's question: are all the commands in the repo, and how do the docs look. The README lagged
