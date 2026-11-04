@@ -80,11 +80,19 @@ Item {
     // clipboard widgets, Enter to type, copy, play or start). Typing in a field from here comes
     // back here after Escape; Escape here, or a click outside the widgets, ends it (`leave`).
     property bool browsing: false
-    signal leave()
+    // `goBack`: return to your workspace (false when a widget handed the keyboard on).
+    signal leave(goBack: bool)
     property Item chosenCard: null
     readonly property var shownCards: cards.filter(c => c.shown && c.widget)
 
-    onBrowsingChanged: {
+    onBrowsingChanged: applyBrowsing()
+    // Built with it already on (the layer coming back): start as if it had just turned on.
+    Component.onCompleted: {
+        if (browsing)
+            applyBrowsing();
+    }
+
+    function applyBrowsing(): void {
         if (browsing) {
             if (!chosenCard || !chosenCard.shown)
                 chosenCard = shownCards[ArrowNavigationJs.nearest(null, shownCards.map(rectOf), "down")] ?? null;
@@ -114,15 +122,28 @@ Item {
         if (!browsing || typing)
             return;
         if (keyboard.released)
-            leave();
+            leave(true);
         else
-            Qt.callLater(browser.start);
+            Qt.callLater(() => {
+                if (browsing && !typing)
+                    browser.start();
+            });
     }
 
     function press(event: var): void {
-        if (chosenCard?.widget?.key(event)) {
-            event.accepted = true;
-            return;
+        const widget = chosenCard?.widget ?? null;
+        if (widget) {
+            let handed = false;
+            const onHand = () => handed = true;
+            widget.handOff.connect(onHand);
+            const used = widget.key(event);
+            widget.handOff.disconnect(onHand);
+            if (handed)
+                leave(false);
+            if (used) {
+                event.accepted = true;
+                return;
+            }
         }
         const directions = { [Qt.Key_Left]: "left", [Qt.Key_Right]: "right", [Qt.Key_Up]: "up", [Qt.Key_Down]: "down" };
         const rects = shownCards.map(rectOf);
@@ -132,10 +153,11 @@ Item {
                 chosenCard = shownCards[next];
         } else if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab) {
             const order = shownCards.slice().sort((a, b) => rectOf(a).y - rectOf(b).y || rectOf(a).x - rectOf(b).x);
+            const at = order.indexOf(chosenCard);
             const step = event.key === Qt.Key_Tab ? 1 : order.length - 1;
-            chosenCard = order[(order.indexOf(chosenCard) + step) % order.length] ?? null;
+            chosenCard = order[at < 0 ? 0 : (at + step) % order.length] ?? null;
         } else if (event.key === Qt.Key_Escape) {
-            leave();
+            leave(true);
         } else {
             return;
         }
@@ -150,7 +172,7 @@ Item {
         }
         onStopped: {
             if (released)
-                stage.leave();
+                stage.leave(true);
         }
     }
 

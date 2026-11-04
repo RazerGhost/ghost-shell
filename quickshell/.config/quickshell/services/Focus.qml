@@ -32,6 +32,8 @@ Singleton {
     }
 
     function start(length: int): void {
+        if (saved.on)
+            return; // already in a session (an old "Focus again" from the history)
         Settings.values.focusMinutes = length;
         if (!Countdown.active || onBreak) {
             Countdown.run(length);
@@ -51,33 +53,34 @@ Singleton {
         saved.timer = -1;
     }
 
-    // Countdown's timer of this session (or its break) reached zero.
+    // Countdown's timer of this session (or its break) reached zero. The notification waits for
+    // its button in a process of its own (notify-send prints the one pressed), which answers
+    // through `qs ipc call focus …`: each ending gets its own, and the buttons still work after
+    // a shell reload (a Process of the shell's was killed with it). Normal urgency: critical's
+    // error red read as a failure.
     function timeUp(runs: int): void {
         const wasBreak = saved.breakTimer === runs;
         saved.breakTimer = -1;
-        ask.command = ["notify-send", "--app-name=Focus", "--icon=appointment-soon", "--urgency=normal", // not critical: its error red read as a failure
-                       "--hint=string:sound-name:alarm-clock-elapsed",
-                       ...(wasBreak ? [] : ["--action=break=Take a " + breakMinutes + "-minute break"]),
-                       "--action=again=Focus again",
-                       wasBreak ? "Break's over" : "Focus time is over",
-                       wasBreak ? "Ready for another " + minutes + " minutes?" : "Well done. Time for a short break?"];
-        ask.running = true;
+        Quickshell.execDetached(["sh", "-c", `
+            choice=$(notify-send --app-name=Focus --icon=appointment-soon --urgency=normal \
+                --hint=string:sound-name:alarm-clock-elapsed "$@")
+            case $choice in
+                break) qs ipc call focus takeBreak ;;
+                again) qs ipc call focus again ;;
+            esac`, "sh",
+            ...(wasBreak ? [] : ["--action=break=Take a " + breakMinutes + "-minute break"]),
+            "--action=again=Focus again",
+            wasBreak ? "Break's over" : "Focus time is over",
+            wasBreak ? "Ready for another " + minutes + " minutes?" : "Well done. Time for a short break?"]);
     }
 
-    // notify-send waits for the button pressed and prints its name.
-    Process {
-        id: ask
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const choice = text.trim();
-                if (choice === "break" && !Countdown.active) {
-                    Countdown.run(root.breakMinutes);
-                    saved.breakTimer = Countdown.runs;
-                } else if (choice === "again") {
-                    root.start(root.minutes);
-                }
-            }
+    function takeBreak(): void {
+        if (Countdown.active) {
+            Notifications.send("Focus", "appointment-soon", "No break started", "A timer is already running.", false, []);
+            return;
         }
+        Countdown.run(breakMinutes);
+        saved.breakTimer = Countdown.runs;
     }
 
     PersistentProperties {
@@ -95,6 +98,15 @@ Singleton {
 
         function toggle(): void {
             root.on ? root.stop() : root.start(root.minutes);
+        }
+
+        // The buttons of the notification at a session's or a break's end (timeUp).
+        function takeBreak(): void {
+            root.takeBreak();
+        }
+
+        function again(): void {
+            root.start(root.minutes);
         }
     }
 

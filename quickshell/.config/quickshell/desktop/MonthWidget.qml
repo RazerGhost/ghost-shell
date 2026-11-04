@@ -15,6 +15,7 @@ WidgetSurface {
     function key(event: var): bool {
         if (!enabled || !(event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space))
             return false;
+        handOff();
         Quickshell.execDetached(["qs", "ipc", "call", "island", "toggle", "today"]);
         return true;
     }

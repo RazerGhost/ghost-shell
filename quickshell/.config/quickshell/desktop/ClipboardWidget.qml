@@ -23,6 +23,13 @@ WidgetSurface {
     // Keyboard mode: the clip the keys are on, -1 for none (Enter then copies the newest).
     property int pick: -1
     onChosenChanged: pick = -1
+    // The list changed (a copy anywhere, cliphist storing it again at the top): the pick stays
+    // on the list, and in view (a new list scrolls the view back to the top).
+    onClipsChanged: {
+        pick = Math.min(pick, clips.length - 1);
+        if (pick >= 0)
+            Qt.callLater(() => list.positionViewAtIndex(pick, ListView.Contain));
+    }
 
     function copyClip(clip: var): void {
         Clipboard.copy(clip);
@@ -45,7 +52,11 @@ WidgetSurface {
         }
         if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space)
             return false;
-        copyClip(clips[Math.max(pick, 0)]);
+        const clip = clips[Math.max(pick, 0)];
+        if (clip) {
+            copyClip(clip);
+            pick = 0; // cliphist stores the copy again at the top
+        }
         return true;
     }
 

@@ -23,6 +23,8 @@ WidgetSurface {
     // Keyboard mode: the task the keys are on, -1 for none (Enter then types a new one).
     property int pick: -1
     onChosenChanged: pick = -1
+    // Tasks ticked or added elsewhere (the other to-do widget): the pick stays on the list.
+    onOpenChanged: pick = Math.min(pick, open.length - 1)
 
     function startTyping(): void {
         keyboard.start();
@@ -49,6 +51,8 @@ WidgetSurface {
             startTyping();
         } else {
             const task = open[pick];
+            if (!task)
+                return true;
             const left = open.length - 1;
             list.keepingPlace(() => Planner.toggle(task.index));
             pick = Math.min(pick, left - 1);

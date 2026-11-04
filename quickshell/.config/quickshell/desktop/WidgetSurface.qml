@@ -21,6 +21,10 @@ Surface {
         return false;
     }
 
+    // Emitted by key() when what it did takes the keyboard elsewhere (the music app opening, the
+    // today menu): the keyboard mode ends there, without going back to your workspace.
+    signal handOff()
+
     implicitWidth: medium || large ? Theme.desktop.medium : Theme.desktop.size
     implicitHeight: large ? Theme.desktop.medium : Theme.desktop.size
     width: implicitWidth

@@ -1892,8 +1892,9 @@ User's picks.
   5-minute break" (its own timer, "Break" with a cup in the island) or "Focus again"; a break's
   end offers another session (`Focus.timeUp`, through notify-send's actions; Countdown leaves
   its own "Time's up" to it). Normal urgency: critical's error red read as a failure. Checked: a
-  1-minute session ran in the island and ended with the notification and its two buttons. The
-  buttons only work while the shell that sent it runs: a reload in between leaves them dead.
+  1-minute session ran in the island and ended with the notification and its two buttons.
+  Since the review below the notification waits in a process of its own and answers through
+  `qs ipc call focus takeBreak|again`, so its buttons survive a shell reload (user's pick).
   Verified by the user: a session from the today menu, ended with the break offer.
 - Up next: a timed calendar event starting within 15 minutes shows in the island as an event
   icon and "in 12 min" (`CalendarEvents.soon`, tested); not its title, which anyone at the
@@ -1920,6 +1921,26 @@ opens the today menu from the calendar and month. Escape after typing comes back
 Escape then, Super+D again or a click elsewhere goes back to your workspace. Key hints show at
 the foot of the screen. Not while locked, in focus mode or in the desktop editor. Checked with
 wtype: moving, the ring, typing into the note and back, Escape home.
+
+### Review of the keyboard mode, focus extras and scrolling (2026-11-04)
+A read-only review, findings checked, then fixed:
+- Focus: a second session ending while the first one's notification waited in the history was
+  silent (the shell's one notify-send Process was still running, so it never started again);
+  each ending now has its own detached process, answering through IPC, so the buttons also
+  survive a reload. "Focus again" during a session is ignored (it disowned the session's timer);
+  "Take a break" while a timer runs says so.
+- Keyboard mode: Super+D with the windows or dock and island editor open took over the
+  editor's way home (Done left you on the empty workspace): it does nothing while an editor is
+  away. Focus mode starting meanwhile left you on the empty workspace with the mode stuck on: the
+  layer going away ends it, and a stage built with it on starts it. A widget that hands the
+  keyboard on (the music app opening, the today menu) ends it without the trip back, so the app
+  isn't left behind on the empty workspace (`WidgetSurface.handOff`). A typing end racing Super+D
+  could take the keyboard back. Tab with nothing chosen starts at the first.
+- The to-do and clipboard picks follow their lists (a task ticked elsewhere made Enter throw;
+  a copy moves the clip to the top, the pick with it).
+- Not done: screen readers hear the mode's pane name change, not each widget as it's chosen.
+- Checked on screen: focus mode during the keyboard mode ends it cleanly; "Focus again" through
+  the IPC starts a session, a second is ignored.
 
 ### Welcome tour brought up to date (2026-11-04)
 The tour's cards were last updated 2026-10-29. Now: the island card says what the island shows

@@ -28,10 +28,12 @@ Scope {
 
     function browse(): void {
         if (browsing) {
-            stopBrowsing();
+            stopBrowsing(true);
             return;
         }
-        if (!any || Session.locked || (Focus.on && !Editing.desktop) || Editing.desktop)
+        // Not while locked, in focus mode (no widgets), or while an editor is away from your
+        // workspace: the trip would take over its way home.
+        if (!shown || Session.locked || Editing.desktop || Editing.awayFrom !== 0 || Editing.backPending)
             return;
         tripped = (Hyprland.focusedWorkspace?.toplevels.values.length ?? 0) > 0;
         if (tripped)
@@ -39,11 +41,23 @@ Scope {
         browsing = true;
     }
 
-    function stopBrowsing(): void {
+    // `goBack`: false when a widget handed you to something else on this workspace (the music
+    // app it opened, the today menu).
+    function stopBrowsing(goBack: bool): void {
+        if (!browsing)
+            return;
         browsing = false;
-        if (tripped)
+        if (tripped && goBack)
             Editing.back();
         tripped = false;
+    }
+
+    // Shown: some widget is on, and not hidden by focus mode (except in the desktop editor).
+    readonly property bool shown: any && (!Focus.on || Editing.desktop)
+    // The layer going away (focus mode starting) ends the keyboard mode with it.
+    onShownChanged: {
+        if (!shown)
+            stopBrowsing(true);
     }
 
     IpcHandler {
@@ -56,7 +70,7 @@ Scope {
 
     LazyLoader {
         // Hidden during focus mode (services/Focus.qml), except in the desktop editor.
-        active: root.any && (!Focus.on || Editing.desktop)
+        active: root.shown
 
         PanelWindow {
             id: window
@@ -114,7 +128,7 @@ Scope {
                 id: widgetStage
 
                 browsing: root.browsing
-                onLeave: root.stopBrowsing()
+                onLeave: goBack => root.stopBrowsing(goBack)
 
                 readonly property bool carded: Editing.cardScreen === (window.screen?.name ?? "")
 
