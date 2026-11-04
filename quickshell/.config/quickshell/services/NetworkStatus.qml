@@ -43,6 +43,9 @@ Singleton {
                                   : Networking.wifiEnabled ? "Not connected"
                                   : "Off"
 
+    // The Wi-Fi signal's strength, 0-1 (widgets/SignalBars.qml); -1 when not on Wi-Fi.
+    readonly property real signal: wired || !wifiNetwork ? -1 : (wifiNetwork.signalStrength ?? 0)
+
     // strength is 0-1. Three arcs, like Android: widgets/WifiIcon.qml draws the unlit ones dimmed.
     function wifiIcon(strength: real): string {
         return strength > 0.66 ? "wifi"

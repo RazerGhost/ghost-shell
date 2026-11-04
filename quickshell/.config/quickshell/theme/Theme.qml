@@ -335,6 +335,14 @@ Singleton {
         readonly property int historyHeight: root.px(300)  // the history in the "today" menu scrolls past this
     }
 
+    // Wi-Fi as signal bars rising left to right (widgets/SignalBars.qml, the wide island).
+    readonly property QtObject signal: QtObject {
+        readonly property int count:  4
+        readonly property int bar:    root.px(3)  // each bar's width
+        readonly property int gap:    root.px(2)
+        readonly property int height: root.px(12) // the tallest bar; the others step down to a quarter
+    }
+
     readonly property QtObject battery: QtObject {
         readonly property real low: 0.15 // at or below this (and discharging) the battery turns red
         readonly property real warn: 0.20     // a "battery low" notification (services/BatteryAlerts.qml)

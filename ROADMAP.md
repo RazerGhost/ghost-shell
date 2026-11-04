@@ -1780,7 +1780,9 @@ User's picks:
   wider so the time stays under the webcam. They only show (user's choice after trying it: a
   click aimed at the island's edge landed on a dot or icon that had just slid in, so the menus
   seemed not to open): a left-click anywhere on the island opens today, a right-click quick
-  settings; the wheel over the dots still steps through the workspaces.
+  settings; the wheel over the dots still steps through the workspaces. Wi-Fi shows as four
+  signal bars rising left to right (user's choice, like a phone's; `widgets/SignalBars.qml`, lit
+  by `NetworkStatus.signal`), the rest dimmed; wired, off or not connected keep their icons.
 - Files dragged onto the island say "Send to <phone>" and go to the phone when dropped
   (`phone.sh share`, now also behind the Phone page and Nautilus's "Send to phone": it finds the
   connected phone, asks which with several, says so with none; tested with stand-ins).

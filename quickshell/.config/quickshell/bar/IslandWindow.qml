@@ -447,8 +447,15 @@ PanelWindow {
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: Theme.spacing.s
 
+                    // Wi-Fi as signal bars (user's choice); wired, off or not connected as their icon.
+                    SignalBars {
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: NetworkStatus.signal >= 0
+                    }
+
                     WifiIcon {
                         anchors.verticalCenter: parent.verticalCenter
+                        visible: NetworkStatus.signal < 0
                         icon: NetworkStatus.icon
                         font.pixelSize: Theme.icon.small
                         Accessible.name: "Network: " + NetworkStatus.label
