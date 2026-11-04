@@ -20,9 +20,9 @@ WidgetSurface {
         note.cursorPosition = note.text.length;
     }
 
-    // Keyboard mode: Enter starts typing.
+    // Keyboard mode: Enter (or Space) starts typing.
     function key(event: var): bool {
-        if (hidesTitles || (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter))
+        if (hidesTitles || !activates(event))
             return false;
         startTyping();
         return true;

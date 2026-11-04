@@ -1917,7 +1917,8 @@ reading order; the chosen one has a ring in the accent, and gets the keys first
 (`WidgetSurface.key`, `chosen`): Up and Down go through the to-do's tasks and the clipboard's
 clips (on past the ends to the next widget), Enter ticks a task off, copies a clip, starts
 typing in the note or a new task, plays or pauses the music, starts or pauses the timer, or
-opens the today menu from the calendar and month. Escape after typing comes back to moving;
+opens the today menu from the calendar, month and notifications widgets (`WidgetSurface.activates`,
+`openToday`, shared). Escape after typing comes back to moving;
 Escape then, Super+D again or a click elsewhere goes back to your workspace. Key hints show at
 the foot of the screen. Not while locked, in focus mode or in the desktop editor. Checked with
 wtype: moving, the ring, typing into the note and back, Escape home.

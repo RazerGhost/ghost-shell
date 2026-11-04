@@ -50,7 +50,7 @@ WidgetSurface {
                 list.positionViewAtIndex(pick, ListView.Contain);
             return true;
         }
-        if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space)
+        if (!activates(event))
             return false;
         const clip = clips[Math.max(pick, 0)];
         if (clip) {

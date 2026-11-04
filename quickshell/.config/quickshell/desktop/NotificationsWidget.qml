@@ -12,19 +12,24 @@ WidgetSurface {
     readonly property int count: Notifications.history.length
     readonly property int apps: new Set(Notifications.history.map(n => Notifications.appOf(n))).size
 
+    // Keyboard mode: Enter opens the today menu, like a click.
+    function key(event: var): bool {
+        if (!enabled || !activates(event))
+            return false;
+        handOff();
+        openToday();
+        return true;
+    }
+
     MouseArea {
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
-        onClicked: openToday()
-
-        function openToday(): void {
-            Quickshell.execDetached(["qs", "ipc", "call", "island", "toggle", "today"]);
-        }
+        onClicked: widget.openToday()
 
         // A button on the desktop; on the lock screen (disabled) plain text with no action.
         Accessible.role: enabled ? Accessible.Button : Accessible.StaticText
         Accessible.name: (widget.count === 1 ? "1 notification" : widget.count + " notifications") + (enabled ? ": open the today menu" : "")
-        Accessible.onPressAction: openToday()
+        Accessible.onPressAction: widget.openToday()
     }
 
     MaterialIcon {

@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import qs.theme
 import qs.widgets
 
@@ -19,6 +20,16 @@ Surface {
     // next widget. A widget that does something on Enter says so here.
     function key(event: var): bool {
         return false;
+    }
+
+    // Enter, Return or Space: the key that uses a widget (or its picked row) in keyboard mode.
+    function activates(event: var): bool {
+        return event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space;
+    }
+
+    // The today menu, where the calendar, month and notifications widgets lead.
+    function openToday(): void {
+        Quickshell.execDetached(["qs", "ipc", "call", "island", "toggle", "today"]);
     }
 
     // Emitted by key() when what it did takes the keyboard elsewhere (the music app opening, the

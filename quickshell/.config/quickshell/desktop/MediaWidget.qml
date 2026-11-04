@@ -28,7 +28,7 @@ WidgetSurface {
 
     // Keyboard mode: Enter or Space plays or pauses (with nothing playing, opens the music app).
     function key(event: var): bool {
-        if (!(event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space))
+        if (!activates(event))
             return false;
         if (player) {
             player.togglePlaying();

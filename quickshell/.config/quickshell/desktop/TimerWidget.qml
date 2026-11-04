@@ -11,7 +11,7 @@ WidgetSurface {
 
     // Keyboard mode: Enter or Space starts the length used last, or pauses and resumes.
     function key(event: var): bool {
-        if (!enabled || !(event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space))
+        if (!enabled || !activates(event))
             return false;
         if (!Countdown.active)
             Countdown.start(Countdown.lastMinutes);

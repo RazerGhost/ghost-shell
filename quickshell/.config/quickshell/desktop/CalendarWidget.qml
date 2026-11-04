@@ -12,10 +12,10 @@ WidgetSurface {
 
     // Keyboard mode: Enter opens the today menu, like a click.
     function key(event: var): bool {
-        if (!enabled || !(event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space))
+        if (!enabled || !activates(event))
             return false;
         handOff();
-        Quickshell.execDetached(["qs", "ipc", "call", "island", "toggle", "today"]);
+        openToday();
         return true;
     }
 
@@ -32,16 +32,12 @@ WidgetSurface {
     MouseArea {
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
-        onClicked: openToday()
-
-        function openToday(): void {
-            Quickshell.execDetached(["qs", "ipc", "call", "island", "toggle", "today"]);
-        }
+        onClicked: widget.openToday()
 
         // A button on the desktop; on the lock screen (disabled) plain text with no action.
         Accessible.role: enabled ? Accessible.Button : Accessible.StaticText
         Accessible.name: enabled ? "Calendar: open the today menu" : "Calendar"
-        Accessible.onPressAction: openToday()
+        Accessible.onPressAction: widget.openToday()
     }
 
     Column {
