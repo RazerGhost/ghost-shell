@@ -1958,7 +1958,7 @@ A read-only review, findings checked, then fixed:
   them. Then (user's find with Orca: only the names were read) each widget says what it shows
   (`WidgetSurface.describe`: the time and date, the weather with high and low, the track, the
   next events, the battery, the timer, the tasks, the note, how many clips), spoken after its
-  name. Verified by the user that Orca reads the mode; the content checked for errors over all
+  name. Verified by the user with Orca: the mode, each widget and its content read; checked for errors over all
   13 widgets.
 - Checked on screen: focus mode during the keyboard mode ends it cleanly; "Focus again" through
   the IPC starts a session, a second is ignored.
