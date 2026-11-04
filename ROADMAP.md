@@ -2093,6 +2093,9 @@ windows).
 - **External monitors:** keep the RTX in `AQ_DRM_DEVICES` (second, after the iGPU), so outputs wired
   to it work, accepting the battery cost. Since 2026-11-04 `env.lua` lists only the devices that exist: the
   RTX sometimes misses a boot (again that day), and a desktop has one card or another kind.
+  On an NVIDIA-only machine (the desktop's RTX 3070) `env.lua` sets the wiki's NVIDIA variables
+  (VA-API's only with libva-nvidia-driver installed) and `shell.sh` leaves the shell's Mesa-only
+  EGL out (Mesa has no GPU there). Untested on the desktop.
 - **No global NVIDIA env vars:** the wiki's NVIDIA page sets `LIBVA_DRIVER_NAME=nvidia` and
   `__GLX_VENDOR_LIBRARY_NAME=nvidia`, but those are for setups where NVIDIA renders the desktop. Here
   `prime-run` sets them per app.

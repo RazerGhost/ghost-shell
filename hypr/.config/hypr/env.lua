@@ -31,6 +31,19 @@ if #gpus > 0 then
     hl.env("AQ_DRM_DEVICES", table.concat(gpus, ":"))
 end
 
--- The wiki's NVIDIA page sets LIBVA_DRIVER_NAME=nvidia and __GLX_VENDOR_LIBRARY_NAME=nvidia.
--- Those are for setups where NVIDIA renders the desktop; here they would push iGPU apps onto
--- NVIDIA libraries. prime-run sets the right variables for each offloaded app instead.
+-- An NVIDIA-only machine (the desktop's RTX 3070): NVIDIA draws everything, so apps should use
+-- its libraries, as the Hyprland wiki's NVIDIA page sets. Not on the laptop (below), where the
+-- AMD chip draws and prime-run picks NVIDIA per app. Video decoding through VA-API only with
+-- NVIDIA's VA-API driver installed (libva-nvidia-driver), or video would lose it.
+if #gpus == 1 and gpus[1] == "/dev/dri/nvidia-dgpu" then
+    hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
+    local vaapi = io.open("/usr/lib/dri/nvidia_drv_video.so", "r")
+    if vaapi then
+        vaapi:close()
+        hl.env("LIBVA_DRIVER_NAME", "nvidia")
+        hl.env("NVD_BACKEND", "direct")
+    end
+end
+
+-- On the laptop the wiki's NVIDIA variables (set above only on an NVIDIA-only machine) would push
+-- iGPU apps onto NVIDIA libraries; prime-run sets them for each offloaded app instead.
