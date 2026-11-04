@@ -244,6 +244,7 @@ Singleton {
         readonly property int icon:    root.px(28)  // the weather's sky and the battery's icon
         readonly property int eventBar: root.px(3)  // the accent bar beside a calendar event
         readonly property int copiedFor: 1500        // ms the clipboard widget says "Copied"
+        readonly property int scrollMark: root.px(3) // the bar beside a list that scrolls
     }
 
     readonly property QtObject dock: QtObject {

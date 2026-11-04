@@ -4,8 +4,8 @@ import qs.theme
 import qs.widgets
 
 // The to-do widgets, a to-do list of their own (the medium "To-do" and the large "To-do list",
-// `large`): the open tasks (services/Planner.qml), as many as fit, click one to tick it off, and
-// a field at the bottom to add one.
+// `large`): the open tasks (services/Planner.qml), a list that scrolls with the wheel or
+// touchpad, click one to tick it off, and a field at the bottom to add one.
 // A click in the field takes the keyboard (WidgetKeyboard.qml) until Enter on an empty field,
 // Escape or a click in a window.
 // On the lock screen (`hidesTitles`) only how many are open.
@@ -19,13 +19,6 @@ WidgetSurface {
 
     readonly property var open: Planner.todos.map((t, i) => ({ text: t.text, done: t.done, index: i })).filter(t => !t.done)
     readonly property int done: Planner.todos.length - open.length
-    // As many rows as fit between the heading and the field; when there are more tasks, the
-    // last row says how many more. With room for one row only (the medium size at small text
-    // sizes), the first task, without the line.
-    readonly property int fit: Math.max(Math.floor(list.height / list.row), 1)
-    readonly property bool overflows: open.length > fit
-    readonly property bool showsMore: overflows && fit > 1
-    readonly property var shown: overflows ? open.slice(0, showsMore ? fit - 1 : 1) : open
 
     WidgetKeyboard {
         id: keyboard
@@ -75,7 +68,7 @@ WidgetSurface {
         }
     }
 
-    Column {
+    ListView {
         id: list
 
         readonly property int row: Theme.font.normal * 2
@@ -84,61 +77,69 @@ WidgetSurface {
         anchors.topMargin: Theme.spacing.s
         anchors.bottom: field.top
         anchors.bottomMargin: Theme.spacing.s
-        width: parent.width
+        width: parent.width - Theme.desktop.scrollMark - Theme.spacing.xs
+        clip: true
+        boundsBehavior: Flickable.StopAtBounds
         visible: !widget.hidesTitles
+        model: widget.open
 
-        Repeater {
-            model: widget.shown
+        // The list is built again when a task is ticked off; stay where it was scrolled to.
+        function keepingPlace(change: var): void {
+            const y = contentY;
+            change();
+            Qt.callLater(() => contentY = Math.max(0, Math.min(y, contentHeight - height)));
+        }
 
-            MouseArea {
-                id: task
+        delegate: MouseArea {
+            id: task
 
-                required property var modelData
+            required property var modelData
 
-                width: parent.width
-                height: list.row
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: Planner.toggle(modelData.index)
+            width: ListView.view.width
+            height: list.row
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: list.keepingPlace(() => Planner.toggle(modelData.index))
 
-                Accessible.role: Accessible.CheckBox
-                Accessible.name: modelData.text
-                Accessible.checkable: true
-                Accessible.checked: false
-                Accessible.onPressAction: Planner.toggle(modelData.index)
+            Accessible.role: Accessible.CheckBox
+            Accessible.name: modelData.text
+            Accessible.checkable: true
+            Accessible.checked: false
+            Accessible.onPressAction: Planner.toggle(modelData.index)
 
-                MaterialIcon {
-                    id: check
-                    anchors.verticalCenter: parent.verticalCenter
-                    // Filled for a moment under the pointer: what a click will do.
-                    icon: task.containsMouse ? "check_circle" : "radio_button_unchecked"
-                    color: task.containsMouse ? Colors.m3primary : Colors.m3onSurfaceVariant
-                    font.pixelSize: Theme.icon.small
-                }
+            MaterialIcon {
+                id: check
+                anchors.verticalCenter: parent.verticalCenter
+                // Filled for a moment under the pointer: what a click will do.
+                icon: task.containsMouse ? "check_circle" : "radio_button_unchecked"
+                color: task.containsMouse ? Colors.m3primary : Colors.m3onSurfaceVariant
+                font.pixelSize: Theme.icon.small
+            }
 
-                Text {
-                    anchors.left: check.right
-                    anchors.leftMargin: Theme.spacing.s
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: task.modelData.text
-                    color: Colors.m3onSurface
-                    font.family: Theme.font.sans
-                    font.pixelSize: Theme.font.normal
-                    elide: Text.ElideRight
-                }
+            Text {
+                anchors.left: check.right
+                anchors.leftMargin: Theme.spacing.s
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                text: task.modelData.text
+                color: Colors.m3onSurface
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.normal
+                elide: Text.ElideRight
             }
         }
 
         Text {
-            id: more
-            visible: widget.showsMore || widget.open.length === 0
-            text: widget.open.length === 0 ? (widget.done > 0 ? "All done" : "Nothing to do")
-                : "+" + (widget.open.length - widget.shown.length) + " more"
+            visible: widget.open.length === 0
+            text: widget.done > 0 ? "All done" : "Nothing to do"
             color: Colors.m3onSurfaceVariant
             font.family: Theme.font.sans
-            font.pixelSize: widget.open.length === 0 ? Theme.font.large : Theme.font.small
+            font.pixelSize: Theme.font.large
         }
+    }
+
+    ScrollMark {
+        flickable: list
     }
 
     TextField {

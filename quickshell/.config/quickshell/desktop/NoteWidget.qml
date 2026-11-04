@@ -19,6 +19,7 @@ WidgetSurface {
         onStopped: {
             note.focus = false;
             note.text = Planner.note;
+            page.contentY = 0;
         }
     }
 
@@ -32,24 +33,44 @@ WidgetSurface {
         font.letterSpacing: 1
     }
 
-    // The note, cut off at the card's foot (the today menu shows all of it). While typing it
-    // scrolls so the line with the cursor shows (a click puts the cursor at the end).
-    Item {
+    // The note, scrolled with the wheel or touchpad; while typing it follows the cursor (a click
+    // puts it at the end). Not dragged: a drag in the text selects. Back to the top when typing
+    // stops.
+    Flickable {
         id: page
-        readonly property real scroll: keyboard.wantsKeyboard
-            ? Math.max(0, note.cursorRectangle.y + note.cursorRectangle.height - height) : 0
+
+        function scroll(event: var): void {
+            const step = event.pixelDelta.y !== 0 ? event.pixelDelta.y : event.angleDelta.y / 120 * Theme.font.normal * 3;
+            contentY = Math.max(0, Math.min(contentY - step, contentHeight - height));
+        }
+
+        function ensureVisible(r: rect): void {
+            if (contentY > r.y)
+                contentY = r.y;
+            else if (contentY + height < r.y + r.height)
+                contentY = r.y + r.height - height;
+        }
 
         anchors.top: title.bottom
         anchors.topMargin: Theme.spacing.s
         anchors.bottom: parent.bottom
-        width: parent.width
+        width: parent.width - Theme.desktop.scrollMark - Theme.spacing.xs
+        contentHeight: note.height
         clip: true
+        interactive: false
         visible: !widget.hidesTitles
+
+        WheelHandler {
+            onWheel: event => page.scroll(event)
+        }
 
         TextEdit {
             id: note
-            y: -page.scroll
             width: parent.width
+            onCursorRectangleChanged: {
+                if (keyboard.wantsKeyboard)
+                    page.ensureVisible(cursorRectangle);
+            }
             text: Planner.note
             wrapMode: TextEdit.Wrap
             color: Colors.m3onSurface
@@ -85,19 +106,25 @@ WidgetSurface {
             color: Colors.m3onSurfaceVariant
             font: note.font
         }
+    }
 
-        // The click asks for the keyboard (the note can't have it before the layer does). Not in
-        // the desktop editor: its widgets are being placed there.
-        MouseArea {
-            anchors.fill: parent
-            visible: !keyboard.wantsKeyboard && !Editing.desktop
-            cursorShape: Qt.IBeamCursor
-            onClicked: {
-                keyboard.start();
-                note.forceActiveFocus();
-                note.cursorPosition = note.text.length;
-            }
+    ScrollMark {
+        flickable: page
+    }
+
+    // The click asks for the keyboard (the note can't have it before the layer does). Not in
+    // the desktop editor: its widgets are being placed there. Over the whole note, so a click
+    // below a short one counts; the wheel scrolls the note from here too.
+    MouseArea {
+        anchors.fill: page
+        visible: page.visible && !keyboard.wantsKeyboard && !Editing.desktop
+        cursorShape: Qt.IBeamCursor
+        onClicked: {
+            keyboard.start();
+            note.forceActiveFocus();
+            note.cursorPosition = note.text.length;
         }
+        onWheel: wheel => page.scroll(wheel)
     }
 
     // On the lock screen: that there's a note, not what it says.

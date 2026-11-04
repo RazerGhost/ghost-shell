@@ -6,7 +6,8 @@ import qs.widgets
 import "../services/ClipboardEntries.js" as ClipboardEntries
 
 // The clipboard widget (medium): your pinned texts, then what you copied last
-// (services/Clipboard.qml, the clipboard menu's history), as many as fit. A click copies one
+// (services/Clipboard.qml, the clipboard menu's history), a list that scrolls with the wheel or
+// touchpad. A click copies one
 // again, ready to paste; it says "Copied" for a moment. It follows the clipboard while shown
 // (`wl-paste --watch`). On the lock screen (`hidesTitles`) it keeps the clips to itself.
 WidgetSurface {
@@ -16,8 +17,6 @@ WidgetSurface {
     property bool hidesTitles: false
 
     readonly property var clips: ClipboardEntries.withPins(Clipboard.pins, Clipboard.entries)
-    readonly property int fit: Math.max(Math.floor(list.height / list.row), 1)
-    readonly property var shown: clips.slice(0, fit)
     // What was just copied, for "Copied": by its content, since cliphist stores a copy again
     // under a new id (and moves it to the top) a moment later.
     property string copied: ""
@@ -62,7 +61,7 @@ WidgetSurface {
         font.letterSpacing: 1
     }
 
-    Column {
+    ListView {
         id: list
 
         readonly property int row: Theme.font.normal * 2
@@ -70,57 +69,56 @@ WidgetSurface {
         anchors.top: title.bottom
         anchors.topMargin: Theme.spacing.s
         anchors.bottom: parent.bottom
-        width: parent.width
+        width: parent.width - Theme.desktop.scrollMark - Theme.spacing.xs
+        clip: true
+        boundsBehavior: Flickable.StopAtBounds
         visible: !widget.hidesTitles
+        model: widget.clips
 
-        Repeater {
-            model: widget.shown
+        delegate: MouseArea {
+            id: clip
 
-            MouseArea {
-                id: clip
+            required property var modelData
+            readonly property bool justCopied: widget.copied === widget.key(modelData)
+            readonly property string label: modelData.image
+                ? "Picture" + (modelData.image.width > 0 ? ", " + modelData.image.width + " × " + modelData.image.height : "")
+                : modelData.text.replace(/\s+/g, " ").trim()
 
-                required property var modelData
-                readonly property bool justCopied: widget.copied === widget.key(modelData)
-                readonly property string label: modelData.image
-                    ? "Picture" + (modelData.image.width > 0 ? ", " + modelData.image.width + " × " + modelData.image.height : "")
-                    : modelData.text.replace(/\s+/g, " ").trim()
+            function copy(): void {
+                Clipboard.copy(modelData);
+                widget.copied = widget.key(modelData);
+                copiedFor.restart();
+            }
 
-                function copy(): void {
-                    Clipboard.copy(modelData);
-                    widget.copied = widget.key(modelData);
-                    copiedFor.restart();
-                }
+            width: ListView.view.width
+            height: list.row
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: copy()
 
-                width: parent.width
-                height: list.row
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: copy()
+            Accessible.role: Accessible.Button
+            Accessible.name: "Copy " + (modelData.pinned ? "pinned: " : "") + label
+            Accessible.onPressAction: copy()
 
-                Accessible.role: Accessible.Button
-                Accessible.name: "Copy " + (modelData.pinned ? "pinned: " : "") + label
-                Accessible.onPressAction: copy()
+            MaterialIcon {
+                id: icon
+                anchors.verticalCenter: parent.verticalCenter
+                icon: clip.justCopied ? "check" : clip.containsMouse ? "content_copy"
+                    : clip.modelData.pinned ? "push_pin" : clip.modelData.image ? "image" : "notes"
+                color: clip.justCopied || clip.containsMouse ? Colors.m3primary : Colors.m3onSurfaceVariant
+                font.pixelSize: Theme.icon.small
+            }
 
-                MaterialIcon {
-                    id: icon
-                    anchors.verticalCenter: parent.verticalCenter
-                    icon: clip.justCopied ? "check" : clip.containsMouse ? "content_copy"
-                        : clip.modelData.pinned ? "push_pin" : clip.modelData.image ? "image" : "notes"
-                    color: clip.justCopied || clip.containsMouse ? Colors.m3primary : Colors.m3onSurfaceVariant
-                    font.pixelSize: Theme.icon.small
-                }
-
-                Text {
-                    anchors.left: icon.right
-                    anchors.leftMargin: Theme.spacing.s
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: clip.justCopied ? "Copied" : clip.label
-                    color: clip.justCopied ? Colors.m3primary : Colors.m3onSurface
-                    font.family: Theme.font.sans
-                    font.pixelSize: Theme.font.normal
-                    elide: Text.ElideRight
-                }
+            Text {
+                anchors.left: icon.right
+                anchors.leftMargin: Theme.spacing.s
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                text: clip.justCopied ? "Copied" : clip.label
+                color: clip.justCopied ? Colors.m3primary : Colors.m3onSurface
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.normal
+                elide: Text.ElideRight
             }
         }
 
@@ -131,6 +129,10 @@ WidgetSurface {
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.normal
         }
+    }
+
+    ScrollMark {
+        flickable: list
     }
 
     // On the lock screen: that there are clips, not what they say.

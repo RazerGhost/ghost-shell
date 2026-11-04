@@ -1886,6 +1886,11 @@ User's picks.
   icon and "in 12 min" (`CalendarEvents.soon`, tested); not its title, which anyone at the
   screen would see (the today menu has it). Checked with a stand-in event (no calendar
   connected now).
+- Scrolling (user's find: a long note couldn't be scrolled back up): the note, the to-do
+  widgets and the clipboard widget scroll with the wheel or touchpad, with a thin bar at the
+  right edge while there's more (`desktop/ScrollMark.qml`). The to-do lists show every open task
+  (no "+N more") and keep their place when one is ticked off; the note follows the cursor while
+  typing and isn't dragged (a drag selects text); the clipboard lists its whole history.
 
 ### Ending and starting the session (built 2026-11-04)
 User's find after the lock screen work: logging out and shutting down gave no feedback, and being
