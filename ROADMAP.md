@@ -1842,7 +1842,7 @@ let in was just the desktop appearing.
   unlock the shell still counted the screen as locked (`Session.locked`, which pop-ups and the
   greeting wait on), set only from the lock's change signal, which didn't follow the unlock of
   the lock made while the shell starts; a shell reload reset it. The lock now sets it itself when
-  it locks and lets you in (`Lock.mirrorLocked`). `qs ipc call island state` prints what decides
+  it locks and lets you in (`Lock.mirrorLocked`; verified after a reboot: unlocked, pop-ups show). `qs ipc call island state` prints what decides
   a pop-up, to catch the next one without a reload. Verified by the user: the unlock, the greeting and Cancel work, and the boot now
   goes black (the graphics driver taking over, with Limine's menu skipped), then the theme's plain
   background, then the lock screen.
