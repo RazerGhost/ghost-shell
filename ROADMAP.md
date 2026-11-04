@@ -2064,9 +2064,23 @@ boots its root port was empty, the card off before the kernel looked. A restart 
 Tried and dropped: `ghost-wake-dgpu.service`, waking the card at shutdown (it woke, the next boot
 still had none; the system module removes it). A sibling model's write-up (NOTES) points the other
 way: Linux's shutdown switches the card on and HP's firmware never cuts its power at "off", which
-Windows' path does; their fix calls a firmware method this BIOS (F.31) doesn't have. Next, if
-wanted: decompile this firmware's tables (iasl, a new package) for its own way to power the card
-off, or an HP BIOS update.
+Windows' path does; their fix calls a firmware method this BIOS (F.31) doesn't have.
+- The firmware's tables (acpidump + iasl, from `acpica`, run once; decoded outside the repo):
+  the firmware decides at power-on whether the RTX is there. With it, two more tables load
+  (32 SSDTs, not 30), defining the card (`\_SB.PCI0.GPP0.PEGP`) and its slot's power switch
+  (`GPP0.PG00`, the slot's `_PR0`/`_PR3`). Without it the card is never defined: gone before Linux
+  starts, so nothing at boot can bring it back. `PG00._OFF` puts the link in L2/L3, holds the card
+  in reset and cuts its power enable (GPIO `PWEN`); `_ON` (`SGPC(1)`) returns at once when `PWEN`
+  is already high, without the power-good wait and reset release. At shutdown (`_PTS` 5) the
+  tables only call into the firmware's own SMM code and tell the embedded controller; nothing
+  switches the card. The guess: Linux powers off with the card on (`PWEN` high: Hyprland keeps
+  it open for outputs on the RTX, so it never runtime-suspends), and the firmware's power-on
+  skips sequencing a card it finds enabled; a restart resets the card properly. Windows switches
+  the card off when idle, so it's off at shutdown.
+- Next (user's test): stop the desktop, switch the card off through `PG00` (`~/rtx-off.sh`, outside
+  the repo: waits for the driver to do it, else unbinds the drivers and lets runtime power
+  management), power off, count the boots with the RTX. If it holds, a shutdown step does the
+  same after the session ends, only for a power-off.
 
 ### Docs and the system module checked for the desktop (2026-11-04)
 User's question: are all the commands in the repo, and how do the docs look. The README lagged
