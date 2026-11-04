@@ -1,5 +1,6 @@
 # Calendar events in the today menu: vdirsyncer downloads subscribed calendars (Google
-# Calendar's secret iCal address, a Proton share link, any .ics address) and khal reads them, recurring events included.
+# Calendar's secret iCal address, any .ics address) and khal reads them, recurring events
+# included.
 # pacman packages; # lines and blank lines are skipped.
 
 vdirsyncer

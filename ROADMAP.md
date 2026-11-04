@@ -661,10 +661,11 @@ Since 2026-11-04 the to-do list is a desktop widget (see "Desktop widgets polish
   to keep up to date, and it's fast enough for the home folder (~10 ms). The last results stay
   up while a new search runs (emptying them on every key made the list flicker).
 
-### Calendar events (built 2026-10-29; a Proton calendar synced on the laptop 2026-11-04)
+### Calendar events (built 2026-10-29; syncing checked on the laptop 2026-11-04)
 - Any calendar with an iCal (.ics) link, read-only: Google Calendar's "Secret address in iCal
-  format" (user's choice 2026-11-04, after first choosing Proton and no Google), a Proton
-  Calendar share link ("Share with anyone"; Proton has no CalDAV). The `calendar` module
+  format" (user's choice 2026-11-04) or any other .ics address. Proton Calendar's share link
+  was tried first (no Google, then): it synced once, then answered 422 "Link not found", and the
+  user dropped Proton for the calendar as too restrictive. The `calendar` module
   (vdirsyncer and khal, `extra`) and `ghost calendar add [name]`, which takes the link from the
   clipboard (then clears it there and from the clipboard history; user's find: pasting into the
   hidden prompt looked like nothing happened) or asks for it without echoing it, and keeps it
@@ -676,7 +677,7 @@ Since 2026-11-04 the to-do list is a desktop widget (see "Desktop widgets polish
   month and the coming week. The today menu lists the next events under the date, the month and
   calendar widgets show them (`CalendarEvents.js`, tested). Events are made in the calendar's own
   app or site. khal gives an all-day event's last day as its end date (its `AllDayEvent.end` is
-  DTEND minus a day). A Proton link that's been turned off answers 422 "Link not found".
+  DTEND minus a day).
 
 ### Optimization review (done, verified on the laptop 2026-10-29)
 Four read-only reviews (code against ENGINEERING_PRINCIPLES.md, packages and system, the running

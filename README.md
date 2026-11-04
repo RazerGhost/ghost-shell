@@ -72,7 +72,7 @@ After the first install, `ghost` (in `~/.local/bin`) does everything:
 | `ghost update` | pull the repo, then install again (new packages, new setup steps) |
 | `ghost install [module...]` | packages and setup for some or all modules |
 | `ghost theme <wallpaper \| "#rrggbb">` | a new wallpaper and the colors from it |
-| `ghost calendar add [name]` | subscribe to a calendar (copy the link first: Google Calendar's secret iCal address, a Proton share link or any .ics address; `remove <name>`, `list`, `sync`) |
+| `ghost calendar add [name]` | subscribe to a calendar (copy the link first: Google Calendar's secret iCal address or any .ics address; `remove <name>`, `list`, `sync`) |
 | `ghost webapp add <name> <url> [icon]` | a site in its own window, in the launcher and the dock (`remove <name>`, `list`) |
 | `ghost doctor` | check that everything is set up; each problem says what fixes it |
 | `ghost modules` | list the modules and which ones this machine uses |

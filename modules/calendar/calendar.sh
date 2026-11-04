@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Subscribed calendars for the today menu (read-only): Google Calendar's "Secret address in
-# iCal format" (Settings -> the calendar -> Integrate calendar), a Proton Calendar share link
-# ("Share with anyone"), or any .ics address. vdirsyncer downloads each into ~/.local/share/calendars/<name>/
+# iCal format" (Settings -> the calendar -> Integrate calendar), or any other
+# .ics address. vdirsyncer downloads each into ~/.local/share/calendars/<name>/
 # (the shell runs `vdirsyncer sync` every 15 minutes) and khal reads them. `ghost calendar` runs
 # this.
 #
 #   ghost calendar add [name]   takes the link from the clipboard (copy it first), or asks for
 #                               it (not echoed, so it stays out of the terminal and the shell
-#                               history); name: "proton" if left out
+#                               history); name: "google" if left out
 #   ghost calendar remove <name>
 #   ghost calendar list
 #   ghost calendar sync         download them now
@@ -107,7 +107,7 @@ cmd_sync() {
 
 cmd_add() {
     local name link
-    name=$(slug "${1:-proton}")
+    name=$(slug "${1:-google}")
     [[ -n $name ]] || fail "\"$1\" isn't a usable name"
     names | grep -qx "$name" && fail "there's already a calendar called $name (ghost calendar remove $name)"
     # The clipboard first: pasting into a prompt that shows nothing looked like it hadn't worked.
