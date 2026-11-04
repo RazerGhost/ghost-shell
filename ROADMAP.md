@@ -2284,7 +2284,8 @@ looked up on public Wi-Fi maps) and the first name in the greeting examples. Use
 history rewritten rather than started over (every commit's author is the GitHub noreply address,
 the name and the network scrubbed from every version), "Ghosty" for the examples' name, and the
 MIT licence. The install no longer needs `gh`: `bootstrap.sh` from raw.githubusercontent.com and
-a plain `git clone`.
+a plain `git clone`. Published as a fresh public repo (GitHub keeps every commit it was ever sent, even
+after a force-push): the old one, renamed `ghost-shell-old`, stays private.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
