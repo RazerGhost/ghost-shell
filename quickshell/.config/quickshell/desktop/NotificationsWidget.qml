@@ -10,7 +10,7 @@ WidgetSurface {
     id: widget
 
     readonly property int count: Notifications.history.length
-    readonly property int apps: new Set(Notifications.history.map(n => n.appName)).size
+    readonly property int apps: new Set(Notifications.history.map(n => Notifications.appOf(n))).size
 
     MouseArea {
         anchors.fill: parent

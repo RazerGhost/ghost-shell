@@ -119,7 +119,7 @@ Scope {
                 ending: Session.ending,
                 welcome: root.welcomeShown,
                 reloadNotice: root.reloadShown,
-                current: Notifications.current ? (Notifications.current.appName + ": " + Notifications.current.summary) : null,
+                current: Notifications.current ? (Notifications.appOf(Notifications.current) + ": " + Notifications.current.summary) : null,
                 queue: Notifications.queue.length,
                 quiet: Notifications.quiet,
                 doNotDisturb: Notifications.doNotDisturb,

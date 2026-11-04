@@ -115,7 +115,7 @@ Column {
 
                 Repeater {
                     model: ScriptModel {
-                        values: NotificationGroups.groups(Notifications.history.map(n => n?.appName ?? ""))
+                        values: NotificationGroups.groups(Notifications.history.map(n => Notifications.appOf(n)))
                             .map(g => ({ app: g.app, notifications: g.indices.map(i => Notifications.history[i]) }))
                         objectProp: "app"
                     }

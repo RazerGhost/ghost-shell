@@ -131,6 +131,17 @@ Singleton {
         queue = [...queue.filter(n => n !== null && n !== notification), notification];
     }
 
+    // The app a notification is from, for its card, its group and the per-app rules: the name it
+    // gives, else the name of its desktop entry (Ghostty, which Claude Code's notifications come
+    // through, sends no name, only its entry), else the entry's id.
+    function appOf(n: Notification): string {
+        if (!n)
+            return "";
+        if (n.appName)
+            return n.appName;
+        return DesktopEntries.heuristicLookup(n.desktopEntry)?.name || n.desktopEntry || "";
+    }
+
     // A pop-up is done (timed out, dismissed or clicked).
     function done(notification: Notification): void {
         queue = queue.filter(n => n !== null && n !== notification);
@@ -188,10 +199,10 @@ Singleton {
             const critical = notification.urgency === NotificationUrgency.Critical;
             // Only once settings.json is in: writing to the defaults before then would save
             // them over the user's file.
-            const apps = Settings.loaded ? Rules.remember(Settings.values.notificationApps, notification.appName) : null;
+            const apps = Settings.loaded ? Rules.remember(Settings.values.notificationApps, root.appOf(notification)) : null;
             if (apps !== null)
                 Settings.values.notificationApps = apps;
-            const mode = Rules.mode(Settings.values.notificationApps, notification.appName);
+            const mode = Rules.mode(Settings.values.notificationApps, root.appOf(notification));
             if (Rules.popsUp(mode, root.quiet, critical)) {
                 root.queue = [...root.queue, notification];
                 root.leaves(notification);

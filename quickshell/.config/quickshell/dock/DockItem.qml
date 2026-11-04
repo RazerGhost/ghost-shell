@@ -29,7 +29,7 @@ MouseArea {
     readonly property bool focused: windows.includes(Windows.active)
     readonly property string name: entry?.name ?? windows[0]?.title ?? item.id
     readonly property int badge: DockApps.notificationCount(
-        Notifications.history.map(n => ({ desktopEntry: n.desktopEntry, appName: n.appName })), item.id, name)
+        Notifications.history.map(n => ({ desktopEntry: n.desktopEntry, appName: Notifications.appOf(n) })), item.id, name)
     // Set by DockBar while this app's window previews show: they replace the name label.
     property bool previewing: false
 

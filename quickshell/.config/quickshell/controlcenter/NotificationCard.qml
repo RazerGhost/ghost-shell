@@ -44,7 +44,7 @@ MouseArea {
     onClicked: Notifications.activate(notification)
 
     Accessible.role: Accessible.Button
-    Accessible.name: (notification?.appName ?? "") + ": " + (notification?.summary ?? "") + ". " + (notification?.body ?? "")
+    Accessible.name: Notifications.appOf(notification) + ": " + (notification?.summary ?? "") + ". " + (notification?.body ?? "")
     Accessible.onPressAction: Notifications.activate(notification)
 
     // The keyboard (arrow keys or Tab, then Enter or Space), like a click.
@@ -120,7 +120,7 @@ MouseArea {
                     anchors.left: parent.left
                     anchors.right: close.left
                     anchors.verticalCenter: parent.verticalCenter
-                    text: [root.notification?.appName,
+                    text: [Notifications.appOf(root.notification),
                            NotificationTime.format(Notifications.received[root.notification?.id] ?? root.now, root.now)]
                           .filter(s => s).join(" · ")
                     color: root.subtleColor
