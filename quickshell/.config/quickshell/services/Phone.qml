@@ -21,6 +21,10 @@ Singleton {
 
     readonly property string script: Quickshell.shellDir + "/services/phone.sh"
 
+    // LocalSend (the phone module): files to any device nearby, phones, tablets and computers,
+    // with its app on the other end. Read from the app list (filled in a moment after the start).
+    readonly property bool localSend: DesktopEntries.applications.values.some(entry => entry.id === "localsend")
+
     function refresh(): void {
         read.start();
     }
@@ -45,6 +49,12 @@ Singleton {
     function share(paths: var): void {
         if (paths.length > 0)
             Quickshell.execDetached(["sh", script, "share", ...paths]);
+    }
+
+    // The files in LocalSend's app, on its Send page with them chosen: pick a device there.
+    function sendWithLocalSend(paths: var): void {
+        if (paths.length > 0)
+            Apps.run(["localsend", ...paths], "localsend", "");
     }
 
     // Its files in the file manager, once KDE Connect has mounted them.

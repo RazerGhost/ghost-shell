@@ -1,5 +1,7 @@
 # Your phone: notifications, clipboard, files and battery through KDE Connect (needs the KDE
-# Connect app on the phone).
+# Connect app on the phone). LocalSend sends files to any device nearby (phones, tablets,
+# computers, iPhones too) with its app on the other end; the island's send menu offers both.
 # pacman packages; # lines and blank lines are skipped.
 
 kdeconnect
+localsend

@@ -1783,8 +1783,15 @@ User's picks:
   (`phone.sh share`, now also behind the Phone page and Nautilus's "Send to phone": it finds the
   connected phone, asks which with several, says so with none; tested with stand-ins).
   `FileUrl.pathOf` (tested) turns the dropped URLs into paths.
-- Checked on screen: the wide island (centred) and no warnings. The wheel, middle-click, the
-  alerts' clicks and a real drop need the mouse: for the user's checklist.
+- The send menu (user's pick, the same day): with LocalSend (phone module, `cachyos` repo,
+  Apache-2.0; port 53317 opened in ufw), files dropped on the island open a small island menu,
+  "Send 3 files" (`controlcenter/SendPanel.qml`, `Island.offerSend`): your phone through KDE
+  Connect, or "Another device", which opens LocalSend's app on its Send page with the files chosen
+  (`localsend <files>`, checked from the unpacked package) to pick any device nearby: phones,
+  tablets, computers, iPhones, with LocalSend on them. Its `localsend-cli` only picks devices
+  interactively, so the app is the way. Without LocalSend a drop goes straight to the phone.
+- Checked on screen: the wide island (centred), the send menu's look, no warnings. The wheel,
+  middle-click, the alerts' clicks and a real drop need the mouse: for the user's checklist.
 
 ### The lock screen is your desktop, locked (built 2026-11-04)
 User's picks after booting straight to the lock screen: the lock screen should feel like the

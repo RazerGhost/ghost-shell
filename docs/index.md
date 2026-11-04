@@ -98,7 +98,7 @@ Recovery procedures (lock screen crash, a session that can't start) are in ROADM
 
 | Feature | Files |
 |---|---|
-| Island: one shape with the time (or music) and alerts, floating or attached to the top edge (`islandAttached`); click for today, right-click for quick settings, middle-click play or pause; the wheel sets the volume (Shift brightness, Ctrl or over the dots workspaces, over the cover tracks); resting on it widens it (workspace dots left, Wi-Fi and battery right); files dropped on it go to the phone; morphs into every menu | `bar/Island.qml`, `IslandWindow.qml`, `IslandPill.qml`, `PillShape.qml`, `PillPath.js`, `IslandViews.js`, `IslandButton.qml`, `IslandFade.qml`, `IslandTap.qml` |
+| Island: one shape with the time (or music) and alerts, floating or attached to the top edge (`islandAttached`); click for today, right-click for quick settings, middle-click play or pause; the wheel sets the volume (Shift brightness, Ctrl or over the dots workspaces, over the cover tracks); resting on it widens it (workspace dots left, Wi-Fi and battery right); files dropped on it open the send menu (phone or, with LocalSend, another device); morphs into every menu | `bar/Island.qml`, `IslandWindow.qml`, `IslandPill.qml`, `PillShape.qml`, `PillPath.js`, `IslandViews.js`, `IslandButton.qml`, `IslandFade.qml`, `IslandTap.qml`, `controlcenter/SendPanel.qml` |
 | Island alerts: an event within 15 minutes (`Agenda.soon`), recording, timer (focus mode's own icon), microphone, camera, screen sharing, low battery; a click goes where each leads (today, the timer, quick settings; the recording stops) | `bar/IslandAlerts.qml`, `bar/IslandTap.qml`, `widgets/StatusGlyph.qml` |
 | Pop-ups out of the island, one at a time: notifications, then attention requests | `bar/IslandWindow.qml`, `IslandViews.js`, `controlcenter/NotificationCard.qml`, `AttentionCard.qml` |
 | Workspace dots (3-10 or only used), shown in the island for a moment after a switch; scroll over the island to step | `bar/Workspaces.qml`, `services/WorkspaceSlots.js` |
@@ -318,7 +318,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 | zen | Zen in the wallpaper's colors |
 | haunt | The Haunt Git client |
 | capture | Recording, color picker, OCR and QR |
-| phone | KDE Connect (opens its ufw ports) |
+| phone | KDE Connect and LocalSend (opens their ufw ports) |
 | proton | Proton Mail, Pass, VPN |
 | calendar | Calendar events from an iCal link (Google's secret address) |
 | llm (opt-in) | Ollama, OpenCode, Aider on the NVIDIA GPU |

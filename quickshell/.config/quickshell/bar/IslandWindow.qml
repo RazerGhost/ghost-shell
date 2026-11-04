@@ -20,7 +20,7 @@ import "../services/FileUrl.js" as FileUrl
 // Resting the pointer on it widens it: the workspace dots on its left, Wi-Fi and the battery on
 // its right. The wheel sets the volume (Shift: the brightness; over the dots or with Ctrl:
 // workspaces; over the music's cover: tracks), its alerts lead where they say, and files dropped
-// on it go to your phone (KDE Connect). A
+// on it go to your phone or, with LocalSend, another device (SendPanel). A
 // shell reload shows "Reloaded" there too, or opens the island with why it failed (it was a card
 // in the corner, among the notifications, for a day: it's the shell's own status, not one).
 // New notifications pop out of it one at a time, then a window asking for attention (user's
@@ -240,8 +240,9 @@ PanelWindow {
         }
     }
 
-    // Files dropped on the island go to your phone (KDE Connect, services/phone.sh: the connected
-    // one; it asks which with several, says so with none). Only files: text and links are refused.
+    // Files dropped on the island: the send menu asks where (your phone or, with LocalSend, another
+    // device), or they go straight to the phone without LocalSend (Island.offerSend). Only files:
+    // text and links are refused.
     DropArea {
         id: fileDrop
         anchors.fill: pill
@@ -257,7 +258,7 @@ PanelWindow {
             const paths = drop.urls.map(url => FileUrl.pathOf(url)).filter(path => path !== "");
             if (paths.length === 0)
                 return;
-            Phone.share(paths);
+            root.island.offerSend(paths, root.modelData.name);
             drop.accept(Qt.CopyAction);
         }
     }
@@ -367,7 +368,7 @@ PanelWindow {
 
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
-                            text: "Send to " + (Phone.phone?.name ?? "your phone")
+                            text: Phone.localSend ? "Drop to send" : "Send to " + (Phone.phone?.name ?? "your phone")
                             color: Colors.m3onSurface
                             font.family: Theme.font.sans
                             font.pixelSize: Theme.font.normal
@@ -566,6 +567,17 @@ PanelWindow {
             content: Component {
                 MediaPanel {
                     width: parent.width
+                }
+            }
+        }
+
+        MenuSlot {
+            shown: pill.shown === "send"
+            content: Component {
+                SendPanel {
+                    width: parent.width
+                    paths: root.island.sendPaths
+                    onDone: root.island.panel = ""
                 }
             }
         }

@@ -113,7 +113,7 @@ its setup (`setup.sh`).
 | `discord`, `spotify`, `zen` | those apps in the wallpaper's colors |
 | `haunt` | the Haunt Git client, from its release package, and what building it needs |
 | `capture` | screen recording, color picker, text and QR codes from the screen |
-| `phone` | KDE Connect |
+| `phone` | KDE Connect and LocalSend |
 | `proton` | Proton Mail, Pass and VPN |
 | `calendar` | calendar events in the today menu, from a calendar's iCal link (`ghost calendar add`) |
 | `llm` | local coding LLM on the NVIDIA GPU: Ollama, OpenCode, Aider (setup and decisions in the ghost-llm repo) |

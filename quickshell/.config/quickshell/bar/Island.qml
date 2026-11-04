@@ -17,7 +17,7 @@ import qs.theme
 Scope {
     id: root
 
-    // "", "today", "settings", "media", "power", "clipboard" or "wallpaper"
+    // "", "today", "settings", "media", "power", "clipboard", "wallpaper" or "send"
     property alias panel: persist.panel
     property alias screenName: persist.screenName // the monitor the menu is open on
 
@@ -37,6 +37,8 @@ Scope {
     property string quickPage: ""
     // The today menu is to open on one of its parts ("timer": the island's timer alert).
     property string todayPart: ""
+    // Files dropped on the island, for the send menu (controlcenter/SendPanel.qml).
+    property var sendPaths: []
 
     // After the shell reloads (a file in its folder changed), the island says so instead of
     // Quickshell's own pop-up: briefly when it worked, longer with the error when it didn't (the
@@ -122,6 +124,18 @@ Scope {
         screenName = screen;
         panel = "today";
         todayPart = part;
+    }
+
+    // Files dropped on the island on `screen`: with LocalSend, the send menu asks where (your
+    // phone or another device); without it they go to the phone.
+    function offerSend(paths: var, screen: string): void {
+        if (!Phone.localSend) {
+            Phone.share(paths);
+            return;
+        }
+        sendPaths = paths;
+        screenName = screen;
+        panel = "send";
     }
 
     function toggle(name: string, screen: string): void {
