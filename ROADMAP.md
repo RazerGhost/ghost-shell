@@ -452,7 +452,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   Settings -> Windows -> Wobbly windows (off by default), through `shell-settings.lua`
   (`HyprlandConfig.js`, tested). The spring curve key renamed to `damping`.
 
-### Touchpad off with a mouse (built 2026-10-28; untested: needs a mouse and a finger)
+### Touchpad off with a mouse (built 2026-10-28; verified by the user 2026-11-04)
 - Settings -> Keyboard and mouse: "Touchpad off while a mouse is connected" (off by default;
   `services/Touchpad.qml`). Hyprland sends no device events, so udev's input events are watched
   while it's on and `hyprctl devices -j` is read a second after one (it polled every 3 s until
@@ -1755,7 +1755,7 @@ desktop, not a screen of its own, and the login screen and the lock screen edito
 - The island lock (`lock/LockIsland.qml`): the desktop's island in its place, a lock and the time,
   opening into the password field like its menus (open while something is typed, checked or said,
   and for 10 s after a key or pointer move; the field keeps the keyboard while closed, so the
-  first key opens it and counts). A wrong password shakes it; caps lock and the layout show in it.
+  first key opens it and counts). A wrong password shakes it; caps lock and the layout show in it (both verified by the user 2026-11-04).
 - The rest is the desktop (`lock/LockContent.qml`): its wallpaper (a live one's still frame),
   sharp, and its widgets at their places on the first screen (`desktop/WidgetStage.qml`, shared
   with the desktop's layer, `locked`): only the media widget takes clicks, the calendar shows
