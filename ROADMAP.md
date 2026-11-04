@@ -1842,6 +1842,12 @@ let in was just the desktop appearing.
   goes black (the graphics driver taking over, with Limine's menu skipped), then the theme's plain
   background, then the lock screen.
 
+### The HP logo through the boot (built 2026-11-04; needs `ghost install system` and a reboot)
+User's pick after the black screen between the firmware and the session: Plymouth back, with its
+`bgrt` theme (see the decision "Plymouth's bgrt splash"). Next, once this is verified: a theme of
+our own in the wallpaper's background color, so the boot hands over to the lock screen without a
+change of color.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
@@ -1855,11 +1861,15 @@ windows).
 - **No global NVIDIA env vars:** the wiki's NVIDIA page sets `LIBVA_DRIVER_NAME=nvidia` and
   `__GLX_VENDOR_LIBRARY_NAME=nvidia`, but those are for setups where NVIDIA renders the desktop. Here
   `prime-run` sets them per app.
-- **No Plymouth:** it left tty1 in graphics mode (the text greeter of the first days was
-  invisible). The system module appends `plymouth.enable=0` and a quiet console to
-  `/etc/default/limine`; the session, logged in and locked at once, is the first thing drawn.
-  The HP logo goes blank when the graphics driver takes over (only Plymouth's bgrt theme would
-  redraw it; the user chose to leave it, 2026-11-04).
+- **Plymouth's bgrt splash** (user's choice, 2026-11-04; off from 2026-10-28 until then): the
+  firmware's HP logo with a spinner from when the graphics driver takes over until Hyprland draws,
+  and at shutdown (`modules/system/packages.txt`; the system module sets the theme and adds
+  `splash`). It was off because it left tty1 in graphics mode, which hid the text greeter of the
+  first days; there's no login screen now. Plymouth quits with `--retain-splash`
+  (`plymouth-quit.service.d/retain-splash.conf`), so Hyprland draws over the logo instead of after
+  a black screen; greetd already waits for it (`after-plymouth.conf`). The firmware reports BGRT
+  status 0; Plymouth reads only the rotation bits from it, so the logo still shows (checked in its
+  code). A theme of our own in the wallpaper's background color is planned next.
 - **Early KMS:** CachyOS's chwd removes the `kms` mkinitcpio hook on NVIDIA laptops, so
   `system/etc/mkinitcpio.conf.d/20-early-amdgpu.conf` adds `amdgpu` to MODULES.
 

@@ -1,0 +1,6 @@
+# The laptop's system setup (modules/system/setup.sh).
+# pacman packages; # lines and blank lines are skipped.
+
+# The boot splash: the HP logo (the firmware's, ACPI BGRT) stays on screen with a spinner from
+# power-on until the session draws, and again at shutdown.
+plymouth
