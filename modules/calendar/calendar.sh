@@ -4,8 +4,9 @@
 # (the shell runs `vdirsyncer sync` every 15 minutes) and khal reads them. `ghost calendar` runs
 # this.
 #
-#   ghost calendar add [name]   asks for the link (not echoed, so it stays out of the terminal
-#                               and the shell history); name: "proton" if left out
+#   ghost calendar add [name]   takes the link from the clipboard (copy it first), or asks for
+#                               it (not echoed, so it stays out of the terminal and the shell
+#                               history); name: "proton" if left out
 #   ghost calendar remove <name>
 #   ghost calendar list
 #   ghost calendar sync         download them now
@@ -95,16 +96,31 @@ cmd_add() {
     name=$(slug "${1:-proton}")
     [[ -n $name ]] || fail "\"$1\" isn't a usable name"
     names | grep -qx "$name" && fail "there's already a calendar called $name (ghost calendar remove $name)"
-    read -rsp "Paste the calendar's link (it won't show): " link
-    echo
+    # The clipboard first: pasting into a prompt that shows nothing looked like it hadn't worked.
+    local copied answer
+    copied=$(wl-paste --no-newline --type text 2>/dev/null || true)
+    if [[ $copied =~ ^https://([^/[:space:]]+)/ ]]; then
+        read -rp "Use the link on the clipboard (${BASH_REMATCH[1]}/…)? [Y/n] " answer
+        [[ $answer =~ ^[Nn] ]] || link=$copied
+    fi
+    if [[ -z ${link:-} ]]; then
+        read -rsp "Paste the calendar's link (it won't show), then Enter: " link
+        echo
+        echo "Got ${#link} characters."
+    fi
     # Written into vdirsyncer's config inside quotes: nothing that would need escaping there.
     [[ $link =~ ^https://[^[:space:]\"\'\\]+$ ]] || fail "that isn't an https address"
     mkdir -p "$(dirname "$list")" "$data/$name"
     (umask 077; printf '%s\t%s\n' "$name" "$link" >>"$list")
     chmod 600 "$list"
+    # Out of the clipboard and its history: the link is the key to the events.
+    if [[ $copied == "$link" ]]; then
+        wl-copy --clear
+        cliphist delete-query "$link" 2>/dev/null || true
+    fi
     cmd_configure
     cmd_sync
-    echo "Added $name: its events show in the today menu."
+    echo "Added $name: its events show in the today menu and the calendar widgets."
 }
 
 cmd_remove() {

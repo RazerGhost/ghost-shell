@@ -664,7 +664,9 @@ Since 2026-11-04 the to-do list is a desktop widget (see "Desktop widgets polish
 ### Calendar events (built 2026-10-29; waiting on the user's share link to test)
 - User's choice: no Google; Proton Calendar through its read-only share link ("Share with
   anyone"; Proton has no CalDAV). The `calendar` module (vdirsyncer and khal, `extra`) and
-  `ghost calendar add [name]`, which asks for the link without echoing it and keeps it only in
+  `ghost calendar add [name]`, which takes the link from the clipboard (then clears it there and
+  from the clipboard history; 2026-11-04, user's find: pasting into the hidden prompt looked like
+  nothing happened) or asks for it without echoing it, and keeps it only in
   `~/.config/ghost/calendars` and vdirsyncer's config (both mode 600, outside the repo), then
   writes vdirsyncer's config (http -> filesystem, `a wins`) and khal's (fixed ISO formats).
   `services/Agenda.qml` runs `vdirsyncer sync` at start and every 15 minutes once khal's config
