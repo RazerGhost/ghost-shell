@@ -8,7 +8,7 @@ cd "$(dirname "$0")/../.."
 
 step "Linking configs with stow"
 # Every top-level directory is a Stow package, except system/ (the system module installs it),
-# tests/, modules/ and docs/.
+# tests/, modules/, docs/ and machines/.
 # -R re-links, so files added to an already-stowed package get linked too.
 # If stow reports a conflict, move the existing file aside and re-run.
 for pkg in $(stow_packages); do
@@ -17,6 +17,15 @@ for pkg in $(stow_packages); do
 done
 # Quickshell fills this in for the QML language server; it's gitignored.
 touch quickshell/.config/quickshell/.qmlls.ini
+
+step "Terminal greeting"
+# fish's greeting (Settings -> Default apps) is ghost-greeting.fish, sourced from config.fish after
+# CachyOS's config, which defines its own greeting (conf.d loads before config.fish, too early).
+# config.fish stays yours: only this line is added, once.
+greeting='source ~/.config/fish/ghost-greeting.fish'
+mkdir -p "$HOME/.config/fish"
+grep -qxF "$greeting" "$HOME/.config/fish/config.fish" 2>/dev/null \
+    || printf '\n# Ghost Shell: the terminal greeting (Settings -> Default apps)\n%s\n' "$greeting" >>"$HOME/.config/fish/config.fish"
 
 step "GTK settings"
 # Light or dark, the GTK theme (adw-gtk3) and the Colloid icons (user's choice) are set with the

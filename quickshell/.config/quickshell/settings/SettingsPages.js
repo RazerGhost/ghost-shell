@@ -27,7 +27,7 @@ const pages = [
     { id: "snapshots", section: "System", icon: "history", title: "Snapshots",
       words: "backup restore btrfs snapper undo files home" },
     { id: "apps", section: "Apps", icon: "apps", title: "Default apps",
-      words: "terminal browser file manager editor image viewer video audio player" },
+      words: "terminal browser file manager editor image viewer video audio player greeting fastfetch" },
     { id: "screentime", section: "Apps", icon: "hourglass", title: "Screen time",
       words: "usage time apps today week hours digital wellbeing" },
     { id: "keybinds", section: "Apps", icon: "keyboard", title: "Keybinds",

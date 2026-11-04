@@ -1,0 +1,28 @@
+// The terminal's system summary (fish's greeting when Settings says "System summary"): a small
+// ghost and the lines that matter. Colors are the terminal's palette, which matugen makes from
+// the wallpaper (Ghostty's theme), so it follows the wallpaper by itself.
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+        "type": "file",
+        "source": "~/.config/fastfetch/ghost.txt",
+        "color": { "1": "blue", "2": "magenta" },
+        "padding": { "top": 1, "left": 2, "right": 3 }
+    },
+    "display": {
+        "separator": "  ",
+        "color": { "keys": "blue", "title": "magenta" },
+        "key": { "width": 9 }
+    },
+    "modules": [
+        "title",
+        { "type": "os", "key": "OS", "format": "{name}" },
+        { "type": "kernel", "key": "Kernel" },
+        { "type": "wm", "key": "WM", "format": "{pretty-name} {version}" },
+        { "type": "uptime", "key": "Uptime" },
+        { "type": "packages", "key": "Packages", "format": "{all}" },
+        { "type": "memory", "key": "Memory", "format": "{used} / {total}" },
+        { "type": "disk", "key": "Disk", "folders": "/", "format": "{size-used} / {size-total}" },
+        { "type": "battery", "key": "Battery", "format": "{capacity} {status}" }
+    ]
+}

@@ -163,7 +163,7 @@ loaded last and aren't in git, so `ghost update` never conflicts with them:
 
 | Folder | |
 |---|---|
-| `hypr/`, `quickshell/`, `ghostty/`, `fish/`, `matugen/`, `zed/`, `spotify/`, `pipewire/`, `paru/`, `nautilus/`, `bin/` | configs, linked into `$HOME` by Stow (each mirrors the home folder) |
+| `hypr/`, `quickshell/`, `ghostty/`, `fish/`, `fastfetch/`, `matugen/`, `zed/`, `spotify/`, `pipewire/`, `paru/`, `nautilus/`, `bin/` | configs, linked into `$HOME` by Stow (each mirrors the home folder) |
 | `modules/` | packages and setup per module, `lib.sh` shared by them |
 | `system/` | files for `/` (udev rule, greetd, mkinitcpio), installed by the `system` module |
 | `machines/` | each machine's module list (`ghost install --machine <name>`) |

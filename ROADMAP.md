@@ -1924,6 +1924,17 @@ Escape then, Super+D again or a click elsewhere goes back to your workspace. Key
 the foot of the screen. Not while locked, in focus mode or in the desktop editor. Checked with
 wtype: moving, the ring, typing into the note and back, Escape home.
 
+### Terminal greeting (2026-11-04)
+User's question about the system summary a new terminal showed: CachyOS's fish config runs
+fastfetch (its defaults: the big CachyOS logo, every line). User's pick: fastfetch with the Ghost
+look (`fastfetch/` Stow package: a small ghost, OS, kernel, Hyprland, uptime, packages, memory,
+disk, battery, in the terminal's palette, which matugen makes from the wallpaper), switchable
+(user's request) with one line ("Good evening, Ghosty · CachyOS Linux · up 12 min · 100%") or
+nothing: Settings -> Default apps -> Terminal greeting (`terminalGreeting`).
+`fish/.config/fish/ghost-greeting.fish` reads it from settings.json and replaces CachyOS's
+`fish_greeting`; it's sourced from config.fish after CachyOS's config (conf.d loads too early),
+the one line the core module adds there. Checked: all three in a scratch home.
+
 ### The RTX missing after a shutdown (2026-11-04; open)
 The RTX was missing from the PCI bus in some boots. The journal's boots showed the pattern: after
 a shutdown the next boot had no RTX in 3 of 4 cases, after a restart it was always there; in those

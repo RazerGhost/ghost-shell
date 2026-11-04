@@ -260,7 +260,9 @@ recording (gpu-screen-recorder), draw on it (satty), folders and quality setting
 
 ### Other
 
-Welcome tour (`welcome/Welcome.qml`), web apps (`ghost webapp`, Chromium `--app`), snapshots
+The terminal greeting (a system summary, one line or nothing; Settings -> Default apps,
+`terminalGreeting`: `fish/.config/fish/ghost-greeting.fish`, sourced from config.fish by the core
+module, and `fastfetch/.config/fastfetch/`). Welcome tour (`welcome/Welcome.qml`), web apps (`ghost webapp`, Chromium `--app`), snapshots
 (snapper, Settings page), Nautilus "Send to phone" script (`nautilus/`), Proton apps, Wave:3
 voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 

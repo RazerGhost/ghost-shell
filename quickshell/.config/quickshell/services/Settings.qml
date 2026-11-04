@@ -206,6 +206,9 @@ Singleton {
             property bool desktopTasks: false
             property bool desktopNote: false
             property bool desktopClipboard: false
+            // What a new terminal shows (fish/.config/fish/ghost-greeting.fish reads it from this
+            // file): "ghost" (fastfetch with the Ghost look), "line" (one line) or "none".
+            property string terminalGreeting: "ghost"
             property int focusMinutes: 25 // focus mode's length, the one picked last
             // The music app last heard (its desktop entry id), which the media widget offers to
             // open while nothing plays (services/Media.qml).
