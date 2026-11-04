@@ -222,6 +222,11 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - `Hyprland.rawEvent(event)` gives every socket2 event (`event.name`, `event.data`, e.g.
   `urgent` with the address without 0x). Don't annotate the parameter's type in QML
   (`HyprlandIpcEvent` isn't a registered name; Qt logs an error per event).
+- Real pointer clicks and the wheel can be sent for tests: the user may write `/dev/uinput`
+  (logind's ACL) and python-evdev is installed, so `evdev.UInput({EV_KEY: [BTN_LEFT, ...],
+  EV_REL: [REL_X, REL_Y, REL_WHEEL]})` is a mouse Hyprland treats as real (place the pointer
+  with `hl.dsp.cursor.move` first). Wait ~0.5 s after creating it before the first event, or it
+  can be lost.
 - wtype: Hyprland doesn't run its binds for wtype's virtual keyboard, so binds can't be tested
   with it. `wtype -M alt` only sets the modifier, without Alt key events; `-P Alt_L` / `-p Alt_L`
   send real ones.

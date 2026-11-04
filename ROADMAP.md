@@ -1777,8 +1777,10 @@ User's picks:
   the apps (`Island.openPage`).
 - Resting on the island (0.4 s) widens it (user's choice over a peek at the date and weather):
   the workspace dots on its left, Wi-Fi and the battery on its right, both sides as wide as the
-  wider so the time stays under the webcam. Wi-Fi opens quick settings' Wi-Fi page, the battery
-  quick settings.
+  wider so the time stays under the webcam. They only show (user's choice after trying it: a
+  click aimed at the island's edge landed on a dot or icon that had just slid in, so the menus
+  seemed not to open): a left-click anywhere on the island opens today, a right-click quick
+  settings; the wheel over the dots still steps through the workspaces.
 - Files dragged onto the island say "Send to <phone>" and go to the phone when dropped
   (`phone.sh share`, now also behind the Phone page and Nautilus's "Send to phone": it finds the
   connected phone, asks which with several, says so with none; tested with stand-ins).
@@ -1790,8 +1792,10 @@ User's picks:
   (`localsend <files>`, checked from the unpacked package) to pick any device nearby: phones,
   tablets, computers, iPhones, with LocalSend on them. Its `localsend-cli` only picks devices
   interactively, so the app is the way. Without LocalSend a drop goes straight to the phone.
-- Checked on screen: the wide island (centred), the send menu's look, no warnings. The wheel,
-  middle-click, the alerts' clicks and a real drop need the mouse: for the user's checklist.
+- Checked on screen: the wide island (centred), the send menu's look, no warnings; with a
+  virtual mouse (python-evdev on /dev/uinput, which the user may write: NOTES), left- and
+  right-clicks on the time, the dots, Wi-Fi and the battery open the menus, and the wheel turns
+  the volume up and down. Verified by the user: a drop, LocalSend.
 
 ### The lock screen is your desktop, locked (built 2026-11-04)
 User's picks after booting straight to the lock screen: the lock screen should feel like the

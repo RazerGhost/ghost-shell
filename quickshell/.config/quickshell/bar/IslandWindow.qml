@@ -18,7 +18,7 @@ import "../services/FileUrl.js" as FileUrl
 // quick settings, where the status icons and background apps are now, a middle-click plays or
 // pauses the music. Switching workspaces shows the dots for a moment in the time's place.
 // Resting the pointer on it widens it: the workspace dots on its left, Wi-Fi and the battery on
-// its right. The wheel sets the volume (Shift: the brightness; over the dots or with Ctrl:
+// its right, only shown (clicks there open the menus too). The wheel sets the volume (Shift: the brightness; over the dots or with Ctrl:
 // workspaces; over the music's cover: tracks), its alerts lead where they say, and files dropped
 // on it go to your phone or, with LocalSend, another device (SendPanel). A
 // shell reload shows "Reloaded" there too, or opens the island with why it failed (it was a card
@@ -296,7 +296,9 @@ PanelWindow {
             onMiddleActivated: Media.playPause()
             onWheel: wheel => root.scrolled(wheel)
 
-            // The workspace dots while the island is wide: click one, or scroll over them.
+            // The workspace dots while the island is wide: only shown (user's choice: a click
+            // anywhere on the island opens its menus, nothing that slid in under the pointer takes
+            // it); the wheel over them steps through the workspaces.
             Item {
                 anchors.verticalCenter: parent.verticalCenter
                 implicitWidth: root.sideWidth
@@ -312,7 +314,7 @@ PanelWindow {
                     id: sideDots
                     anchors.left: parent.left
                     screen: root.modelData
-                    enabled: root.wide
+                    clickable: false
                 }
             }
 
@@ -422,8 +424,8 @@ PanelWindow {
                 onSettingsRequested: root.island.openPage("", root.modelData.name)
             }
 
-            // Wi-Fi and the battery while the island is wide; a click opens quick settings (on the
-            // Wi-Fi page for Wi-Fi), where the rest of the status is.
+            // Wi-Fi and the battery while the island is wide, only shown like the dots (the rest of the
+            // status is in quick settings, a right-click away).
             Item {
                 anchors.verticalCenter: parent.verticalCenter
                 implicitWidth: root.sideWidth
@@ -445,22 +447,13 @@ PanelWindow {
                         anchors.verticalCenter: parent.verticalCenter
                         icon: NetworkStatus.icon
                         font.pixelSize: Theme.icon.small
-
-                        IslandTap {
-                            label: "Network: " + NetworkStatus.label
-                            enabled: root.wide
-                            onTapped: root.island.openPage("wifi", root.modelData.name)
-                        }
+                        Accessible.name: "Network: " + NetworkStatus.label
+                        Accessible.ignored: false
+                        Accessible.role: Accessible.StaticText
                     }
 
                     BatteryPill {
                         visible: Battery.present
-
-                        IslandTap {
-                            label: "Battery " + Math.round(Battery.level * 100) + "%" + (Battery.charging ? ", charging" : "")
-                            enabled: root.wide
-                            onTapped: root.island.openPage("", root.modelData.name)
-                        }
                     }
                 }
             }

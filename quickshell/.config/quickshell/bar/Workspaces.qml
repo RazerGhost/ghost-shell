@@ -13,6 +13,9 @@ Item {
     id: root
 
     required property ShellScreen screen
+    // Whether a click on a dot goes there. The wide island's dots only show (a click there opens
+    // the island's menus, like anywhere on it); the wheel over them still steps.
+    property bool clickable: true
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(screen)
     readonly property alias hovered: wheelArea.containsMouse
     readonly property int active: WorkspaceSlots.idOf(monitor?.activeWorkspace) ?? 1
@@ -88,7 +91,7 @@ Item {
                      : Colors.m3onSurfaceVariant
                 opacity: isActive || occupied || workspace?.urgent ? 1 : 0.35
 
-                Accessible.role: Accessible.Button
+                Accessible.role: root.clickable ? Accessible.Button : Accessible.StaticText
                 Accessible.name: "Workspace " + modelData + (isActive ? ", current" : occupied ? "" : ", empty")
                 Accessible.onPressAction: root.go(modelData)
 
@@ -104,6 +107,7 @@ Item {
 
                 MouseArea {
                     // Bigger hit area than the 8px dot, so it's easy to click.
+                    enabled: root.clickable
                     anchors.fill: parent
                     anchors.margins: -Theme.spacing.xs
                     cursorShape: Qt.PointingHandCursor
