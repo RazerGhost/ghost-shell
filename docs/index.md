@@ -29,7 +29,7 @@ the reasons and history are in [ROADMAP.md](../ROADMAP.md), verified API facts i
 | `install.sh` only bootstraps `ghost install` | `install.sh` |
 | `ghost update` refuses with uncommitted changes; never stash with the live config | `cmd_update` |
 | Wallpaper and colors always go through `wallpaper.sh`; matugen hooks only deliver colors, app setup belongs in its module | `matugen/.config/matugen/wallpaper.sh` |
-| The login screen runs its own copy of the shell: run `ghost greeter` after changing shell code | `modules/core/greeter.sh` |
+| No login screen: greetd logs in at boot and after a logout, and the session locks at once | `system/etc/greetd/config.toml`, `lock/Lock.qml`, `hypr/hyprland.lua` |
 | Machine-local overrides, gitignored, loaded last | `hypr/local.lua`, `ghostty/local`, `fish/conf.d/local.fish` |
 | `system/` mirrors `/`, copied with `sudo install` by the system module | `modules/system/setup.sh` |
 | Browser is Zen (`zen-browser-bin`), never Firefox | |
@@ -88,7 +88,7 @@ updated) · Boy Scout Rule within touched lines · end each change with a summar
 | Third-party code | Pinned (`clone_at`); the user's own Ghost repos follow main |
 | Not doing | Hibernation, fingerprint login, dictation, letting games take Super |
 
-Recovery procedures (lock screen crash, login screen failure) are in ROADMAP Phase 5.
+Recovery procedures (lock screen crash, a session that can't start) are in ROADMAP Phase 5.
 
 ---
 
@@ -192,7 +192,6 @@ Cancel / Done, full keyboard control. `customize/Customize.qml`, `EditorChrome.q
 
 | Editor | Tabs | File |
 |---|---|---|
-| Lock screen | Looks, Clock (style, font, place, size, quiet side), Widgets, Picture; drag every part | `customize/LockEditor.qml` |
 | Desktop | Themes (save, rename, export/import), Looks + widget layouts, Wallpaper, Colors, Widgets (grid), Style, Size and text | `customize/DesktopEditor.qml`, `Themes.js`, `LooksFile.js` |
 | Dock and island | Looks, island (style, dots, clock, status icons in quick settings), dock (when, icon size) | `customize/DockIslandEditor.qml` |
 | Windows | Looks, Borders, Space, Motion (with Play samples) on example windows | `customize/WindowsEditor.qml`, `ExampleWindow.qml` |
@@ -200,9 +199,10 @@ Cancel / Done, full keyboard control. `customize/Customize.qml`, `EditorChrome.q
 
 ### Desktop widgets
 
-Clock, weather, media, calendar, battery, to-do, timer; glass cards on a `Bottom` layer, drag
-with snapping or a grid, keyboard nudges, zoom with the shell's size.
-`desktop/DesktopWidgets.qml/.js`, `*Widget.qml`, `WidgetSurface.qml`, `WidgetRegion.qml`.
+Clock, weather, media, calendar, battery, to-do, timer, notifications; glass cards on a `Bottom`
+layer, drag with snapping or a grid, keyboard nudges, zoom with the shell's size. The lock screen
+draws the same stage, locked. `desktop/DesktopWidgets.qml/.js`, `WidgetStage.qml`, `*Widget.qml`,
+`WidgetSurface.qml`, `WidgetRegion.qml`.
 
 ### Wallpaper and colors
 
@@ -215,13 +215,13 @@ with snapping or a grid, keyboard nudges, zoom with the shell's size.
 | Light / dark / at sunset, style, contrast, accent, smooth recolor | `services/ColorScheme.qml/.js`, `theme/Colors.qml` |
 | matugen for the shell, Hyprland, Ghostty, GTK, Yazi, Zed, Zen, Spotify, Discord, Steam, MangoHud | `matugen/.config/matugen/config.toml`, `templates/`, `hooks/` |
 
-### Lock, login and idle
+### Lock and idle
 
 | Feature | Files |
 |---|---|
-| Lock screen (PAM, blur, clock styles, widgets, media, grace period, shake on error, hints) | `lock/Lock.qml`, `LockContent.qml`, `LockClock.qml/.js`, `LockWidget.qml`, `LockWidgets.js`, `LockStatus.qml` |
-| Movable parts with outlines in the editor | `lock/PartShift.qml`, `PartOutline.qml`, `GlideTranslate.qml` |
-| Boot logs in and locks at once (greetd `initial_session`, `GHOST_AUTOLOGIN`); the Quickshell greeter after a logout, synced settings through a shared folder | `greeter.qml`, `greeter/Greeter.qml`, `greeter/sync.sh`, `lock/LoginScreenSync.qml`, `system/etc/greetd/` |
+| Lock screen: the desktop locked (its wallpaper and widgets, glass behind them), PAM, grace period, message line | `lock/Lock.qml`, `LockContent.qml`, `desktop/WidgetStage.qml` |
+| The island opens into the password field (shake on error, caps lock and layout hints) | `lock/LockIsland.qml` |
+| Boot and logout log in and lock at once (greetd, `GHOST_AUTOLOGIN`, a per-instance lock mark); no login screen | `system/etc/greetd/config.toml`, `hypr/hyprland.lua`, `lock/Lock.qml` |
 | Idle: dim, lock, screen off, suspend (battery / plugged in) | `idle/Idle.qml`, `hypridle.conf` |
 | Polkit agent | `polkit/PolkitPrompt.qml` |
 
@@ -260,7 +260,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 
 ### `ghost`
 
-`install [module...] [--theme X]` · `update` · `theme <wallpaper|#rrggbb>` · `greeter` ·
+`install [module...] [--theme X]` · `update` · `theme <wallpaper|#rrggbb>` ·
 `webapp add|remove|list` · `calendar add|remove|list|sync` · `looks export|import` ·
 `wallpapers get [words] [--count N] [--general] [--style S]` / `fetch <id>` · `doctor` ·
 `modules` · `keybinds`
@@ -275,7 +275,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 | `settings` | `open`, `page <id>` |
 | `wallpapers` | `browse` |
 | `wallpaper` | `set <path>`, `get`, `picker` |
-| `customize` | `menu`, `lock`, `desktop`, `dock`, `windows`, `quick`, `close`, `importLooks <path>` |
+| `customize` | `menu`, `desktop`, `dock`, `windows`, `quick`, `close`, `importLooks <path>` |
 | `lock` | `lock`, `isLocked`, `preview` |
 | `switcher` | `next`, `previous` |
 | `overview` | `toggle`, `open`, `close` |
@@ -293,8 +293,8 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 
 | Module | What |
 |---|---|
-| core | Hyprland, the shell, fonts and themes, the login screen, the colors |
-| system | GPU rule, boot options, greetd and services (sudo) |
+| core | Hyprland, the shell, fonts and themes, the colors |
+| system | GPU rule, boot options, logging in at boot (greetd) and services (sudo) |
 | snapshots | Btrfs snapshots: system at every update, home hourly (sudo) |
 | apps | Terminal, editor, files, pictures, video, music, browser, web apps |
 | dev | Languages, package managers, Docker |

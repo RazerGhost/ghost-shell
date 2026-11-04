@@ -140,6 +140,8 @@ notifications in the corner".
   `./install.sh <image>` set it too. With none chosen, Hyprland's default wallpaper shows.
 
 ### Phase 5: Lock screen + idle + greeter (done, verified on the laptop 2026-10-28)
+As first built; since 2026-11-04 there's no login screen and the lock screen is the desktop,
+locked, see "The lock screen is your desktop, locked".
 - Lock screen (`lock/Lock.qml`, `LockContent.qml`): Quickshell `WlSessionLock` on every monitor,
   blurred wallpaper, big clock and date, password field checked through PAM's `login` config.
   `qs ipc call lock lock` (Super+L, power menu, hypridle); `qs ipc call lock preview` shows it
@@ -164,9 +166,9 @@ Ctrl+Alt+F2, log in, run
 `hyprctl --instance 0 dispatch 'hl.dsp.exec_cmd("hyprlock -c /usr/share/hypr/hyprlock.conf")'`,
 go back with Ctrl+Alt+F1 and unlock with your password.
 
-**Login screen recovery.** If the Quickshell greeter doesn't come up (black screen, or it keeps
-restarting): Ctrl+Alt+F2, log in, then switch greetd back to tuigreet and restart it:
-`sudo sed -i 's/^command = "env/# command = "env/; s/^# command = "tuigreet/command = "tuigreet/' /etc/greetd/config.toml && sudo systemctl restart greetd`.
+**Session recovery.** There's no login screen since 2026-11-04: greetd starts your session at
+boot and after every logout. If it can't start (it would start again and again): Ctrl+Alt+F2, log
+in, `sudo systemctl stop greetd`, fix it, then `sudo systemctl start greetd`.
 
 ### Phase 6: Window switching + snap layouts (done, verified on the laptop 2026-10-28)
 Added at the user's request after researching Windows/macOS features (2026-10-28). The phase number
@@ -1730,6 +1732,34 @@ User's picks from the layout research (the volume pop-up stays where it is):
   from `bar/PillPath.js` (tested); `Theme.island.reserved` (gap + height) is what the menus'
   cards, the OSD at the top, the wallpaper strip, launcher, overview, editors and window menu sit
   below.
+
+### The lock screen is your desktop, locked (built 2026-11-04)
+User's picks after booting straight to the lock screen: the lock screen should feel like the
+desktop, not a screen of its own, and the login screen and the lock screen editor can go.
+- The island lock (`lock/LockIsland.qml`): the desktop's island in its place, a lock and the time,
+  opening into the password field like its menus (open while something is typed, checked or said,
+  and for 10 s after a key or pointer move; the field keeps the keyboard while closed, so the
+  first key opens it and counts). A wrong password shakes it; caps lock and the layout show in it.
+- The rest is the desktop (`lock/LockContent.qml`): its wallpaper (a live one's still frame),
+  sharp, and its widgets at their places on the first screen (`desktop/WidgetStage.qml`, shared
+  with the desktop's layer, `locked`): only the media widget takes clicks, the calendar shows
+  "Event" for each title and the to-do only how many are open. Hyprland's blur can't reach inside
+  the lock surface, so the island and the cards are glass over a blurred copy of the wallpaper,
+  masked to their shapes. Settings -> Lock screen keeps the message line and the grace period.
+- Gone: the lock screen editor and its looks, the big clock and date, the picture choice, blur
+  and darkening, the round widget row and moving parts (`LockClock`, `LockStatus`, `LockWidget`,
+  `PartShift`, `PartOutline`, `GlideTranslate`, `MiniClock`, `EditOutline`, `lockLooks` and the
+  `lock*` settings). The desktop editor's gallery gained a notifications widget
+  (`desktop/NotificationsWidget.qml`: how many wait and from how many apps, never what they say).
+- No login screen: greetd's `default_session` is your own session with `GHOST_AUTOLOGIN=1`, at
+  boot and after every logout, locked at once (the greeter, its Hyprland, `ghost greeter`, the
+  shared folder and `greeter/sync.sh` are gone; the system module removes their copies). The
+  "locked once" mark that lets `hyprland.lua` load the keybinds is per Hyprland instance: the
+  runtime folder outlives a logout for a few seconds, and the next session must not find it.
+- Also: the Limine `ESP_PATH` read in the system module declares `KERNEL_CMDLINE` as a named array
+  first (sourced bare under `set -u` it stopped the module before the boot menu and greetd steps).
+  The HP logo still goes blank when the graphics driver takes over (nothing redraws it without
+  Plymouth; the user chose to leave it).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

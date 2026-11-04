@@ -23,19 +23,21 @@ machine can take what it needs.
   the number of windows), Snap Assist, window tabs, Alt+Tab with live previews, an overview
   (Super+Tab, a three-finger swipe or the top-left corner), minimize, a dock with window previews.
 - **The rest of a desktop**: notifications (with sounds), launcher (apps, windows, files with `/`, commands with `>`, a calculator), on-screen
-  volume and brightness, lock and login screen, idle and night light, screenshots and screen
+  volume and brightness, a lock screen that is your desktop locked (it logs in at boot and locks;
+  no login screen), idle and night light, screenshots and screen
   recording, a password prompt for apps (polkit), an equalizer, screen time, web apps
   (`ghost webapp`), an update count, wallpapers (a Wallpapers window browses anime art on
   wallhaven.cc, safe for work only, and downloads what you pick into your folder; `ghost
   wallpapers get` fetches a batch, `--style sky|lofi|painterly|minimal` for one kind), and a
   welcome tour on the first start.
 - **Editors on the screen itself** for how it looks, like Android's "Wallpaper & style" with iOS's
-  lock screen editing: the lock screen (clock styles, fonts, looks, picture, widgets), the desktop
-  (saved themes, wallpaper, colors, desktop widgets, glass, sizes, fonts), the dock and island, and how
+  lock screen editing: the desktop (saved themes, wallpaper, colors, desktop widgets, glass, sizes,
+  fonts; the lock screen shows the same), the dock and island, and how
   windows look (borders, gaps, animations, on example windows). Each shows the screen as a card
   with live previews and ready-made looks; Super + U picks one, and each works with the keyboard as well as the pointer. Your themes and looks travel to another machine with `ghost looks export` / `import` (a `looks.json` in the repo).
 - **Desktop widgets**: a clock, the weather, the media player, the calendar's next events, the
-  battery, the to-do list and a timer on the wallpaper, picked from a gallery and dragged into place.
+  battery, the to-do list, a timer and the notification count on the wallpaper, picked from a
+  gallery and dragged into place; the lock screen shows them too (titles hidden).
 - **A settings app** for what would otherwise be config files: displays, sound, keyboard and
   touchpad, power, default apps, keybinds, Btrfs snapshots and more.
 - **Glass**: see-through panels with Hyprland's blur behind exactly their shape.
@@ -56,7 +58,7 @@ cd ~/ghost-shell
 ```
 
 It installs the packages, links the configs into your home folder (GNU Stow) and sets up the
-system (login screen, services). It asks for your password for pacman and the system parts. Log
+system (logging in at boot, services). It asks for your password for pacman and the system parts. Log
 out and back in afterwards. Some app themes need the app started once first; the install says
 so and `ghost install <module>` finishes them later.
 
@@ -69,7 +71,6 @@ After the first install, `ghost` (in `~/.local/bin`) does everything:
 | `ghost update` | pull the repo, then install again (new packages, new setup steps) |
 | `ghost install [module...]` | packages and setup for some or all modules |
 | `ghost theme <wallpaper \| "#rrggbb">` | a new wallpaper and the colors from it |
-| `ghost greeter` | update the login screen's copy of the shell (after changing its code) |
 | `ghost calendar add [name]` | subscribe to a calendar (it asks for the link: a Proton Calendar share link or any .ics address; `remove <name>`, `list`, `sync`) |
 | `ghost webapp add <name> <url> [icon]` | a site in its own window, in the launcher and the dock (`remove <name>`, `list`) |
 | `ghost doctor` | check that everything is set up; each problem says what fixes it |
@@ -83,8 +84,8 @@ its setup (`setup.sh`).
 
 | Module | |
 |---|---|
-| `core` | Hyprland, the shell, fonts and themes, the login screen, the colors |
-| `system` | this laptop's GPU rule, boot options, greetd and services |
+| `core` | Hyprland, the shell, fonts and themes, the colors |
+| `system` | this laptop's GPU rule, boot options, logging in at boot (greetd) and services |
 | `snapshots` | Btrfs snapshots: the system's before and after every update (bootable), your home folder hourly |
 | `apps` | terminal, editor, files, pictures, video, music, browser, web apps |
 | `dev` | languages, package managers and Docker |
