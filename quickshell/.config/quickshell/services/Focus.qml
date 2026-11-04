@@ -53,25 +53,14 @@ Singleton {
         saved.timer = -1;
     }
 
-    // Countdown's timer of this session (or its break) reached zero. The notification waits for
-    // its button in a process of its own (notify-send prints the one pressed), which answers
-    // through `qs ipc call focus …`: each ending gets its own, and the buttons still work after
-    // a shell reload (a Process of the shell's was killed with it). Normal urgency: critical's
-    // error red read as a failure.
+    // Countdown's timer of this session (or its break) reached zero: a notification asks what
+    // next, from a process of its own (services/focus-notify.sh): each ending gets its own, and
+    // its buttons still work after a shell reload (a Process of the shell's was killed with it).
     function timeUp(runs: int): void {
         const wasBreak = saved.breakTimer === runs;
         saved.breakTimer = -1;
-        Quickshell.execDetached(["sh", "-c", `
-            choice=$(notify-send --app-name=Focus --icon=appointment-soon --urgency=normal \
-                --hint=string:sound-name:alarm-clock-elapsed "$@")
-            case $choice in
-                break) qs ipc call focus takeBreak ;;
-                again) qs ipc call focus again ;;
-            esac`, "sh",
-            ...(wasBreak ? [] : ["--action=break=Take a " + breakMinutes + "-minute break"]),
-            "--action=again=Focus again",
-            wasBreak ? "Break's over" : "Focus time is over",
-            wasBreak ? "Ready for another " + minutes + " minutes?" : "Well done. Time for a short break?"]);
+        Quickshell.execDetached(["sh", Quickshell.shellDir + "/services/focus-notify.sh",
+                                 wasBreak ? "break" : "session", String(wasBreak ? minutes : breakMinutes)]);
     }
 
     function takeBreak(): void {
