@@ -55,10 +55,9 @@ Singleton {
         id: recorder
         onExited: code => {
             if (code === 0) {
-                Quickshell.execDetached(["sh", "-c", `
-                    action=$(notify-send -a Recorder -i video-x-generic -A default=Play "Recording saved" "In $2")
-                    [ "$action" = default ] && "$3" xdg-open xdg-open "$1"
-                `, "sh", root.file, CaptureFolders.short(root.folder, Quickshell.env("HOME")), Apps.runApp]);
+                // The notification and its Play button: screenshot/capture.sh, like the screenshots'.
+                Quickshell.execDetached(["sh", Quickshell.shellDir + "/screenshot/capture.sh", "recorded",
+                                         root.file, CaptureFolders.short(root.folder, Quickshell.env("HOME"))]);
             } else {
                 Quickshell.execDetached(["notify-send", "-a", "Recorder", "-u", "critical", "Recording failed",
                     "gpu-screen-recorder exited with code " + code]);

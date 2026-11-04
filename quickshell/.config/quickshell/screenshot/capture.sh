@@ -8,6 +8,11 @@
 #   capture.sh qr <picture>     the QR code in it (zbarimg), copied; a link can be opened from the
 #                               notification; the picture is removed
 #   capture.sh color            the color picker (hyprpicker), #rrggbb copied
+#   capture.sh recorded <video> <folder>
+#                               a screen recording is saved (services/Recorder.qml): notify,
+#                               naming the folder; Play opens it
+# Each waits for its notification's button itself, so the buttons work without the shell (and
+# after a shell reload).
 
 # An app in its own scope, like the ones the shell starts (hypr/run-app.sh).
 app() {
@@ -57,8 +62,12 @@ case "${1-}" in
         sleep 0.3
         color=$(hyprpicker -a -f hex) && [ -n "$color" ] && notify-send -a "Color picker" "Color copied" "$color"
         ;;
+    recorded)
+        action=$(notify-send -a Recorder -i video-x-generic -A default=Play "Recording saved" "In $3")
+        [ "$action" = default ] && app xdg-open "$2"
+        ;;
     *)
-        echo "usage: capture.sh save|text|qr <picture> | color" >&2
+        echo "usage: capture.sh save|text|qr <picture> | color | recorded <video> <folder>" >&2
         exit 2
         ;;
 esac

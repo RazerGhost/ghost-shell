@@ -1924,6 +1924,15 @@ Escape then, Super+D again or a click elsewhere goes back to your workspace. Key
 the foot of the screen. Not while locked, in focus mode or in the desktop editor. Checked with
 wtype: moving, the ring, typing into the note and back, Escape home.
 
+### The recording's notification beside the screenshots' (2026-11-04)
+User's pick from the ideas: the shell's notifications with buttons the same way. Looked at first:
+the screenshot's ("Open", "Draw on it") and the recording's ("Play") already wait for their
+button in a process of their own and act directly, so they work without the shell and after a
+reload; routing them through `qs ipc` like focus mode's would make them depend on the shell at
+the click (focus mode's need the shell: they start its timers). What was left: the recording's
+notification was a script in a QML string; it's `capture.sh recorded` now, beside the
+screenshot's. Checked with stand-in notify-send and xdg-open: the text, and Play opening the file.
+
 ### The shell with a screen reader (checked 2026-11-04)
 User's request after Orca joined: how the whole shell reads. The accessibility tree (what Orca
 reads, over AT-SPI) of the desktop, the island's menus, the launcher, Settings, the overview,
