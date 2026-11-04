@@ -1938,6 +1938,21 @@ DAC the kernel picks by itself they'd have had no volume control) loaded through
 Next, if wanted: a speaker profile (parametric EQ or a measured curve) for all four, a limiter
 and loudness. Windows' B&O tuning is HP's own processing, which Linux doesn't have.
 
+### Speaker profile (2026-11-04)
+After the bass speakers (above), a correction for all four, user's pick. Measured first: a log
+sweep through the speakers recorded with the built-in microphone (twice, averaged, sixth-octave
+smoothing): a strong hump around 630-1250 Hz (the boxy midrange of small speakers), the upper
+mids and treble well below it (partly the microphone, which faces you), little below 150 Hz.
+Then by ear with the user's own music, profiles switched live every 12 s with a notification
+naming each: "B" (the gentle correction) won for voices and instruments, then "B+" for the bass.
+The profile: high-pass at 90 Hz (below it only distortion), +4 dB at 110 Hz (the bass speakers'
+punch), +3 dB low shelf at 200 Hz, -5 dB at 1 kHz, +2 dB at 2.5 kHz, +3 dB treble shelf at 5 kHz,
+and 0.6x before them so the boosts don't clip. It's in the equalizer's own filter after your five
+bands (`sp_*` nodes in ghost-equalizer.conf), set per output by the shell (`Equalizer.js`
+`outputProfiles`, tested): the laptop speakers get it, headphones and anything else neutral
+values. The speakers' own equalizer setting went to Off (its old "Laptop speakers" preset cut the
+bass the profile now gives). Checked: after a restart of the filter the shell puts it back.
+
 ### The recording's notification beside the screenshots' (2026-11-04)
 User's pick from the ideas: the shell's notifications with buttons the same way. Looked at first:
 the screenshot's ("Open", "Draw on it") and the recording's ("Play") already wait for their

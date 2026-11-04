@@ -8,7 +8,8 @@ import "Equalizer.js" as EqualizerJs
 // The equalizer between the apps and the speakers or headphones: PipeWire's filter-chain
 // (filter-chain.service with ghost-equalizer.conf), whose gains this sets with pw-cli. Each
 // output keeps its own (`equalizer` in settings.json, by PipeWire node name), applied when the
-// output changes and again whenever the filter (re)starts, since it starts flat.
+// output changes and again whenever the filter (re)starts, since it starts flat. An output with a
+// profile of its own (the laptop's speakers, Equalizer.js `outputProfiles`) gets it after them.
 Singleton {
     id: root
 
@@ -35,9 +36,11 @@ Singleton {
 
     function apply(): void {
         if (running)
-            Quickshell.execDetached(["pw-cli", "set-param", "ghost-equalizer", "Props", EqualizerJs.props(gains)]);
+            Quickshell.execDetached(["pw-cli", "set-param", "ghost-equalizer", "Props", EqualizerJs.props(gains, device?.name ?? "")]);
     }
 
     onGainsChanged: apply()
+    // Another output has its own profile, even with the same five gains.
+    onDeviceChanged: apply()
     onRunningChanged: apply()
 }

@@ -40,8 +40,30 @@ function presetName(g) {
     return presets.find(p => p.gains.every((v, i) => v === g[i]))?.name ?? "Custom";
 }
 
-// The value for `pw-cli set-param ghost-equalizer Props <value>`.
-function props(g) {
-    const params = bands.map((b, i) => `"${b.name}:Gain" ${gains(g)[i].toFixed(1)}`);
+// An output's own correction, after your five bands (the `sp_*` nodes): what every output
+// gets, and the outputs with a profile of their own, by PipeWire node name.
+const neutralProfile = { preamp: 1.0, rumble: 10, punch: 0, body: 0, honk: 0, clarity: 0, air: 0 };
+const outputProfiles = {
+    // The HP Omen 16-xf0's speakers, bass speakers included (the system module's patch): measured
+    // with a sweep and the built-in microphone (a hump around 1 kHz, little below 150 Hz), settled
+    // by ear (user's pick, 2026-11-04: "B" for voices and instruments, then "B+" for the bass).
+    // The preamp keeps the boosts from clipping.
+    "alsa_output.pci-0000_05_00.6.HiFi__Speaker__sink":
+        { preamp: 0.6, rumble: 90, punch: 4, body: 3, honk: -5, clarity: 2, air: 3 }
+};
+
+function profileFor(output) {
+    return outputProfiles[output] ?? neutralProfile;
+}
+
+// The value for `pw-cli set-param ghost-equalizer Props <value>`: your bands, then the output's
+// profile.
+function props(g, output) {
+    const p = profileFor(output);
+    const params = bands.map((b, i) => `"${b.name}:Gain" ${gains(g)[i].toFixed(1)}`).concat([
+        `"sp_preamp:Mult" ${p.preamp.toFixed(2)}`, `"sp_rumble:Freq" ${p.rumble.toFixed(1)}`,
+        `"sp_punch:Gain" ${p.punch.toFixed(1)}`, `"sp_body:Gain" ${p.body.toFixed(1)}`,
+        `"sp_honk:Gain" ${p.honk.toFixed(1)}`, `"sp_clarity:Gain" ${p.clarity.toFixed(1)}`,
+        `"sp_air:Gain" ${p.air.toFixed(1)}`]);
     return `{ params = [ ${params.join(" ")} ] }`;
 }

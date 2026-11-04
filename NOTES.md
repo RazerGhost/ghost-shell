@@ -415,6 +415,12 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   test with `modprobe -r snd_hda_intel` and `modprobe snd_hda_intel patch=<file>,<file>` (PipeWire
   stopped). hda-verb needs root (CAP_SYS_RAWIO), not just the audio group. Patch files skip
   `#` lines.
+- WirePlumber 0.5 orders smart filters (`filter.smart.before`/`after`) only among filters aimed
+  at the same output: a second filter with `filter.smart.target` on the speakers didn't chain
+  with the untargeted equalizer (the stream went into one, skipping the other). So per-output
+  correction lives in the equalizer's own graph, set per output with pw-cli.
+- Recording from a microphone with `pw-record --target <id>` recorded silence; `--target` with the
+  node's name worked. Restarting filter-chain.service makes Spotify pause.
 - The shell's accessibility tree can be read without a screen reader: Python's `gi` with
   `Atspi` 2.0 (at-spi2-core), the app named "quickshell" on `Atspi.get_desktop(0)`; filter on the
   SHOWING state (Qt Quick's tree is flat under each window, hidden items included) and call
