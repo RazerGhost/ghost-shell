@@ -20,8 +20,9 @@ machine can take what it needs.
   the time (or the playing song's cover) and what needs attention (recording, microphone, camera,
   timer, low battery); switching workspaces shows the dots for a moment. Notifications pop out of
   it one at a time. It opens into menus (click: today, right-click: quick settings): quick
-  settings (status icons, Wi-Fi, Bluetooth, sound, power mode, game mode, system stats), today (date, weather, the next events, note, timer,
-  notifications), background apps, media, clipboard, emoji.
+  settings (status icons, Wi-Fi, Bluetooth, sound, power mode, game mode, focus mode, system
+  stats), today (date, weather, the next events, note, timer, notifications), background apps,
+  media, clipboard, emoji. An event starting soon shows as "in 12 min" beside the time.
 - **Windows**: a tiling layout of its own (halves, thirds, quarters from the window menu, or by
   the number of windows), Snap Assist, window tabs, Alt+Tab with live previews, an overview
   (Super+Tab, a three-finger swipe or the top-left corner), minimize, a dock with window previews.
@@ -31,17 +32,23 @@ machine can take what it needs.
   recording, a password prompt for apps (polkit), an equalizer, screen time, web apps
   (`ghost webapp`), an update count, wallpapers (a Wallpapers window browses anime art on
   wallhaven.cc, safe for work only, and downloads what you pick into your folder; `ghost
-  wallpapers get` fetches a batch, `--style sky|lofi|painterly|minimal` for one kind), and a
-  welcome tour on the first start.
+  wallpapers get` fetches a batch, `--style sky|lofi|painterly|minimal` for one kind), focus
+  mode (a 15/25/50-minute timer that holds pop-ups back and hides the widgets, then offers a
+  break), and a welcome tour on the first start.
 - **Editors on the screen itself** for how it looks, like Android's "Wallpaper & style" with iOS's
   lock screen editing: the desktop (saved themes, wallpaper, colors, desktop widgets, glass, sizes,
   fonts; the lock screen shows the same), the dock and island, and how
   windows look (borders, gaps, animations, on example windows). Each shows the screen as a card
   with live previews and ready-made looks; Super + U picks one, and each works with the keyboard as well as the pointer. Your themes and looks travel to another machine with `ghost looks export` / `import` (a `looks.json` in the repo).
 - **Desktop widgets**: a clock, the weather (now or by the hour), the media player, the
-  calendar's next events or the whole month, the battery, a to-do list you add to, a timer and the
-  notification count on the wallpaper, picked from a
-  gallery and dragged into place; the lock screen shows them too (titles hidden).
+  calendar's next events or the whole month, the battery, a to-do list you add to, a note, your
+  clipboard, a timer and the notification count on the wallpaper, picked from a gallery and
+  dragged into place; the lock screen shows them too (their content hidden). Super+D shows the
+  desktop and gives them the keyboard.
+- **Accessible**: every menu and widget has names and roles for screen readers (Orca is in the
+  core module), the keyboard reaches everything, and the widgets say what they show.
+- **Sound**: a five-band equalizer per output, and for the HP Omen 16's speakers their bass
+  speakers switched on (the kernel leaves them off), a measured speaker profile and a limiter.
 - **A settings app** for what would otherwise be config files: displays, sound, keyboard and
   touchpad, power, default apps, keybinds, Btrfs snapshots and more.
 - **Glass**: see-through panels with Hyprland's blur behind exactly their shape.
@@ -80,9 +87,11 @@ After the first install, `ghost` (in `~/.local/bin`) does everything:
 | Command | |
 |---|---|
 | `ghost update` | pull the repo, then install again (new packages, new setup steps) |
-| `ghost install [module...]` | packages and setup for some or all modules |
+| `ghost install [module...]` | packages and setup for some or all modules (`--machine laptop\|desktop` picks this machine's from `machines/`, `--yes` answers pacman's and paru's questions) |
 | `ghost theme <wallpaper \| "#rrggbb">` | a new wallpaper and the colors from it |
 | `ghost calendar add [name]` | subscribe to a calendar (copy the link first: Google Calendar's secret iCal address or any .ics address; `remove <name>`, `list`, `sync`) |
+| `ghost looks export` / `import` | your themes and looks into the repo's `looks.json`, or from it on another machine |
+| `ghost wallpapers get [words] [--style S]` | anime art from wallhaven.cc into your wallpaper folder (safe for work only) |
 | `ghost webapp add <name> <url> [icon]` | a site in its own window, in the launcher and the dock (`remove <name>`, `list`) |
 | `ghost doctor` | check that everything is set up; each problem says what fixes it |
 | `ghost modules` | list the modules and which ones this machine uses |
@@ -96,7 +105,7 @@ its setup (`setup.sh`).
 | Module | |
 |---|---|
 | `core` | Hyprland, the shell, fonts and themes, the colors |
-| `system` | this laptop's GPU rule, boot options, its bass speakers, logging in at boot (greetd) and services |
+| `system` | the GPU rule, boot options (Limine), the Omen's bass speakers, logging in at boot (greetd) and services |
 | `snapshots` | Btrfs snapshots: the system's before and after every update (bootable), your home folder hourly |
 | `apps` | terminal, editor, files, pictures, video, music, browser, web apps |
 | `dev` | languages, package managers and Docker |
@@ -112,15 +121,17 @@ its setup (`setup.sh`).
 
 Every module except `llm` and `wave3` is installed unless `~/.config/ghost/modules` lists the ones this
 machine wants, one per line (`llm` and `wave3` only ever come from that list: they're for the machine
-with the NVIDIA GPU and the one the microphone is plugged into). That file isn't in the repo, so each machine keeps its own:
+with the NVIDIA GPU and the one the microphone is plugged into). That file isn't in the repo, so each
+machine keeps its own; `machines/` has the laptop's and the desktop's to start from
+(`ghost install --machine desktop`), or write one:
 
 ```sh
 mkdir -p ~/.config/ghost
 printf '%s\n' core apps dev > ~/.config/ghost/modules
 ```
 
-The `system` module is written for this laptop (an AMD + NVIDIA GPU rule, Limine boot entries);
-leave it out elsewhere.
+The `system` module adapts: the AMD + NVIDIA laptop, an NVIDIA-only desktop; the kernel line and
+boot menu only with Limine (otherwise it says what to add by hand), the speakers only on the Omen.
 
 ## Your own changes
 
@@ -134,6 +145,20 @@ loaded last and aren't in git, so `ghost update` never conflicts with them:
 | `~/.config/ghostty/local` | Ghostty settings |
 | `~/.config/fish/conf.d/local.fish` | fish: aliases, variables |
 
+## If something breaks
+
+- **The lock screen crashed** (a red screen, still locked): Ctrl+Alt+F2, log in, run
+  `hyprctl --instance 0 dispatch 'hl.dsp.exec_cmd("hyprlock -c /usr/share/hypr/hyprlock.conf")'`,
+  go back with Ctrl+Alt+F1 and unlock with your password.
+- **The session won't start** (it starts again and again): Ctrl+Alt+F2, log in,
+  `sudo systemctl stop greetd`, fix it (`journalctl --user -b` shows why), then
+  `sudo systemctl start greetd`.
+- **The shell is gone** (no island): it restarts itself after a crash; if it doesn't,
+  `hyprctl dispatch 'hl.dsp.exec_cmd("~/.config/hypr/shell.sh")'` in a terminal (Super+Enter still
+  opens one). Super+Shift+L locks with hyprlock meanwhile.
+- **Something looks wrong after an update**: `ghost doctor` checks the setup and says what fixes
+  each problem.
+
 ## Layout
 
 | Folder | |
@@ -141,7 +166,8 @@ loaded last and aren't in git, so `ghost update` never conflicts with them:
 | `hypr/`, `quickshell/`, `ghostty/`, `fish/`, `matugen/`, `zed/`, `spotify/`, `pipewire/`, `paru/`, `nautilus/`, `bin/` | configs, linked into `$HOME` by Stow (each mirrors the home folder) |
 | `modules/` | packages and setup per module, `lib.sh` shared by them |
 | `system/` | files for `/` (udev rule, greetd, mkinitcpio), installed by the `system` module |
-| `tests/` | tests: `QT_QPA_PLATFORM=offscreen /usr/lib/qt6/bin/qmltestrunner -input tests` and `lua tests/tiling_test.lua` |
+| `machines/` | each machine's module list (`ghost install --machine <name>`) |
+| `tests/` | tests: `QT_QPA_PLATFORM=offscreen /usr/lib/qt6/bin/qmltestrunner -input tests`, `lua tests/tiling_test.lua` and `bash tests/calendar_test.sh` |
 | `docs/` | keybinds and screenshots |
 
 [NOTES.md](NOTES.md) has the Hyprland and Quickshell API facts this was built on.

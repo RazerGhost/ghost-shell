@@ -1924,6 +1924,18 @@ Escape then, Super+D again or a click elsewhere goes back to your workspace. Key
 the foot of the screen. Not while locked, in focus mode or in the desktop editor. Checked with
 wtype: moving, the ring, typing into the note and back, Escape home.
 
+### Docs and the system module checked for the desktop (2026-11-04)
+User's question: are all the commands in the repo, and how do the docs look. The README lagged
+(no focus mode, Super+D, note and clipboard widgets, screen readers, the speakers; no `--machine`,
+`--yes`, `ghost looks`, `ghost wallpapers`), and the recovery steps were only in this file: the
+README has an "If something breaks" section now. Checking the system module against the desktop
+profile found two stops: it failed without an AMD chip ("/dev/dri/amd-igpu is missing"), and its
+boot steps assumed Limine (it would have written a stray /etc/default/limine). Now it accepts any
+GPU setup (only the same card under both names is an error), installs early AMD KMS only with an
+AMD chip, and does the kernel line and boot menu only with Limine (otherwise it says what to add,
+and rebuilds the initramfs with mkinitcpio). Checked here: the GPU step's output; the desktop's
+run is the real test.
+
 ### A quicker install (2026-11-04)
 User's question before setting up the desktop. Packages were already one pacman and one paru run.
 Added: machine profiles (`machines/laptop`, `machines/desktop`: module lists; `ghost install

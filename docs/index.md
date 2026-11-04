@@ -270,7 +270,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 
 ### `ghost`
 
-`install [module...] [--theme X]` · `update` · `theme <wallpaper|#rrggbb>` ·
+`install [module...] [--machine laptop|desktop] [--theme X] [--yes]` · `update` · `theme <wallpaper|#rrggbb>` ·
 `webapp add|remove|list` · `calendar add|remove|list|sync` · `looks export|import` ·
 `wallpapers get [words] [--count N] [--general] [--style S]` / `fetch <id>` · `doctor` ·
 `modules` · `keybinds`

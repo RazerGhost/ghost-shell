@@ -15,18 +15,17 @@ if ! cmp -s "$rule" "/etc/udev/rules.d/$(basename "$rule")"; then
     sudo udevadm trigger --subsystem-match=drm
     udevadm settle
 fi
-# The iGPU is the primary GPU in AQ_DRM_DEVICES: without it Hyprland can't start, so stop here.
-[[ -e /dev/dri/amd-igpu ]] || fail "/dev/dri/amd-igpu is missing (udev rule didn't match the AMD card)"
-echo "amd-igpu    -> $(readlink -f /dev/dri/amd-igpu)"
-# The RTX is only needed for outputs wired to it (HDMI / USB-C), so a missing card is a warning.
-# It's missing when the NVIDIA driver didn't load or didn't create a DRM card.
-if [[ -e /dev/dri/nvidia-dgpu ]]; then
+# Hyprland's env.lua lists whichever of the two exist (the laptop: both, the AMD chip first; the
+# desktop: the NVIDIA card alone). Only the same card under both names is wrong.
+for gpu in amd-igpu nvidia-dgpu; do
+    [[ -e /dev/dri/$gpu ]] && printf '%-11s -> %s\n' "$gpu" "$(readlink -f /dev/dri/$gpu)"
+done
+if [[ -e /dev/dri/amd-igpu && -e /dev/dri/nvidia-dgpu ]]; then
     [[ $(readlink -f /dev/dri/nvidia-dgpu) != $(readlink -f /dev/dri/amd-igpu) ]] \
         || fail "both GPU symlinks point at $(readlink -f /dev/dri/amd-igpu)"
-    echo "nvidia-dgpu -> $(readlink -f /dev/dri/nvidia-dgpu)"
-else
+elif [[ -e /dev/dri/amd-igpu ]] && lspci -d 10de::03xx | grep -q .; then
+    # A hybrid laptop whose RTX has no DRM card: outputs wired to it (HDMI / USB-C) won't work.
     printf '\033[1;33mwarning:\033[0m /dev/dri/nvidia-dgpu is missing; external monitors on the RTX will not work.\n' >&2
-    echo "NVIDIA driver status:"
     lspci -k -d 10de::03xx
     lsmod | grep -E '^nvidia' || echo "  (no nvidia kernel modules loaded)"
 fi
@@ -36,11 +35,15 @@ ls -l /dev/dri/by-path/ | grep -- '-card'
 
 step "Boot: early KMS, no Plymouth splash"
 rebuild_boot=false
+# The kernel line and the boot menu are set for Limine (CachyOS's default); with another boot
+# loader those parts are skipped and say so.
+limine=false
+[[ -f /etc/default/limine ]] && command -v limine-mkinitcpio >/dev/null && limine=true
 
 # Early KMS: load the AMD driver before any services start. CachyOS's chwd removes the kms
 # hook on NVIDIA laptops (10-chwd-kms.conf), so without this amdgpu loads late.
 kms=system/etc/mkinitcpio.conf.d/20-early-amdgpu.conf
-if ! cmp -s "$kms" "/etc/mkinitcpio.conf.d/$(basename "$kms")"; then
+if [[ -e /dev/dri/amd-igpu ]] && ! cmp -s "$kms" "/etc/mkinitcpio.conf.d/$(basename "$kms")"; then
     sudo install -Dm644 "$kms" "/etc/mkinitcpio.conf.d/$(basename "$kms")"
     rebuild_boot=true
 fi
@@ -50,7 +53,7 @@ fi
 # the first thing drawn. /etc/default/limine is bash; each
 # KERNEL_CMDLINE[default]+= line appends to the kernel command line.
 no_splash='KERNEL_CMDLINE[default]+=" plymouth.enable=0"'
-if ! grep -qxF "$no_splash" /etc/default/limine; then
+if $limine && ! grep -qxF "$no_splash" /etc/default/limine; then
     echo "$no_splash" | sudo tee -a /etc/default/limine >/dev/null
     rebuild_boot=true
 fi
@@ -60,7 +63,7 @@ fi
 # slow or fails, and no blinking text cursor (a recovery login on Ctrl+Alt+F2 has none either;
 # `setterm --cursor on` brings it back there).
 quiet_console='KERNEL_CMDLINE[default]+=" loglevel=3 rd.udev.log_level=3 systemd.show_status=auto vt.global_cursor_default=0"'
-if ! grep -qxF "$quiet_console" /etc/default/limine; then
+if $limine && ! grep -qxF "$quiet_console" /etc/default/limine; then
     echo "$quiet_console" | sudo tee -a /etc/default/limine >/dev/null
     rebuild_boot=true
 fi
@@ -80,7 +83,7 @@ fi
 
 # `splash` is Plymouth's, which is gone: the kernel only logs it as an unknown option. The line
 # the 2026-11-04 try added goes whole; a `splash` in CachyOS's own line is cut out of it.
-if grep -qxF 'KERNEL_CMDLINE[default]+=" splash"' /etc/default/limine; then
+if $limine && grep -qxF 'KERNEL_CMDLINE[default]+=" splash"' /etc/default/limine; then
     sudo sed -i '/^KERNEL_CMDLINE\[default\]+=" splash"$/d' /etc/default/limine
     rebuild_boot=true
 fi
@@ -90,45 +93,52 @@ if [[ -e /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf ]]; then
     sudo rmdir --ignore-fail-on-non-empty /etc/systemd/system/plymouth-quit.service.d
     sudo systemctl daemon-reload
 fi
-if grep -Eq '^KERNEL_CMDLINE.* splash( |")' /etc/default/limine; then
+if $limine && grep -Eq '^KERNEL_CMDLINE.* splash( |")' /etc/default/limine; then
     sudo sed -i -E '/^KERNEL_CMDLINE/ s/ splash( |")/\1/' /etc/default/limine
     rebuild_boot=true
 fi
 
-if $rebuild_boot; then
+if $rebuild_boot && $limine; then
     # limine-mkinitcpio (CachyOS) rebuilds the initramfs and rewrites the Limine boot entries.
     sudo limine-mkinitcpio
+elif $rebuild_boot; then
+    sudo mkinitcpio -P
 fi
-# Stop if the option didn't reach the boot entries. Only the kernels' own entries (two slashes
-# deep, "//linux-cachyos"): the snapshot entries further down ("////linux-cachyos",
-# limine-snapper-sync) keep the kernel line from when each was taken.
-# /etc/default/limine is bash written for limine-entry-tool, which declares KERNEL_CMDLINE as a
-# named (associative) array first; sourced bare, `[default]` is read as an unset variable under
-# set -u.
-esp=$(declare -A KERNEL_CMDLINE; . /etc/default/limine; echo "${ESP_PATH:-/boot}")
-sudo test -f "$esp/limine.conf" || fail "$esp/limine.conf is missing; check ESP_PATH in /etc/default/limine"
-cmdlines=$(sudo awk '/^ *\//{ match($0, /\/+/); depth = RLENGTH } /cmdline:/ && depth == 2' "$esp/limine.conf")
-[[ -n $cmdlines ]] || fail "no kernel entries in $esp/limine.conf; run sudo limine-mkinitcpio"
-! grep -vqF 'plymouth.enable=0' <<<"$cmdlines" \
-    || fail "a kernel entry in $esp/limine.conf has no plymouth.enable=0; check /etc/default/limine and run sudo limine-mkinitcpio"
+if ! $limine; then
+    printf '\033[1;33mnote:\033[0m not Limine: add "plymouth.enable=0 loglevel=3 rd.udev.log_level=3 systemd.show_status=auto vt.global_cursor_default=0" to your boot loader'"'"'s kernel line by hand.\n' >&2
+fi
+if $limine; then
+    # Stop if the option didn't reach the boot entries. Only the kernels' own entries (two slashes
+    # deep, "//linux-cachyos"): the snapshot entries further down ("////linux-cachyos",
+    # limine-snapper-sync) keep the kernel line from when each was taken.
+    # /etc/default/limine is bash written for limine-entry-tool, which declares KERNEL_CMDLINE as a
+    # named (associative) array first; sourced bare, `[default]` is read as an unset variable under
+    # set -u.
+    esp=$(declare -A KERNEL_CMDLINE; . /etc/default/limine; echo "${ESP_PATH:-/boot}")
+    sudo test -f "$esp/limine.conf" || fail "$esp/limine.conf is missing; check ESP_PATH in /etc/default/limine"
+    cmdlines=$(sudo awk '/^ *\//{ match($0, /\/+/); depth = RLENGTH } /cmdline:/ && depth == 2' "$esp/limine.conf")
+    [[ -n $cmdlines ]] || fail "no kernel entries in $esp/limine.conf; run sudo limine-mkinitcpio"
+    ! grep -vqF 'plymouth.enable=0' <<<"$cmdlines" \
+        || fail "a kernel entry in $esp/limine.conf has no plymouth.enable=0; check /etc/default/limine and run sudo limine-mkinitcpio"
 
-step "Boot menu: the HP logo stays, the menu only on a key"
-# Limine's own options, at the top of its config (limine-entry-tool, which rewrites the boot
-# entries, keeps them): firmware_logo puts the firmware's logo back when Limine hands over; quiet hides the menu unless a key is pressed during
-# the timeout (to pick Windows or a snapshot). $esp is read in the step above.
-limine_conf=$esp/limine.conf
-for option in "timeout: 1" "quiet: yes" "firmware_logo: yes"; do
-    key=${option%%:*}
-    if sudo grep -q "^$key:" "$limine_conf"; then
-        sudo sed -i "s/^$key:.*/$option/" "$limine_conf"
-    else
-        sudo sed -i "1i $option" "$limine_conf"
+    step "Boot menu: the HP logo stays, the menu only on a key"
+    # Limine's own options, at the top of its config (limine-entry-tool, which rewrites the boot
+    # entries, keeps them): firmware_logo puts the firmware's logo back when Limine hands over; quiet hides the menu unless a key is pressed during
+    # the timeout (to pick Windows or a snapshot). $esp is read in the step above.
+    limine_conf=$esp/limine.conf
+    for option in "timeout: 1" "quiet: yes" "firmware_logo: yes"; do
+        key=${option%%:*}
+        if sudo grep -q "^$key:" "$limine_conf"; then
+            sudo sed -i "s/^$key:.*/$option/" "$limine_conf"
+        else
+            sudo sed -i "1i $option" "$limine_conf"
+        fi
+    done
+    # A config enrolled into Limine's binary must be enrolled again after a change, or it won't
+    # boot (off by default on CachyOS).
+    if grep -qs '^ENABLE_ENROLL_LIMINE_CONFIG=yes' /etc/default/limine /etc/limine-entry-tool.conf; then
+        sudo limine-enroll-config
     fi
-done
-# A config enrolled into Limine's binary must be enrolled again after a change, or it won't
-# boot (off by default on CachyOS).
-if grep -qs '^ENABLE_ENROLL_LIMINE_CONFIG=yes' /etc/default/limine /etc/limine-entry-tool.conf; then
-    sudo limine-enroll-config
 fi
 
 step "Logging in (greetd)"
