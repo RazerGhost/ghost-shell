@@ -30,6 +30,7 @@ ShellRoot {
     Dock {}
     Launcher {}
     Lock {}
+    SessionEnd {}
     Customize {}
     PolkitPrompt {}
     Welcome {}

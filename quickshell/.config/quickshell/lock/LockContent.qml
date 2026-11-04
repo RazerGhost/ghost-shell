@@ -22,6 +22,8 @@ Item {
     property bool messageIsError
     // A password is being checked; the field waits.
     property bool busy
+    // The password was right: the island closes with the lock open (Lock.qml unlocks after).
+    property bool unlocking
     // The desktop's picture (a live wallpaper's still frame); "" shows the plain background color.
     property string wallpaper
     // The desktop widgets: only on the screen the desktop shows them on.
@@ -142,6 +144,7 @@ Item {
         message: root.message
         messageIsError: root.messageIsError
         busy: root.busy
+        unlocking: root.unlocking
         onSubmitted: password => root.submitted(password)
         onTyped: root.activity()
     }

@@ -5,6 +5,7 @@ import Quickshell.Io
 import Quickshell.Services.Pam
 import Quickshell.Wayland
 import qs.services
+import qs.theme
 
 // The lock screen. `qs ipc call lock lock` locks the session (Super+L, the power menu, hypridle
 // when idle or before suspend); the password is checked through PAM's "login" config, the same
@@ -39,6 +40,27 @@ Scope {
     readonly property string lockedOnce: Quickshell.env("XDG_RUNTIME_DIR") + "/ghost-autologin-locked-"
         + (Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE") || "default")
     property bool lockingFirst: false
+    // This lock is the one the session started with (the login): its unlock gets the greeting.
+    property bool loginLock: false
+    // The password was right: the lock opens on screen for a moment before the desktop shows.
+    property bool unlocking: false
+
+    function letIn(): void {
+        unlocking = true;
+        opening.restart();
+    }
+
+    Timer {
+        id: opening
+        interval: Theme.lock.opening
+        onTriggered: {
+            const first = root.loginLock;
+            root.loginLock = false;
+            sessionLock.locked = false;
+            root.unlocking = false;
+            Session.unlocked(first);
+        }
+    }
 
     // Read in-process as the shell loads (it used to wait for a `test -e` process, a moment in
     // which the dock and the island already took clicks). Missing: not locked yet this session.
@@ -48,6 +70,7 @@ Scope {
         printErrors: false
         onLoadFailed: {
             root.lockingFirst = true;
+            root.loginLock = true;
             root.lock(false);
         }
     }
@@ -75,10 +98,11 @@ Scope {
                 message: root.message
                 messageIsError: root.messageIsError
                 busy: root.busy
+                unlocking: root.unlocking
                 onSubmitted: password => root.unlock(password)
                 onActivity: {
-                    if (grace.running)
-                        sessionLock.locked = false;
+                    if (grace.running && !root.unlocking)
+                        root.letIn();
                 }
 
                 Connections {
@@ -111,7 +135,7 @@ Scope {
             if (result === PamResult.Success) {
                 root.message = "";
                 root.messageIsError = false;
-                sessionLock.locked = false;
+                root.letIn();
             } else {
                 root.message = result === PamResult.MaxTries ? "Too many tries, wait a moment" : "Wrong password";
                 root.messageIsError = true;
@@ -167,7 +191,7 @@ Scope {
         }
 
         // Shows the lock screen in a normal window, without locking, to check how it looks.
-        // Closes after a few seconds, on Enter, or when called again.
+        // Closes after a few seconds, on Enter (showing the lock opening), or when called again.
         function preview(): void {
             preview.active = !preview.active;
         }
@@ -196,8 +220,18 @@ Scope {
                 id: previewContent
                 anchors.fill: parent
                 wallpaper: root.wallpaper
-                message: "Preview: nothing is locked"
-                onSubmitted: preview.active = false
+                message: unlocking ? "" : "Preview: nothing is locked"
+                // Enter shows the lock opening, like a right password, then closes.
+                onSubmitted: {
+                    unlocking = true;
+                    previewDone.start();
+                }
+            }
+
+            Timer {
+                id: previewDone
+                interval: Theme.lock.opening * 2
+                onTriggered: preview.active = false
             }
         }
     }

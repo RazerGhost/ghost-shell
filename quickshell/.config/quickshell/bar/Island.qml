@@ -40,6 +40,27 @@ Scope {
     property bool reloadShown: false
     property string reloadError: ""
 
+    // After the lock screen lets you in, the island greets you for a moment with what's waiting
+    // (WelcomeCard.qml); pop-ups wait for it. `welcomeFirst`: the login's unlock.
+    property bool welcomeShown: false
+    property bool welcomeFirst: false
+
+    Connections {
+        target: Session
+
+        function onUnlocked(first: bool): void {
+            root.welcomeFirst = first;
+            root.welcomeShown = true;
+            welcomeTimer.restart();
+        }
+    }
+
+    Timer {
+        id: welcomeTimer
+        interval: Theme.island.welcome
+        onTriggered: root.welcomeShown = false
+    }
+
     Connections {
         target: Quickshell
 

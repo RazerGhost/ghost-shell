@@ -16,6 +16,8 @@ Item {
     property string message
     property bool messageIsError
     property bool busy
+    // The password was right: closed, with the lock open, the moment before the desktop shows.
+    property bool unlocking
 
     signal submitted(string password)
     // A key in the field: the lock screen's activity (the idle lock's grace period).
@@ -39,7 +41,7 @@ Item {
     }
 
     property bool awake: false
-    readonly property bool open: awake || password.text !== "" || busy || message !== ""
+    readonly property bool open: !unlocking && (awake || password.text !== "" || busy || message !== "")
 
     Timer {
         id: sleep
@@ -78,8 +80,8 @@ Item {
 
             MaterialIcon {
                 anchors.verticalCenter: parent.verticalCenter
-                icon: root.busy ? "hourglass_top" : "lock"
-                color: Colors.m3onSurfaceVariant
+                icon: root.unlocking ? "lock_open" : root.busy ? "hourglass_top" : "lock"
+                color: root.unlocking ? Colors.m3primary : Colors.m3onSurfaceVariant
                 font.pixelSize: Theme.icon.small
             }
 

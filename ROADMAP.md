@@ -1817,6 +1817,26 @@ and light mode:
   in the to-do widgets, so the medium one is the same widget as the large one (`TasksWidget`, its
   field and as many rows as fit; `TodoWidget` is gone).
 
+### Ending and starting the session (built 2026-11-04)
+User's find after the lock screen work: logging out and shutting down gave no feedback, and being
+let in was just the desktop appearing.
+- Log out, Restart and Shut down (`lock/SessionEnd.qml`, `Session.ending`): every screen dims to
+  the background color; the focused one says "Shutting down" (or Restarting, Logging out) under
+  a turning ring, with "Closing your apps… 1 of 3". Every window is asked to close, like closing
+  it by hand, so apps can save; once all are gone it goes ahead (`Session.finish`: systemctl,
+  or Hyprland's exit). An app still open after 6 s is listed with "Show it" (stops and brings it
+  forward to be answered), beside "Shut down anyway" and Cancel (Escape). The hyprshutdown call
+  (never installed here) is gone. Checked on screen with the closing and the shutdown stubbed
+  out: both states. Not checked: a real shutdown, and Escape.
+- Being let in: a right password closes the lock island with the lock open in the accent color
+  for a moment (`Lock.letIn`, `Theme.lock.opening`; the preview shows it on Enter), then the
+  desktop's island greets you (`bar/WelcomeCard.qml`, `Greeting.js`, tested): "Good morning,
+  Ghosty" after the login (your account's full name, `Session.userName`; morning, afternoon or
+  evening), "Welcome back, Ghosty" after later unlocks, with chips for the weather, waiting
+  notifications, the next event, open tasks and a running timer. 4.5 s, or a click for the
+  today menu; pop-ups wait for it (`IslandViews.shown`'s "welcome", tested). Checked on screen
+  by firing the unlock signal; a real unlock needs your password.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

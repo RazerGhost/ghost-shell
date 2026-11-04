@@ -3,14 +3,16 @@
 .pragma library
 
 // The open menu ("today", "settings", ...), else why the shell couldn't reload ("reload"), else
-// the notification pop-up ("notification"), else a window asking for attention ("attention"),
+// the greeting after an unlock ("welcome"), else the notification pop-up ("notification"), else a window asking for attention ("attention"),
 // else the hover view ("media", as "peek-media"), else "". `panel` is the open menu on this screen
 // ("" for none), `peek` the hover view ("" for none); the others are whether each is there.
-function shown(panel, reloadFailed, notification, attention, peek) {
+function shown(panel, reloadFailed, welcome, notification, attention, peek) {
     if (panel !== "")
         return panel;
     if (reloadFailed)
         return "reload";
+    if (welcome)
+        return "welcome";
     if (notification)
         return "notification";
     if (attention)

@@ -124,6 +124,8 @@ Recovery procedures (lock screen crash, a session that can't start) are in ROADM
 | Clipboard: history, images, search, pins, paste into the previous window | `controlcenter/ClipboardPanel.qml`, `services/Clipboard.qml`, `ClipboardEntries.js` |
 | Emoji picker | `controlcenter/EmojiPanel.qml`, `services/EmojiData.js` |
 | Power menu (lock, screen off, suspend, log out, restart, shut down) | `controlcenter/PowerPanel.qml` |
+| Logging out, restarting, shutting down: the apps are asked to close first, a dimmed screen says what's happening, apps that don't close are listed (show, go ahead anyway, cancel) | `lock/SessionEnd.qml`, `services/Session.qml` (`ending`, `finish`, `cancel`) |
+| The greeting after an unlock ("Good morning" after the login, "Welcome back" later) with what's waiting; the lock opens on screen first | `bar/WelcomeCard.qml`, `Greeting.js`, `Island.qml` (`welcomeShown`), `lock/Lock.qml` (`letIn`) |
 | Arrow-key navigation and focus ring in every menu | `widgets/ArrowNavigation.qml/.js`, `FocusRing.qml` |
 
 ### Notifications

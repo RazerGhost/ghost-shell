@@ -84,6 +84,15 @@ Singleton {
     // menu's restart and shut down, End task.
     readonly property int confirmTimeout: 4000
 
+    // Logging out, restarting or shutting down (lock/SessionEnd.qml).
+    readonly property QtObject session: QtObject {
+        readonly property int patience: 6000 // ms the apps get to close before they're listed
+        readonly property int settle:   700  // ms the screen shows once they're closed
+        readonly property int width:    root.px(380)
+        readonly property int ring:     root.px(88)
+        readonly property int icon:     root.px(36)
+    }
+
     // The on/off switch (widgets/Switch.qml), Material 3's size.
     readonly property QtObject toggle: QtObject {
         readonly property int width:  root.px(52)
@@ -165,6 +174,8 @@ Singleton {
         // How long "Reloaded" shows after a shell reload, and a failed reload's error (ms).
         readonly property int reloaded:       2000
         readonly property int reloadError:    10000
+        // How long the greeting after an unlock stays (ms; bar/WelcomeCard.qml).
+        readonly property int welcome:        4500
     }
 
     readonly property QtObject tile: QtObject {
@@ -274,6 +285,7 @@ Singleton {
         readonly property int shake:      root.px(12) // how far a wrong password shakes the island
         readonly property int islandAwake: 10000      // ms the island stays open after a key or a pointer move
         readonly property int moved:      24  // px the pointer must move to end the grace period
+        readonly property int opening:    root.anim.morph // ms the island shows the lock open before the desktop
     }
 
     readonly property QtObject polkit: QtObject {
