@@ -342,7 +342,8 @@ tag, Material-Theme at a commit; the user's own Ghost repos follow their main br
 
 ### Weather (done, verified on the laptop 2026-10-29)
 - A row under the date in the today menu (user's pick from the Glyph rice's ideas): icon,
-  temperature, sky, today's high and low, and the town (`controlcenter/WeatherRow.qml`,
+  temperature, sky, today's high and low, and the town (`controlcenter/WeatherRow.qml`; since
+  2026-11-04 beside the date in `controlcenter/TodayHeader.qml`,
   `services/Weather.qml`, parsing in `Weather.js`, tested). open-meteo: free, no account. The town
   is typed once in that row (click it to change; `weatherLocation` in settings.json) and looked
   up with open-meteo's own geocoding, rather than guessing the place from the IP address
@@ -629,7 +630,11 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   checked with a stand-in node of that name. The same share asked in the portal's picker three
   times (Vesktop opens three portal sessions for one share): `hypr/xdph.conf` ticks the picker's
   restore token by default, so the sessions after the first reuse the choice. Verified by the
-  user: one question, and the screen icon shows during the share.
+  user: one question, and the screen icon shows during the share. The trade-off (review
+  2026-11-04): an app given a token can share the same screen or window again later without
+  the picker; the island's screen icon still shows, and the picker's box can be unticked for
+  a share. The icon follows the portal's stream, so it may show a moment before an app goes
+  live (Vesktop's preview) and while a share is paused: the safe direction for a privacy sign.
 
 ### Light mode (done, verified on the laptop 2026-10-29)
 - Settings -> Appearance -> Light or dark: Dark (default), Light or At sunset (dark from sunset
@@ -671,9 +676,13 @@ Since 2026-11-04 the to-do list is a desktop widget (see "Desktop widgets polish
   clipboard (then clears it there and from the clipboard history; user's find: pasting into the
   hidden prompt looked like nothing happened) or asks for it without echoing it, and keeps it
   only in `~/.config/ghost/calendars` and vdirsyncer's config (both mode 600, outside the repo),
-  then writes vdirsyncer's config (http -> filesystem, `a wins`), syncs, and only then writes
-  khal's (fixed ISO formats): the shell starts on khal's config, and its own first sync raced
-  the setup's and failed. `services/Agenda.qml` runs `vdirsyncer sync` at start, every 15
+  then writes vdirsyncer's config (http -> filesystem, `a wins`), syncs only the new calendar,
+  and only then writes khal's (fixed ISO formats): the shell starts on khal's config, and its own
+  first sync raced the setup's and failed. A calendar that can't be downloaded is taken out
+  again (nothing half added; the review of 2026-11-04). vdirsyncer's messages are shown with
+  every address replaced by `<link>`: its errors print the whole address. `webcal://` links
+  (Apple, Outlook) are taken as https. Checked with Google's public Dutch holidays calendar in a
+  scratch home folder: add, sync, remove, and a failing link rolled back. `services/Agenda.qml` runs `vdirsyncer sync` at start, every 15
   minutes once khal's config exists, and when that config changes, and asks khal for the shown
   month and the coming week. The today menu lists the next events under the date, the month and
   calendar widgets show them (`CalendarEvents.js`, tested). Events are made in the calendar's own
@@ -1859,7 +1868,8 @@ and light mode:
 User's picks.
 - A medium clipboard widget (`desktop/ClipboardWidget.qml`): your pinned texts, then the last
   copies (the clipboard menu's history), as many as fit; a click copies one again
-  (`Clipboard.copy`, no paste: there's no window to paste into) and says "Copied" for a moment.
+  (`Clipboard.copy`, no paste: there's no window to paste into) and says "Copied" for a moment
+  (matched by content: cliphist stores the copy again under a new id).
   It follows the clipboard while shown (`wl-paste --watch`, NOTES). On the lock screen "Hidden
   while locked". Checked: a copy showed in it at once.
 - Focus mode (`services/Focus.qml`; a round button to add in quick settings' edit mode,
@@ -1868,7 +1878,10 @@ User's picks.
   Not Disturb (`Notifications.quiet`, so "N came in while you were busy" follows), and the
   desktop widgets hidden (not in the desktop editor). It lasts as long as the timer; ending it
   from the button cancels the timer it started. The island's timer shows a meditating figure
-  for it. Checked: on and off through the IPC, the widgets gone and back.
+  for it, also with the timer chip hidden. Apps' bell is quiet too. The lock screen still shows
+  the widgets (the desktop, locked, where nobody is working). Ending it cancels only the timer
+  it started, not one started over it since (`Countdown.runs`). Checked: on and off through
+  the IPC, the widgets gone and back, pop-ups held and the bell off.
 - Up next: a timed calendar event starting within 15 minutes shows in the island as an event
   icon and "in 12 min" (`CalendarEvents.soon`, tested); not its title, which anyone at the
   screen would see (the today menu has it). Checked with a stand-in event (no calendar

@@ -402,7 +402,12 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   the clipboard; list cliphist a moment later (300 ms), after it has stored the new entry.
 - Vesktop opens three portal sessions for one share (a source preview, then the share), so the
   picker asked three times. With `screencopy:allow_token_by_default` (`hypr/xdph.conf`) the picker
-  hands out a restore token and Chromium's WebRTC reuses it for the following sessions.
+  hands out a restore token and Chromium's WebRTC reuses it for the following sessions. xdph's
+  restore tokens carry their own restore data: an app holding one can capture the same output
+  or window again later without the picker.
+- vdirsyncer's errors (aiohttp's `ClientResponseError`) print the whole URL, so a secret iCal
+  link reaches the terminal unless the output is filtered. vdirsyncer 0.21 won't sync a pair
+  that hasn't been discovered; `vdirsyncer discover <pair>` and `sync <pair>` work on one.
 - A USB webcam (uvcvideo, power control `auto`) is `runtime_status` "active" only while an app has
   it open, "suspended" otherwise (the Omen's HP True Vision camera, checked idle).
 - An inline component (`component InUse: Row {...}`) in `controlcenter/QuickSettings.qml` failed

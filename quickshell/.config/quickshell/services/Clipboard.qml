@@ -27,7 +27,7 @@ Singleton {
 
     // Copies `entry` (from the history, or a pin) and pastes it. Call after closing the menu.
     function paste(entry: var): void {
-        copy.start(entry.pinned ? ["sh", "-c", 'printf %s "$1" | wl-copy', "sh", entry.text]
+        pasteCopy.start(entry.pinned ? ["sh", "-c", 'printf %s "$1" | wl-copy', "sh", entry.text]
                                 : ["sh", "-c", 'cliphist decode "$1" | wl-copy', "sh", entry.id]);
     }
 
@@ -108,7 +108,7 @@ Singleton {
 
     // A pick while the last one still copies runs after it instead of being dropped.
     LatestProcess {
-        id: copy
+        id: pasteCopy
         onExited: pasteLater.start()
     }
 

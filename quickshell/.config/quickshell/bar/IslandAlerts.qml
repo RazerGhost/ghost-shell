@@ -12,7 +12,8 @@ import qs.widgets
 Row {
     id: root
 
-    readonly property bool timerShown: Countdown.active && !Array.from(Settings.values.hiddenStatusIcons ?? []).includes("timer")
+    // Focus mode's timer always shows: it's the only sign focus mode is on.
+    readonly property bool timerShown: Countdown.active && (Focus.on || !Array.from(Settings.values.hiddenStatusIcons ?? []).includes("timer"))
     readonly property bool lowBattery: Battery.present && Battery.low
 
     readonly property string recordingText: Recorder.recording ? "Recording the screen, " + Recorder.time : ""

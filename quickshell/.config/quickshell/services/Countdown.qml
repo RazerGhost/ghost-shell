@@ -28,8 +28,12 @@ Singleton {
         run(minutes);
     }
 
+    // Which start this is: focus mode cancels only the timer it started, not one started after.
+    readonly property int runs: saved.runs
+
     // Starts without making it the length quick settings' button starts next (focus mode's).
     function run(minutes: int): void {
+        saved.runs++;
         saved.total = minutes * 60000;
         saved.pausedLeft = 0;
         saved.endsAt = Date.now() + minutes * 60000;
@@ -59,6 +63,7 @@ Singleton {
         property real pausedLeft: 0  // ms left while paused, else 0
         property real total: 0       // ms the running timer started with
         property int minutes: 5
+        property int runs: 0
     }
 
     Timer {

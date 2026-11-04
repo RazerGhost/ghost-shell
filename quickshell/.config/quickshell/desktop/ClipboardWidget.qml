@@ -18,12 +18,18 @@ WidgetSurface {
     readonly property var clips: ClipboardEntries.withPins(Clipboard.pins, Clipboard.entries)
     readonly property int fit: Math.max(Math.floor(list.height / list.row), 1)
     readonly property var shown: clips.slice(0, fit)
-    property string copied: "" // the id of the clip just copied, for "Copied"
+    // What was just copied, for "Copied": by its content, since cliphist stores a copy again
+    // under a new id (and moves it to the top) a moment later.
+    property string copied: ""
+    function key(clip: var): string {
+        return clip.image ? "image " + clip.image.size + " " + clip.image.width + "x" + clip.image.height : clip.text;
+    }
 
     // Each change of the clipboard: list it again, a moment later, once cliphist (which watches
-    // the same way, hypr/autostart.lua) has stored it.
+    // the same way, hypr/autostart.lua) has stored it. Only while it's seen: every widget is
+    // built whether it's on or not (DesktopCard fades it), and on the lock screen it shows none.
     Process {
-        running: !widget.hidesTitles
+        running: !widget.hidesTitles && widget.visible
         command: ["wl-paste", "--watch", "echo"]
         stdout: SplitParser {
             onRead: relist.restart()
@@ -74,14 +80,14 @@ WidgetSurface {
                 id: clip
 
                 required property var modelData
-                readonly property bool justCopied: widget.copied === modelData.id
+                readonly property bool justCopied: widget.copied === widget.key(modelData)
                 readonly property string label: modelData.image
                     ? "Picture" + (modelData.image.width > 0 ? ", " + modelData.image.width + " × " + modelData.image.height : "")
                     : modelData.text.replace(/\s+/g, " ").trim()
 
                 function copy(): void {
                     Clipboard.copy(modelData);
-                    widget.copied = modelData.id;
+                    widget.copied = widget.key(modelData);
                     copiedFor.restart();
                 }
 

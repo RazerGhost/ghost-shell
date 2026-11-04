@@ -12,7 +12,7 @@ Scope {
     id: root
 
     readonly property bool bell: Settings.values.soundEvents && Settings.values.soundNotifications
-                                 && !Notifications.doNotDisturb && !GameMode.on
+                                 && !Notifications.doNotDisturb && !GameMode.on && !Focus.on
     readonly property string text: HyprlandConfig.lua(Settings.values, GameMode.on, Wallpaper.path !== "", bell)
         + (HyprlandRuntime.lua ? "\n-- While the windows editor is open (services/HyprlandRuntime.qml).\n" + HyprlandRuntime.lua + "\n" : "")
 

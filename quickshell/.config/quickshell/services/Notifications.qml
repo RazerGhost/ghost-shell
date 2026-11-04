@@ -3,7 +3,7 @@
 // stay in the history (the "today" menu) until dismissed. Do Not Disturb skips the pop-ups,
 // except critical ones; the history still collects everything. With a schedule (settings
 // window) it turns on at the start time and off at the end time; toggling in between lasts
-// until the next of those, like night light. Game mode and a fullscreen window hold the pop-ups
+// until the next of those, like night light. Game mode, focus mode and a fullscreen window hold the pop-ups
 // back the same way; afterwards one notification says how many came in meanwhile.
 // Each app can be silent (never pops up) or always pop up, even then (Settings -> Notifications,
 // NotificationRules.js).

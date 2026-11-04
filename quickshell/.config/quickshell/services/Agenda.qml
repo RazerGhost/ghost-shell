@@ -52,7 +52,7 @@ Singleton {
     onRangeChanged: refresh()
     onEnabledChanged: {
         if (enabled) {
-            sync.running = true;
+            sync.start();
         } else {
             events = [];
             error = "";
@@ -74,7 +74,7 @@ Singleton {
         // error) and list again.
         onLoaded: {
             if (root.enabled)
-                sync.running = true;
+                sync.start();
         }
     }
 
@@ -82,10 +82,11 @@ Singleton {
         interval: 15 * 60 * 1000
         running: root.enabled
         repeat: true
-        onTriggered: sync.running = true
+        onTriggered: sync.start()
     }
 
-    Process {
+    // A sync asked for while one runs (a calendar added meanwhile) runs again after it.
+    LatestProcess {
         id: sync
         command: ["vdirsyncer", "sync"]
         onExited: code => {

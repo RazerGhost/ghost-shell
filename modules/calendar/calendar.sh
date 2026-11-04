@@ -14,7 +14,7 @@
 #
 # The links are secrets (anyone with one can read the events), so they're kept in
 # ~/.config/ghost/calendars and vdirsyncer's config, both readable only by you, never in the
-# repo.
+# repo, and vdirsyncer's messages are shown with them cut out (its errors print the address).
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 . modules/lib.sh
@@ -31,6 +31,19 @@ names() {
     [[ -f $list ]] && cut -f1 "$list" || true
 }
 
+tools() {
+    command -v vdirsyncer >/dev/null && command -v khal >/dev/null \
+        || fail "vdirsyncer and khal aren't installed (ghost install calendar)"
+}
+
+# Runs vdirsyncer, its output shown with every address replaced by <link>; its exit code.
+vdirsyncer_quiet() {
+    local out code=0
+    out=$({ yes || true; } | vdirsyncer "$@" 2>&1) || code=$?
+    [[ -z $out ]] || sed -E "s#(https?|webcal)://[^[:space:]'\"]+#<link>#g" <<<"$out"
+    return "$code"
+}
+
 # vdirsyncer's and khal's configs from the list (both written whole: they're ours).
 cmd_configure() {
     configure_vdirsyncer
@@ -40,8 +53,7 @@ cmd_configure() {
 configure_vdirsyncer() {
     local name link
     [[ -s $list ]] || return 0
-    command -v vdirsyncer >/dev/null && command -v khal >/dev/null \
-        || fail "vdirsyncer and khal aren't installed (ghost install calendar)"
+    tools
     mkdir -p "$HOME/.config/vdirsyncer" "$HOME/.config/khal" "$HOME/.local/state/vdirsyncer"
     (
         umask 077
@@ -70,6 +82,7 @@ EOT
             done <"$list"
         } >"$HOME/.config/vdirsyncer/config"
     )
+    chmod 600 "$HOME/.config/vdirsyncer/config" # umask only applies to a new file
 }
 
 # The shell starts using the calendars when khal's config lists them (services/Agenda.qml), so
@@ -97,12 +110,26 @@ EOT
     } >"$HOME/.config/khal/config"
 }
 
+# All calendars, or the ones named. discover sets a pair up on its first run (vdirsyncer
+# won't sync one it hasn't); `yes` answers its "create it?" questions.
 cmd_sync() {
     [[ -s $list ]] || fail "no calendars yet (ghost calendar add)"
-    # discover sets the pairs up on the first run; `yes` answers its "create it?" questions. It
-    # dies of SIGPIPE when discover is done, which pipefail would count as a failure.
-    { yes || true; } | vdirsyncer discover >/dev/null
-    vdirsyncer sync
+    vdirsyncer_quiet --verbosity WARNING discover "$@" && vdirsyncer_quiet --verbosity WARNING sync "$@"
+}
+
+# Takes a calendar out of the list and its downloaded events and sync state with it, then
+# writes the configs again (or removes them with the last one, links and all).
+forget() {
+    awk -F'\t' -v n="$1" '$1 != n' "$list" >"$list.new" && mv "$list.new" "$list"
+    chmod 600 "$list"
+    # vdirsyncer's status is "<pair>" plus files starting "<pair>."; not a bare prefix, which
+    # would also take "work-stuff" with "work".
+    rm -rf "${data:?}/$1" "$HOME/.local/state/vdirsyncer/status/$1" "$HOME/.local/state/vdirsyncer/status/$1".*
+    if [[ -s $list ]]; then
+        cmd_configure
+    else
+        rm -f "$list" "$HOME/.config/vdirsyncer/config" "$HOME/.config/khal/config"
+    fi
 }
 
 cmd_add() {
@@ -110,11 +137,12 @@ cmd_add() {
     name=$(slug "${1:-google}")
     [[ -n $name ]] || fail "\"$1\" isn't a usable name"
     names | grep -qx "$name" && fail "there's already a calendar called $name (ghost calendar remove $name)"
+    tools
     # The clipboard first: pasting into a prompt that shows nothing looked like it hadn't worked.
     local copied answer
     copied=$(wl-paste --no-newline --type text 2>/dev/null || true)
-    if [[ $copied =~ ^https://([^/[:space:]]+)/ ]]; then
-        read -rp "Use the link on the clipboard (${BASH_REMATCH[1]}/…)? [Y/n] " answer
+    if [[ $copied =~ ^(https|webcal)://([^/[:space:]]+)/ ]]; then
+        read -rp "Use the link on the clipboard (${BASH_REMATCH[2]}/…)? [Y/n] " answer
         [[ $answer =~ ^[Nn] ]] || link=$copied
     fi
     if [[ -z ${link:-} ]]; then
@@ -122,18 +150,27 @@ cmd_add() {
         echo
         echo "Got ${#link} characters."
     fi
+    # Apple's and Outlook's links are webcal://, which is https underneath.
+    [[ $link == webcal://* ]] && link="https://${link#webcal://}"
     # Written into vdirsyncer's config inside quotes: nothing that would need escaping there.
     [[ $link =~ ^https://[^[:space:]\"\'\\]+$ ]] || fail "that isn't an https address"
+    # Out of the clipboard and its history: anyone with the link can read the events. Matched by
+    # the start of cliphist's preview, passed through the environment (an argument would show
+    # in the process list).
+    if [[ -n $copied && ( $copied == "$link" || $copied == "webcal://${link#https://}" ) ]]; then
+        wl-copy --clear
+        cliphist list | start="${copied:0:90}" awk -F'\t' 'index($2, ENVIRON["start"]) == 1' | cliphist delete || true
+    fi
     mkdir -p "$(dirname "$list")" "$data/$name"
     (umask 077; printf '%s\t%s\n' "$name" "$link" >>"$list")
     chmod 600 "$list"
-    # Out of the clipboard and its history: anyone with the link can read the events.
-    if [[ $copied == "$link" ]]; then
-        wl-copy --clear
-        cliphist delete-query "$link" 2>/dev/null || true
-    fi
     configure_vdirsyncer
-    cmd_sync
+    # Only this one: another calendar failing mustn't stop it. If it can't be downloaded, it's
+    # taken out again, so nothing is left half added.
+    if ! cmd_sync "$name"; then
+        forget "$name"
+        fail "couldn't download that calendar (a wrong or expired link, or offline); nothing was added"
+    fi
     configure_khal
     echo "Added $name: its events show in the today menu and the calendar widgets."
 }
@@ -143,16 +180,7 @@ cmd_remove() {
     local name
     name=$(slug "$1")
     names | grep -qx "$name" || fail "no calendar called \"$1\" (ghost calendar list)"
-    awk -F'\t' -v n="$name" '$1 != n' "$list" >"$list.new" && mv "$list.new" "$list"
-    chmod 600 "$list"
-    # vdirsyncer's status is "<pair>" plus files starting "<pair>."; not a bare prefix, which
-    # would also take "work-stuff" with "work".
-    rm -rf "${data:?}/$name" "$HOME/.local/state/vdirsyncer/status/$name" "$HOME/.local/state/vdirsyncer/status/$name".*
-    if [[ -s $list ]]; then
-        cmd_configure
-    else
-        rm -f "$list" "$HOME/.config/vdirsyncer/config" "$HOME/.config/khal/config"
-    fi
+    forget "$name"
     echo "Removed $name"
 }
 
@@ -160,7 +188,8 @@ case ${1:-} in
     add) shift; cmd_add "$@" ;;
     remove) shift; cmd_remove "$@" ;;
     list) names ;;
-    sync) cmd_sync ;;
+    sync) cmd_sync || fail "couldn't update the calendars (offline, or a link no longer works)"
+          echo "Calendars updated" ;;
     configure) cmd_configure ;;
     *) fail "usage: ghost calendar add [name] | remove <name> | list | sync" ;;
 esac

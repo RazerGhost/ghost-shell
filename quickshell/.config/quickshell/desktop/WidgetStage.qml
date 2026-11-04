@@ -28,7 +28,7 @@ Item {
     readonly property alias clipboardCard: clipboardCard
     readonly property var cards: [clockCard, weatherCard, mediaCard, calendarCard, batteryCard, todoCard, timerCard,
                                   notificationsCard, forecastCard, monthCard, tasksCard, noteCard, clipboardCard]
-    // A to-do widget's field is being typed in: the desktop's layer takes the keyboard meanwhile
+    // A to-do widget's field or the note is being typed in: the desktop's layer takes the keyboard meanwhile
     // ("take" until it has it, then "keep"; DesktopWidgets.qml), else "none".
     readonly property var typists: [todoWidget.keyboard, tasksWidget.keyboard, noteWidget.keyboard]
     readonly property var typing: typists.find(k => k.wantsKeyboard) ?? null

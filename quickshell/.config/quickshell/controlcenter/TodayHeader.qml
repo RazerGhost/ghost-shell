@@ -103,6 +103,7 @@ Column {
                 color: Colors.m3onSurfaceVariant
                 font.family: Theme.font.sans
                 font.pixelSize: Theme.font.small
+                Accessible.name: root.now ? `${root.now.label}, high ${root.now.high}°, low ${root.now.low}°` : ""
             }
 
             // The town; click to change it.

@@ -14,7 +14,7 @@ import "DesktopWidgets.js" as DesktopWidgets
 Item {
     id: root
 
-    // Its key in desktopWidgets ("clock", "weather", "media", "calendar", "battery", "todo", "timer").
+    // Its key in desktopWidgets (DesktopWidgets.js's `kinds`: "clock", "weather", "media", ...).
     required property string name
     // On (its setting, and for media something to play); it stays visible while fading out.
     property bool shown: true

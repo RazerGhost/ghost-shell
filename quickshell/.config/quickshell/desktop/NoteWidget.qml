@@ -32,8 +32,13 @@ WidgetSurface {
         font.letterSpacing: 1
     }
 
-    // The note, cut off at the card's foot (the today menu shows all of it).
+    // The note, cut off at the card's foot (the today menu shows all of it). While typing it
+    // scrolls so the line with the cursor shows (a click puts the cursor at the end).
     Item {
+        id: page
+        readonly property real scroll: keyboard.wantsKeyboard
+            ? Math.max(0, note.cursorRectangle.y + note.cursorRectangle.height - height) : 0
+
         anchors.top: title.bottom
         anchors.topMargin: Theme.spacing.s
         anchors.bottom: parent.bottom
@@ -43,6 +48,7 @@ WidgetSurface {
 
         TextEdit {
             id: note
+            y: -page.scroll
             width: parent.width
             text: Planner.note
             wrapMode: TextEdit.Wrap
