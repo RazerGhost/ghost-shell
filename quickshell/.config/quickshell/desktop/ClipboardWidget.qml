@@ -24,6 +24,11 @@ WidgetSurface {
     // Keyboard mode: the clip the keys are on, -1 for none (Enter then copies the newest).
     property int pick: -1
     onChosenChanged: pick = -1
+    // Screen readers hear the clip the keys are on.
+    onPickChanged: {
+        if (chosen && pick >= 0)
+            Accessible.announce((clips[pick].pinned ? "Pinned: " : "") + (clips[pick].image ? "Picture" : clips[pick].text) + ". Enter copies it.");
+    }
     // The list changed (a copy anywhere, cliphist storing it again at the top): the pick stays
     // on the list, and in view (a new list scrolls the view back to the top).
     onClipsChanged: {

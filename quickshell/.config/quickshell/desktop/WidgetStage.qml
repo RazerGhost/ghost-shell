@@ -97,6 +97,8 @@ Item {
             if (!chosenCard || !chosenCard.shown)
                 chosenCard = shownCards[ArrowNavigationJs.nearest(null, shownCards.map(rectOf), "down")] ?? null;
             browser.start();
+            navigator.Accessible.announce("Desktop widgets" + (chosenCard ? ": " + DesktopWidgetsJs.title(chosenCard.name) : "")
+                                          + ". Arrow keys move, Enter uses, Escape goes back.");
         } else {
             if (browser.wantsKeyboard)
                 browser.stop();
@@ -104,7 +106,12 @@ Item {
         }
         markChosen();
     }
-    onChosenCardChanged: markChosen()
+    // Screen readers hear each widget as the keys reach it (focus stays on the navigator).
+    onChosenCardChanged: {
+        markChosen();
+        if (browsing && chosenCard)
+            navigator.Accessible.announce(DesktopWidgetsJs.title(chosenCard.name));
+    }
 
     function markChosen(): void {
         for (const card of cards)
@@ -180,7 +187,7 @@ Item {
         id: navigator
         Keys.onPressed: event => stage.press(event)
         Accessible.role: Accessible.Pane
-        Accessible.name: "Desktop widgets" + (stage.chosenCard ? ": " + stage.chosenCard.name : "")
+        Accessible.name: "Desktop widgets" + (stage.chosenCard ? ": " + DesktopWidgetsJs.title(stage.chosenCard.name) : "")
     }
 
     // What the keys do, at the foot of the screen while the keyboard mode is on.

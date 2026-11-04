@@ -1952,7 +1952,10 @@ A read-only review, findings checked, then fixed:
   could take the keyboard back. Tab with nothing chosen starts at the first.
 - The to-do and clipboard picks follow their lists (a task ticked elsewhere made Enter throw;
   a copy moves the clip to the top, the pick with it).
-- Not done: screen readers hear the mode's pane name change, not each widget as it's chosen.
+- Screen readers (fixed after, user's request): the mode, each widget as it's chosen and the picked
+  task or clip are spoken (`Accessible.announce`, Qt 6.8+); the widgets' names for people are
+  `DesktopWidgets.title`, shared with the editor's gallery. Orca joined the core module to hear
+  them.
 - Checked on screen: focus mode during the keyboard mode ends it cleanly; "Focus again" through
   the IPC starts a session, a second is ignored.
 

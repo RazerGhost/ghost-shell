@@ -661,19 +661,19 @@ Scope {
                             clip: true
                             boundsBehavior: Flickable.StopAtBounds
                             model: [
-                                { key: "desktopClock", title: "Clock", widget: clockWidget },
-                                { key: "desktopWeather", title: "Weather", widget: weatherWidget },
-                                { key: "desktopForecast", title: "Weather, hourly", widget: forecastWidget },
-                                { key: "desktopCalendar", title: "Calendar", widget: calendarWidget },
-                                { key: "desktopMonth", title: "Month", widget: monthWidget },
-                                { key: "desktopTodo", title: "To-do", widget: todoWidget },
-                                { key: "desktopTasks", title: "To-do list", widget: tasksWidget },
-                                { key: "desktopNote", title: "Note", widget: noteWidget },
-                                { key: "desktopClipboard", title: "Clipboard", widget: clipboardWidget },
-                                { key: "desktopTimer", title: "Timer", widget: timerWidget },
-                                { key: "desktopNotifications", title: "Notifications", widget: notificationsWidget },
-                                { key: "desktopBattery", title: "Battery", widget: batteryWidget },
-                                { key: "desktopMedia", title: "Media", widget: mediaWidget }
+                                { key: "desktopClock", title: DesktopWidgetsJs.title("desktopClock"), widget: clockWidget },
+                                { key: "desktopWeather", title: DesktopWidgetsJs.title("desktopWeather"), widget: weatherWidget },
+                                { key: "desktopForecast", title: DesktopWidgetsJs.title("desktopForecast"), widget: forecastWidget },
+                                { key: "desktopCalendar", title: DesktopWidgetsJs.title("desktopCalendar"), widget: calendarWidget },
+                                { key: "desktopMonth", title: DesktopWidgetsJs.title("desktopMonth"), widget: monthWidget },
+                                { key: "desktopTodo", title: DesktopWidgetsJs.title("desktopTodo"), widget: todoWidget },
+                                { key: "desktopTasks", title: DesktopWidgetsJs.title("desktopTasks"), widget: tasksWidget },
+                                { key: "desktopNote", title: DesktopWidgetsJs.title("desktopNote"), widget: noteWidget },
+                                { key: "desktopClipboard", title: DesktopWidgetsJs.title("desktopClipboard"), widget: clipboardWidget },
+                                { key: "desktopTimer", title: DesktopWidgetsJs.title("desktopTimer"), widget: timerWidget },
+                                { key: "desktopNotifications", title: DesktopWidgetsJs.title("desktopNotifications"), widget: notificationsWidget },
+                                { key: "desktopBattery", title: DesktopWidgetsJs.title("desktopBattery"), widget: batteryWidget },
+                                { key: "desktopMedia", title: DesktopWidgetsJs.title("desktopMedia"), widget: mediaWidget }
                             ].filter(w => w.key !== "desktopBattery" || Battery.present)
 
                             delegate: Item {

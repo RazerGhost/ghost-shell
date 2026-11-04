@@ -9,20 +9,25 @@
 // themes and widget layouts take their keys from here; adding a widget also means its card in
 // WidgetStage.qml, its regions in DesktopWidgets.qml, its setting and the editor's gallery.
 const kinds = [
-    { name: "clock",    key: "desktopClock",    medium: true },
-    { name: "weather",  key: "desktopWeather",  medium: false },
-    { name: "media",    key: "desktopMedia",    medium: true },
-    { name: "calendar", key: "desktopCalendar", medium: true },
-    { name: "battery",  key: "desktopBattery",  medium: false },
-    { name: "todo",     key: "desktopTodo",     medium: true },
-    { name: "timer",    key: "desktopTimer",    medium: false },
-    { name: "notifications", key: "desktopNotifications", medium: false },
-    { name: "forecast", key: "desktopForecast", medium: true },
-    { name: "month",    key: "desktopMonth",    medium: true, large: true },
-    { name: "tasks",    key: "desktopTasks",    medium: true, large: true },
-    { name: "note",     key: "desktopNote",     medium: true },
-    { name: "clipboard", key: "desktopClipboard", medium: true }
+    { name: "clock",    key: "desktopClock", title: "Clock",    medium: true },
+    { name: "weather",  key: "desktopWeather", title: "Weather",  medium: false },
+    { name: "media",    key: "desktopMedia", title: "Media",    medium: true },
+    { name: "calendar", key: "desktopCalendar", title: "Calendar", medium: true },
+    { name: "battery",  key: "desktopBattery", title: "Battery",  medium: false },
+    { name: "todo",     key: "desktopTodo", title: "To-do",     medium: true },
+    { name: "timer",    key: "desktopTimer", title: "Timer",    medium: false },
+    { name: "notifications", key: "desktopNotifications", title: "Notifications", medium: false },
+    { name: "forecast", key: "desktopForecast", title: "Weather, hourly", medium: true },
+    { name: "month",    key: "desktopMonth", title: "Month",    medium: true, large: true },
+    { name: "tasks",    key: "desktopTasks", title: "To-do list",    medium: true, large: true },
+    { name: "note",     key: "desktopNote", title: "Note",     medium: true },
+    { name: "clipboard", key: "desktopClipboard", title: "Clipboard", medium: true }
 ];
+
+// A widget's name for people (the editor's gallery, screen readers), by its settings key or name.
+function title(keyOrName) {
+    return kinds.find(k => k.key === keyOrName || k.name === keyOrName)?.title ?? keyOrName;
+}
 const keys = kinds.map(k => k.key);
 
 // Two columns down the left side, under the island's height, until moved (the second one

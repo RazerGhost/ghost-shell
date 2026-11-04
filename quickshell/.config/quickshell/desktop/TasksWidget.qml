@@ -26,6 +26,11 @@ WidgetSurface {
     onChosenChanged: pick = -1
     // Tasks ticked or added elsewhere (the other to-do widget): the pick stays on the list.
     onOpenChanged: pick = ListPick.kept(pick, open.length)
+    // Screen readers hear the task the keys are on.
+    onPickChanged: {
+        if (chosen)
+            Accessible.announce(pick >= 0 ? open[pick].text + ". Enter ticks it off." : "Add a task. Enter to type.");
+    }
 
     function startTyping(): void {
         keyboard.start();
