@@ -792,8 +792,8 @@ Scope {
                         Component { id: calendarWidget; CalendarWidget {} }
                         Component { id: forecastWidget; ForecastWidget {} }
                         Component { id: monthWidget; MonthWidget {} }
-                        Component { id: tasksWidget; TasksWidget {} }
-                        Component { id: todoWidget; TodoWidget {} }
+                        Component { id: tasksWidget; TasksWidget { large: true } }
+                        Component { id: todoWidget; TasksWidget {} }
                         Component { id: batteryWidget; BatteryWidget {} }
                         Component { id: timerWidget; TimerWidget {} }
                         Component { id: notificationsWidget; NotificationsWidget {} }

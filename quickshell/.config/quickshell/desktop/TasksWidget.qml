@@ -3,8 +3,9 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// The to-do list widget (large), a to-do list of its own: the open tasks (services/Planner.qml,
-// the today menu's list too), click one to tick it off, and a field at the bottom to add one.
+// The to-do widgets, a to-do list of their own (the medium "To-do" and the large "To-do list",
+// `large`): the open tasks (services/Planner.qml), as many as fit, click one to tick it off, and
+// a field at the bottom to add one.
 // The desktop's layer takes no keyboard, so a click in the field asks for it (`wantsKeyboard`,
 // which DesktopWidgets.qml follows: taken, then kept until you click elsewhere) until Enter on an
 // empty field, Escape or a click in a window.
@@ -12,7 +13,7 @@ import qs.widgets
 WidgetSurface {
     id: widget
 
-    large: true
+    medium: true
     property bool hidesTitles: false
     // Typing into the field: the desktop's layer takes the keyboard meanwhile.
     property bool wantsKeyboard: false

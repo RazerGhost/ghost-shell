@@ -635,6 +635,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   that read came back stale and made every switch run twice (~2 s; now one run after 300 ms).
 
 ### To-do, note and timer in the today menu (done, verified on the laptop 2026-10-29)
+Since 2026-11-04 the to-do list is a desktop widget (see "Desktop widgets polish").
 - Three buttons under the weather, each opening its part (one at a time, folded when the menu
   opens): a to-do list (Enter adds, click ticks off, × removes, "Clear done"), one note saved
   while typing (both in `~/.local/state/quickshell/today.json`, `services/Planner.qml`), and a
@@ -1811,6 +1812,10 @@ and light mode:
   screen both keep titles to themselves like the medium ones. The drag handle shows only in the
   desktop editor, so the widgets look clean day to day. A "Planner" widget layout (the time, the
   hourly weather, the month and the to-do list on the right).
+- Then (user's request): the month calendar and the to-do list left the today menu, which keeps
+  the date, the weather, the next events, the note and timer, and notifications. Tasks are added
+  in the to-do widgets, so the medium one is the same widget as the large one (`TasksWidget`, its
+  field and as many rows as fit; `TodoWidget` is gone).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

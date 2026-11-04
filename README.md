@@ -17,7 +17,7 @@ machine can take what it needs.
   the time (or the playing song's cover) and what needs attention (recording, microphone, camera,
   timer, low battery); switching workspaces shows the dots for a moment. Notifications pop out of
   it one at a time. It opens into menus (click: today, right-click: quick settings): quick
-  settings (status icons, Wi-Fi, Bluetooth, sound, power mode, game mode, system stats), today (date, weather, calendar and its events, to-do, note, timer,
+  settings (status icons, Wi-Fi, Bluetooth, sound, power mode, game mode, system stats), today (date, weather, the next events, note, timer,
   notifications), background apps, media, clipboard, emoji.
 - **Windows**: a tiling layout of its own (halves, thirds, quarters from the window menu, or by
   the number of windows), Snap Assist, window tabs, Alt+Tab with live previews, an overview
@@ -35,8 +35,9 @@ machine can take what it needs.
   fonts; the lock screen shows the same), the dock and island, and how
   windows look (borders, gaps, animations, on example windows). Each shows the screen as a card
   with live previews and ready-made looks; Super + U picks one, and each works with the keyboard as well as the pointer. Your themes and looks travel to another machine with `ghost looks export` / `import` (a `looks.json` in the repo).
-- **Desktop widgets**: a clock, the weather, the media player, the calendar's next events, the
-  battery, the to-do list, a timer and the notification count on the wallpaper, picked from a
+- **Desktop widgets**: a clock, the weather (now or by the hour), the media player, the
+  calendar's next events or the whole month, the battery, a to-do list you add to, a timer and the
+  notification count on the wallpaper, picked from a
   gallery and dragged into place; the lock screen shows them too (titles hidden).
 - **A settings app** for what would otherwise be config files: displays, sound, keyboard and
   touchpad, power, default apps, keybinds, Btrfs snapshots and more.

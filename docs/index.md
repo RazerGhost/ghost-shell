@@ -119,7 +119,7 @@ Recovery procedures (lock screen crash, a session that can't start) are in ROADM
 | System page: CPU, memory, GPUs, disk, busiest apps with End task | `controlcenter/SystemPage.qml`, `services/SystemStats.qml`, `system-stats.sh` |
 | Phone page: ring, send files, clipboard, browse | `controlcenter/PhonePage.qml`, `services/Phone.qml`, `phone.sh` |
 | Background apps (tray), from quick settings' bottom row | `controlcenter/Tray.qml` |
-| Today: date, folded calendar with event dots, weather, agenda, to-do, note, timer, grouped notifications | `controlcenter/TodayPanel.qml`, `TodayTools.qml`, `WeatherRow.qml`, `AgendaList.qml` |
+| Today: date, weather, agenda, note, timer, grouped notifications (the month and the to-do list are desktop widgets) | `controlcenter/TodayPanel.qml`, `TodayTools.qml`, `WeatherRow.qml`, `AgendaList.qml` |
 | Media menu: cover colors, seek, shuffle/repeat | `controlcenter/MediaPanel.qml`, `MediaAccent.js` |
 | Clipboard: history, images, search, pins, paste into the previous window | `controlcenter/ClipboardPanel.qml`, `services/Clipboard.qml`, `ClipboardEntries.js` |
 | Emoji picker | `controlcenter/EmojiPanel.qml`, `services/EmojiData.js` |
@@ -201,8 +201,8 @@ Cancel / Done, full keyboard control. `customize/Customize.qml`, `EditorChrome.q
 
 Clock, weather, media (the cover as its card), calendar, battery, to-do, timer, notifications,
 the hourly weather (`ForecastWidget`, `Weather.hours`), and two large ones: the month
-(`MonthWidget`) and a to-do list you can add to (`TasksWidget`: the layer takes the keyboard while
-its field is typed in). Small, medium and large (`DesktopWidgets.js` `kinds`, `box`;
+(`MonthWidget`) and the to-do list. Both to-do widgets are `TasksWidget` (medium and large), where
+tasks are added (the layer takes the keyboard while its field is typed in). Small, medium and large (`DesktopWidgets.js` `kinds`, `box`;
 `Theme.desktop.box`); glass cards on a `Bottom` layer, dragged by a handle shown only in the
 desktop editor, snapping or a grid, keyboard nudges, zoom with the shell's size. The lock screen
 draws the same stage, locked. `desktop/DesktopWidgets.qml/.js`, `WidgetStage.qml`, `*Widget.qml`,
@@ -247,7 +247,7 @@ recording (gpu-screen-recorder), draw on it (satty), folders and quality setting
 | `Privacy` | Camera and screen sharing indicators |
 | `Updates` | checkupdates + paru count, Update button |
 | `Weather`, `Agenda` | open-meteo; vdirsyncer + khal calendar |
-| `Planner`, `Countdown` | To-do, note, timer |
+| `Planner`, `Countdown` | To-do (the desktop's to-do widgets), note, timer |
 | `ScreenTime` | Per-app time, 30 days |
 | `Touchpad`, `Keyboard` | Touchpad off with a mouse; layout and caps lock |
 | `Media`, `Sounds`, `Phone`, `Session`, `Windows`, `HyprlandRuntime`, `LatestProcess` | Players, sound events, KDE Connect, session actions, window state, runtime Hyprland rules, process helper |

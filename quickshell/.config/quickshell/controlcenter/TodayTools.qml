@@ -3,12 +3,12 @@ import qs.services
 import qs.theme
 import qs.widgets
 
-// The today menu's to-do list, note and timer (services/Planner.qml, services/Countdown.qml):
-// a button for each, which opens its part below (one at a time, folded like the calendar).
+// The today menu's note and timer (services/Planner.qml, services/Countdown.qml): a button for
+// each, which opens its part below (one at a time). The to-do list is a desktop widget.
 Column {
     id: root
 
-    // "", "todo", "note" or "timer".
+    // "", "note" or "timer".
     property string open: ""
 
     spacing: Theme.spacing.s
@@ -19,14 +19,6 @@ Column {
 
     Row {
         spacing: Theme.spacing.xs
-
-        TextButton {
-            text: Planner.open > 0 ? "To-do · " + Planner.open : "To-do"
-            filled: root.open === "todo"
-            Accessible.checkable: true
-            Accessible.checked: root.open === "todo"
-            onClicked: root.toggle("todo")
-        }
 
         TextButton {
             text: "Note"
@@ -42,107 +34,6 @@ Column {
             Accessible.checkable: true
             Accessible.checked: root.open === "timer"
             onClicked: root.toggle("timer")
-        }
-    }
-
-    // To-do: type and Enter to add; click a task to tick it off.
-    Column {
-        visible: root.open === "todo"
-        width: parent.width
-        spacing: Theme.spacing.xs
-
-        onVisibleChanged: {
-            if (visible)
-                newTask.focusInput();
-        }
-
-        TextField {
-            id: newTask
-            width: parent.width
-            placeholder: "Add a task"
-            onAccepted: {
-                Planner.add(text);
-                text = "";
-            }
-        }
-
-        Repeater {
-            model: Planner.todos
-
-            MouseArea {
-                id: task
-
-                required property var modelData
-                required property int index
-
-                width: parent.width
-                implicitHeight: Theme.list.rowHeight * 0.75
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: Planner.toggle(index)
-
-                Accessible.role: Accessible.CheckBox
-                Accessible.name: modelData.text
-                Accessible.checkable: true
-                Accessible.checked: modelData.done
-                Accessible.onPressAction: Planner.toggle(index)
-
-                // The keyboard (arrow keys or Tab, then Enter or Space), like a click.
-                activeFocusOnTab: true
-                Keys.onReturnPressed: Planner.toggle(index)
-                Keys.onEnterPressed: Planner.toggle(index)
-                Keys.onSpacePressed: Planner.toggle(index)
-
-                StateLayer {
-                    radius: Theme.radius.m
-                    hovered: task.containsMouse
-                }
-
-                FocusRing {
-                    radius: Theme.radius.m
-                }
-
-                MaterialIcon {
-                    id: check
-                    anchors.left: parent.left
-                    anchors.leftMargin: Theme.spacing.m
-                    anchors.verticalCenter: parent.verticalCenter
-                    icon: task.modelData.done ? "check_circle" : "radio_button_unchecked"
-                    color: task.modelData.done ? Colors.m3primary : Colors.m3onSurfaceVariant
-                }
-
-                Text {
-                    anchors.left: check.right
-                    anchors.leftMargin: Theme.spacing.m
-                    anchors.right: removeTask.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: task.modelData.text
-                    elide: Text.ElideRight
-                    font.strikeout: task.modelData.done
-                    color: task.modelData.done ? Colors.m3onSurfaceVariant : Colors.m3onSurface
-                    font.family: Theme.font.sans
-                    font.pixelSize: Theme.font.normal
-                }
-
-                IconButton {
-                    id: removeTask
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    // Always there (screen readers only see what's visible), faint until hovered.
-                    opacity: task.containsMouse ? 1 : Theme.state.disabled
-                    icon: "close"
-                    label: "Remove " + task.modelData.text
-                    iconSize: Theme.icon.small
-                    onClicked: Planner.remove(task.index)
-                }
-            }
-        }
-
-        TextButton {
-            anchors.right: parent.right
-            visible: Planner.todos.some(t => t.done)
-            text: "Clear done"
-            onClicked: Planner.clearDone()
         }
     }
 

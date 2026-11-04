@@ -8,9 +8,9 @@ import "DesktopWidgets.js" as DesktopWidgetsJs
 // Widgets on the wallpaper (the desktop editor's Widgets tab): a clock, the weather, the media
 // player (with nothing playing, it offers the music app last heard), the calendar's next events,
 // the battery, the to-do list, the timer, how many notifications wait, the next hours' weather,
-// the month and a to-do list to add to (ClockWidget, WeatherWidget, MediaWidget, CalendarWidget,
-// BatteryWidget, TodoWidget, TimerWidget, NotificationsWidget, ForecastWidget, MonthWidget,
-// TasksWidget: one family of sizes; the list of them is DesktopWidgets.js's `kinds`). On the first screen, on the layer just above the wallpaper, so windows cover them.
+// the month and a larger to-do list (ClockWidget, WeatherWidget, MediaWidget, CalendarWidget,
+// BatteryWidget, TasksWidget for both to-dos, TimerWidget, NotificationsWidget, ForecastWidget,
+// MonthWidget: one family of sizes; the list of them is DesktopWidgets.js's `kinds`). On the first screen, on the layer just above the wallpaper, so windows cover them.
 // Each can be dragged by its handle (DesktopCard.qml). The widgets themselves are WidgetStage.qml,
 // which the lock screen draws too.
 Scope {
