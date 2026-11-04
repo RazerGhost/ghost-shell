@@ -12,11 +12,15 @@ Item {
 
     property bool wantsKeyboard: false
     property bool hasKeyboard: false
+    // The last stop came from a click elsewhere (the layer lost the keyboard), not from Escape
+    // or being done: the desktop's keyboard mode (WidgetStage.browsing) ends then too.
+    property bool released: false
 
     // The typing ended: put the field back (clear it, drop its focus).
     signal stopped()
 
     function start(): void {
+        released = false;
         wantsKeyboard = true;
         // The layer may have the keyboard already (another widget was typed in): then there's
         // no change of window focus to wait for.
@@ -25,6 +29,11 @@ Item {
     }
 
     function stop(): void {
+        released = false;
+        end();
+    }
+
+    function end(): void {
         wantsKeyboard = false;
         hasKeyboard = false;
         stopped();
@@ -34,7 +43,10 @@ Item {
     Timer {
         running: root.wantsKeyboard && !root.hasKeyboard
         interval: 1000
-        onTriggered: root.stop()
+        onTriggered: {
+            root.released = true;
+            root.end();
+        }
     }
 
     Connections {
@@ -44,8 +56,10 @@ Item {
                 return;
             if (root.Window.active)
                 root.hasKeyboard = true;
-            else if (root.hasKeyboard)
-                root.stop();
+            else if (root.hasKeyboard) {
+                root.released = true; // before end(): its `stopped` handlers read it
+                root.end();
+            }
         }
     }
 }

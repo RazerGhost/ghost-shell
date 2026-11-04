@@ -19,6 +19,17 @@ Item {
     // On (its setting, and for media something to play); it stays visible while fading out.
     property bool shown: true
     default property alias content: body.data
+    // The widget inside (a WidgetSurface), for the keyboard mode (WidgetStage).
+    readonly property Item widget: body.children[0] ?? null
+    // The keyboard mode is on this widget: a ring in the accent around it.
+    property bool chosen: false
+
+    Binding {
+        target: root.widget
+        property: "chosen"
+        value: root.chosen
+        when: root.widget !== null
+    }
     readonly property bool locked: parent?.locked === true
 
     readonly property var spot: DesktopWidgets.place(Settings.values.desktopWidgets, name)
@@ -142,5 +153,14 @@ Item {
                 Qt.callLater(() => root.settling = false);
             }
         }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        visible: root.chosen
+        radius: Theme.desktop.radius
+        color: "transparent"
+        border.width: Theme.focus.width
+        border.color: Colors.m3primary
     }
 }

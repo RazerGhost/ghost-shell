@@ -26,6 +26,17 @@ WidgetSurface {
     // behind the lock.
     property bool locked: false
 
+    // Keyboard mode: Enter or Space plays or pauses (with nothing playing, opens the music app).
+    function key(event: var): bool {
+        if (!(event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space))
+            return false;
+        if (player)
+            player.togglePlaying();
+        else
+            open();
+        return true;
+    }
+
     function open(): void {
         if (app && !locked)
             Apps.launch(app);

@@ -1893,6 +1893,21 @@ User's picks.
   typing and isn't dragged (a drag selects text); the clipboard lists its whole history.
   Verified by the user (scrolling, a clip copied and pasted, a long note typed into).
 
+### The desktop widgets by keyboard (built 2026-11-04; checked on the laptop)
+User's pick (a gap the review found: the note, to-do and clipboard widgets took no keyboard
+without a click first). Super+D (`qs ipc call widgets browse`), like Windows' "show desktop":
+from a workspace with windows it goes to an empty one (`Editing`'s trip), and the widgets'
+layer takes the keyboard (`WidgetStage.browsing`, a fourth `WidgetKeyboard`). The arrow keys
+move to the nearest widget that way (`ArrowNavigation.js`, the island menus' rule), Tab in
+reading order; the chosen one has a ring in the accent, and gets the keys first
+(`WidgetSurface.key`, `chosen`): Up and Down go through the to-do's tasks and the clipboard's
+clips (on past the ends to the next widget), Enter ticks a task off, copies a clip, starts
+typing in the note or a new task, plays or pauses the music, starts or pauses the timer, or
+opens the today menu from the calendar and month. Escape after typing comes back to moving;
+Escape then, Super+D again or a click elsewhere goes back to your workspace. Key hints show at
+the foot of the screen. Not while locked, in focus mode or in the desktop editor. Checked with
+wtype: moving, the ring, typing into the note and back, Escape home.
+
 ### Ending and starting the session (built 2026-11-04)
 User's find after the lock screen work: logging out and shutting down gave no feedback, and being
 let in was just the desktop appearing.

@@ -11,6 +11,15 @@ Surface {
     property bool medium: false
     property bool large: false
     default property alias content: inner.data
+    // The desktop's keyboard mode (Super+D, WidgetStage.browsing) is on this widget: a widget
+    // with rows of its own shows which one the keys are on.
+    property bool chosen: false
+
+    // A key while this widget is chosen; true if it used it, else the arrow keys move on to the
+    // next widget. A widget that does something on Enter says so here.
+    function key(event: var): bool {
+        return false;
+    }
 
     implicitWidth: medium || large ? Theme.desktop.medium : Theme.desktop.size
     implicitHeight: large ? Theme.desktop.medium : Theme.desktop.size

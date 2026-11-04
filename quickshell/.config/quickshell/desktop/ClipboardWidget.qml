@@ -20,7 +20,36 @@ WidgetSurface {
     // What was just copied, for "Copied": by its content, since cliphist stores a copy again
     // under a new id (and moves it to the top) a moment later.
     property string copied: ""
-    function key(clip: var): string {
+    // Keyboard mode: the clip the keys are on, -1 for none (Enter then copies the newest).
+    property int pick: -1
+    onChosenChanged: pick = -1
+
+    function copyClip(clip: var): void {
+        Clipboard.copy(clip);
+        copied = contentOf(clip);
+        copiedFor.restart();
+    }
+
+    // Up and Down through the clips (on past the ends to the next widget), Enter copies.
+    function key(event: var): bool {
+        if (hidesTitles || clips.length === 0)
+            return false;
+        if (event.key === Qt.Key_Down || event.key === Qt.Key_Up) {
+            const next = pick + (event.key === Qt.Key_Down ? 1 : -1);
+            if (next < -1 || next >= clips.length)
+                return false;
+            pick = next;
+            if (pick >= 0)
+                list.positionViewAtIndex(pick, ListView.Contain);
+            return true;
+        }
+        if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space)
+            return false;
+        copyClip(clips[Math.max(pick, 0)]);
+        return true;
+    }
+
+    function contentOf(clip: var): string {
         return clip.image ? "image " + clip.image.size + " " + clip.image.width + "x" + clip.image.height : clip.text;
     }
 
@@ -79,15 +108,16 @@ WidgetSurface {
             id: clip
 
             required property var modelData
-            readonly property bool justCopied: widget.copied === widget.key(modelData)
+            required property int index
+            // Under the pointer, or picked in keyboard mode.
+            readonly property bool lit: containsMouse || (widget.chosen && widget.pick === index)
+            readonly property bool justCopied: widget.copied === widget.contentOf(modelData)
             readonly property string label: modelData.image
                 ? "Picture" + (modelData.image.width > 0 ? ", " + modelData.image.width + " × " + modelData.image.height : "")
                 : modelData.text.replace(/\s+/g, " ").trim()
 
             function copy(): void {
-                Clipboard.copy(modelData);
-                widget.copied = widget.key(modelData);
-                copiedFor.restart();
+                widget.copyClip(modelData);
             }
 
             width: ListView.view.width
@@ -103,9 +133,9 @@ WidgetSurface {
             MaterialIcon {
                 id: icon
                 anchors.verticalCenter: parent.verticalCenter
-                icon: clip.justCopied ? "check" : clip.containsMouse ? "content_copy"
+                icon: clip.justCopied ? "check" : clip.lit ? "content_copy"
                     : clip.modelData.pinned ? "push_pin" : clip.modelData.image ? "image" : "notes"
-                color: clip.justCopied || clip.containsMouse ? Colors.m3primary : Colors.m3onSurfaceVariant
+                color: clip.justCopied || clip.lit ? Colors.m3primary : Colors.m3onSurfaceVariant
                 font.pixelSize: Theme.icon.small
             }
 

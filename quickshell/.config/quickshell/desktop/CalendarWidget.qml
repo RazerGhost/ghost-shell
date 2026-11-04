@@ -10,6 +10,14 @@ import qs.theme
 WidgetSurface {
     id: widget
 
+    // Keyboard mode: Enter opens the today menu, like a click.
+    function key(event: var): bool {
+        if (!enabled || !(event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space))
+            return false;
+        Quickshell.execDetached(["qs", "ipc", "call", "island", "toggle", "today"]);
+        return true;
+    }
+
     medium: true
     property bool hidesTitles: false
 

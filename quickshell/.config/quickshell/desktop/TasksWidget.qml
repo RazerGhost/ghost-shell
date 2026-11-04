@@ -20,6 +20,42 @@ WidgetSurface {
     readonly property var open: Planner.todos.map((t, i) => ({ text: t.text, done: t.done, index: i })).filter(t => !t.done)
     readonly property int done: Planner.todos.length - open.length
 
+    // Keyboard mode: the task the keys are on, -1 for none (Enter then types a new one).
+    property int pick: -1
+    onChosenChanged: pick = -1
+
+    function startTyping(): void {
+        keyboard.start();
+        field.focusInput();
+    }
+
+    // Up and Down through the tasks (on past the ends to the next widget), Enter ticks the one
+    // picked off, or with none picked types a new one.
+    function key(event: var): bool {
+        if (hidesTitles)
+            return false;
+        if (event.key === Qt.Key_Down || event.key === Qt.Key_Up) {
+            const next = pick + (event.key === Qt.Key_Down ? 1 : -1);
+            if (next < -1 || next >= open.length)
+                return false;
+            pick = next;
+            if (pick >= 0)
+                list.positionViewAtIndex(pick, ListView.Contain);
+            return true;
+        }
+        if (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter && event.key !== Qt.Key_Space)
+            return false;
+        if (pick < 0) {
+            startTyping();
+        } else {
+            const task = open[pick];
+            const left = open.length - 1;
+            list.keepingPlace(() => Planner.toggle(task.index));
+            pick = Math.min(pick, left - 1);
+        }
+        return true;
+    }
+
     WidgetKeyboard {
         id: keyboard
         onStopped: {
@@ -94,6 +130,9 @@ WidgetSurface {
             id: task
 
             required property var modelData
+            required property int index
+            // Under the pointer, or picked in keyboard mode: what a click or Enter will do.
+            readonly property bool lit: containsMouse || (widget.chosen && widget.pick === index)
 
             width: ListView.view.width
             height: list.row
@@ -110,9 +149,8 @@ WidgetSurface {
             MaterialIcon {
                 id: check
                 anchors.verticalCenter: parent.verticalCenter
-                // Filled for a moment under the pointer: what a click will do.
-                icon: task.containsMouse ? "check_circle" : "radio_button_unchecked"
-                color: task.containsMouse ? Colors.m3primary : Colors.m3onSurfaceVariant
+                icon: task.lit ? "check_circle" : "radio_button_unchecked"
+                color: task.lit ? Colors.m3primary : Colors.m3onSurfaceVariant
                 font.pixelSize: Theme.icon.small
             }
 
@@ -167,10 +205,7 @@ WidgetSurface {
             anchors.fill: parent
             visible: !keyboard.wantsKeyboard
             cursorShape: Qt.IBeamCursor
-            onClicked: {
-                keyboard.start();
-                field.focusInput();
-            }
+            onClicked: widget.startTyping()
         }
     }
 

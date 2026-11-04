@@ -14,6 +14,20 @@ WidgetSurface {
     property bool hidesTitles: false
     readonly property alias keyboard: keyboard
 
+    function startTyping(): void {
+        keyboard.start();
+        note.forceActiveFocus();
+        note.cursorPosition = note.text.length;
+    }
+
+    // Keyboard mode: Enter starts typing.
+    function key(event: var): bool {
+        if (hidesTitles || (event.key !== Qt.Key_Return && event.key !== Qt.Key_Enter))
+            return false;
+        startTyping();
+        return true;
+    }
+
     WidgetKeyboard {
         id: keyboard
         onStopped: {
@@ -119,11 +133,7 @@ WidgetSurface {
         anchors.fill: page
         visible: page.visible && !keyboard.wantsKeyboard && !Editing.desktop
         cursorShape: Qt.IBeamCursor
-        onClicked: {
-            keyboard.start();
-            note.forceActiveFocus();
-            note.cursorPosition = note.text.length;
-        }
+        onClicked: widget.startTyping()
         onWheel: wheel => page.scroll(wheel)
     }
 

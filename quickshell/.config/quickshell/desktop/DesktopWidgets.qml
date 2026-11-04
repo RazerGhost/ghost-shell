@@ -1,5 +1,7 @@
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
+import Quickshell.Io
 import Quickshell.Wayland
 import qs.services
 import qs.theme
@@ -17,6 +19,40 @@ Scope {
     id: root
 
     readonly property bool any: DesktopWidgetsJs.keys.some(key => Settings.values[key])
+
+    // The keyboard mode (Super+D, `qs ipc call widgets browse`; WidgetStage.browsing): like
+    // Windows' "show desktop", from a workspace with windows it goes to an empty one first
+    // (Editing's trip, which the editors use), and back when it ends.
+    property bool browsing: false
+    property bool tripped: false
+
+    function browse(): void {
+        if (browsing) {
+            stopBrowsing();
+            return;
+        }
+        if (!any || Session.locked || (Focus.on && !Editing.desktop) || Editing.desktop)
+            return;
+        tripped = (Hyprland.focusedWorkspace?.toplevels.values.length ?? 0) > 0;
+        if (tripped)
+            Editing.toEmptyWorkspace();
+        browsing = true;
+    }
+
+    function stopBrowsing(): void {
+        browsing = false;
+        if (tripped)
+            Editing.back();
+        tripped = false;
+    }
+
+    IpcHandler {
+        target: "widgets"
+
+        function browse(): void {
+            root.browse();
+        }
+    }
 
     LazyLoader {
         // Hidden during focus mode (services/Focus.qml), except in the desktop editor.
@@ -76,6 +112,9 @@ Scope {
             // as while the desktop editor is open (services/Editing.qml).
             WidgetStage {
                 id: widgetStage
+
+                browsing: root.browsing
+                onLeave: root.stopBrowsing()
 
                 readonly property bool carded: Editing.cardScreen === (window.screen?.name ?? "")
 

@@ -9,6 +9,19 @@ import qs.widgets
 WidgetSurface {
     id: widget
 
+    // Keyboard mode: Enter or Space starts the length used last, or pauses and resumes.
+    function key(event: var): bool {
+        if (!enabled || !(event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space))
+            return false;
+        if (!Countdown.active)
+            Countdown.start(Countdown.lastMinutes);
+        else if (Countdown.paused)
+            Countdown.resume();
+        else
+            Countdown.pause();
+        return true;
+    }
+
     Text {
         visible: !Countdown.active
         text: "TIMER"

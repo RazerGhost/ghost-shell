@@ -25,6 +25,7 @@ Generated from Hyprland's binds with `ghost keybinds`, by category; every bind i
 | `Super` + `V` | Clipboard history |
 | `Super` + `.` | Emoji |
 | `Super` + `U` | Customize (desktop, dock and island, windows, quick settings) |
+| `Super` + `D` | Show the desktop, its widgets taking the keyboard (arrows, Enter, Escape) |
 
 ## Session
 
