@@ -158,4 +158,30 @@ TestCase {
         const down = DesktopWidgets.nudged(start, 0, 32, 168, 168, 1920, 1080, 32);
         compare(down.y * 1080, 572);
     }
+
+    // A widget turned on next to a row goes at the row's end, not under it (the most compact spot).
+    function test_freePlaceCompact() {
+        const saved = { clock: { x: 80 / 1920, y: 80 / 1080 }, weather: { x: 448 / 1920, y: 80 / 1080 },
+                        battery: { x: 632 / 1920, y: 80 / 1080 },
+                        timer: { x: 80 / 1920, y: 80 / 1080 } }; // its own place taken (under the clock)
+        const after = DesktopWidgets.freePlace(saved, "timer", ["clock", "weather", "battery"], 1920, 1080);
+        compare(after.timer.y, Math.round(80 / 1080 * 10000) / 10000);
+        compare(after.timer, { x: Math.round(816 / 1920 * 10000) / 10000, y: Math.round(80 / 1080 * 10000) / 10000 });
+    }
+
+    // The calmer side of a picture: busy (a checkerboard) on one third, flat on the other.
+    function test_quietSide() {
+        const w = 48, h = 27;
+        const picture = busySide => {
+            const gray = [];
+            for (let y = 0; y < h; y++)
+                for (let x = 0; x < w; x++)
+                    gray.push((busySide === "left" ? x < 16 : x >= 32) ? ((x + y) % 2) * 255 : 128);
+            return gray;
+        };
+        compare(DesktopWidgets.quietSide(picture("left"), w, h), "right");
+        compare(DesktopWidgets.quietSide(picture("right"), w, h), "left");
+        compare(DesktopWidgets.quietSide(new Array(w * h).fill(100), w, h), "");
+        compare(DesktopWidgets.quietSide([1, 2, 3], w, h), "");
+    }
 }

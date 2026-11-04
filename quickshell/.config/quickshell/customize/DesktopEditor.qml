@@ -209,7 +209,9 @@ Scope {
                         savedKey: "widgetLooks"
                         savedPrefix: "My layout"
                         subtitle: "Which widgets, and where"
-                        presets: Presets.desktopWidgets
+                        // Laid out for the widgets' screen, on the calmer side of the wallpaper.
+                        presets: Presets.widgetPresets(Quickshell.screens[0]?.width ?? 1920, Quickshell.screens[0]?.height ?? 1080,
+                                                       Wallpaper.quietSide)
                         fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)
                         art: Component {
                             Item {

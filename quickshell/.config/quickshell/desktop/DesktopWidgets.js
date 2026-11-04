@@ -144,10 +144,11 @@ function box(name) {
 
 // Places `name` as it's turned on (the desktop editor's gallery), clear of the widgets already
 // showing (`others`, their names) on a sw x sh screen: at the place you last gave it if that's
-// free, else right beside, below, left of or above one of them (so it joins your arrangement),
-// else the first free spot from the top left; where nothing is free, as it was. All at 100 %
-// (places zoom with the size as a whole, so what's clear at 100 % stays clear). Returns the new
-// desktopWidgets.
+// free, else next to one of them, lined up with its edges (beside it top or bottom aligned, below
+// or above it left or right aligned), the spot that keeps the arrangement most compact (the
+// smallest box around all of them); else the first free spot from the top left; where nothing is
+// free, as it was. All at 100 % (places zoom with the size as a whole, so what's clear at 100 %
+// stays clear). Returns the new desktopWidgets.
 function freePlace(saved, name, others, sw, sh) {
     const size = box(name);
     const rects = others.map(n => {
@@ -163,18 +164,73 @@ function freePlace(saved, name, others, sw, sh) {
         && rects.every(r => c.x + size.w + gap <= r.x || r.x + r.w + gap <= c.x
                          || c.y + size.h + gap <= r.y || r.y + r.h + gap <= c.y);
     const own = place(saved, name);
-    const candidates = [{ x: own.x * sw, y: own.y * sh }];
-    for (const r of rects)
-        candidates.push({ x: r.x + r.w + unit.gap, y: r.y }, { x: r.x, y: r.y + r.h + unit.gap },
-                        { x: r.x - unit.gap - size.w, y: r.y }, { x: r.x, y: r.y - unit.gap - size.h });
-    for (let y = unit.top; y + size.h <= sh - unit.bottom; y += unit.gap)
-        for (let x = unit.side; x + size.w <= sw - unit.side; x += unit.gap)
-            candidates.push({ x: x, y: y });
-    const spot = candidates.find(fits);
+    const round = v => Math.round(v * 10000) / 10000;
+    const ownSpot = { x: own.x * sw, y: own.y * sh };
+    let spot = fits(ownSpot) ? ownSpot : null;
+    if (!spot && rects.length > 0) {
+        // Next to a widget, lined up with one of its edges; the most compact wins.
+        const beside = [];
+        for (const r of rects) {
+            const right = r.x + r.w + unit.gap, left = r.x - unit.gap - size.w;
+            const below = r.y + r.h + unit.gap, above = r.y - unit.gap - size.h;
+            beside.push({ x: right, y: r.y }, { x: right, y: r.y + r.h - size.h },
+                        { x: left, y: r.y }, { x: left, y: r.y + r.h - size.h },
+                        { x: r.x, y: below }, { x: r.x + r.w - size.w, y: below },
+                        { x: r.x, y: above }, { x: r.x + r.w - size.w, y: above });
+        }
+        const area = c => {
+            const all = rects.concat([{ x: c.x, y: c.y, w: size.w, h: size.h }]);
+            const x0 = Math.min(...all.map(r => r.x)), y0 = Math.min(...all.map(r => r.y));
+            const x1 = Math.max(...all.map(r => r.x + r.w)), y1 = Math.max(...all.map(r => r.y + r.h));
+            return (x1 - x0) * (y1 - y0);
+        };
+        let best = Infinity;
+        for (const c of beside.filter(fits)) {
+            const a = area(c);
+            if (a < best) {
+                best = a;
+                spot = c;
+            }
+        }
+    }
+    if (!spot) {
+        for (let y = unit.top; !spot && y + size.h <= sh - unit.bottom; y += unit.gap)
+            for (let x = unit.side; x + size.w <= sw - unit.side; x += unit.gap)
+                if (fits({ x: x, y: y })) {
+                    spot = { x: x, y: y };
+                    break;
+                }
+    }
     if (!spot)
         return saved ?? {};
-    const round = v => Math.round(v * 10000) / 10000;
     return withPlace(saved, name, { x: round(spot.x / sw), y: round(spot.y / sh) });
+}
+
+// The calmer side of a wallpaper, for placing widget layouts around the picture's subject
+// (Presets.widgetPresets): `gray` is the picture shrunk to w x h grey values (0-255, row by row;
+// services/Wallpaper.qml asks ffmpeg for 48 x 27). How busy each outer third is: the mean
+// difference between neighbouring pixels. "left" or "right" when one is at least 1.5 times as
+// calm as the other, else "" (evenly busy, or too little to tell).
+function quietSide(gray, w, h) {
+    if (!gray || gray.length < w * h || w < 6 || h < 2)
+        return "";
+    const third = Math.floor(w / 3);
+    const busy = (from, to) => {
+        let sum = 0, n = 0;
+        for (let y = 0; y < h - 1; y++)
+            for (let x = from; x < to - 1; x++) {
+                const p = gray[y * w + x];
+                sum += Math.abs(p - gray[y * w + x + 1]) + Math.abs(p - gray[(y + 1) * w + x]);
+                n += 2;
+            }
+        return n > 0 ? sum / n : 0;
+    };
+    const left = busy(0, third), right = busy(w - third, w);
+    if (right >= Math.max(left, 0.5) * 1.5)
+        return "left";
+    if (left >= Math.max(right, 0.5) * 1.5)
+        return "right";
+    return "";
 }
 
 // A widget dropped at (x, y), w x h px, on a sw x sh screen, lines up with what's near it: the

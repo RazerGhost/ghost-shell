@@ -9,6 +9,7 @@ import Quickshell
 import Quickshell.Io
 import "CaptureFolders.js" as CaptureFolders
 import "Wallpapers.js" as WallpapersJs
+import "../desktop/DesktopWidgets.js" as DesktopWidgetsJs
 
 Singleton {
     id: root
@@ -190,6 +191,37 @@ Singleton {
             Notifications.send("Wallpaper", "dialog-warning", "Couldn't set the wallpaper",
                                "Making its colors failed (wallpaper.sh exited with " + code + "). Run `ghost theme <picture>` in a terminal to see why.",
                                false, []);
+        }
+    }
+
+    // Which side of the picture is calmer ("left", "right" or ""), for placing widget layouts
+    // around its subject (customize/Presets.js widgetPresets). ffmpeg shrinks it to 48 x 27 grey
+    // pixels (a fraction of a second, once per wallpaper); DesktopWidgets.quietSide compares them.
+    property string quietSide: ""
+    onStillPathChanged: measure()
+    // A video's frame is remade at the same path after the wallpaper changes.
+    onBusyChanged: {
+        if (!busy)
+            measure();
+    }
+    Component.onCompleted: measure()
+
+    function measure(): void {
+        if (stillPath === "") {
+            quietSide = "";
+            return;
+        }
+        quietCheck.start(["sh", "-c", 'ffmpeg -v error -i "$1" -vf scale=48:27,format=gray -frames:v 1 -f rawvideo - | od -An -tu1 -v',
+                          "sh", stillPath]);
+    }
+
+    LatestProcess {
+        id: quietCheck
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const gray = text.trim().split(/\s+/).map(Number).filter(n => !isNaN(n));
+                root.quietSide = DesktopWidgetsJs.quietSide(gray, 48, 27);
+            }
         }
     }
 }

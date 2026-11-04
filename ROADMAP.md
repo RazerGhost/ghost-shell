@@ -1924,6 +1924,25 @@ Escape then, Super+D again or a click elsewhere goes back to your workspace. Key
 the foot of the screen. Not while locked, in focus mode or in the desktop editor. Checked with
 wtype: moving, the ring, typing into the note and back, Escape home.
 
+### Widget layouts and placement reworked (2026-11-04)
+User's picks, all four:
+- Every widget in a layout: Clean, Glance, Focus (time, timer, note, to-do), Music, Workday,
+  Planner, Writer (time, sky, note, clipboard; new), Side, Everything (all but the medium to-do,
+  in two blocks of the same size at the top corners). All 13 widgets appear in some layout
+  (tested).
+- Any screen size: a layout is groups anchored to a part of the screen ("center-right",
+  "top-left", ...) laid out in rows at 100 % (`Presets.widgetLayouts`, `layoutPlaces`), not px on
+  1920 x 1080; on a small screen the margins shrink, and a layout that still doesn't fit is left
+  out. Tested at 1920 x 1080, 2560 x 1440, 1366 x 768 and 3840 x 2160.
+- Around your wallpaper: `Wallpaper.quietSide` measures which side of the picture is calmer
+  (ffmpeg shrinks it to 48 x 27 grey pixels; `DesktopWidgets.quietSide` compares the outer
+  thirds, one at least 1.5 times as calm; tested) and a one-sided layout moves to it, so the art's
+  subject stays clear. The editor's gallery shows them for the widgets' screen and wallpaper.
+- A widget you turn on that can't have its own place goes next to one already showing, lined up
+  with its edges, where the arrangement stays most compact (the smallest box around them all;
+  tested: at the end of a row, not under it).
+- Checked: the gallery on screen (the user's widgets match Music, whose places are unchanged).
+
 ### Menus consolidated (2026-11-04)
 User's picks from a look at every menu and modal:
 - Background apps is a page of quick settings (`controlcenter/Tray.qml` with a page header, page

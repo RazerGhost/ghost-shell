@@ -126,4 +126,42 @@ TestCase {
         compare(values.gapsOut, 20);
         compare(values.other, 1);
     }
+
+    // The layouts on other screens, and moved to a wallpaper's calmer side: on the screen, clear
+    // of the island and dock, none over another; a one-sided layout moves; every widget is used.
+    function test_widgetLayoutsAnywhere() {
+        const used = new Set();
+        for (const [sw, sh] of [[1920, 1080], [2560, 1440], [1366, 768], [3840, 2160]]) {
+            for (const quiet of ["", "left", "right"]) {
+                const presets = Presets.widgetPresets(sw, sh, quiet);
+                verify(presets.length >= 3, sw + "x" + sh);
+                for (const preset of presets) {
+                    const rects = [];
+                    for (const kind of DesktopWidgets.kinds) {
+                        const place = preset.values.desktopWidgets[kind.name];
+                        if (!place)
+                            continue;
+                        used.add(kind.name);
+                        const b = DesktopWidgets.box(kind.name);
+                        const r = { n: kind.name, x: place.x * sw, y: place.y * sh, w: b.w, h: b.h };
+                        verify(r.x >= 31 && r.x + r.w <= sw - 31 && r.y >= 79 && r.y + r.h <= sh - 99, preset.name + " " + r.n + " " + sw);
+                        rects.push(r);
+                    }
+                    for (const a of rects)
+                        for (const b of rects)
+                            if (a !== b)
+                                verify(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y,
+                                       preset.name + ": " + a.n + " over " + b.n);
+                }
+            }
+        }
+        compare(used.size, DesktopWidgets.kinds.length);
+        // Planner sits on the right; on a picture calmer on the left it moves there; Everything
+        // (both sides) stays.
+        const x = (quiet, name, widget) => Presets.widgetPresets(1920, 1080, quiet).find(p => p.name === name).values.desktopWidgets[widget].x;
+        verify(x("", "Planner", "clock") > 0.5);
+        verify(x("left", "Planner", "clock") < 0.5);
+        compare(x("right", "Planner", "clock"), x("", "Planner", "clock"));
+        compare(x("left", "Everything", "clock"), x("", "Everything", "clock"));
+    }
 }
