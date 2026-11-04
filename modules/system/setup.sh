@@ -88,20 +88,25 @@ if $rebuild_boot; then
     # limine-mkinitcpio (CachyOS) rebuilds the initramfs and rewrites the Limine boot entries.
     sudo limine-mkinitcpio
 fi
-# Stop if the boot entries didn't follow: no splash, or still told to skip it.
-sudo grep -rqs --include=limine.conf -E 'cmdline:.* splash( |$)' /boot \
-    || fail "splash is not on the kernel line in /boot's limine.conf; check /etc/default/limine and run sudo limine-mkinitcpio"
-! sudo grep -rqs --include=limine.conf 'plymouth.enable=0' /boot \
-    || fail "/boot's limine.conf still has plymouth.enable=0; check /etc/default/limine and run sudo limine-mkinitcpio"
+# Stop if the boot entries didn't follow: no splash, or still told to skip it. Only the
+# kernels' own entries (two slashes deep, "//linux-cachyos"): the snapshot entries further down
+# ("////linux-cachyos", limine-snapper-sync) keep the kernel line from when each was taken.
+# /etc/default/limine is bash written for limine-entry-tool, which declares KERNEL_CMDLINE as a
+# named (associative) array first; sourced bare, `[default]` is read as an unset variable under
+# set -u.
+esp=$(declare -A KERNEL_CMDLINE; . /etc/default/limine; echo "${ESP_PATH:-/boot}")
+cmdlines=$(sudo awk '/^ *\//{ match($0, /\/+/); depth = RLENGTH } /cmdline:/ && depth == 2' "$esp/limine.conf")
+[[ -n $cmdlines ]] || fail "no kernel entries in $esp/limine.conf; run sudo limine-mkinitcpio"
+! grep -vqE ' splash( |$)' <<<"$cmdlines" \
+    || fail "a kernel entry in $esp/limine.conf has no splash; check /etc/default/limine and run sudo limine-mkinitcpio"
+! grep -qF 'plymouth.enable=0' <<<"$cmdlines" \
+    || fail "a kernel entry in $esp/limine.conf still has plymouth.enable=0; check /etc/default/limine and run sudo limine-mkinitcpio"
 
 step "Boot menu: the HP logo stays, the menu only on a key"
 # Limine's own options, at the top of its config (limine-entry-tool, which rewrites the boot
 # entries, keeps them): firmware_logo puts the firmware's logo back when Limine hands over
 # (Plymouth then keeps it until Hyprland draws); quiet hides the menu unless a key is pressed during
-# the timeout (to pick Windows or a snapshot).
-# The file is bash written for limine-entry-tool, which declares KERNEL_CMDLINE as a named
-# (associative) array first; sourced bare, `[default]` is read as an unset variable under set -u.
-esp=$(declare -A KERNEL_CMDLINE; . /etc/default/limine; echo "${ESP_PATH:-/boot}")
+# the timeout (to pick Windows or a snapshot). $esp is read in the step above.
 limine_conf=$esp/limine.conf
 sudo test -f "$limine_conf" || fail "$limine_conf is missing; check ESP_PATH in /etc/default/limine"
 for option in "timeout: 1" "quiet: yes" "firmware_logo: yes"; do
