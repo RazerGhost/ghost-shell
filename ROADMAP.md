@@ -1838,7 +1838,9 @@ let in was just the desktop appearing.
   by firing the unlock signal; a real unlock needs your password.
 - Hyprland's splash (a random sentence at the bottom of its background, seen for a moment at
   login before the lock screen covers it; user's find) is off: `misc.disable_splash_rendering`
-  in look.lua. Verified by the user: the unlock, the greeting and Cancel work.
+  in look.lua. Verified by the user: the unlock, the greeting and Cancel work, and the boot now
+  goes black (the graphics driver taking over, with Limine's menu skipped), then the theme's plain
+  background, then the lock screen.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
