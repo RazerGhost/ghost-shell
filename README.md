@@ -69,9 +69,12 @@ On Arch or CachyOS, log in to GitHub once (the repo is private), then one comman
 git if needed, clones the repo to `~/Projects/ghost-shell` and runs the install):
 
 ```sh
-sudo pacman -S --needed github-cli && gh auth login
-bash <(gh api repos/RazerGhost/ghost-shell/contents/bootstrap.sh -H "Accept: application/vnd.github.raw") desktop
+sudo pacman -S --needed github-cli; and gh auth login
+gh api repos/RazerGhost/ghost-shell/contents/bootstrap.sh -H "Accept: application/vnd.github.raw" > /tmp/bootstrap.sh
+bash /tmp/bootstrap.sh desktop
 ```
+
+(fish, CachyOS's shell; in bash write `&&` for `; and`.)
 
 `desktop` or `laptop` picks the machine's modules from `machines/` (they become
 `~/.config/ghost/modules`, which you can edit); leave it out for all of them but the opt-in ones.
