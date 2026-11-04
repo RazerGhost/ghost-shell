@@ -390,7 +390,12 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 
 - Hyprland sends `screencast>>1,monitor` / `screencast>>0,monitor` (and `screencastv2` with the
   output) for any screencopy client, grim included, so it can't tell real screen sharing apart.
-  The portal's own PipeWire stream is named `xdph-streaming-<n>` (string in the xdph binary).
+  The portal's own PipeWire stream: xdph 1.5 names the node `xdg-desktop-portal-hyprland` (its
+  `media.name` is `xdph-streaming-<n>`; checked during a real Vesktop share, 2026-11-04), older
+  versions named the node `xdph-streaming-<n>`. xdph makes no other PipeWire node.
+- Vesktop opens three portal sessions for one share (a source preview, then the share), so the
+  picker asked three times. With `screencopy:allow_token_by_default` (`hypr/xdph.conf`) the picker
+  hands out a restore token and Chromium's WebRTC reuses it for the following sessions.
 - A USB webcam (uvcvideo, power control `auto`) is `runtime_status` "active" only while an app has
   it open, "suspended" otherwise (the Omen's HP True Vision camera, checked idle).
 - An inline component (`component InUse: Row {...}`) in `controlcenter/QuickSettings.qml` failed

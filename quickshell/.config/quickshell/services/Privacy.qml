@@ -3,9 +3,10 @@
 // - Camera: its USB power state, read in-process every 3 s (the folders come from
 //   services/camera.sh once at start; a camera plugged in later isn't seen until a restart).
 //   Only while it's on does camera.sh name the apps holding it. Privacy.js, tested.
-// - Screen sharing: xdg-desktop-portal-hyprland's PipeWire stream ("xdph-streaming-<n>") exists
-//   while an app shares the screen or a window through the portal. Matched by node name: reading
-//   node properties in a binding loops (see NOTES.md). The shell's own previews and grim don't
+// - Screen sharing: xdg-desktop-portal-hyprland's PipeWire stream exists while an app shares the
+//   screen or a window through the portal; xdph 1.5 names the node "xdg-desktop-portal-hyprland"
+//   (older ones "xdph-streaming-<n>"). Matched by node name: reading node properties in a binding
+//   loops (see NOTES.md). The shell's own previews and grim don't
 //   go through the portal, so they don't count.
 pragma Singleton
 
@@ -20,7 +21,7 @@ Singleton {
 
     property bool cameraInUse: false
     property var cameraApps: []
-    readonly property bool screenShared: (Pipewire.nodes?.values ?? []).some(n => n.name.startsWith("xdph-streaming-"))
+    readonly property bool screenShared: (Pipewire.nodes?.values ?? []).some(n => n.name === "xdg-desktop-portal-hyprland" || n.name.startsWith("xdph-streaming-"))
 
     // The cameras' device folders, once.
     property var cameraDirs: []

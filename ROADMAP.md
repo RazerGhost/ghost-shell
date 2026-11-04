@@ -612,18 +612,19 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   GTK 4, so it follows the wallpaper's colors): arrows, boxes, text, blur. Enter saves the drawing
   over the screenshot and copies it. Without satty the button isn't offered.
 
-### Camera and screen sharing indicators (built 2026-10-29; camera verified on the laptop 2026-11-04)
+### Camera and screen sharing indicators (built 2026-10-29; verified on the laptop 2026-11-04)
 - Like the microphone: a camera and a screen icon in the island, and "Camera in use by ..." /
   "Your screen is being shared" in quick settings (`services/Privacy.qml`, `StatusRow`). The
   camera's USB power state is read in-process every 3 s (its folder found once by
   `services/camera.sh devices`; before 2026-10-29's review it started a script every 3 s, ~6,000
   an hour); `camera.sh apps` (`fuser`) names the apps only while it's on (`Privacy.js`, tested). Screen sharing is the portal's PipeWire stream
-  (`xdph-streaming-<n>`): Hyprland's `screencast` event also fires for grim and the shell's own
-  previews.
-- Checked 2026-11-04: the webcam opened by ffmpeg showed the camera icon beside the time (within
-  the 3 s it checks every; `camera.sh apps` named ffmpeg), and a dummy PipeWire node named
-  `xdph-streaming-test` showed the screen icon. Not checked: a real share through the portal's
-  picker (needs a click there), and a call app's name in quick settings.
+  (xdph 1.5's node `xdg-desktop-portal-hyprland`, older versions' `xdph-streaming-<n>`): Hyprland's
+  `screencast` event also fires for grim and the shell's own previews.
+- Checked 2026-11-04: the webcam showed the camera icon (`camera.sh apps` named ffmpeg). A real
+  Vesktop share showed no screen icon (user's find): xdph 1.5 had renamed its node; matched now,
+  checked with a stand-in node of that name. The same share asked in the portal's picker three
+  times (Vesktop opens three portal sessions for one share): `hypr/xdph.conf` ticks the picker's
+  restore token by default, so the sessions after the first reuse the choice.
 
 ### Light mode (done, verified on the laptop 2026-10-29)
 - Settings -> Appearance -> Light or dark: Dark (default), Light or At sunset (dark from sunset

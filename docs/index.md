@@ -247,7 +247,7 @@ recording (gpu-screen-recorder), draw on it (satty), folders and quality setting
 | `Brightness`, `NightLight`, `KeepAwake`, `GameMode` | Backlight, hyprsunset, idle inhibitor, performance mode |
 | `NetworkStatus`, `NetworkExtras`, `BluetoothStatus` | Wi-Fi, VPN, hotspot, airplane, Bluetooth |
 | `Battery`, `BatteryAlerts`, `DiskAlerts`, `OomAlerts` | Power and resource alerts |
-| `Privacy` | Camera and screen sharing indicators |
+| `Privacy` | Camera and screen sharing indicators (the portal's picker settings: `hypr/xdph.conf`) |
 | `Updates` | checkupdates + paru count, Update button |
 | `Weather`, `Agenda` | open-meteo; vdirsyncer + khal calendar |
 | `Planner`, `Countdown` | To-do (the desktop's to-do widgets), note, timer |
