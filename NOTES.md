@@ -37,10 +37,11 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   so a `resize`/`move` dispatched in the same bind is undone; from a later call (a timer) they stick.
   Hyprland's own `hl.dsp.window.drag()` would then carry it from that centred place, so the
   Super + Shift drag moves the window itself.
-- Hyprland's own drag (`hl.dsp.window.drag()`) of a tiled window in a Lua layout takes it out of
-  the layout's targets while it's carried and gives it back on release, after a `release = true`
-  bind has run (seen: a swap done in that bind was lost, the window always came back last, on the
-  right). Act on it from a short timer after the release.
+- Hyprland's own drag (`hl.dsp.window.drag()`) of a tiled window in a Lua layout floats it out of
+  the layout at the press (logged: a non-consuming press bind declared after the drag bind already
+  saw it floating) and gives it back on release, after a `release = true` bind has run; the layout
+  adds it last (the right). Bind a press handler before the drag bind to see the window still
+  tiled, and act on the release from a short timer.
   `hl.get_cursor_pos()` can follow the pointer between a press and a `release = true` bind, which
   can share a key with a `mouse = true` bind when marked `non_consuming`. Registering
   a name twice is an error (`hyprctl eval` of the file again fails; `hyprctl reload` works).
