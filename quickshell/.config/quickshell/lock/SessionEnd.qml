@@ -9,7 +9,8 @@ import qs.widgets
 import "SessionEnd.js" as SessionEndJs
 
 // Logging out, restarting or shutting down (the power menu; Session.ending): the screens dim and
-// say what's happening, every app is asked to close (so it can save, like closing its window),
+// count down a few seconds ("Shutting down in 5": Cancel or Escape, or "now" with Enter; the
+// power menu no longer asks for a second click), then every app is asked to close (so it can save, like closing its window),
 // and once they're gone it goes ahead (Session.finish). An app that doesn't close within a few
 // seconds (asking whether to save, or stuck) is listed: show it to answer it (which stops the
 // shutdown), go ahead anyway, or cancel (Escape).
@@ -32,14 +33,46 @@ Scope {
     }
 
     readonly property var words: ({
-        logout:   { title: "Logging out",   icon: "logout",             anyway: "Log out anyway" },
-        reboot:   { title: "Restarting",    icon: "restart_alt",        anyway: "Restart anyway" },
-        poweroff: { title: "Shutting down", icon: "power_settings_new", anyway: "Shut down anyway" }
-    })[action] ?? { title: "", icon: "power_settings_new", anyway: "" }
+        logout:   { title: "Logging out",   icon: "logout",             anyway: "Log out anyway",   now: "Log out now" },
+        reboot:   { title: "Restarting",    icon: "restart_alt",        anyway: "Restart anyway",   now: "Restart now" },
+        poweroff: { title: "Shutting down", icon: "power_settings_new", anyway: "Shut down anyway", now: "Shut down now" }
+    })[action] ?? { title: "", icon: "power_settings_new", anyway: "", now: "" }
 
-    onActiveChanged: begin()
-    // A shell reload while the apps close comes back with `ending` still set (Session.qml).
-    Component.onCompleted: begin()
+    // Seconds left to change your mind before the apps are asked to close.
+    property int left: 0
+    readonly property bool counting: active && left > 0
+
+    onActiveChanged: countDown()
+    // A shell reload while it counts or the apps close comes back with `ending` still set
+    // (Session.qml): it counts again, so there's still a moment to cancel.
+    Component.onCompleted: countDown()
+
+    function countDown(): void {
+        waited = false;
+        left = active ? Theme.session.countdown : 0;
+        if (left > 0)
+            tick.restart();
+        else
+            begin();
+    }
+
+    function now(): void {
+        tick.stop();
+        left = 0;
+        begin();
+    }
+
+    Timer {
+        id: tick
+        interval: 1000
+        repeat: true
+        onTriggered: {
+            if (--root.left <= 0) {
+                stop();
+                root.begin();
+            }
+        }
+    }
 
     function begin(): void {
         waited = false;
@@ -139,6 +172,14 @@ Scope {
 
                 focus: true
                 Keys.onEscapePressed: Session.cancel()
+                Keys.onReturnPressed: {
+                    if (root.counting)
+                        root.now();
+                }
+                Keys.onEnterPressed: {
+                    if (root.counting)
+                        root.now();
+                }
 
                 // The action's icon in a ring that turns while apps close.
                 Item {
@@ -148,12 +189,15 @@ Scope {
 
                     ProgressRing {
                         anchors.fill: parent
-                        value: Theme.session.arc
+                        // Counting: it empties second by second; then it turns while apps close.
+                        value: root.counting ? root.left / Theme.session.countdown : Theme.session.arc
                         visible: !root.stuck
+
+                        Behavior on value { NumberAnimation { duration: Theme.anim.normal } }
 
                         // Still while animations are off.
                         RotationAnimation on rotation {
-                            running: root.active && !root.stuck && Theme.session.turn > 0
+                            running: root.active && !root.counting && !root.stuck && Theme.session.turn > 0
                             from: 0
                             to: 360
                             loops: Animation.Infinite
@@ -171,7 +215,7 @@ Scope {
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: root.words.title
+                    text: root.counting ? root.words.title + " in " + root.left : root.words.title
                     color: Colors.m3onSurface
                     font.family: Theme.font.sans
                     font.pixelSize: Theme.font.title
@@ -185,7 +229,8 @@ Scope {
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter
                     wrapMode: Text.Wrap
-                    text: SessionEndJs.message(root.started, root.remaining.length, root.stuck)
+                    text: root.counting ? "Your apps will then be asked to close, so they can save."
+                        : SessionEndJs.message(root.started, root.remaining.length, root.stuck)
                     color: Colors.m3onSurfaceVariant
                     font.family: Theme.font.sans
                     font.pixelSize: Theme.font.normal
@@ -218,6 +263,13 @@ Scope {
                     TextButton {
                         text: "Cancel"
                         onClicked: Session.cancel()
+                    }
+
+                    TextButton {
+                        visible: root.counting
+                        filled: true
+                        text: root.words.now
+                        onClicked: root.now()
                     }
 
                     TextButton {

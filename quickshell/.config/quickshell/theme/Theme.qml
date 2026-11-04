@@ -86,6 +86,7 @@ Singleton {
 
     // Logging out, restarting or shutting down (lock/SessionEnd.qml).
     readonly property QtObject session: QtObject {
+        readonly property int countdown: 5   // s to change your mind before the apps are asked to close
         readonly property int patience: 6000 // ms the apps get to close before they're listed
         readonly property int settle:   700  // ms the screen shows once they're closed
         readonly property int width:    root.px(380)

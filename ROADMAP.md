@@ -1929,6 +1929,11 @@ User's picks from a look at every menu and modal:
 - Background apps is a page of quick settings (`controlcenter/Tray.qml` with a page header, page
   "apps"), sliding in like Wi-Fi, Bluetooth, Sound, Phone and System; it was its own island menu.
   `qs ipc call island toggle tray` opens the page. Checked on screen.
+- Shutting down in one step: the power menu's Log out, Restart and Shut down no longer ask for a
+  second click; the shutdown screen comes at once and counts down 5 s ("Shutting down in 5", a
+  ring emptying; Cancel or Escape, "Shut down now" or Enter) before the apps are asked to close
+  (`Theme.session.countdown`). A shell reload meanwhile counts again. Checked with the closing and
+  the shutdown stubbed: the countdown, then Cancel.
 
 ### Keybinds reworked (2026-11-04)
 User's request: list them all and see what to rework; user's picks, following Windows 11:
