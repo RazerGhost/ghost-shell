@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
-import Quickshell.Widgets
 import qs.services
 import qs.theme
 import qs.widgets
@@ -10,27 +9,24 @@ import "LockClock.js" as LockClockJs
 import "LockWidgets.js" as LockWidgets
 import "../services/FileUrl.js" as FileUrl
 
-// What the lock screen shows on each monitor: the wallpaper blurred and darkened, a big clock
-// (LockClock.qml) and the date, and the password field. Lock.qml checks the password. The login
-// screen (greeter/Greeter.qml) uses it too, with the user's name above the field and power
-// buttons. The look (blur, dimming, clock style and place, date) follows Settings -> Lock screen.
-// Children go under the date (the lock screen's LockStatus: media and the notification count).
+// What the lock screen shows on each monitor: the wallpaper (blurred and darkened as set), a big
+// clock (LockClock.qml) and the date, and the island at the top, which opens into the password
+// field (LockIsland.qml), so the lock screen reads as the desktop locked rather than a screen of
+// its own. Lock.qml checks the password. The login screen (greeter/Greeter.qml) uses it too, with
+// power buttons. The look follows the lock screen editor. Children go under the date (the lock
+// screen's LockStatus: media and the widgets).
 Item {
     id: root
 
     default property alias status: statusSlot.data
 
-    // Shown under the field: "Wrong password", or PAM's own messages.
+    // Shown under the password field: "Wrong password", or PAM's own messages.
     property string message
     property bool messageIsError
     // A password is being checked; the field waits.
     property bool busy
     // The picture behind everything (blurred); "" shows the plain background color.
     property string wallpaper
-    // Shown above the password field when set (the login screen).
-    property string user
-    // Your picture above the name (the login screen; greeter/sync.sh copies ~/.face); "" for none.
-    property string face
     // Suspend, restart and shut down in the bottom right corner (the login screen).
     property bool powerButtons
 
@@ -39,11 +35,9 @@ Item {
     signal activity()
 
     // The lock screens on other monitors clear theirs too after a try; a wrong password also
-    // shakes the field.
+    // shakes the island.
     function clear(failed: bool): void {
-        password.text = "";
-        if (failed)
-            shake.restart();
+        island.clear(failed);
     }
 
     // Takes the keyboard for the password; not inside the lock screen editor, whose own keys
@@ -52,7 +46,7 @@ Item {
 
     Component.onCompleted: {
         if (takesKeyboard)
-            password.forceActiveFocus();
+            island.field.forceActiveFocus();
         Qt.callLater(measureQuiet);
     }
 
@@ -75,6 +69,7 @@ Item {
                 root.pointerStart = p;
             } else if (Math.abs(p.x - root.pointerStart.x) + Math.abs(p.y - root.pointerStart.y) > Theme.lock.moved) {
                 root.activity();
+                island.wake();
             }
         }
     }
@@ -94,13 +89,14 @@ Item {
     }
 
     MultiEffect {
+        id: backdrop
         anchors.fill: parent
         visible: wallpaper.status === Image.Ready
         source: wallpaper
         blurEnabled: true
         blur: Settings.values.lockBlur / 100
         blurMax: Theme.lock.blur
-        brightness: -Settings.values.lockDim / 100 // darker, so the clock and field stand out
+        brightness: -Settings.values.lockDim / 100 // darker, so the clock and widgets stand out
     }
 
     SystemClock {
@@ -108,8 +104,8 @@ Item {
         precision: SystemClock.Minutes
     }
 
-    // Where the clock sits (Settings -> Lock screen -> Clock): at the top with the field low
-    // (the default), both together in the middle, or the clock in the bottom-left corner.
+    // Where the clock sits (Settings -> Lock screen -> Clock): at the top (the default), in the
+    // middle, or in the bottom-left corner.
     readonly property string layout: LockClockJs.pick(Settings.values.lockLayout, LockClockJs.layouts)
 
     // The lock screen editor's frame (customize/EditorChrome.qml) while editing: each part shows
@@ -118,25 +114,20 @@ Item {
     property var editor: null
 
     // Every part has its own place, dragged in the editor (Settings' lockPlaces, fractions of the
-    // screen; LockClock.placeOf): the clock, the date, the player, each widget, the password
-    // field. `drags` holds a drag going on ({ part: point px }) until it's let go.
-    readonly property var parts: ["clock", "date", "player"].concat(LockWidgets.known).concat(["field"])
+    // screen; LockClock.placeOf): the clock, the date, the player, each widget. `drags` holds a
+    // drag going on ({ part: point px }) until it's let go.
+    readonly property var parts: ["clock", "date", "player"].concat(LockWidgets.known)
     property var drags: ({})
     // A drag just let go is being saved: no glide meanwhile.
     property bool settling: false
     readonly property bool dragging: Object.keys(drags).length > 0
 
-    // The field's own move, and where it ends up with its hints: what the other parts keep
-    // clear of, besides the login screen's power buttons and the message line at the bottom.
-    readonly property var fieldMove: shiftOf("field", fieldColumn)
-    // Where the field's column is laid out, without its shake (a wrong password moves it side to
-    // side for a moment: the clamp would hold it still at an edge, and parts beside it would jump).
-    readonly property real fieldX: fieldColumn.x - fieldColumn.anchors.horizontalCenterOffset
-    readonly property var fieldArea: ({ x: fieldX + fieldShift + fieldMove.x, y: fieldColumn.y + fieldMove.y,
-                                        width: fieldColumn.width, height: fieldColumn.height + belowReserve })
+    // What the parts keep clear of: the island open with the password field, the login screen's
+    // power buttons and the message line at the bottom.
     readonly property var bottomRow: (powerRow.visible ? [{ x: powerRow.x, y: powerRow.y, width: powerRow.width, height: powerRow.height }] : [])
         .concat(messageLine.visible ? [{ x: messageLine.x, y: messageLine.y, width: messageLine.width, height: messageLine.height }] : [])
-    readonly property var keepClear: [fieldArea].concat(bottomRow)
+    readonly property var keepClear: [{ x: island.area.x, y: island.area.y, width: island.area.width, height: island.area.height }]
+        .concat(bottomRow)
 
     // How far `item` (the part `name`) is moved from where the layout puts it: its saved place,
     // plus `by` px (the drag going on unless given), mirrored while `mirrored`, kept on the screen
@@ -145,15 +136,14 @@ Item {
         // Read so a change around it is followed (mapToItem alone isn't).
         for (let p = item; p && p !== root; p = p.parent)
             void (p.x + p.y + p.width + p.height);
-        const field = name === "field";
-        const at = field ? Qt.point(fieldX + fieldShift, fieldColumn.y) : item.parent.mapToItem(root, item.x, item.y);
+        const at = item.parent.mapToItem(root, item.x, item.y);
         const place = LockClockJs.placeOf(Settings.values.lockPlaces, name, Settings.values);
         const extra = by ?? drags[name] ?? Qt.point(0, 0);
         const dx = place.x * width + extra.x;
-        return LockClockJs.clamped({ x: at.x, y: at.y, width: item.width, height: field ? item.height + belowReserve : item.height },
+        return LockClockJs.clamped({ x: at.x, y: at.y, width: item.width, height: item.height },
                                    mirrored ? LockClockJs.mirroredMove(at.x, item.width, dx, width) : dx,
                                    place.y * height + extra.y, width, height,
-                                   field ? bottomRow : keepClear, Theme.spacing.l * 2, Theme.spacing.l);
+                                   keepClear, Theme.spacing.l * 2, Theme.spacing.l);
     }
 
     // The parts move to the picture's quieter side (Settings' lockQuietSide): when the clock (or
@@ -164,8 +154,8 @@ Item {
     readonly property bool followsQuiet: Settings.values.lockQuietSide === true && editor === null && wallpaper !== ""
     property string quietSide: ""
     readonly property Item anchorPart: Settings.values.lockClock ? bigClock : Settings.values.lockDate ? dateLine : null
-    // Its saved place without the clamp: the clamp keeps clear of the field, whose place depends
-    // on `mirrored` (a loop), and only keeps the part on the screen, not on another side.
+    // Its saved place without the clamp: the clamp only keeps the part on the screen and clear of
+    // the rest, not on another side.
     readonly property string anchorSide: {
         if (!anchorPart)
             return "";
@@ -239,11 +229,7 @@ Item {
             AnchorChanges {
                 target: clockColumn
                 anchors.top: undefined
-                anchors.bottom: fieldColumn.top
-            }
-            PropertyChanges {
-                clockColumn.anchors.bottomMargin: Theme.spacing.l * 3
-                fieldColumn.anchors.bottomMargin: root.height * 0.32
+                anchors.verticalCenter: root.verticalCenter
             }
         },
         State {
@@ -308,206 +294,16 @@ Item {
         }
     }
 
-    Column {
-        id: fieldColumn
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        // A fifth of the way up; lower when the clock and the lines under it (a large clock,
-        // media, weather, battery) reach down that far, so they never overlap.
-        // Never lower than leaves room for the hints and messages under it and the message line
-        // at the bottom.
-        anchors.bottomMargin: root.layout !== "top" ? parent.height * 0.2
-            : Math.max(root.belowReserve, Math.min(parent.height * 0.2,
-                       parent.height - clockColumn.y - clockColumn.height - Theme.spacing.l * 2 - height))
-        // In the bottom-left layout, moved right when a large clock reaches under it; and where
-        // it was dragged in the editor (glides there). No input while editing.
-        enabled: root.editor === null
-        transform: GlideTranslate {
-            content: root
-            x: root.fieldShift + root.fieldMove.x
-            y: root.fieldMove.y
-        }
-        spacing: Theme.spacing.m
-
-        // A wrong password shakes the field side to side, like most lock screens.
-        SequentialAnimation {
-            id: shake
-            readonly property int step: Theme.anim.fast / 3
-            NumberAnimation { target: fieldColumn; property: "anchors.horizontalCenterOffset"; to: -Theme.lock.shake; duration: shake.step }
-            NumberAnimation { target: fieldColumn; property: "anchors.horizontalCenterOffset"; to: Theme.lock.shake; duration: shake.step * 2 }
-            NumberAnimation { target: fieldColumn; property: "anchors.horizontalCenterOffset"; to: -Theme.lock.shake / 2; duration: shake.step * 2 }
-            NumberAnimation { target: fieldColumn; property: "anchors.horizontalCenterOffset"; to: 0; duration: shake.step }
-        }
-
-        ClippingRectangle {
-            anchors.horizontalCenter: parent.horizontalCenter
-            visible: root.user !== "" && faceImage.status === Image.Ready
-            width: Theme.lock.face
-            height: width
-            radius: width / 2
-            color: "transparent"
-
-            Image {
-                id: faceImage
-                anchors.fill: parent
-                source: FileUrl.of(root.face)
-                fillMode: Image.PreserveAspectCrop
-                sourceSize: Qt.size(width * 2, height * 2)
-                Accessible.ignored: true
-            }
-        }
-
-        Row {
-            anchors.horizontalCenter: parent.horizontalCenter
-            visible: root.user !== ""
-            spacing: Theme.spacing.s
-
-            MaterialIcon {
-                anchors.verticalCenter: parent.verticalCenter
-                visible: faceImage.status !== Image.Ready
-                icon: "account_circle"
-                color: Colors.m3onSurface
-                font.pixelSize: Theme.icon.launcher
-            }
-
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                text: root.user
-                color: Colors.m3onSurface
-                font.family: Theme.font.sans
-                font.pixelSize: Theme.font.large
-                font.weight: Font.DemiBold
-            }
-        }
-
-        Rectangle {
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: Theme.lock.fieldWidth
-            height: Theme.slider.height + Theme.spacing.s
-            radius: Theme.radius.full
-            color: Colors.surfaceTranslucent
-            border.width: password.activeFocus ? Theme.outline.normal : 0
-            border.color: root.messageIsError ? Colors.m3error : Colors.m3primary
-
-            MaterialIcon {
-                id: lockIcon
-                anchors.left: parent.left
-                anchors.leftMargin: Theme.spacing.l
-                anchors.verticalCenter: parent.verticalCenter
-                icon: root.busy ? "hourglass_top" : "lock"
-                color: Colors.m3onSurfaceVariant
-            }
-
-            TextInput {
-                id: password
-
-                anchors.left: lockIcon.right
-                anchors.right: parent.right
-                anchors.leftMargin: Theme.spacing.m
-                anchors.rightMargin: Theme.spacing.l
-                anchors.verticalCenter: parent.verticalCenter
-                echoMode: TextInput.Password
-                passwordCharacter: "●"
-                readOnly: root.busy
-                color: Colors.m3onSurface
-                font.family: Theme.font.sans
-                font.pixelSize: Theme.font.large
-                clip: true
-                focus: true
-
-                Accessible.role: Accessible.EditableText
-                Accessible.name: "Password"
-                Accessible.passwordEdit: true
-
-                onAccepted: {
-                    if (text !== "")
-                        root.submitted(text);
-                }
-                // Escape clears what was typed, like most lock screens.
-                Keys.onEscapePressed: text = ""
-                // Not accepted: the key still types.
-                Keys.onPressed: event => {
-                    root.activity();
-                    event.accepted = false;
-                }
-                // Tab stays here: the buttons below take the keyboard elsewhere (the media
-                // card, the login screen's power buttons), and Enter there would suspend or
-                // restart, while the password typed after it went nowhere.
-                Keys.onTabPressed: event => event.accepted = true
-                Keys.onBacktabPressed: event => event.accepted = true
-
-                Text {
-                    visible: password.text === ""
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: "Password"
-                    color: Colors.m3onSurfaceVariant
-                    font: password.font
-                }
-            }
-        }
-    }
-
-    // The room the field keeps below it: the hints and a message (two lines), and the message
-    // line at the bottom when there is one.
-    readonly property real belowReserve: Theme.spacing.m * 3 + Theme.font.normal * 4
-        + (messageLine.visible ? messageLine.height + Theme.spacing.l * 2 : Theme.spacing.l * 2)
-
-    // How far right the field moves in the bottom-left layout to clear the clock beside it.
-    readonly property real fieldShift: layout !== "left" ? 0
-        : Math.max(0, clockColumn.x + clockColumn.width + Theme.spacing.l * 2 - (width - fieldColumn.width) / 2)
-
-    // Under the field, hanging from it: the hints and "Wrong password" appear and go without
-    // moving the field (in its column they pushed it up into the lines under the clock).
-    Column {
-        transform: GlideTranslate { content: root; x: root.fieldShift + root.fieldMove.x; y: root.fieldMove.y }
-        anchors.top: fieldColumn.bottom
-        anchors.topMargin: Theme.spacing.m
-        anchors.horizontalCenter: fieldColumn.horizontalCenter
-        spacing: Theme.spacing.m
-
-        // Hints while typing: caps lock, and the layout when there's more than one to switch to.
-        Row {
-            anchors.horizontalCenter: parent.horizontalCenter
-            visible: Keyboard.capsLock || Keyboard.layoutCount > 1
-            spacing: Theme.spacing.l
-
-            Repeater {
-                model: [
-                    { shown: Keyboard.capsLock, icon: "keyboard_capslock", text: "Caps lock is on" },
-                    { shown: Keyboard.layoutCount > 1, icon: "keyboard", text: Keyboard.layout }
-                ]
-
-                Row {
-                    required property var modelData
-                    visible: modelData.shown
-                    spacing: Theme.spacing.xs
-
-                    MaterialIcon {
-                        anchors.verticalCenter: parent.verticalCenter
-                        icon: parent.modelData.icon
-                        color: Colors.m3onSurfaceVariant
-                        font.pixelSize: Theme.icon.small
-                    }
-
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: parent.modelData.text
-                        color: Colors.m3onSurfaceVariant
-                        font.family: Theme.font.sans
-                        font.pixelSize: Theme.font.normal
-                    }
-                }
-            }
-        }
-
-        Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            visible: root.message !== ""
-            text: root.message
-            color: root.messageIsError ? Colors.m3error : Colors.m3onSurfaceVariant
-            font.family: Theme.font.sans
-            font.pixelSize: Theme.font.normal
-        }
+    LockIsland {
+        id: island
+        anchors.fill: parent
+        backdrop: backdrop
+        message: root.message
+        messageIsError: root.messageIsError
+        busy: root.busy
+        editing: root.editor !== null
+        onSubmitted: password => root.submitted(password)
+        onTyped: root.activity()
     }
 
     // Your own line at the bottom (Settings -> Lock screen -> Message): "If found, call ...".
@@ -524,16 +320,6 @@ Item {
         font.pixelSize: Theme.font.large
         horizontalAlignment: Text.AlignHCenter
         wrapMode: Text.Wrap
-    }
-
-    // The field's outline in the editor: beside it (the field's column would lay it out).
-    PartOutline {
-        content: root
-        part: "field"
-        target: fieldColumn
-        tab: ""
-        name: "The password field"
-        area: Qt.rect(root.fieldArea.x, root.fieldArea.y, fieldColumn.width, fieldColumn.height)
     }
 
     Row {

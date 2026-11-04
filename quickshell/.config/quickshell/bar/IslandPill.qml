@@ -20,6 +20,8 @@ Item {
     default property alias views: views.data
 
     readonly property bool expanded: shown !== ""
+    // The outline as drawn (the lock screen's island masks a blurred wallpaper with a copy of it).
+    readonly property alias outline: shape
     readonly property bool hovered: content.containsMouse
     // The row's button carries the island's padding itself, so its highlight fills the shape.
     readonly property real closedWidth: row.implicitWidth

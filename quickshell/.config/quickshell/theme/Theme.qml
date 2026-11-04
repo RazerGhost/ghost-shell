@@ -267,7 +267,8 @@ Singleton {
         readonly property int fieldWidth: root.px(340) // password field
         readonly property int blur:       64  // wallpaper blur radius
         readonly property int face:       root.px(96) // your picture on the login screen
-        readonly property int shake:      root.px(12) // how far a wrong password shakes the field
+        readonly property int shake:      root.px(12) // how far a wrong password shakes the island
+        readonly property int islandAwake: 10000      // ms the island stays open after a key or a pointer move
         readonly property int moved:      24  // px the pointer must move to end the grace period
         readonly property int widget:     root.text(72) // a lock screen widget's height, a round one's width (LockWidget.qml)
         readonly property int widgetGap:  root.px(12)

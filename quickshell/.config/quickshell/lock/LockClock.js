@@ -36,8 +36,8 @@ function offset(saved) {
 
 // The move (dx, dy, px) of the clock's column (`rect`: { x, y, width, height } at its layout's
 // place) kept on the screen (sw x sh, `margin` from the edges) and off what must stay clear
-// (`fields`: rects, or one: the password field with its hints, the login screen's power
-// buttons, the message line; `gap` around each): where it would cover one, it stops just above.
+// (`fields`: rects, or one: the island with the password field, the message line; `gap` around
+// each): where it would cover one, it stops just above, or under it when there's no room above.
 function clamped(rect, dx, dy, sw, sh, fields, margin, gap) {
     const within = (v, low, high) => Math.min(Math.max(v, low), Math.max(low, high));
     const x = within(rect.x + dx, margin, sw - margin - rect.width);
@@ -49,7 +49,7 @@ function clamped(rect, dx, dy, sw, sh, fields, margin, gap) {
         const below = y + rect.height > field.y - gap && y < field.y + field.height + gap;
         if (!across || !below)
             continue;
-        // Above it when there's room (the field dragged near the top may leave none), else under it.
+        // Above it when there's room (none above the island at the top), else under it.
         const above = field.y - gap - rect.height;
         y = above >= margin ? above : Math.min(field.y + field.height + gap, sh - margin - rect.height);
     }
@@ -57,15 +57,13 @@ function clamped(rect, dx, dy, sw, sh, fields, margin, gap) {
 }
 
 // Where each part of the lock screen was dragged (Settings' lockPlaces: { clock: { x, y }, date,
-// player, weather, ..., field }, fractions of the screen), each on its own. Before lockPlaces
+// player, weather, ... }, fractions of the screen), each on its own. Before lockPlaces
 // there were two moves: the clock's (lockClockOffset, for the clock and the date) and the
 // widgets' (lockWidgetsOffset, for the player and each widget); `values` (the settings) gives
 // those while lockPlaces isn't set.
 function placeOf(places, name, values) {
     if (places !== null && typeof places === "object" && !Array.isArray(places))
         return offset(places[name]);
-    if (name === "field")
-        return offset(null);
     return offset(name === "clock" || name === "date" ? values?.lockClockOffset : values?.lockWidgetsOffset);
 }
 
