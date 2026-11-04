@@ -612,7 +612,7 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   GTK 4, so it follows the wallpaper's colors): arrows, boxes, text, blur. Enter saves the drawing
   over the screenshot and copies it. Without satty the button isn't offered.
 
-### Camera and screen sharing indicators (built 2026-10-29; untested with a real call)
+### Camera and screen sharing indicators (built 2026-10-29; camera verified on the laptop 2026-11-04)
 - Like the microphone: a camera and a screen icon in the island, and "Camera in use by ..." /
   "Your screen is being shared" in quick settings (`services/Privacy.qml`, `StatusRow`). The
   camera's USB power state is read in-process every 3 s (its folder found once by
@@ -620,6 +620,10 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   an hour); `camera.sh apps` (`fuser`) names the apps only while it's on (`Privacy.js`, tested). Screen sharing is the portal's PipeWire stream
   (`xdph-streaming-<n>`): Hyprland's `screencast` event also fires for grim and the shell's own
   previews.
+- Checked 2026-11-04: the webcam opened by ffmpeg showed the camera icon beside the time (within
+  the 3 s it checks every; `camera.sh apps` named ffmpeg), and a dummy PipeWire node named
+  `xdph-streaming-test` showed the screen icon. Not checked: a real share through the portal's
+  picker (needs a click there), and a call app's name in quick settings.
 
 ### Light mode (done, verified on the laptop 2026-10-29)
 - Settings -> Appearance -> Light or dark: Dark (default), Light or At sunset (dark from sunset
