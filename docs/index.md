@@ -306,7 +306,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 | Module | What |
 |---|---|
 | core | Hyprland, the shell, fonts and themes, the colors |
-| system | GPU rule, boot options, the Omen's bass speakers (`ghost-hp-8bca-speakers.fw`), logging in at boot (greetd) and services (sudo) |
+| system | GPU rule, boot options, the Omen's bass speakers (`ghost-hp-8bca-speakers.fw`) and its RTX woken at shutdown (`ghost-wake-dgpu.service`), logging in at boot (greetd) and services (sudo) |
 | snapshots | Btrfs snapshots: system at every update, home hourly (sudo) |
 | apps | Terminal, editor, files, pictures, video, music, browser, web apps |
 | dev | Languages, package managers, Docker |

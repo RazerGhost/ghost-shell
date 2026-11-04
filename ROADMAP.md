@@ -1924,6 +1924,17 @@ Escape then, Super+D again or a click elsewhere goes back to your workspace. Key
 the foot of the screen. Not while locked, in focus mode or in the desktop editor. Checked with
 wtype: moving, the ring, typing into the note and back, Escape home.
 
+### The RTX missing after a shutdown (2026-11-04; the fix untested)
+The RTX was missing from the PCI bus in some boots (twice noticed that day). The journal's boots
+showed the pattern: after a shutdown the next boot had no RTX in 3 of 4 cases, after a restart it
+was always there; in those boots its root port was empty, the card off before the kernel looked.
+Likely: powered off while the card sleeps in D3cold (runtime power management, whenever idle),
+HP's firmware doesn't switch it on at the next start. `ghost-wake-dgpu.service` (system module,
+board 8BCA only) wakes any NVIDIA graphics card at shutdown (power/control "on", waiting until
+it's active), so the firmware finds it on; while running the card still sleeps when idle.
+Checked on stand-in device folders (only the NVIDIA graphics card woken). To verify: a few
+shutdowns and starts with `lspci | grep -i nvidia` each time. Meanwhile a restart brings it back.
+
 ### Docs and the system module checked for the desktop (2026-11-04)
 User's question: are all the commands in the repo, and how do the docs look. The README lagged
 (no focus mode, Super+D, note and clipboard widgets, screen readers, the speakers; no `--machine`,

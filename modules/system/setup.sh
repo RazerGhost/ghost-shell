@@ -168,13 +168,17 @@ if ! cmp -s "$mdns" "/etc/systemd/resolved.conf.d/$(basename "$mdns")"; then
     sudo systemctl try-restart systemd-resolved.service
 fi
 
-step "Speakers: the HP Omen 16-xf0's bass speakers"
-# Only on that laptop (board 8BCA): the kernel leaves its bass speakers off (the patch file
-# says why). Takes effect when the sound driver loads next: at the next boot.
+step "HP Omen 16-xf0: its bass speakers, and the RTX after a shutdown"
+# Only on that laptop (board 8BCA). The kernel leaves its bass speakers off (the patch file says
+# why; it takes effect when the sound driver loads next, at the next boot). And powered off while
+# the RTX sleeps, the next boot often has no RTX: a service wakes it at shutdown (the unit says why).
 if [[ $(cat /sys/class/dmi/id/board_name 2>/dev/null) == 8BCA ]]; then
-    for file in system/usr/lib/firmware/ghost-hp-8bca-speakers.fw system/etc/modprobe.d/ghost-hp-8bca-speakers.conf; do
+    for file in system/usr/lib/firmware/ghost-hp-8bca-speakers.fw system/etc/modprobe.d/ghost-hp-8bca-speakers.conf \
+                system/etc/systemd/system/ghost-wake-dgpu.service; do
         sudo install -Dm644 "$file" "/${file#system/}"
     done
+    sudo systemctl daemon-reload
+    sudo systemctl enable --now ghost-wake-dgpu.service
 else
     echo "Not an HP Omen 16-xf0 (board 8BCA): skipped"
 fi

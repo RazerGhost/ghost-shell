@@ -1,0 +1,24 @@
+# The HP Omen 16-xf0 (board 8BCA): powered off while the RTX sleeps in D3cold (runtime power
+# management, idle), the next boot often has no RTX at all (missing from the PCI bus; 3 of 4
+# shutdowns, never after a restart, journal 2026-11-04). So at shutdown, before the power goes, the
+# card is woken: the firmware finds it on. Nothing happens at start; the card still sleeps while
+# idle. Installed by modules/system/setup.sh on that laptop only.
+[Unit]
+Description=Wake the NVIDIA GPU before shutting down (so the next boot finds it)
+After=multi-user.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/true
+# Stopped at shutdown: power/control "on" resumes the card at once; wait until it's active.
+ExecStop=/bin/sh -c 'for d in /sys/bus/pci/devices/*; do \
+    [ "$(cat "$d/vendor")" = 0x10de ] || continue; \
+    case "$(cat "$d/class")" in 0x03*) ;; *) continue ;; esac; \
+    echo on > "$d/power/control"; \
+    for i in 1 2 3 4 5 6 7 8 9 10; do [ "$(cat "$d/power/runtime_status")" = active ] && break; sleep 0.2; done; \
+    echo "$d: $(cat "$d/power/runtime_status")"; \
+done'
+
+[Install]
+WantedBy=multi-user.target
