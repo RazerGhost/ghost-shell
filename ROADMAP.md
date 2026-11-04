@@ -1764,6 +1764,10 @@ desktop, not a screen of its own, and the login screen and the lock screen edito
   first (sourced bare under `set -u` it stopped the module before the boot menu and greetd steps).
   The HP logo still goes blank when the graphics driver takes over (nothing redraws it without
   Plymouth; the user chose to leave it).
+- Settings -> Account (user's request): "Change your password" opens `passwd` in the default
+  terminal (`settings/AccountPage.qml`), so the shell never handles the password; it's the one
+  for logging in, the lock screen and sudo (sudo asks for your own; a separate root password
+  for sudo was offered and not wanted).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

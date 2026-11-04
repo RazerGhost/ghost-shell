@@ -177,7 +177,7 @@ sizes. `launcher/Launcher.qml`, `Fuzzy.js`, `Calc.js`, `CalcRow.qml`, `FileSearc
 | Section | Pages (id) |
 |---|---|
 | Personalize | Appearance (`appearance`), Display (`display`), Lock screen (`lock`) |
-| System | Sound (`sound`), Windows (`windows`), Notifications (`notifications`), Power (`power`), Keyboard and mouse (`input`), Snapshots (`snapshots`) |
+| System | Sound (`sound`), Windows (`windows`), Notifications (`notifications`), Power (`power`), Keyboard and mouse (`input`), Account (`account`: change your password), Snapshots (`snapshots`) |
 | Apps | Default apps (`apps`), Screen time (`screentime`), Keybinds (`keybinds`), Screenshots and recordings (`capture`), Weather and clock (`clock`) |
 
 Settings are saved in `~/.local/state/quickshell/settings.json` (`services/Settings.qml`);

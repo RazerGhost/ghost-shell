@@ -225,7 +225,7 @@ Item {
             // Centered when the panel is wider than a page (full size).
             x: Math.max(Theme.spacing.l, (content.width - width) / 2)
             width: Math.min(Theme.settings.content, content.width - Theme.spacing.l * 2)
-            sourceComponent: ({ appearance: appearancePage, display: displayPage, lock: lockPage, sound: soundPage, windows: windowsPage, notifications: notificationsPage, power: powerPage, input: inputPage, snapshots: snapshotsPage, apps: appsPage, screentime: screentimePage, keybinds: keybindsPage, capture: capturePage, clock: clockPage })[root.page] ?? null
+            sourceComponent: ({ appearance: appearancePage, display: displayPage, lock: lockPage, sound: soundPage, windows: windowsPage, notifications: notificationsPage, power: powerPage, input: inputPage, account: accountPage, snapshots: snapshotsPage, apps: appsPage, screentime: screentimePage, keybinds: keybindsPage, capture: capturePage, clock: clockPage })[root.page] ?? null
 
             Component { id: appearancePage; AppearancePage {} }
             Component { id: displayPage; DisplayPage {} }
@@ -235,6 +235,7 @@ Item {
             Component { id: notificationsPage; NotificationsPage {} }
             Component { id: powerPage; PowerPage {} }
             Component { id: inputPage; InputPage {} }
+            Component { id: accountPage; AccountPage {} }
             Component { id: snapshotsPage; SnapshotsPage {} }
             Component { id: appsPage; AppsPage {} }
             Component { id: screentimePage; ScreenTimePage {} }
