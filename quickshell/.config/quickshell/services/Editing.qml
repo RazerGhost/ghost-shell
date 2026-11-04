@@ -2,6 +2,7 @@ pragma Singleton
 
 import Quickshell
 import Quickshell.Hyprland
+import "WorkspaceSlots.js" as WorkspaceSlots
 
 // Which on-screen editor is open, for what it edits to show itself for editing: the desktop
 // widgets show their handles while the desktop editor is open, the dock stays shown while the
@@ -73,8 +74,8 @@ Singleton {
             backPending = false; // still there, still knowing the way home
             return;
         }
-        awayFrom = Hyprland.focusedWorkspace?.id ?? 1;
-        const used = Hyprland.workspaces.values.map(w => w.id).filter(id => id > 0);
+        awayFrom = WorkspaceSlots.idOf(Hyprland.focusedWorkspace) ?? 1;
+        const used = Hyprland.workspaces.values.map(WorkspaceSlots.idOf).filter(id => id > 0);
         emptyWorkspace = Math.max(0, ...used) + 1;
         Hyprland.dispatch(`hl.dsp.focus({ workspace = ${emptyWorkspace} })`);
     }

@@ -1922,6 +1922,18 @@ Escape then, Super+D again or a click elsewhere goes back to your workspace. Key
 the foot of the screen. Not while locked, in focus mode or in the desktop editor. Checked with
 wtype: moving, the ring, typing into the note and back, Escape home.
 
+### What Hyprland 0.57.1 changed (checked 2026-11-04)
+After the drop-down terminal (see "Magnifier and drop-down terminal"), a check of everything
+reading workspace ids. Hyprland's Lua: only the layout keyed by id; the rest uses the active
+workspace or names. The shell: Quickshell reads every workspace's id as -1 at start and learns
+the real ones at the first workspace switch (NOTES), so after a login, until then, the overview
+showed no workspaces, restoring a minimized window would move it to "workspace -1", an editor's
+or Super+D's trip could take workspace 1 for empty and come back to -1, and the window menu
+couldn't mark the current workspace. Every read now goes through `WorkspaceSlots.idOf` (the
+name's number while the id is -1; tested), 14 places: the island's dots, the overview, Snap
+Assist, the window menu, minimize, the editors and Snap's empty cells. Checked with a fresh
+Quickshell instance: workspaces 1 and 3 read -1 and resolve to 1 and 3.
+
 ### Review of the keyboard mode, focus extras and scrolling (2026-11-04)
 A read-only review, findings checked, then fixed:
 - Focus: a second session ending while the first one's notification waited in the history was

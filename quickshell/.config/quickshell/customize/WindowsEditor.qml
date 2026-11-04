@@ -9,6 +9,7 @@ import qs.theme
 import qs.widgets
 import "../settings/HyprlandConfig.js" as HyprlandConfig
 import "Presets.js" as Presets
+import "../services/WorkspaceSlots.js" as WorkspaceSlots
 
 // The windows editor: the windows' borders, corners, gaps and motion, shown on two example
 // windows it opens side by side on an empty workspace (user's choice: not relying on windows
@@ -124,8 +125,8 @@ Scope {
         // Once at a time: a second Play would come back to the first one's empty workspace.
         if (workspaceBack.running)
             return;
-        playFrom = Hyprland.focusedWorkspace?.id ?? 0;
-        const used = Hyprland.workspaces.values.map(w => w.id).filter(id => id > 0);
+        playFrom = WorkspaceSlots.idOf(Hyprland.focusedWorkspace) ?? 0;
+        const used = Hyprland.workspaces.values.map(WorkspaceSlots.idOf).filter(id => id > 0);
         Hyprland.dispatch(`hl.dsp.focus({ workspace = ${Math.max(0, ...used) + 1} })`);
         workspaceBack.restart();
     }

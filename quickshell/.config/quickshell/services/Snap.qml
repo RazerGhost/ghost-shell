@@ -8,6 +8,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
+import "WorkspaceSlots.js" as WorkspaceSlots
 
 Singleton {
     id: root
@@ -51,7 +52,7 @@ Singleton {
         if (!window?.workspace)
             return;
         empty.nextWindow = window;
-        empty.start(["hyprctl", "repl", `return ShellLayout.empty(${window.workspace.id})`]);
+        empty.start(["hyprctl", "repl", `return ShellLayout.empty(${WorkspaceSlots.idOf(window.workspace)})`]);
     }
 
     // A second snap while the first is asked about runs after it (it was dropped); `window` is

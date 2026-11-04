@@ -5,6 +5,7 @@ import Quickshell.Widgets
 import qs.services
 import qs.theme
 import qs.widgets
+import "../services/WorkspaceSlots.js" as WorkspaceSlots
 
 // The top of the window menu (WindowMenu.qml): the window's icon and title, what title bar
 // buttons would do (minimize, maximize, fullscreen, close), floating or tiling it, tabs, and
@@ -151,7 +152,7 @@ Column {
 
                     required property int index
                     readonly property int workspace: index + 1
-                    readonly property bool current: root.target?.workspace?.id === workspace
+                    readonly property bool current: WorkspaceSlots.idOf(root.target?.workspace) === workspace
 
                     width: Theme.slider.height
                     height: Theme.island.height

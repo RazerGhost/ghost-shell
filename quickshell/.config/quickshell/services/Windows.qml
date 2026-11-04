@@ -7,6 +7,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
+import "WorkspaceSlots.js" as WorkspaceSlots
 
 Singleton {
     id: root
@@ -115,7 +116,7 @@ Singleton {
     }
 
     function restore(window: HyprlandToplevel): void {
-        run(window, "move", `workspace = ${Hyprland.focusedWorkspace?.id ?? 1}, follow = false`);
+        run(window, "move", `workspace = ${WorkspaceSlots.idOf(Hyprland.focusedWorkspace) ?? 1}, follow = false`);
         focus(window);
     }
 

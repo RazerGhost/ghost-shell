@@ -15,14 +15,14 @@ Item {
     required property ShellScreen screen
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(screen)
     readonly property alias hovered: wheelArea.containsMouse
-    readonly property int active: monitor?.activeWorkspace?.id ?? 1
+    readonly property int active: WorkspaceSlots.idOf(monitor?.activeWorkspace) ?? 1
 
     // This monitor's workspaces, by id. Hyprland.workspaces only lists ones that exist.
     readonly property var existing: {
         const byId = {};
         for (const ws of Hyprland.workspaces.values) {
             if (ws.monitor === monitor)
-                byId[ws.id] = ws;
+                byId[WorkspaceSlots.idOf(ws)] = ws;
         }
         return byId;
     }

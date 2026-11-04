@@ -48,4 +48,14 @@ TestCase {
         // Special workspaces (minimized windows, scratchpad) have negative ids.
         compare(WorkspaceSlots.used([8, -98, 2], 2), [2, 8]);
     }
+
+    function test_idOf() {
+        compare(WorkspaceSlots.idOf({ id: 3, name: "3" }), 3);
+        // Read as -1 at the shell's start (Hyprland 0.57.1): the name says which.
+        compare(WorkspaceSlots.idOf({ id: -1, name: "4" }), 4);
+        compare(WorkspaceSlots.idOf({ id: -1, name: "special:magic" }), -1);
+        compare(WorkspaceSlots.idOf({ id: -98, name: "special:minimized" }), -98);
+        compare(WorkspaceSlots.idOf({ id: -1, name: "work" }), -1); // a named workspace
+        compare(WorkspaceSlots.idOf(null), null);
+    }
 }

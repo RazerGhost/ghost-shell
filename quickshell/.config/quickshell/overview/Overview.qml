@@ -77,8 +77,8 @@ Scope {
             Theme.overview.gap, Theme.overview.label)
 
         // The workspaces in the strip: the ones in use and the current one (like the island).
-        readonly property var existing: Hyprland.workspaces.values.filter(ws => ws.monitor === monitor && ws.id > 0)
-        readonly property var workspaceIds: WorkspaceSlots.used(existing.map(ws => ws.id), workspace?.id ?? 1)
+        readonly property var existing: Hyprland.workspaces.values.filter(ws => ws.monitor === monitor && WorkspaceSlots.idOf(ws) > 0)
+        readonly property var workspaceIds: WorkspaceSlots.used(existing.map(WorkspaceSlots.idOf), WorkspaceSlots.idOf(workspace) ?? 1)
 
         function go(id: int): void {
             Hyprland.dispatch(`hl.dsp.focus({ workspace = ${id} })`);
@@ -135,7 +135,7 @@ Scope {
             Keys.onPressed: event => {
                 const directions = { [Qt.Key_Left]: "left", [Qt.Key_Right]: "right", [Qt.Key_Up]: "up", [Qt.Key_Down]: "down" };
                 const selectedWindow = window.windows[window.selected];
-                const current = window.workspace?.id ?? 1;
+                const current = WorkspaceSlots.idOf(window.workspace) ?? 1;
                 if (event.key >= Qt.Key_1 && event.key <= Qt.Key_9 && selectedWindow) {
                     Windows.moveToWorkspace(selectedWindow, event.key - Qt.Key_0);
                     event.accepted = true;
@@ -317,8 +317,8 @@ Scope {
                         id: ws
 
                         required property int modelData
-                        readonly property HyprlandWorkspace workspace: window.existing.find(w => w.id === modelData) ?? null
-                        readonly property bool current: modelData === window.workspace?.id
+                        readonly property HyprlandWorkspace workspace: window.existing.find(w => WorkspaceSlots.idOf(w) === modelData) ?? null
+                        readonly property bool current: modelData === WorkspaceSlots.idOf(window.workspace)
                         readonly property real scale: width / window.monitorWidth
 
                         width: Theme.overview.workspace

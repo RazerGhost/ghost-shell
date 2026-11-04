@@ -401,6 +401,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   "special:magic", id nil; `window.workspace.id` nil too; hyprctl's JSON leaves it out), while
   numbered ones keep theirs. A layout keyed by id skips the scratchpad's windows: they kept a
   size of -10 x -10. Checked 2026-11-04 with `hyprctl eval` writing the values to a file.
+- Quickshell 0.3.2 on Hyprland 0.57.1 reads every workspace's id as -1 at start (its initial
+  `j/workspaces` read; a fresh `qs -p` with `Hyprland.refreshWorkspaces()` showed 1 and 3 as -1)
+  and gets the real ids from the first workspace event (a switch). Special workspaces stay -1.
+  `WorkspaceSlots.idOf` takes a numbered workspace's id from its name meanwhile.
 - `qs ipc call <target> show` never reaches an IPC function named `show`: qs reads it as its own
   `qs ipc show` and prints the target's functions, exit 0 (`-- show` works). The welcome tour's
   function was `show`, so Settings' "Show the welcome tour" did nothing; it's `open` now.

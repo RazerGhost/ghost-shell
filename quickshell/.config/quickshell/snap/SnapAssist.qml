@@ -6,6 +6,7 @@ import qs.services
 import qs.theme
 import qs.widgets
 import "../services/WindowGrid.js" as WindowGrid
+import "../services/WorkspaceSlots.js" as WorkspaceSlots
 
 // Snap Assist, like Windows: when you snap a window and its workspace's arrangement has an empty
 // spot left (a lone window snapped to a half, two windows in thirds), that spot shows the windows
@@ -27,14 +28,14 @@ Scope {
     readonly property list<HyprlandToplevel> candidates: open
         ? Windows.recent.filter(t => t !== snappedWindow && (t.workspace === snappedWindow?.workspace
             ? t.lastIpcObject?.floating === true
-            : t.workspace?.id > 0 || t.workspace?.name === Windows.minimizedWorkspace))
+            : WorkspaceSlots.idOf(t.workspace) > 0 || t.workspace?.name === Windows.minimizedWorkspace))
         : []
 
     // The picked window moves to the workspace and tiles: the layout puts a new window in the
     // first empty spot. Then the layout is asked for the next one.
     function pick(window: HyprlandToplevel): void {
         open = false;
-        const workspace = snappedWindow?.workspace?.id;
+        const workspace = WorkspaceSlots.idOf(snappedWindow?.workspace);
         if (!window || !workspace)
             return;
         Windows.moveToWorkspace(window, workspace);

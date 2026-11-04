@@ -2,6 +2,19 @@
 // can be tested on its own (tests/tst_workspaces.qml).
 .pragma library
 
+// A workspace's id (a HyprlandWorkspace, or null). Quickshell reads every id as -1 from
+// Hyprland 0.57.1's workspace list at start and learns the real ones from the first workspace
+// event, so until then a numbered workspace's id comes from its name. Special workspaces (the
+// scratchpad, minimized windows) keep theirs (-1: filtered out wherever ids > 0 are wanted).
+function idOf(workspace) {
+    if (!workspace)
+        return null;
+    if (workspace.id > 0)
+        return workspace.id;
+    const n = Number(workspace.name);
+    return Number.isInteger(n) && n > 0 ? n : workspace.id;
+}
+
 // Ids 1..n: always at least `minimum` dots, more when a higher workspace exists, so a
 // workspace you opened with Super+8 still gets a dot.
 function slots(minimum, existingIds) {
