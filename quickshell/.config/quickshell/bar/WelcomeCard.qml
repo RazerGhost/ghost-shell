@@ -72,7 +72,7 @@ MouseArea {
                     id: chipBox
                     required property var modelData
                     width: chip.implicitWidth + Theme.spacing.m * 2
-                    height: Theme.slider.height
+                    height: Theme.island.chip
                     radius: height / 2
                     color: Colors.tint
 

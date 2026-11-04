@@ -242,6 +242,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   keeps it until a click elsewhere. An item's `activeFocus` is true before the layer has the
   keyboard (`forceActiveFocus()` sets it anyway); the attached `Window.active` tells (the desktop's
   to-do list, `desktop/TasksWidget.qml`).
+- A full-screen `Overlay` layer mapped with `WlrKeyboardFocus.OnDemand` doesn't get the keyboard
+  by itself (verified 2026-11-04: Escape went nowhere, the pointer resting elsewhere); one that
+  must take keys at once (the shutdown screen) needs `Exclusive`, and then has to let go before a
+  window can be focused.
 - `plymouth quit --retain-splash` before greetd starts Hyprland makes Hyprland crash at boot
   (verified 2026-11-04): logind's TakeDevice on the card answers "Device or resource busy",
   aquamarine finds no GPU ("CBackend::create() failed"), and greetd starts the session again. The

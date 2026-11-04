@@ -6,6 +6,7 @@ import qs.controlcenter
 import qs.services
 import qs.theme
 import qs.widgets
+import "SessionEnd.js" as SessionEndJs
 
 // Logging out, restarting or shutting down (the power menu; Session.ending): the screens dim and
 // say what's happening, every app is asked to close (so it can save, like closing its window),
@@ -19,10 +20,16 @@ Scope {
     readonly property bool active: action !== ""
     // The windows still open, the shell's own left out (its windows close with it).
     readonly property var remaining: Hyprland.toplevels.values.filter(w => (w.wayland?.appId ?? "") !== "org.quickshell")
-    // Waited long enough: the apps still open are listed.
-    property bool stuck: false
-    // How many there were to close, for "2 of 5 closed".
+    // Waited long enough; while apps are still open then, they're listed (and go off the list as
+    // they close, or come back on it when one opens a "save?" window).
+    property bool waited: false
+    readonly property bool stuck: active && waited && remaining.length > 0
+    // How many there were to close, for "2 of 5 closed"; more when an app opens another window.
     property int started: 0
+    onRemainingChanged: {
+        if (active)
+            started = Math.max(started, remaining.length);
+    }
 
     readonly property var words: ({
         logout:   { title: "Logging out",   icon: "logout",             anyway: "Log out anyway" },
@@ -30,8 +37,12 @@ Scope {
         poweroff: { title: "Shutting down", icon: "power_settings_new", anyway: "Shut down anyway" }
     })[action] ?? { title: "", icon: "power_settings_new", anyway: "" }
 
-    onActiveChanged: {
-        stuck = false;
+    onActiveChanged: begin()
+    // A shell reload while the apps close comes back with `ending` still set (Session.qml).
+    Component.onCompleted: begin()
+
+    function begin(): void {
+        waited = false;
         if (!active)
             return;
         started = remaining.length;
@@ -59,14 +70,27 @@ Scope {
     Timer {
         id: patience
         interval: Theme.session.patience
-        onTriggered: root.stuck = root.active && root.remaining.length > 0
+        onTriggered: root.waited = true
     }
 
-    // Stops, then brings the window forward to be answered (the dimmed screen took the keyboard,
-    // and Hyprland won't focus a window while it's there).
+    // Stops, then brings the window forward to be answered, a moment later: right away, the
+    // dimmed screen's hold on the keyboard hadn't reached Hyprland yet, which then raised the
+    // window without focusing it (the switcher's race, NOTES).
     function showWindow(window: HyprlandToplevel): void {
         Session.cancel();
-        Qt.callLater(() => Windows.show(window));
+        showLater.window = window;
+        showLater.restart();
+    }
+
+    Timer {
+        id: showLater
+        property HyprlandToplevel window: null
+        interval: Theme.session.release
+        onTriggered: {
+            if (window)
+                Windows.show(window);
+            window = null;
+        }
     }
 
     Variants {
@@ -85,13 +109,15 @@ Scope {
             color: "transparent"
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.namespace: "qs-session-end"
+            // Exclusive: the keyboard (Escape) goes here (OnDemand never got it, checked). Hyprland
+            // won't focus a window while it's there, so "Show it" lets go first (showWindow).
             WlrLayershell.keyboardFocus: root.active && focused ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
             Rectangle {
                 id: shade
                 anchors.fill: parent
                 color: Colors.m3surface
-                opacity: root.active ? 0.95 : 0
+                opacity: root.active ? Theme.session.shade : 0
                 Behavior on opacity { NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
 
                 // Clicks stop here, not on what's under it.
@@ -122,15 +148,16 @@ Scope {
 
                     ProgressRing {
                         anchors.fill: parent
-                        value: 0.25
+                        value: Theme.session.arc
                         visible: !root.stuck
 
+                        // Still while animations are off.
                         RotationAnimation on rotation {
-                            running: root.active && !root.stuck
+                            running: root.active && !root.stuck && Theme.session.turn > 0
                             from: 0
                             to: 360
                             loops: Animation.Infinite
-                            duration: 1200
+                            duration: Theme.session.turn
                         }
                     }
 
@@ -158,11 +185,7 @@ Scope {
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter
                     wrapMode: Text.Wrap
-                    text: root.stuck
-                        ? (root.remaining.length === 1 ? "This app hasn't closed. It may be asking you something."
-                                                       : "These apps haven't closed. They may be asking you something.")
-                        : root.remaining.length > 0 ? "Closing your apps… " + (root.started - root.remaining.length) + " of " + root.started
-                        : root.started > 0 ? "Your apps are closed" : ""
+                    text: SessionEndJs.message(root.started, root.remaining.length, root.stuck)
                     color: Colors.m3onSurfaceVariant
                     font.family: Theme.font.sans
                     font.pixelSize: Theme.font.normal

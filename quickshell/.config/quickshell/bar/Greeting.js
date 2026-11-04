@@ -16,3 +16,11 @@ function greeting(hour, name, first) {
 function count(n, one, many) {
     return n + " " + (n === 1 ? one : many);
 }
+
+// Your first name from your account's line in the user database (`getent passwd`: name, password,
+// uid, gid, full name and more, then home and shell, separated by colons): the full name's first
+// word, before any comma (some systems add a room or phone there); "" when there's none.
+function firstName(passwdLine) {
+    const full = (String(passwdLine ?? "").split(":")[4] ?? "").split(",")[0].trim();
+    return full === "" ? "" : full.split(/\s+/)[0];
+}

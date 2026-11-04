@@ -4,8 +4,11 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../bar/Greeting.js" as Greeting
 
 Singleton {
+    id: root
+
     // lock/Lock.qml locks the screen when this fires. `grace`: the idle lock, which a touch
     // within Settings -> Lock screen -> Grace period undoes without the password.
     signal lockRequested(bool grace)
@@ -26,26 +29,51 @@ Singleton {
         command: ["getent", "passwd", Quickshell.env("USER") ?? ""]
         stdout: StdioCollector {
             onStreamFinished: {
-                const full = (text.split(":")[4] ?? "").split(",")[0].trim();
-                if (full !== "")
-                    userName = full.split(" ")[0];
+                const first = Greeting.firstName(text);
+                if (first !== "")
+                    root.userName = first;
             }
         }
     }
 
     // Logging out, restarting or shutting down ("logout", "reboot", "poweroff"; "" otherwise):
     // lock/SessionEnd.qml asks every app to close first, then calls finish(). cancel() stops it
-    // (an app asked to save something).
-    property string ending: ""
+    // (an app asked to save something). Kept across a shell reload, so a reload while the apps
+    // close doesn't drop the shutdown halfway (a crash still does: the restarted shell starts
+    // afresh).
+    property alias ending: kept.ending
 
+    PersistentProperties {
+        id: kept
+        reloadableId: "sessionEnding"
+
+        property string ending: ""
+    }
+
+    // Does it, once. A refused restart or shutdown (another app holding it off, polkit) brings
+    // the desktop back and says so, rather than leaving the screen waiting.
     function finish(): void {
-        const action = ending;
-        if (action === "logout")
-            Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.exit()"]);
-        else if (action === "reboot")
-            Quickshell.execDetached(["systemctl", "reboot"]);
-        else if (action === "poweroff")
-            Quickshell.execDetached(["systemctl", "poweroff"]);
+        if (ender.running)
+            return;
+        ender.command = ({
+            logout: ["hyprctl", "dispatch", "hl.dsp.exit()"],
+            reboot: ["systemctl", "reboot"],
+            poweroff: ["systemctl", "poweroff"]
+        })[ending] ?? [];
+        if (ender.command.length > 0)
+            ender.running = true;
+    }
+
+    Process {
+        id: ender
+        onExited: code => {
+            if (code === 0)
+                return;
+            const what = root.ending === "reboot" ? "restart" : root.ending === "poweroff" ? "shut down" : "log out";
+            root.cancel();
+            Notifications.send("Session", "dialog-warning", "Couldn't " + what,
+                               "Something held it off. Try again, or close what's still running.", false, []);
+        }
     }
 
     function cancel(): void {

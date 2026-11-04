@@ -20,4 +20,11 @@ TestCase {
         compare(Greeting.count(1, "task", "tasks"), "1 task");
         compare(Greeting.count(3, "task", "tasks"), "3 tasks");
     }
+
+    function test_firstName() {
+        compare(Greeting.firstName("razerghost:x:1000:1000:Ghosty Example,,,:/home/razerghost:/usr/bin/fish\n"), "Ghosty");
+        compare(Greeting.firstName("razerghost:x:1000:1000::/home/razerghost:/usr/bin/fish"), "");
+        compare(Greeting.firstName("razerghost:x:1000:1000:Ghosty:/home/razerghost:/bin/sh"), "Ghosty");
+        compare(Greeting.firstName(""), "");
+    }
 }

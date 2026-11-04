@@ -106,6 +106,7 @@ fi
 # named (associative) array first; sourced bare, `[default]` is read as an unset variable under
 # set -u.
 esp=$(declare -A KERNEL_CMDLINE; . /etc/default/limine; echo "${ESP_PATH:-/boot}")
+sudo test -f "$esp/limine.conf" || fail "$esp/limine.conf is missing; check ESP_PATH in /etc/default/limine"
 cmdlines=$(sudo awk '/^ *\//{ match($0, /\/+/); depth = RLENGTH } /cmdline:/ && depth == 2' "$esp/limine.conf")
 [[ -n $cmdlines ]] || fail "no kernel entries in $esp/limine.conf; run sudo limine-mkinitcpio"
 ! grep -vqF 'plymouth.enable=0' <<<"$cmdlines" \
@@ -116,7 +117,6 @@ step "Boot menu: the HP logo stays, the menu only on a key"
 # entries, keeps them): firmware_logo puts the firmware's logo back when Limine hands over; quiet hides the menu unless a key is pressed during
 # the timeout (to pick Windows or a snapshot). $esp is read in the step above.
 limine_conf=$esp/limine.conf
-sudo test -f "$limine_conf" || fail "$limine_conf is missing; check ESP_PATH in /etc/default/limine"
 for option in "timeout: 1" "quiet: yes" "firmware_logo: yes"; do
     key=${option%%:*}
     if sudo grep -q "^$key:" "$limine_conf"; then
@@ -137,8 +137,12 @@ step "Logging in (greetd)"
 sed "s/@USER@/$USER/" system/etc/greetd/config.toml >"${TMPDIR:-/tmp}/ghost-greetd.toml"
 sudo install -Dm644 "${TMPDIR:-/tmp}/ghost-greetd.toml" /etc/greetd/config.toml
 rm -f "${TMPDIR:-/tmp}/ghost-greetd.toml"
-sudo install -Dm644 system/etc/systemd/system/greetd.service.d/after-plymouth.conf \
-    /etc/systemd/system/greetd.service.d/after-plymouth.conf
+# Its ordering after Plymouth (installed until 2026-11-04) is greetd's own unit's already, and
+# there's no Plymouth: the copy goes.
+if [[ -e /etc/systemd/system/greetd.service.d/after-plymouth.conf ]]; then
+    sudo rm /etc/systemd/system/greetd.service.d/after-plymouth.conf
+    sudo rmdir --ignore-fail-on-non-empty /etc/systemd/system/greetd.service.d
+fi
 sudo systemctl daemon-reload
 # Enable only, don't start: starting it now would take over tty1 under the running session.
 # It takes effect on the next boot.

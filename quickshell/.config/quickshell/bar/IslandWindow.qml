@@ -38,7 +38,9 @@ PanelWindow {
     // while no menu is open and the screen isn't locked (they wait, and show once it's unlocked),
     // then a window asking for attention.
     readonly property bool focusedScreen: (Hyprland.focusedMonitor?.name ?? Quickshell.screens[0]?.name) === modelData.name
-    readonly property bool canPop: !open && focusedScreen && !Session.locked && !island.welcomeShown
+    // Not while locked, greeting, or logging out / shutting down (under its dimmed screen a pop-up
+    // would use up its time unseen).
+    readonly property bool canPop: !open && focusedScreen && !Session.locked && !island.welcomeShown && Session.ending === ""
     readonly property Notification popup: canPop ? Notifications.current : null
     readonly property HyprlandToplevel attentionWindow: canPop && !Notifications.current ? Windows.needsAttention : null
     // How long each stays, from Settings (it offers 3-30 s; kept within 1-60 should the file say
@@ -188,7 +190,7 @@ PanelWindow {
         id: pill
 
         shown: IslandViews.shown(root.panel, root.island.reloadShown && root.island.reloadError !== "",
-                                 root.island.welcomeShown && root.focusedScreen, root.popup !== null, root.attentionWindow !== null, root.peek)
+                                 root.island.welcomeShown && root.focusedScreen && !Notifications.fullscreenNow, root.popup !== null, root.attentionWindow !== null, root.peek)
         hasFocus: root.open
         // Each menu's own width. Kept while closing, so the menu fading out doesn't reflow.
         onShownChanged: rememberWidth()
@@ -326,6 +328,8 @@ PanelWindow {
                 x: Theme.spacing.s
                 width: parent.width - Theme.spacing.s * 2
                 first: root.island.welcomeFirst
+                // Stays while the pointer is on it, like a notification.
+                onContainsMouseChanged: root.island.holdWelcome(containsMouse)
                 onActivated: {
                     root.island.welcomeShown = false;
                     root.island.toggle("today", root.modelData.name);

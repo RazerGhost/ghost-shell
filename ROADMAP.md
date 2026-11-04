@@ -1856,6 +1856,22 @@ let in was just the desktop appearing.
   goes black (the graphics driver taking over, with Limine's menu skipped), then the theme's plain
   background, then the lock screen.
 
+- Review of all this (read-only, findings checked, then fixed): a lock while the lock was
+  opening (a right password, then the lid closed at once) was undone by the opening a moment
+  later, after hypridle had let the suspend go ahead on "locked": a lock now stops the opening.
+  The shutdown screen: "stuck" follows the windows (an app that opened a "save?" window after the
+  wait left it closing forever, and an emptied list stayed "stuck"), the count never goes below
+  zero (`lock/SessionEnd.js`, tested), "Show it" lets go of the keyboard before focusing the app
+  (the switcher's race), a refused restart or shutdown brings the desktop back with a
+  notification (`Session.finish` through a Process), a shell reload while apps close keeps
+  going, pop-ups wait under it, and its ring is still while animations are off. The greeting
+  stays while the pointer is on it and waits out a fullscreen window; your first name is read by
+  `Greeting.firstName` (tested). The system module checks limine.conf is there before reading
+  it, and greetd's drop-in to wait for Plymouth is gone (greetd's own unit already orders it).
+  Verified by the user: a real restart with apps open (they close first). Checked here with the
+  closing and the restart stubbed: Escape cancels (the dimmed screen keeps `Exclusive`:
+  `OnDemand` never got the keyboard).
+
 ### The HP logo through the boot (tried and dropped 2026-11-04)
 User's pick after the black screen between the firmware and the session: Plymouth's `bgrt` theme
 (the HP logo with a spinner until just before Hyprland draws). It worked, but its first version

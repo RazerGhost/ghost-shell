@@ -157,6 +157,11 @@ Scope {
     // for Settings -> Lock screen -> Grace period (off by default). Any other lock (Super+L, the
     // power menu, before a suspend) ends a grace period that's still running.
     function lock(withGrace: bool): void {
+        // A lock while the lock is opening (a right password a moment ago; the lid closed right
+        // after) wins: the opening would otherwise unlock it again a moment later, after
+        // hypridle had already let the suspend go ahead on "locked".
+        opening.stop();
+        unlocking = false;
         message = "";
         messageIsError = false;
         if (withGrace && !sessionLock.locked && Settings.values.lockGrace > 0)

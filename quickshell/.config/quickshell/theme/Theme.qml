@@ -91,6 +91,10 @@ Singleton {
         readonly property int width:    root.px(380)
         readonly property int ring:     root.px(88)
         readonly property int icon:     root.px(36)
+        readonly property real shade:   0.95  // how much the screens dim
+        readonly property real arc:     0.25  // the turning ring's length, of a full circle
+        readonly property int release:  200   // ms between letting go of the keyboard and showing an app
+        readonly property int turn:     root.anim.speed > 0 ? Math.round(1200 / root.anim.speed) : 0 // ms per turn
     }
 
     // The on/off switch (widgets/Switch.qml), Material 3's size.
@@ -174,8 +178,9 @@ Singleton {
         // How long "Reloaded" shows after a shell reload, and a failed reload's error (ms).
         readonly property int reloaded:       2000
         readonly property int reloadError:    10000
-        // How long the greeting after an unlock stays (ms; bar/WelcomeCard.qml).
+        // How long the greeting after an unlock stays (ms; bar/WelcomeCard.qml), and its chips' height.
         readonly property int welcome:        4500
+        readonly property int chip:           root.px(32)
     }
 
     readonly property QtObject tile: QtObject {

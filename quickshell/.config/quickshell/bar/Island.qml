@@ -55,6 +55,14 @@ Scope {
         }
     }
 
+    // The pointer rests on the greeting: it stays until the pointer leaves, then its full time.
+    function holdWelcome(held: bool): void {
+        if (held)
+            welcomeTimer.stop();
+        else if (welcomeShown)
+            welcomeTimer.restart();
+    }
+
     Timer {
         id: welcomeTimer
         interval: Theme.island.welcome
