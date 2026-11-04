@@ -20,8 +20,13 @@ for arg in "$@"; do
         args+=(--yes)
     elif [[ $arg != */* && -f machines/$arg ]]; then
         args+=(--machine "$arg")
-    else
+    elif [[ -f $arg || $arg =~ ^#[0-9a-fA-F]{6}$ ]]; then
         args+=(--theme "$arg")
+    else
+        # A mistyped machine name would otherwise be taken as a wallpaper and install every module.
+        echo "install.sh: '$arg' is no machine profile (machines/: $(ls machines | tr '\n' ' '))," >&2
+        echo "a picture that exists, or a #rrggbb color" >&2
+        exit 1
     fi
 done
 exec ./bin/.local/bin/ghost install "${args[@]}"

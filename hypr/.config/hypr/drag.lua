@@ -142,9 +142,11 @@ local function end_pop()
     pop.timer:set_enabled(false)
     local address, pos = pop.address, hl.get_cursor_pos()
     pop = nil
-    if pos and tiled_window_at(pos, address) then
+    local window = hl.get_window("address:" .. address)
+    if pos and window and tiled_window_at(pos, address) then
         -- Back into the tiling: it's under the pointer, so the layout puts it in the place of the
-        -- window there (layout.lua).
+        -- window there (layout.lua; marked carried also when it was floating from the start).
+        layout.carry(address, layout.key(window.workspace))
         local target = "address:" .. address
         hl.dispatch(hl.dsp.window.float({ window = target, action = "disable" }))
         hl.dispatch(hl.dsp.focus({ window = target }))

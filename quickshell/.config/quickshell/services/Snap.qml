@@ -60,8 +60,11 @@ Singleton {
         }
     }
 
+    // From the window menu: the layout is told first, so the window doesn't count as dropped by a
+    // drag where the pointer is (hypr/layout.lua's `key` message).
     function toggleFloating(window: HyprlandToplevel): void {
         forget(window);
+        Hyprland.dispatch(`hl.dsp.layout("key 0x${window.address}")`);
         Windows.run(window, "float", `action = "toggle"`);
     }
 

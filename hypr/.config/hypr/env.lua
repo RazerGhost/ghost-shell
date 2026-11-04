@@ -19,11 +19,15 @@ hl.env("QS_ICON_THEME", "Colloid-Dark")
 -- Only read when Hyprland starts: log out and back in after changing it.
 -- Only the ones that exist: the RTX sometimes misses a boot, and another machine (a desktop
 -- with one card) has neither or one; with none listed Hyprland picks the card itself.
+-- Opening fails with "No such file" (errno 2) only when it's missing: another error (no access
+-- yet at the start of the session) still means it's there.
 local gpus = {}
 for _, device in ipairs({ "/dev/dri/amd-igpu", "/dev/dri/nvidia-dgpu" }) do
-    local file = io.open(device, "r")
+    local file, _, code = io.open(device, "r")
     if file then
         file:close()
+    end
+    if file or code ~= 2 then
         table.insert(gpus, device)
     end
 end

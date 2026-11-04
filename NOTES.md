@@ -226,7 +226,12 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   (logind's ACL) and python-evdev is installed, so `evdev.UInput({EV_KEY: [BTN_LEFT, ...],
   EV_REL: [REL_X, REL_Y, REL_WHEEL]})` is a mouse Hyprland treats as real (place the pointer
   with `hl.dsp.cursor.move` first). Wait ~0.5 s after creating it before the first event, or it
-  can be lost.
+  can be lost. A keyboard works the same (`KEY_LEFTMETA`, ...): Hyprland runs its binds for it,
+  unlike wtype's. Move the pointer with small `REL_X`/`REL_Y` steps checked against `hyprctl
+  cursorpos -j` (libinput accelerates them): Hyprland's own drags follow only real motion, not
+  `hl.dsp.cursor.move`. Test on workspace 9; the keys go to the focused window.
+- snd-hda-intel's `patch=` is given out per card in probe order (`patch[0]` to the first card,
+  ...): list a patch once per possible card, as the RTX's HDMI codec comes and goes.
 - wtype: Hyprland doesn't run its binds for wtype's virtual keyboard, so binds can't be tested
   with it. `wtype -M alt` only sets the modifier, without Alt key events; `-P Alt_L` / `-p Alt_L`
   send real ones.

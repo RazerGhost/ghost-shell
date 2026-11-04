@@ -94,7 +94,8 @@ is_module() {
 keep_sudo() {
     sudo -v || fail "sudo is needed to install packages"
     local parent=$$
-    ( while kill -0 "$parent" 2>/dev/null; do sudo -n -v 2>/dev/null; sleep 50; done ) &
+    # Its output closed, so `ghost install | tee log` doesn't wait for its last sleep.
+    ( while kill -0 "$parent" 2>/dev/null; do sudo -n -v 2>/dev/null; sleep 50; done ) >/dev/null 2>&1 &
 }
 
 cmd_install() {

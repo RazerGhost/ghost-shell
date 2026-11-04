@@ -11,6 +11,10 @@ step "Linking configs with stow"
 # tests/, modules/, docs/ and machines/.
 # -R re-links, so files added to an already-stowed package get linked too.
 # If stow reports a conflict, move the existing file aside and re-run.
+# fish's folder exists first, so stow links the repo's files into it rather than the whole folder
+# into the repo: fish writes its own files there (fish_variables, and config.fish's greeting line
+# below), which would otherwise land in the repo.
+mkdir -p "$HOME/.config/fish"
 for pkg in $(stow_packages); do
     echo "$pkg"
     stow -R -t "$HOME" "$pkg"

@@ -57,6 +57,10 @@ share)
     for file in "$@"; do
         kdeconnect-cli -d "$id" --share "$(realpath -- "$file")" >/dev/null 2>&1 && count=$((count + 1))
     done
+    if [ "$count" -eq 0 ]; then
+        notify-send -a "Phone" -i smartphone "Couldn't send to your phone" "KDE Connect sends files, not folders."
+        exit 1
+    fi
     [ "$count" -eq 1 ] && what="1 file" || what="$count files"
     notify-send -a "Phone" -i smartphone "Sent to your phone" "$what"
     ;;

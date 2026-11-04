@@ -79,7 +79,7 @@ for _, direction in ipairs({ "left", "right", "up", "down" }) do
     hl.bind(mainMod .. " + ALT + " .. direction, hl.dsp.layout("resize " .. direction), { repeating = true, description = "Windows: Resize the tiled window" })
     hl.bind(mainMod .. " + SHIFT + " .. direction, hl.dsp.layout("move " .. direction), { description = "Windows: Swap with the window next to it" })
 end
-hl.bind(mainMod .. " + SHIFT + space", hl.dsp.window.float({ action = "toggle" }), { description = "Windows: Float or tile" })
+hl.bind(mainMod .. " + SHIFT + space", require("layout").toggle_float, { description = "Windows: Float or tile" })
 
 -- Window tabs (Hyprland groups): windows sharing one spot, with a tab bar on top. Super+G makes
 -- the window a tab group (again: back to separate windows), Super+Ctrl+Shift+arrows moves a
@@ -170,6 +170,15 @@ hl.bind(mainMod .. " + mouse:273", drag.stop, { release = true, non_consuming = 
 -- dropped on a tiled window, a floating one goes into its place (drag.lua).
 hl.bind(mainMod .. " + SHIFT + mouse:272", drag.start_pop, { description = "Windows: Take a tiled window out (or drop one into a tiled spot)" })
 hl.bind(mainMod .. " + SHIFT + mouse:272", drag.stop_pop, { release = true, non_consuming = true })
+-- A release with Super or Shift already let go doesn't match the binds above, and the window (or
+-- the border) would keep following the pointer: the button's release with the other key states
+-- ends them too (each does nothing when no drag is on).
+for _, mods in ipairs({ "", mainMod .. " + ", "SHIFT + " }) do
+    hl.bind(mods .. "mouse:272", drag.stop_pop, { release = true, non_consuming = true })
+end
+for _, mods in ipairs({ "", "SHIFT + ", mainMod .. " + SHIFT + " }) do
+    hl.bind(mods .. "mouse:273", drag.stop, { release = true, non_consuming = true })
+end
 
 -- Volume & brightness
 -- Quickshell's OSD sees volume changes through PipeWire by itself. It can't watch the backlight,

@@ -23,7 +23,7 @@ done
 if [[ -e /dev/dri/amd-igpu && -e /dev/dri/nvidia-dgpu ]]; then
     [[ $(readlink -f /dev/dri/nvidia-dgpu) != $(readlink -f /dev/dri/amd-igpu) ]] \
         || fail "both GPU symlinks point at $(readlink -f /dev/dri/amd-igpu)"
-elif [[ -e /dev/dri/amd-igpu ]] && lspci -d 10de::03xx | grep -q .; then
+elif [[ -e /dev/dri/amd-igpu && -n $(lspci -d 10de::03xx) ]]; then
     # A hybrid laptop whose RTX has no DRM card: outputs wired to it (HDMI / USB-C) won't work.
     printf '\033[1;33mwarning:\033[0m /dev/dri/nvidia-dgpu is missing; external monitors on the RTX will not work.\n' >&2
     lspci -k -d 10de::03xx

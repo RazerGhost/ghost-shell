@@ -112,9 +112,15 @@ end
 -- tiled window (Super + drag, or an app's own title bar, which asks Hyprland to move it) floats it
 -- while it's carried and tiles it again where it's let go, and Hyprland tells Lua nothing else
 -- about the drag; so a window that comes back under the pointer (as a carried one is) takes the
--- place of the window under it. (It doesn't read as floating yet when it leaves; a window restored
--- or tiled by key comes back away from the pointer and goes in as before.)
+-- place of the window under it. (It doesn't read as floating yet when it leaves.) A window floated
+-- or tiled by key or from the window menu isn't carried: those say so first (`by_key`, the `key`
+-- layout message) and go in as before. A floating window the Super + Shift drag drops on a tiled
+-- one is marked carried by drag.lua (`carry`). Closed windows are forgotten.
 local floated = {}
+local by_key = {}
+hl.on("window.close", function(window)
+    floated[window.address], by_key[window.address] = nil, nil
+end)
 
 local function under_pointer(id, pointer)
     local window = hl.get_window("address:" .. id)
@@ -146,17 +152,29 @@ local function current(ctx)
     end
     local back
     local before = states[ws] and states[ws].slots or {}
-    local present = {}
-    for _, id in ipairs(ids) do
-        present[id] = true
-        if floated[id] == ws then
-            back, floated[id] = id, nil
+    local was, present = {}, {}
+    for _, id in ipairs(before) do
+        if id then
+            was[id] = true
         end
     end
-    for _, id in ipairs(before) do
-        if id and not present[id] then
+    for _, id in ipairs(ids) do
+        present[id] = true
+        if not was[id] then -- came in (back, or new)
+            if by_key[id] then
+                by_key[id] = nil
+            elseif floated[id] == ws then
+                back = id
+            end
+            floated[id] = nil
+        end
+    end
+    for id in pairs(was) do
+        if not present[id] then -- left
             local window = hl.get_window("address:" .. id)
-            if window and key_of(window.workspace) == ws then
+            if by_key[id] then
+                by_key[id] = nil
+            elseif window and key_of(window.workspace) == ws then
                 floated[id] = ws
             end
         end
@@ -185,6 +203,13 @@ hl.layout.register("shell", {
     end,
 
     layout_msg = function(ctx, msg)
+        -- key <address>: the window's next float or tile is by key or from the window menu, not
+        -- a drag (see `floated`).
+        local key_address = msg:match("^key%s+(%S+)")
+        if key_address then
+            by_key[key_address] = true
+            return true
+        end
         local state, _, focused = current(ctx)
         if not state then
             return "shell layout: no tiled windows here"
@@ -227,6 +252,19 @@ ShellLayout = {
 -- the workspace had tiled windows).
 return {
     key = key_of,
+    -- Super+Shift+Space: float or tile the focused window, by key (not a drag's drop).
+    toggle_float = function()
+        local window = hl.get_active_window()
+        if window then
+            by_key[window.address] = true
+            hl.dispatch(hl.dsp.window.float({ window = "address:" .. window.address, action = "toggle" }))
+        end
+    end,
+    -- drag.lua's Super + Shift drop: the floating window `address` on workspace `ws` (its key) is
+    -- carried, so it takes the place of the tiled window under the pointer.
+    carry = function(address, ws)
+        floated[address] = ws
+    end,
     workspace = function(ws)
         return states[ws], areas[ws]
     end,

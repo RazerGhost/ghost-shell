@@ -1800,6 +1800,37 @@ User's picks:
 - The welcome tour's island and windows cards and the README name the mouse features (the
   wheel, middle-click, resting, dropping files; dragging windows, Super+Shift+drag).
 
+### Review of the day's later work (2026-11-04)
+Two read-only reviews of everything since the keyboard mode's review (Hyprland, setup and
+scripts; the shell), findings checked, then fixed:
+- The bass speakers were silent whenever the RTX was on the bus: its HDMI codec took the second
+  of two `patch=` entries and the ALC245 got none (journal: "picked fixup  for PCI SSID
+  103c:0000"). Listed four times now; needs `ghost install system` and a reboot.
+- The shutdown countdown: with no windows open it went ahead after 0.7 s under "Shutting down
+  in 5"; it waits for the countdown now.
+- Dragging windows (checked with a virtual mouse and keyboard on workspace 9, NOTES): a window
+  floated or tiled by Super+Shift+Space or the window menu no longer counts as dropped by a drag
+  (the layout's `key` message, `toggle_float`); a window floating from the start and dropped
+  with Super + Shift takes the target's place (`carry`); closed windows are forgotten; letting
+  go of Super or Shift before the button ends the drag (release binds for every key state).
+  Super+Up / Down step from a remembered spot only while the window is still in it
+  (`SnapLayout.holds`, tested). Checked: Super + drag both ways, a Ghostty title-bar drag,
+  Super+Shift+Space there and back, a floating window dropped in, keys let go first.
+- The island: brightness from the wheel stays 1-100 % (below 0 it stopped for good); the wheel
+  over the cover changes tracks also once the hover player is open; a page, part or edit mode
+  goes to the menu on its own screen; the timer alert opens the timer unfolded; menus are never
+  wider than the screen (the wallpaper row on a small one); dropped `file://localhost` URLs and
+  broken escapes (tested); the wallpaper menu's state after a reload.
+- Setup: a mistyped machine name stops install.sh instead of installing every module as a
+  "wallpaper"; fish's folder exists before stow, so fish's own files and the greeting line
+  can't land in the repo on a fresh machine; env.lua keeps a GPU it can't open yet (only "No
+  such file" leaves it out); `ghost install | tee` doesn't wait for the sudo refresher; sending
+  only folders to the phone says it can't.
+- Not done: a drag still turns a chosen arrangement back to automatic when the carried window
+  leaves a column of its own (it was so for title-bar drags before; keeping the cell empty while
+  it's carried needs the layout to tell a carry from a float that stays). Super+. again doesn't
+  close the launcher's emoji mode (Escape does).
+
 ### The lock screen is your desktop, locked (built 2026-11-04)
 User's picks after booting straight to the lock screen: the lock screen should feel like the
 desktop, not a screen of its own, and the login screen and the lock screen editor can go.
