@@ -13,6 +13,13 @@ import "ListPick.js" as ListPick
 WidgetSurface {
     id: widget
 
+    // For screen readers in keyboard mode (WidgetStage): what it shows, in words.
+    function describe(): string {
+        return open.length === 0 ? (done > 0 ? "All done" : "Nothing to do")
+            : (open.length === 1 ? "1 task" : open.length + " tasks") + ": " + open.map(t => t.text).join(", ")
+              + ". Down picks one, Enter adds a task";
+    }
+
     medium: true
     property bool hidesTitles: false
     // Typing into the field: the desktop's layer has the keyboard meanwhile (WidgetStage.qml).

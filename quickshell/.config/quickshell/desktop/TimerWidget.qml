@@ -9,6 +9,13 @@ import qs.widgets
 WidgetSurface {
     id: widget
 
+    // For screen readers in keyboard mode (WidgetStage): what it shows, in words.
+    function describe(): string {
+        if (!Countdown.active)
+            return "Not running. Enter starts " + Countdown.lastMinutes + " minutes";
+        return Countdown.label + (Countdown.paused ? " left, paused. Enter resumes" : " left. Enter pauses");
+    }
+
     // Keyboard mode: Enter or Space starts the length used last, or pauses and resumes.
     function key(event: var): bool {
         if (!enabled || !activates(event))

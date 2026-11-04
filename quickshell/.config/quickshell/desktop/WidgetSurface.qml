@@ -22,6 +22,11 @@ Surface {
         return false;
     }
 
+    // What it shows, in words: spoken after its name when the keyboard mode reaches it.
+    function describe(): string {
+        return "";
+    }
+
     // Enter, Return or Space: the key that uses a widget (or its picked row) in keyboard mode.
     function activates(event: var): bool {
         return event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space;

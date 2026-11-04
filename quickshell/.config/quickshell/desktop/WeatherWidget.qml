@@ -8,6 +8,11 @@ import qs.widgets
 WidgetSurface {
     id: widget
 
+    // For screen readers in keyboard mode (WidgetStage): what it shows, in words.
+    function describe(): string {
+        return now ? `${now.temperature}°, ${now.label}, high ${now.high}°, low ${now.low}°` : "No weather yet";
+    }
+
     readonly property var now: Weather.current
     // On the lock screen: the town is where you live, to anyone at the screen.
     property bool hidesPlace: false

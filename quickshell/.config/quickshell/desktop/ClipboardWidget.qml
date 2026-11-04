@@ -14,6 +14,12 @@ import "../services/ClipboardEntries.js" as ClipboardEntries
 WidgetSurface {
     id: widget
 
+    // For screen readers in keyboard mode (WidgetStage): what it shows, in words.
+    function describe(): string {
+        return clips.length === 0 ? "Nothing copied yet"
+            : (clips.length === 1 ? "1 clip" : clips.length + " clips") + ". Down picks one, Enter copies the newest";
+    }
+
     medium: true
     property bool hidesTitles: false
 

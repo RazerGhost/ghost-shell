@@ -5,6 +5,13 @@ import qs.theme
 
 // The clock widget (medium): the weekday in the accent, the time large, the date under it.
 WidgetSurface {
+    id: widget
+
+    // For screen readers in keyboard mode (WidgetStage): what it shows, in words.
+    function describe(): string {
+        return Qt.formatTime(clock.date, Settings.values.clock24Hour ? "HH:mm" : "h:mm AP") + ", "
+            + Qt.locale(Qt.uiLanguage).toString(clock.date, "dddd d MMMM");
+    }
     medium: true
 
     SystemClock {

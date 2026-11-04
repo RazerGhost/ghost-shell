@@ -11,6 +11,12 @@ import qs.theme
 WidgetSurface {
     id: widget
 
+    // For screen readers in keyboard mode (WidgetStage): what it shows, in words.
+    function describe(): string {
+        return Qt.locale(Qt.uiLanguage).toString(clock.date, "MMMM yyyy") + ", today the " + clock.date.getDate()
+            + ". " + (events.length ? "Next: " + events.map(e => e.title + ", " + Agenda.when(e)).join("; ") : "Nothing coming up");
+    }
+
     // Keyboard mode: Enter opens the today menu, like a click.
     function key(event: var): bool {
         if (!enabled || !activates(event))

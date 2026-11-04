@@ -97,8 +97,8 @@ Item {
             if (!chosenCard || !chosenCard.shown)
                 chosenCard = shownCards[ArrowNavigationJs.nearest(null, shownCards.map(rectOf), "down")] ?? null;
             browser.start();
-            navigator.Accessible.announce("Desktop widgets" + (chosenCard ? ": " + DesktopWidgetsJs.title(chosenCard.name) : "")
-                                          + ". Arrow keys move, Enter uses, Escape goes back.");
+            navigator.Accessible.announce("Desktop widgets. Arrow keys move, Enter uses, Escape goes back. "
+                                          + (chosenCard ? spoken(chosenCard) : ""));
         } else {
             if (browser.wantsKeyboard)
                 browser.stop();
@@ -110,7 +110,13 @@ Item {
     onChosenCardChanged: {
         markChosen();
         if (browsing && chosenCard)
-            navigator.Accessible.announce(DesktopWidgetsJs.title(chosenCard.name));
+            navigator.Accessible.announce(spoken(chosenCard));
+    }
+
+    // A widget for screen readers: its name, then what it shows.
+    function spoken(card: Item): string {
+        const what = card.widget?.describe() ?? "";
+        return DesktopWidgetsJs.title(card.name) + (what ? ": " + what : "");
     }
 
     function markChosen(): void {

@@ -1955,7 +1955,11 @@ A read-only review, findings checked, then fixed:
 - Screen readers (fixed after, user's request): the mode, each widget as it's chosen and the picked
   task or clip are spoken (`Accessible.announce`, Qt 6.8+); the widgets' names for people are
   `DesktopWidgets.title`, shared with the editor's gallery. Orca joined the core module to hear
-  them.
+  them. Then (user's find with Orca: only the names were read) each widget says what it shows
+  (`WidgetSurface.describe`: the time and date, the weather with high and low, the track, the
+  next events, the battery, the timer, the tasks, the note, how many clips), spoken after its
+  name. Verified by the user that Orca reads the mode; the content checked for errors over all
+  13 widgets.
 - Checked on screen: focus mode during the keyboard mode ends it cleanly; "Focus again" through
   the IPC starts a session, a second is ignored.
 

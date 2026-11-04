@@ -14,6 +14,14 @@ import qs.widgets
 WidgetSurface {
     id: widget
 
+    // For screen readers in keyboard mode (WidgetStage): what it shows, in words.
+    function describe(): string {
+        if (!player)
+            return app ? "Nothing playing. Enter opens " + app.name : "Nothing playing";
+        return (player.isPlaying ? "Playing " : "Paused: ") + (player.trackTitle || player.identity || "")
+            + (player.trackArtist ? " by " + player.trackArtist : "") + ". Enter " + (player.isPlaying ? "pauses" : "plays");
+    }
+
     readonly property MprisPlayer player: Media.player
     readonly property DesktopEntry app: player ? null : Media.lastApp
     // The cover is the card: everything over it turns light.
