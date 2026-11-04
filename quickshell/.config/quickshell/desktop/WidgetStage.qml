@@ -24,11 +24,43 @@ Item {
     readonly property alias forecastCard: forecastCard
     readonly property alias monthCard: monthCard
     readonly property alias tasksCard: tasksCard
+    readonly property alias noteCard: noteCard
     readonly property var cards: [clockCard, weatherCard, mediaCard, calendarCard, batteryCard, todoCard, timerCard,
-                                  notificationsCard, forecastCard, monthCard, tasksCard]
+                                  notificationsCard, forecastCard, monthCard, tasksCard, noteCard]
     // A to-do widget's field is being typed in: the desktop's layer takes the keyboard meanwhile
     // ("take" until it has it, then "keep"; DesktopWidgets.qml), else "none".
-    readonly property var typing: [todoWidget, tasksWidget].find(w => w.wantsKeyboard) ?? null
+    readonly property var typists: [todoWidget.keyboard, tasksWidget.keyboard, noteWidget.keyboard]
+    readonly property var typing: typists.find(k => k.wantsKeyboard) ?? null
+    // One field at a time: starting in one ends the others' typing.
+    function only(keyboard: var): void {
+        for (const other of typists)
+            if (other !== keyboard && other.wantsKeyboard)
+                other.stop();
+    }
+
+    Connections {
+        target: todoWidget.keyboard
+        function onWantsKeyboardChanged(): void {
+            if (todoWidget.keyboard.wantsKeyboard)
+                stage.only(todoWidget.keyboard);
+        }
+    }
+
+    Connections {
+        target: tasksWidget.keyboard
+        function onWantsKeyboardChanged(): void {
+            if (tasksWidget.keyboard.wantsKeyboard)
+                stage.only(tasksWidget.keyboard);
+        }
+    }
+
+    Connections {
+        target: noteWidget.keyboard
+        function onWantsKeyboardChanged(): void {
+            if (noteWidget.keyboard.wantsKeyboard)
+                stage.only(noteWidget.keyboard);
+        }
+    }
     readonly property string keyboard: !typing ? "none" : typing.hasKeyboard ? "keep" : "take"
 
     // Where each widget showing goes at the shell's size, groups kept together
@@ -135,11 +167,6 @@ Item {
         TasksWidget {
             id: todoWidget
             hidesTitles: stage.locked
-            // One field at a time: starting in this one ends the other's typing.
-            onWantsKeyboardChanged: {
-                if (wantsKeyboard)
-                    tasksWidget.stopTyping();
-            }
         }
     }
 
@@ -186,10 +213,17 @@ Item {
             id: tasksWidget
             large: true
             hidesTitles: stage.locked
-            onWantsKeyboardChanged: {
-                if (wantsKeyboard)
-                    todoWidget.stopTyping();
-            }
+        }
+    }
+
+    DesktopCard {
+        id: noteCard
+        name: "note"
+        shown: Settings.values.desktopNote
+
+        NoteWidget {
+            id: noteWidget
+            hidesTitles: stage.locked
         }
     }
 }

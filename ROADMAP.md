@@ -1825,6 +1825,12 @@ and light mode:
   follow the 12/24-hour clock (`Weather.hourLabel`, tested); the media widget's colors over the
   cover are `Colors` tokens; stale comments about the today menu's calendar. The "Everything"
   widget layout keeps the first eight widgets (the larger ones have the Planner layout).
+- A note widget (user's pick, 2026-11-04; medium, `desktop/NoteWidget.qml`): the today menu's note,
+  written straight on the desktop and saved as you type; on the lock screen "Hidden while
+  locked". The keyboard handover the to-do field had (Exclusive to take it, OnDemand to keep it,
+  a click elsewhere ends it) is `desktop/WidgetKeyboard.qml` now, for the three fields, and the
+  stage lets one type at a time (`WidgetStage.only`). Checked live: typing saved, and starting
+  the to-do field took the keyboard over from the note at once.
 
 ### Ending and starting the session (built 2026-11-04)
 User's find after the lock screen work: logging out and shutting down gave no feedback, and being

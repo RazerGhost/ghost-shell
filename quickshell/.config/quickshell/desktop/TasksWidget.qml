@@ -6,20 +6,16 @@ import qs.widgets
 // The to-do widgets, a to-do list of their own (the medium "To-do" and the large "To-do list",
 // `large`): the open tasks (services/Planner.qml), as many as fit, click one to tick it off, and
 // a field at the bottom to add one.
-// The desktop's layer takes no keyboard, so a click in the field asks for it (`wantsKeyboard`,
-// which DesktopWidgets.qml follows: taken, then kept until you click elsewhere) until Enter on an
-// empty field, Escape or a click in a window.
+// A click in the field takes the keyboard (WidgetKeyboard.qml) until Enter on an empty field,
+// Escape or a click in a window.
 // On the lock screen (`hidesTitles`) only how many are open.
 WidgetSurface {
     id: widget
 
     medium: true
     property bool hidesTitles: false
-    // Typing into the field: the desktop's layer takes the keyboard meanwhile.
-    property bool wantsKeyboard: false
-    // The layer has the keyboard (its window is active): from then on it only keeps it, and
-    // losing it (a click in a window) ends the typing.
-    property bool hasKeyboard: false
+    // Typing into the field: the desktop's layer has the keyboard meanwhile (WidgetStage.qml).
+    readonly property alias keyboard: keyboard
 
     readonly property var open: Planner.todos.map((t, i) => ({ text: t.text, done: t.done, index: i })).filter(t => !t.done)
     readonly property int done: Planner.todos.length - open.length
@@ -31,27 +27,12 @@ WidgetSurface {
     readonly property bool showsMore: overflows && fit > 1
     readonly property var shown: overflows ? open.slice(0, showsMore ? fit - 1 : 1) : open
 
-    function startTyping(): void {
-        wantsKeyboard = true;
-        // The layer may have the keyboard already (the other to-do widget was typed in): then
-        // there's no change of window focus to wait for.
-        if (field.Window.active)
-            hasKeyboard = true;
-        field.focusInput();
-    }
-
-    function stopTyping(): void {
-        field.text = "";
-        wantsKeyboard = false;
-        hasKeyboard = false;
-        field.input.focus = false;
-    }
-
-    // Asked for and never given (the layer refused): give up rather than wait.
-    Timer {
-        running: widget.wantsKeyboard && !widget.hasKeyboard
-        interval: 1000
-        onTriggered: widget.stopTyping()
+    WidgetKeyboard {
+        id: keyboard
+        onStopped: {
+            field.text = "";
+            field.input.focus = false;
+        }
     }
 
     Item {
@@ -169,13 +150,13 @@ WidgetSurface {
         keepsEscape: true
         onAccepted: {
             if (text.trim() === "") {
-                widget.stopTyping();
+                keyboard.stop();
                 return;
             }
             Planner.add(text.trim());
             text = "";
         }
-        onEscaped: widget.stopTyping()
+        onEscaped: keyboard.stop()
 
         // The click asks for the keyboard (the field can't have it before the layer does). Not in
         // the desktop editor: its widgets are being placed there, and the editor has the keyboard.
@@ -183,22 +164,11 @@ WidgetSurface {
 
         MouseArea {
             anchors.fill: parent
-            visible: !widget.wantsKeyboard
+            visible: !keyboard.wantsKeyboard
             cursorShape: Qt.IBeamCursor
-            onClicked: widget.startTyping()
-        }
-
-        // The item's focus says nothing about the keyboard (it's set before the layer has it);
-        // the window being active does.
-        Connections {
-            target: field.Window
-            function onActiveChanged(): void {
-                if (!widget.wantsKeyboard)
-                    return;
-                if (field.Window.active)
-                    widget.hasKeyboard = true;
-                else if (widget.hasKeyboard)
-                    widget.stopTyping();
+            onClicked: {
+                keyboard.start();
+                field.focusInput();
             }
         }
     }

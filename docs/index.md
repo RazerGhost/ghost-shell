@@ -204,7 +204,8 @@ Cancel / Done, full keyboard control. `customize/Customize.qml`, `EditorChrome.q
 Clock, weather, media (the cover as its card), calendar, battery, to-do, timer, notifications,
 the hourly weather (`ForecastWidget`, `Weather.hours`), and two large ones: the month
 (`MonthWidget`) and the to-do list. Both to-do widgets are `TasksWidget` (medium and large), where
-tasks are added (the layer takes the keyboard while its field is typed in). Small, medium and large (`DesktopWidgets.js` `kinds`, `box`;
+tasks are added, and the note (`NoteWidget`) is written on the desktop; the layer takes the keyboard
+while a field is typed in, one at a time (`WidgetKeyboard.qml`). Small, medium and large (`DesktopWidgets.js` `kinds`, `box`;
 `Theme.desktop.box`); glass cards on a `Bottom` layer, dragged by a handle shown only in the
 desktop editor, snapping or a grid, keyboard nudges, zoom with the shell's size. The lock screen
 draws the same stage, locked. `desktop/DesktopWidgets.qml/.js`, `WidgetStage.qml`, `*Widget.qml`,
