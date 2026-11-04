@@ -393,6 +393,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   The portal's own PipeWire stream: xdph 1.5 names the node `xdg-desktop-portal-hyprland` (its
   `media.name` is `xdph-streaming-<n>`; checked during a real Vesktop share, 2026-11-04), older
   versions named the node `xdph-streaming-<n>`. xdph makes no other PipeWire node.
+- Hyprland's blur samples past the blurred area (size 8, 3 passes: tens of px), so a bright window
+  8 px under the island showed through its glass as light streaks. The `xray` layer rule makes a
+  layer blur only the wallpaper, and it applies to ext-background-effect's blur too (checked
+  2026-11-04 with a white window under the island).
 - Vesktop opens three portal sessions for one share (a source preview, then the share), so the
   picker asked three times. With `screencopy:allow_token_by_default` (`hypr/xdph.conf`) the picker
   hands out a restore token and Chromium's WebRTC reuses it for the following sessions.

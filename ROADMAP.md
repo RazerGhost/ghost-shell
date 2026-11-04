@@ -540,6 +540,9 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   the overview its whole dimmed screen. No `blur` layer rules are left. Not the screenshot bar
   (over the frozen, opaque picture) or the lock preview (its own blurred wallpaper). The glass
   opacity now goes down to 20 % (was 35, for the rules' `ignore_alpha`; user's choice).
+- The island blurs only the wallpaper (layer rule `xray`, 2026-11-04; user's find): its blur
+  reached the window just below it, and a white one (Discord reloading) showed through as light
+  streaks. Its menus over a window blur the wallpaper too, not the window.
 
 ### Elgato Wave:3 (built 2026-10-29; reviewed by the user, untested: the microphone is on the desktop)
 - The opt-in `wave3` module (`modules/wave3/`, its README has the details): openxlr (AUR)

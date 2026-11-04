@@ -128,9 +128,12 @@ local panels = {
     { "qs-wallpaper-picker", "slide top" },    -- the strip under the island
 }
 
--- The volume and brightness pop-up also shows over the lock screen (the keys work there), not
--- taking input. The password prompt never shows in a screen share.
+-- The island's glass blurs only the wallpaper (`xray`): its blur reaches past its edge, so a
+-- bright window just below (Discord reloading, white) bled into it as light streaks; its menus
+-- over a window show the blurred wallpaper too. The volume and brightness pop-up also shows over
+-- the lock screen (the keys work there), not taking input. The password prompt never shows in a screen share.
 local extra = {
+    ["qs-island"] = { xray = true },
     ["qs-osd"]    = { above_lock = 1 },
     ["qs-polkit"] = { no_screen_share = true },
 }
