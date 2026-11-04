@@ -14,7 +14,9 @@ switch=$dev/$port/firmware_node/power_resources_D3hot
 
 say() { logger -t ghost-rtx-off -- "$*"; }
 
-if ! systemctl list-jobs --no-legend 2>/dev/null | grep -q '^[0-9]* *poweroff\.target'; then
+# A power-off has a start job for poweroff.target (a restart has reboot.target's). Not found: left
+# as it is, the safe way.
+if ! systemctl list-jobs --no-legend 2>/dev/null | grep -q 'poweroff\.target.*start'; then
     say "Not a power-off: the RTX stays as it is."
     exit 0
 fi
@@ -22,10 +24,19 @@ if [ ! -e "$dev/$gpu" ]; then
     say "The RTX isn't on the bus this boot: nothing to switch off."
     exit 0
 fi
+# The addresses are this laptop's; never remove anything that isn't NVIDIA's.
+for d in "$gpu" "$audio"; do
+    if [ -e "$dev/$d" ] && [ "$(cat "$dev/$d/vendor")" != 0x10de ]; then
+        say "$d isn't an NVIDIA device: nothing done."
+        exit 0
+    fi
+done
 
 card=$(ls -d "$dev/$audio"/sound/card* 2>/dev/null | head -1)
 card=${card##*/card}
-files=(/dev/nvidia*)
+# What can hold the card: CUDA (/dev/nvidia*), its display nodes (Hyprland draws through them) and
+# its HDMI sound card.
+files=(/dev/nvidia* /dev/dri/by-path/pci-$gpu-*)
 [ -n "$card" ] && files+=(/dev/snd/*C"${card}"D* "/dev/snd/controlC$card")
 if fuser -s "${files[@]}" 2>/dev/null; then
     # Taking away a sound card waits until every program has closed it: never hang a shutdown.
