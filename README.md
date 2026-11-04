@@ -21,10 +21,15 @@ machine can take what it needs.
   timer, low battery); switching workspaces shows the dots for a moment. Notifications pop out of
   it one at a time. It opens into menus (click: today, right-click: quick settings): quick
   settings (status icons, Wi-Fi, Bluetooth, sound, power mode, game mode, focus mode, system
-  stats), today (date, weather, the next events, note, timer, notifications), background apps,
-  media, clipboard, wallpapers (a row of your pictures). An event starting soon shows as "in 12 min" beside the time.
+  stats, background apps), today (date, weather, the next events, note, timer, notifications),
+  media, clipboard, wallpapers (a row of your pictures). An event starting soon shows as "in 12
+  min" beside the time. The mouse does more on it: the wheel sets the volume (Shift: brightness,
+  Ctrl: workspaces, over the cover: tracks), a middle-click plays or pauses, resting on it shows
+  the workspaces, Wi-Fi and battery, its alerts lead where they say (the timer, the recording's
+  stop), and files dropped on it go to your phone (KDE Connect) or any device nearby (LocalSend).
 - **Windows**: a tiling layout of its own (halves, thirds, quarters from the window menu, or by
-  the number of windows), Snap Assist, window tabs, Alt+Tab with live previews, an overview
+  the number of windows), dragging a window by its title bar (or with Super) onto another to swap
+  them, Super+Shift+drag to float one, Snap Assist, window tabs, Alt+Tab with live previews, an overview
   (Super+Tab, a three-finger swipe or the top-left corner), minimize, a dock with window previews.
 - **The rest of a desktop**: notifications (with sounds), launcher (apps, windows, files with `/`, commands with `>`, emoji with `:`, a calculator), on-screen
   volume and brightness, a lock screen that is your desktop locked (it logs in at boot and locks;
@@ -51,7 +56,7 @@ machine can take what it needs.
   speakers switched on (the kernel leaves them off), a measured speaker profile and a limiter.
 - **A settings app** for what would otherwise be config files: displays, sound, keyboard and
   touchpad, power, default apps, keybinds, Btrfs snapshots and more.
-- **Glass**: see-through panels with Hyprland's blur behind exactly their shape.
+- **Glass**: see-through panels with Hyprland's blur behind exactly their shape (or solid ones).
 - **One color scheme** from the wallpaper (matugen) for the shell, Hyprland, Ghostty, GTK apps,
   Zed, Yazi, Zen, Discord, Spotify, Steam and MangoHud.
 

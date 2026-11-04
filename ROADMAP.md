@@ -1797,6 +1797,9 @@ User's picks:
   right-clicks on the time, the dots, Wi-Fi and the battery open the menus, and the wheel turns
   the volume up and down. Verified by the user: a drop, LocalSend.
 
+- The welcome tour's island and windows cards and the README name the mouse features (the
+  wheel, middle-click, resting, dropping files; dragging windows, Super+Shift+drag).
+
 ### The lock screen is your desktop, locked (built 2026-11-04)
 User's picks after booting straight to the lock screen: the lock screen should feel like the
 desktop, not a screen of its own, and the login screen and the lock screen editor can go.
