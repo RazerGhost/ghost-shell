@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# System setup for this laptop (needs sudo): the GPU udev rule, early KMS and the HP logo splash,
+# System setup for this laptop (needs sudo): the GPU udev rule, early KMS and no Plymouth,
 # Limine's boot menu, greetd (logging in at boot, then locking), one mDNS service, and the
 # services the shell reads.
 # Run by `ghost install`; alone: `ghost install system`. Safe to re-run.
@@ -34,7 +34,7 @@ echo "Compare with the PCI addresses below (1002 = AMD, 10de = NVIDIA):"
 lspci -nn -d ::03xx
 ls -l /dev/dri/by-path/ | grep -- '-card'
 
-step "Boot: early KMS, the HP logo splash"
+step "Boot: early KMS, no Plymouth splash"
 rebuild_boot=false
 
 # Early KMS: load the AMD driver before any services start. CachyOS's chwd removes the kms
@@ -45,38 +45,14 @@ if ! cmp -s "$kms" "/etc/mkinitcpio.conf.d/$(basename "$kms")"; then
     rebuild_boot=true
 fi
 
-# The boot splash (user's choice, 2026-11-04; off from 2026-10-28 until then): Plymouth's bgrt
-# theme keeps the firmware's HP logo on screen with a spinner from when the graphics driver takes
-# over (the screen went black there) until the session draws, and at shutdown. The plymouth
-# package is in packages.txt; its hook is in /etc/mkinitcpio.conf's HOOKS (CachyOS's default).
-# Until 2026-11-04 this module turned it off: undo that. /etc/default/limine is bash; each
+# No boot splash (user's choice; tried again on 2026-11-04 with the HP logo theme and dropped:
+# not worth it for the second of logo it kept). The session (straight to its lock screen) is
+# the first thing drawn. /etc/default/limine is bash; each
 # KERNEL_CMDLINE[default]+= line appends to the kernel command line.
-if [[ -e /etc/mkinitcpio.conf.d/30-no-plymouth.conf ]]; then
-    sudo rm /etc/mkinitcpio.conf.d/30-no-plymouth.conf
+no_splash='KERNEL_CMDLINE[default]+=" plymouth.enable=0"'
+if ! grep -qxF "$no_splash" /etc/default/limine; then
+    echo "$no_splash" | sudo tee -a /etc/default/limine >/dev/null
     rebuild_boot=true
-fi
-if grep -qF 'plymouth.enable=0' /etc/default/limine; then
-    sudo sed -i '/plymouth\.enable=0/d' /etc/default/limine
-    rebuild_boot=true
-fi
-grep -Eq '^HOOKS=.*\bplymouth\b' /etc/mkinitcpio.conf \
-    || fail "/etc/mkinitcpio.conf's HOOKS has no plymouth; add it after kms"
-splash='KERNEL_CMDLINE[default]+=" splash"'
-if ! grep -qxF "$splash" /etc/default/limine; then
-    echo "$splash" | sudo tee -a /etc/default/limine >/dev/null
-    rebuild_boot=true
-fi
-if [[ $(plymouth-set-default-theme) != bgrt ]]; then
-    sudo plymouth-set-default-theme bgrt
-    rebuild_boot=true
-fi
-# Plymouth quits the normal way. With `quit --retain-splash` (installed here on 2026-11-04) it
-# still held the graphics card when Hyprland started: logind refused it ("Device or resource
-# busy"), Hyprland crashed and greetd started the session again a second later. Undo that.
-if [[ -e /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf ]]; then
-    sudo rm /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
-    sudo rmdir --ignore-fail-on-non-empty /etc/systemd/system/plymouth-quit.service.d
-    sudo systemctl daemon-reload
 fi
 
 # A quiet console: tty1 shows before the desktop, and at logout and
@@ -89,28 +65,55 @@ if ! grep -qxF "$quiet_console" /etc/default/limine; then
     rebuild_boot=true
 fi
 
+# Plymouth is off, so its packages and initramfs hook go too.
+noplymouth=system/etc/mkinitcpio.conf.d/30-no-plymouth.conf
+if ! cmp -s "$noplymouth" "/etc/mkinitcpio.conf.d/$(basename "$noplymouth")"; then
+    sudo install -Dm644 "$noplymouth" "/etc/mkinitcpio.conf.d/$(basename "$noplymouth")"
+    rebuild_boot=true
+fi
+plymouth=$(pacman -Qq plymouth cachyos-plymouth-bootanimation cachyos-plymouth-theme 2>/dev/null || true)
+if [[ -n $plymouth ]]; then
+    # shellcheck disable=SC2086 # one package name per word
+    sudo pacman -Rns --noconfirm $plymouth
+    rebuild_boot=true
+fi
+
+# `splash` is Plymouth's, which is gone: the kernel only logs it as an unknown option. The line
+# the 2026-11-04 try added goes whole; a `splash` in CachyOS's own line is cut out of it.
+if grep -qxF 'KERNEL_CMDLINE[default]+=" splash"' /etc/default/limine; then
+    sudo sed -i '/^KERNEL_CMDLINE\[default\]+=" splash"$/d' /etc/default/limine
+    rebuild_boot=true
+fi
+# That try's Plymouth drop-in (it kept the logo on screen and crashed Hyprland's first start).
+if [[ -e /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf ]]; then
+    sudo rm /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
+    sudo rmdir --ignore-fail-on-non-empty /etc/systemd/system/plymouth-quit.service.d
+    sudo systemctl daemon-reload
+fi
+if grep -Eq '^KERNEL_CMDLINE.* splash( |")' /etc/default/limine; then
+    sudo sed -i -E '/^KERNEL_CMDLINE/ s/ splash( |")/\1/' /etc/default/limine
+    rebuild_boot=true
+fi
+
 if $rebuild_boot; then
     # limine-mkinitcpio (CachyOS) rebuilds the initramfs and rewrites the Limine boot entries.
     sudo limine-mkinitcpio
 fi
-# Stop if the boot entries didn't follow: no splash, or still told to skip it. Only the
-# kernels' own entries (two slashes deep, "//linux-cachyos"): the snapshot entries further down
-# ("////linux-cachyos", limine-snapper-sync) keep the kernel line from when each was taken.
+# Stop if the option didn't reach the boot entries. Only the kernels' own entries (two slashes
+# deep, "//linux-cachyos"): the snapshot entries further down ("////linux-cachyos",
+# limine-snapper-sync) keep the kernel line from when each was taken.
 # /etc/default/limine is bash written for limine-entry-tool, which declares KERNEL_CMDLINE as a
 # named (associative) array first; sourced bare, `[default]` is read as an unset variable under
 # set -u.
 esp=$(declare -A KERNEL_CMDLINE; . /etc/default/limine; echo "${ESP_PATH:-/boot}")
 cmdlines=$(sudo awk '/^ *\//{ match($0, /\/+/); depth = RLENGTH } /cmdline:/ && depth == 2' "$esp/limine.conf")
 [[ -n $cmdlines ]] || fail "no kernel entries in $esp/limine.conf; run sudo limine-mkinitcpio"
-! grep -vqE ' splash( |$)' <<<"$cmdlines" \
-    || fail "a kernel entry in $esp/limine.conf has no splash; check /etc/default/limine and run sudo limine-mkinitcpio"
-! grep -qF 'plymouth.enable=0' <<<"$cmdlines" \
-    || fail "a kernel entry in $esp/limine.conf still has plymouth.enable=0; check /etc/default/limine and run sudo limine-mkinitcpio"
+! grep -vqF 'plymouth.enable=0' <<<"$cmdlines" \
+    || fail "a kernel entry in $esp/limine.conf has no plymouth.enable=0; check /etc/default/limine and run sudo limine-mkinitcpio"
 
 step "Boot menu: the HP logo stays, the menu only on a key"
 # Limine's own options, at the top of its config (limine-entry-tool, which rewrites the boot
-# entries, keeps them): firmware_logo puts the firmware's logo back when Limine hands over
-# (Plymouth then keeps it until Hyprland draws); quiet hides the menu unless a key is pressed during
+# entries, keeps them): firmware_logo puts the firmware's logo back when Limine hands over; quiet hides the menu unless a key is pressed during
 # the timeout (to pick Windows or a snapshot). $esp is read in the step above.
 limine_conf=$esp/limine.conf
 sudo test -f "$limine_conf" || fail "$limine_conf is missing; check ESP_PATH in /etc/default/limine"

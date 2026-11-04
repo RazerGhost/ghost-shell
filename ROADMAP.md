@@ -1842,14 +1842,14 @@ let in was just the desktop appearing.
   goes black (the graphics driver taking over, with Limine's menu skipped), then the theme's plain
   background, then the lock screen.
 
-### The HP logo through the boot (built 2026-11-04; needs `ghost install system` and a reboot)
-User's pick after the black screen between the firmware and the session: Plymouth back, with its
-`bgrt` theme (see the decision "Plymouth's bgrt splash"). Verified by the user: the logo shows
-through the boot. The first boot with it crashed Hyprland once (`--retain-splash`, see the
-decision); the RTX was also missing from the PCI bus that boot (its slot empty, a warm restart),
-which Hyprland skips ("Explicit device ... not found"), so that's harmless. Next, once this is verified: a theme of
-our own in the wallpaper's background color, so the boot hands over to the lock screen without a
-change of color.
+### The HP logo through the boot (tried and dropped 2026-11-04)
+User's pick after the black screen between the firmware and the session: Plymouth's `bgrt` theme
+(the HP logo with a spinner until just before Hyprland draws). It worked, but its first version
+crashed Hyprland's first start at every boot (`plymouth quit --retain-splash`, NOTES), and once
+that was fixed the gain over no splash was a second of logo; the user dropped it ("not worth the
+effort"), along with a theme of our own. The system module removes it again (packages, hook,
+`splash`, the drop-in). Seen that boot: the RTX missing from the PCI bus after a warm restart (its
+slot empty), which Hyprland skips ("Explicit device ... not found"); harmless.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
@@ -1864,18 +1864,11 @@ windows).
 - **No global NVIDIA env vars:** the wiki's NVIDIA page sets `LIBVA_DRIVER_NAME=nvidia` and
   `__GLX_VENDOR_LIBRARY_NAME=nvidia`, but those are for setups where NVIDIA renders the desktop. Here
   `prime-run` sets them per app.
-- **Plymouth's bgrt splash** (user's choice, 2026-11-04; off from 2026-10-28 until then): the
-  firmware's HP logo with a spinner from when the graphics driver takes over until Hyprland draws,
-  and at shutdown (`modules/system/packages.txt`; the system module sets the theme and adds
-  `splash`). It was off because it left tty1 in graphics mode, which hid the text greeter of the
-  first days; there's no login screen now. Plymouth quits the normal way before greetd starts
-  (`after-plymouth.conf`), leaving a short black screen until Hyprland's first frame. Tried and
-  dropped the same day: `plymouth quit --retain-splash`, to keep the logo up until Hyprland drew
-  over it; Plymouth still held the graphics card when Hyprland started, logind refused it
-  ("Device or resource busy"), Hyprland crashed and greetd started the session again a second
-  later (a longer black screen; the crash report's log tail showed it). The firmware reports BGRT
-  status 0; Plymouth reads only the rotation bits from it, so the logo still shows (checked in its
-  code). A theme of our own in the wallpaper's background color is planned next.
+- **No Plymouth:** it left tty1 in graphics mode (the text greeter of the first days was
+  invisible), and its HP logo theme, tried again on 2026-11-04, wasn't worth it (see "The HP logo
+  through the boot"). The system module appends `plymouth.enable=0` and a quiet console to
+  `/etc/default/limine`; the session, logged in and locked at once, is the first thing drawn.
+  The HP logo goes blank when the graphics driver takes over.
 - **Early KMS:** CachyOS's chwd removes the `kms` mkinitcpio hook on NVIDIA laptops, so
   `system/etc/mkinitcpio.conf.d/20-early-amdgpu.conf` adds `amdgpu` to MODULES.
 
