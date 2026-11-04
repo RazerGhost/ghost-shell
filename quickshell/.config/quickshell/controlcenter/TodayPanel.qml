@@ -21,6 +21,11 @@ Column {
     topPadding: Theme.spacing.s
     spacing: Theme.spacing.m
 
+    // Unfolds one of the note and timer parts ("note", "timer"), when it's opened on it.
+    function openPart(part: string): void {
+        tools.open = part;
+    }
+
     onVisibleChanged: {
         if (visible) {
             tools.open = "";

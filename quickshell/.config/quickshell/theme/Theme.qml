@@ -135,8 +135,9 @@ Singleton {
     }
 
     // Backgrounds of the island, menus, launcher, OSD...; Hyprland blurs what's behind them. This
-    // is the opacity with the glass setting off; with it on, the setting's (Colors.surfaceTranslucent).
-    readonly property real surfaceOpacity: 0.85
+    // is the opacity with the glass setting off (solid); with it on, the setting's
+    // (Colors.surfaceTranslucent).
+    readonly property real surfaceOpacity: 1
 
     readonly property QtObject glass: QtObject {
         readonly property int edge: 1          // the thin light line around glass panels
@@ -178,6 +179,13 @@ Singleton {
         readonly property int maxHeight:  root.px(840)
         // How long the workspace dots stay in the time's place after the workspace changes (ms).
         readonly property int workspaceFlash: 1200
+        // How long the pointer rests on the closed island before it widens with the workspace
+        // dots on its left and Wi-Fi and the battery on its right (ms).
+        readonly property int wideDelay:      400
+        // What one notch of the wheel on the island changes the volume, or with Shift the
+        // brightness, by (0-1).
+        readonly property real volumeStep:     0.05
+        readonly property real brightnessStep: 0.05
         // How long "Reloaded" shows after a shell reload, and a failed reload's error (ms).
         readonly property int reloaded:       2000
         readonly property int reloadError:    10000

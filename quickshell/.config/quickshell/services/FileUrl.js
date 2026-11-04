@@ -5,6 +5,15 @@
 // (tests/tst_fileurl.qml).
 .pragma library
 
+// The other way: a file:// URL (a file dropped from a file manager) as its path; "" for
+// anything that isn't a local file.
+function pathOf(url) {
+    const text = String(url || "");
+    if (!text.startsWith("file://"))
+        return "";
+    return decodeURIComponent(text.slice("file://".length).split(/[?#]/)[0]);
+}
+
 function of(path) {
     if (!path)
         return "";

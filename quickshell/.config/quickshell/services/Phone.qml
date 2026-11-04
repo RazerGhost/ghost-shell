@@ -40,6 +40,13 @@ Singleton {
             Quickshell.execDetached(["sh", script, "send", phone.id]);
     }
 
+    // Files dropped on the island (paths): to the connected phone, or the one picked when several
+    // are (phone.sh asks); without one, a notification says so.
+    function share(paths: var): void {
+        if (paths.length > 0)
+            Quickshell.execDetached(["sh", script, "share", ...paths]);
+    }
+
     // Its files in the file manager, once KDE Connect has mounted them.
     function browse(): void {
         if (phone)

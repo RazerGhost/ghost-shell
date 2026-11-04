@@ -170,7 +170,7 @@ Singleton {
             property string fontSans: ""
             property string fontMono: ""
             // The shell's panels (island, menus, dock, launcher...): glass, see-through over
-            // Hyprland's blur with a thin light edge (like the Ghost Spotify theme), or nearly solid.
+            // Hyprland's blur with a thin light edge (like the Ghost Spotify theme), or solid.
             property bool glass: true
             property int glassOpacity: 45 // percent, 20-85 (settings/AppearancePage.qml)
 

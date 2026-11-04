@@ -1763,6 +1763,29 @@ User's picks from the layout research (the volume pop-up stays where it is):
   cards, the OSD at the top, the wallpaper strip, launcher, overview, editors and window menu sit
   below.
 
+### The island and the mouse (built 2026-11-04)
+User's picks:
+- The wheel on the island sets the volume (5 % a notch), with Shift the brightness (with its
+  pop-up, `Brightness.change`), over the workspace dots or with Ctrl the workspaces (plain
+  scrolling did that before), over the music's cover the tracks; a touchpad's natural scrolling is
+  turned back for the levels. A middle-click plays or pauses (`Media.playPause`, now shared with
+  the media keys' IPC).
+- The alerts lead where they say (`bar/IslandTap.qml`: a click, a tooltip and a screen reader
+  name): the event in the next 15 minutes opens the today menu, the timer opens it on the timer
+  (`Island.openToday`, `TodayPanel.openPart`), the recording dot stops the recording, the
+  microphone, camera, screen sharing and low battery open quick settings, whose status lines name
+  the apps (`Island.openPage`).
+- Resting on the island (0.4 s) widens it (user's choice over a peek at the date and weather):
+  the workspace dots on its left, Wi-Fi and the battery on its right, both sides as wide as the
+  wider so the time stays under the webcam. Wi-Fi opens quick settings' Wi-Fi page, the battery
+  quick settings.
+- Files dragged onto the island say "Send to <phone>" and go to the phone when dropped
+  (`phone.sh share`, now also behind the Phone page and Nautilus's "Send to phone": it finds the
+  connected phone, asks which with several, says so with none; tested with stand-ins).
+  `FileUrl.pathOf` (tested) turns the dropped URLs into paths.
+- Checked on screen: the wide island (centred) and no warnings. The wheel, middle-click, the
+  alerts' clicks and a real drop need the mouse: for the user's checklist.
+
 ### The lock screen is your desktop, locked (built 2026-11-04)
 User's picks after booting straight to the lock screen: the lock screen should feel like the
 desktop, not a screen of its own, and the login screen and the lock screen editor can go.
@@ -2340,7 +2363,8 @@ windows).
   (the island draws the same with its shape's outline): `Colors.surfaceTranslucent` at the
   setting's opacity (45 % by default, 20-85; it was 35-85 while the blur came from layer rules
   with `ignore_alpha`, see "Native blur shapes") and a 1 px edge in the text color at 8 % (`Colors.glassEdge`). Settings ->
-  Appearance -> Shell panels -> Glass turns it off (85 % opaque, no edge). Hyprland's blur is stronger
+  Appearance -> Shell panels -> Glass turns it off (solid since 2026-11-04, no edge; it was 85 %
+  opaque, and the Solid look still showed the wallpaper through). Hyprland's blur is stronger
   (size 8, 3 passes, more vibrancy, a little darker; look.lua). Ghostty (`background-opacity
   0.85`) and Zed (`background.appearance: blurred`, main backgrounds at 85 %) are see-through
   too; those are fixed, not following the setting. GTK/libadwaita apps can't be.

@@ -9,13 +9,18 @@ import qs.theme
 import qs.wallpaper
 import qs.widgets
 import "IslandViews.js" as IslandViews
+import "../services/FileUrl.js" as FileUrl
 
 // The island on one monitor (see Island.qml): one shape under the webcam that shows only the time
 // (or the playing music) and what needs attention (IslandAlerts.qml), and morphs into every menu
 // (user's choice, 2026-11-03: workspaces, status icons and background apps in it, or in pills of
 // their own, looked uneven). A click opens today (or media while music shows), a right-click
-// quick settings, where the status icons and background apps are now. Switching workspaces shows
-// the dots for a moment in the time's place; scrolling over the island steps through them. A
+// quick settings, where the status icons and background apps are now, a middle-click plays or
+// pauses the music. Switching workspaces shows the dots for a moment in the time's place.
+// Resting the pointer on it widens it: the workspace dots on its left, Wi-Fi and the battery on
+// its right. The wheel sets the volume (Shift: the brightness; over the dots or with Ctrl:
+// workspaces; over the music's cover: tracks), its alerts lead where they say, and files dropped
+// on it go to your phone (KDE Connect). A
 // shell reload shows "Reloaded" there too, or opens the island with why it failed (it was a card
 // in the corner, among the notifications, for a day: it's the shell's own status, not one).
 // New notifications pop out of it one at a time, then a window asking for attention (user's
@@ -80,10 +85,58 @@ PanelWindow {
     property bool flashing: false
     // "Reloaded" for a moment in the time's place after the shell reloads (Island.qml).
     readonly property bool showReloaded: island.reloadShown && island.reloadError === "" && !open
-    readonly property bool showDots: flashing && !open && !showReloaded
+    readonly property bool showDots: flashing && !open && !showReloaded && !wide && !showDrop
+    // Files dragged over the island: "Send to <phone>" in the time's place.
+    readonly property bool showDrop: fileDrop.containsDrag && !open
     // While music plays the island shows the music instead of the time. Once it opens (hover
     // player or a menu) the time comes back, since the music is then shown below it.
-    readonly property bool showMedia: Settings.values.islandMedia && Media.playing && !pill.expanded && !showDots && !showReloaded
+    readonly property bool showMedia: Settings.values.islandMedia && Media.playing && !pill.expanded && !showDots && !showReloaded && !showDrop
+
+    // The pointer has rested on the island (Theme.island.wideDelay): it widens, the workspace dots
+    // on the left and Wi-Fi and the battery on the right, while nothing opens below it but the
+    // hover player.
+    property bool rested: false
+    // Both sides as wide as the wider, so the time stays in the middle, under the webcam.
+    readonly property real sideWidth: Math.max(sideDots.implicitWidth, status.implicitWidth) + Theme.spacing.s
+    readonly property bool wide: rested && !open && !showDrop && (pill.shown === "" || pill.shown === "peek-media")
+    Timer {
+        interval: Theme.island.wideDelay
+        running: pill.hovered && !root.rested
+        onTriggered: root.rested = true
+    }
+    Connections {
+        target: pill
+        function onHoveredChanged(): void {
+            if (!pill.hovered)
+                root.rested = false;
+        }
+    }
+
+    // The wheel on the island (user's choice): the volume; with Shift the brightness; over the
+    // workspace dots or with Ctrl the workspaces; over the music's cover the tracks, a notch each.
+    // A touchpad's natural scrolling (`inverted`) is turned back for the levels, so swiping up
+    // turns them up.
+    property real trackScroll: 0
+    function scrolled(wheel: var): void {
+        const delta = wheel.angleDelta.y !== 0 ? wheel.angleDelta.y : wheel.angleDelta.x;
+        const level = (wheel.inverted ? -delta : delta) / 120;
+        if ((wheel.modifiers & Qt.ControlModifier) || sideDots.hovered) {
+            workspaces.scroll(delta);
+        } else if (wheel.modifiers & Qt.ShiftModifier) {
+            Brightness.change(level * Theme.island.brightnessStep);
+        } else if (root.showMedia && coverHover.hovered) {
+            trackScroll += delta;
+            if (Math.abs(trackScroll) >= 120) {
+                if (trackScroll > 0)
+                    Media.previous();
+                else
+                    Media.next();
+                trackScroll = 0;
+            }
+        } else {
+            Audio.setVolume(Audio.volume + level * Theme.island.volumeStep);
+        }
+    }
 
     onOpenChanged: peek = ""
 
@@ -187,6 +240,28 @@ PanelWindow {
         }
     }
 
+    // Files dropped on the island go to your phone (KDE Connect, services/phone.sh: the connected
+    // one; it asks which with several, says so with none). Only files: text and links are refused.
+    DropArea {
+        id: fileDrop
+        anchors.fill: pill
+        enabled: !root.open
+        onEntered: drag => {
+            if (!drag.hasUrls) {
+                drag.accepted = false;
+                return;
+            }
+            Phone.refresh(); // its name for the hint
+        }
+        onDropped: drop => {
+            const paths = drop.urls.map(url => FileUrl.pathOf(url)).filter(path => path !== "");
+            if (paths.length === 0)
+                return;
+            Phone.share(paths);
+            drop.accept(Qt.CopyAction);
+        }
+    }
+
     IslandPill {
         id: pill
 
@@ -212,15 +287,38 @@ PanelWindow {
             // The time first, so a screen reader says what the island shows.
             label: root.showMedia ? "Media" : clock.text + ", calendar"
             secondaryLabel: "Quick settings (Super+A)"
-            details: alerts.summary
+            middleLabel: Media.player ? "Play or pause" : ""
+            details: [alerts.summary, "Scroll: volume, with Shift: brightness, with Ctrl: workspaces"].filter(text => text !== "").join(". ")
             active: root.open
             onActivated: root.island.toggle(menu, root.modelData.name)
             onSecondaryActivated: root.island.toggle("settings", root.modelData.name)
-            onWheel: wheel => workspaces.scroll(wheel.angleDelta.y)
+            onMiddleActivated: Media.playPause()
+            onWheel: wheel => root.scrolled(wheel)
+
+            // The workspace dots while the island is wide: click one, or scroll over them.
+            Item {
+                anchors.verticalCenter: parent.verticalCenter
+                implicitWidth: root.sideWidth
+                implicitHeight: Theme.island.height
+                opacity: root.wide ? 1 : 0
+                visible: opacity > 0
+
+                Behavior on opacity {
+                    NumberAnimation { duration: Theme.anim.normal }
+                }
+
+                Workspaces {
+                    id: sideDots
+                    anchors.left: parent.left
+                    screen: root.modelData
+                    enabled: root.wide
+                }
+            }
 
             Item {
                 anchors.verticalCenter: parent.verticalCenter
-                implicitWidth: root.showReloaded ? reloaded.implicitWidth
+                implicitWidth: root.showDrop ? dropHint.implicitWidth
+                             : root.showReloaded ? reloaded.implicitWidth
                              : root.showDots ? workspaces.implicitWidth
                              : root.showMedia ? activity.implicitWidth : clock.implicitWidth
                 // Not animated here: the island's own width follows it with its morph (IslandPill),
@@ -229,7 +327,7 @@ PanelWindow {
                 implicitHeight: Theme.island.height
 
                 IslandFade {
-                    shown: !root.showMedia && !root.showDots && !root.showReloaded
+                    shown: !root.showMedia && !root.showDots && !root.showReloaded && !root.showDrop
 
                     Clock {
                         id: clock
@@ -240,9 +338,41 @@ PanelWindow {
                 IslandFade {
                     shown: root.showMedia
 
+                    // The wheel over the cover steps through the tracks.
+                    HoverHandler {
+                        id: coverHover
+                    }
+
                     MediaActivity {
                         id: activity
                         anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+
+                // Files dragged over the island: where they'll go.
+                IslandFade {
+                    shown: root.showDrop
+
+                    Row {
+                        id: dropHint
+                        anchors.centerIn: parent
+                        spacing: Theme.spacing.xs
+
+                        MaterialIcon {
+                            anchors.verticalCenter: parent.verticalCenter
+                            icon: "send_to_mobile"
+                            font.pixelSize: Theme.icon.small
+                            color: Colors.m3primary
+                        }
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: "Send to " + (Phone.phone?.name ?? "your phone")
+                            color: Colors.m3onSurface
+                            font.family: Theme.font.sans
+                            font.pixelSize: Theme.font.normal
+                            font.weight: Font.DemiBold
+                        }
                     }
                 }
 
@@ -287,6 +417,51 @@ PanelWindow {
 
             IslandAlerts {
                 id: alerts
+                onTodayRequested: part => root.island.openToday(part, root.modelData.name)
+                onSettingsRequested: root.island.openPage("", root.modelData.name)
+            }
+
+            // Wi-Fi and the battery while the island is wide; a click opens quick settings (on the
+            // Wi-Fi page for Wi-Fi), where the rest of the status is.
+            Item {
+                anchors.verticalCenter: parent.verticalCenter
+                implicitWidth: root.sideWidth
+                implicitHeight: Theme.island.height
+                opacity: root.wide ? 1 : 0
+                visible: opacity > 0
+
+                Behavior on opacity {
+                    NumberAnimation { duration: Theme.anim.normal }
+                }
+
+                Row {
+                    id: status
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacing.s
+
+                    WifiIcon {
+                        anchors.verticalCenter: parent.verticalCenter
+                        icon: NetworkStatus.icon
+                        font.pixelSize: Theme.icon.small
+
+                        IslandTap {
+                            label: "Network: " + NetworkStatus.label
+                            enabled: root.wide
+                            onTapped: root.island.openPage("wifi", root.modelData.name)
+                        }
+                    }
+
+                    BatteryPill {
+                        visible: Battery.present
+
+                        IslandTap {
+                            label: "Battery " + Math.round(Battery.level * 100) + "%" + (Battery.charging ? ", charging" : "")
+                            enabled: root.wide
+                            onTapped: root.island.openPage("", root.modelData.name)
+                        }
+                    }
+                }
             }
         }
 
@@ -446,7 +621,24 @@ PanelWindow {
             shown: pill.shown === "today"
             content: Component {
                 TodayPanel {
+                    id: today
                     width: parent.width
+                    // Asked for one of its parts (the island's timer): built now or already open.
+                    // Later, so its own folding when it's shown comes first.
+                    function takePart(): void {
+                        if (root.island.todayPart !== "") {
+                            const part = root.island.todayPart;
+                            root.island.todayPart = "";
+                            Qt.callLater(() => today.openPart(part));
+                        }
+                    }
+                    Component.onCompleted: takePart()
+                    Connections {
+                        target: root.island
+                        function onTodayPartChanged(): void {
+                            today.takePart();
+                        }
+                    }
                 }
             }
         }

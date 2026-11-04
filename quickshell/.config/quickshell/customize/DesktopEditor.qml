@@ -871,7 +871,7 @@ Scope {
 
                     SheetTile {
                         title: "Glass"
-                        subtitle: Settings.values.glass ? Settings.values.glassOpacity + " % solid" : "Off: panels nearly solid"
+                        subtitle: Settings.values.glass ? Settings.values.glassOpacity + " % solid" : "Off: panels solid"
                         weight: 1.2
                         action: Switch {
                             label: "Glass panels"

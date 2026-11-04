@@ -98,8 +98,8 @@ Recovery procedures (lock screen crash, a session that can't start) are in ROADM
 
 | Feature | Files |
 |---|---|
-| Island: one shape with the time (or music) and alerts, floating or attached to the top edge (`islandAttached`); click for today, right-click for quick settings; morphs into every menu | `bar/Island.qml`, `IslandWindow.qml`, `IslandPill.qml`, `PillShape.qml`, `PillPath.js`, `IslandViews.js`, `IslandButton.qml`, `IslandFade.qml` |
-| Island alerts: an event within 15 minutes (`Agenda.soon`), recording, timer (focus mode's own icon), microphone, camera, screen sharing, low battery | `bar/IslandAlerts.qml`, `widgets/StatusGlyph.qml` |
+| Island: one shape with the time (or music) and alerts, floating or attached to the top edge (`islandAttached`); click for today, right-click for quick settings, middle-click play or pause; the wheel sets the volume (Shift brightness, Ctrl or over the dots workspaces, over the cover tracks); resting on it widens it (workspace dots left, Wi-Fi and battery right); files dropped on it go to the phone; morphs into every menu | `bar/Island.qml`, `IslandWindow.qml`, `IslandPill.qml`, `PillShape.qml`, `PillPath.js`, `IslandViews.js`, `IslandButton.qml`, `IslandFade.qml`, `IslandTap.qml` |
+| Island alerts: an event within 15 minutes (`Agenda.soon`), recording, timer (focus mode's own icon), microphone, camera, screen sharing, low battery; a click goes where each leads (today, the timer, quick settings; the recording stops) | `bar/IslandAlerts.qml`, `bar/IslandTap.qml`, `widgets/StatusGlyph.qml` |
 | Pop-ups out of the island, one at a time: notifications, then attention requests | `bar/IslandWindow.qml`, `IslandViews.js`, `controlcenter/NotificationCard.qml`, `AttentionCard.qml` |
 | Workspace dots (3-10 or only used), shown in the island for a moment after a switch; scroll over the island to step | `bar/Workspaces.qml`, `services/WorkspaceSlots.js` |
 | Clock (day, seconds, 24-hour options) | `bar/Clock.qml` |
@@ -117,7 +117,7 @@ Recovery procedures (lock screen crash, a session that can't start) are in ROADM
 | Bluetooth page: scan, pair, connect, device batteries | `controlcenter/BluetoothPage.qml` |
 | Sound page: output, microphone, per-app volume, equalizer preset | `controlcenter/SoundPage.qml` |
 | System page: CPU, memory, GPUs, disk, busiest apps with End task | `controlcenter/SystemPage.qml`, `services/SystemStats.qml`, `system-stats.sh` |
-| Phone page: ring, send files, clipboard, browse | `controlcenter/PhonePage.qml`, `services/Phone.qml`, `phone.sh` |
+| Phone page: ring, send files, clipboard, browse; files dropped on the island and Nautilus's "Send to phone" go through `phone.sh share` | `controlcenter/PhonePage.qml`, `services/Phone.qml`, `phone.sh` |
 | Background apps (tray), from quick settings' bottom row | `controlcenter/Tray.qml` |
 | Today: a header (weekday, date, the weather with its town to change), agenda, the note and timer as tiles, grouped notifications (the month and the to-do list are desktop widgets) | `controlcenter/TodayPanel.qml`, `TodayHeader.qml`, `TodayTools.qml`, `AgendaList.qml` |
 | Media menu: cover colors, seek, shuffle/repeat | `controlcenter/MediaPanel.qml`, `MediaAccent.js` |

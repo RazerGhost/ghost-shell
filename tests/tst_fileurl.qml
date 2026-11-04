@@ -23,4 +23,12 @@ TestCase {
         const path = "/p/a #b/c?d%e.png";
         compare(new URL(FileUrl.of(path)).pathname, path);
     }
+
+    // A dropped file's URL back to its path; the island sends dropped files to the phone.
+    function test_pathOf() {
+        compare(FileUrl.pathOf("file:///home/me/art%20%232.png"), "/home/me/art #2.png");
+        compare(FileUrl.pathOf(FileUrl.of("/p/a #b/c?d%e.png")), "/p/a #b/c?d%e.png");
+        compare(FileUrl.pathOf("https://example.com/a.png"), "");
+        compare(FileUrl.pathOf(""), "");
+    }
 }

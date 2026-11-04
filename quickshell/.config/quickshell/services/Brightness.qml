@@ -15,7 +15,8 @@ Singleton {
     // 0-1; -1 until the first read finishes.
     property real level: -1
 
-    // Emitted when a refresh from IPC has read the new value; not for the read at startup.
+    // Emitted when a refresh from IPC has read the new value, or change() set one (the OSD shows
+    // it); not for the read at startup.
     signal changed()
 
     property bool emitOnRead: false
@@ -28,6 +29,14 @@ Singleton {
         pending = Math.round(Math.max(0.01, Math.min(1, level)) * 100);
         if (!write.running)
             apply();
+    }
+
+    // Up or down by `by` (the island's wheel), with the pop-up like the keys.
+    function change(by: real): void {
+        if (level < 0)
+            return;
+        set(level + by);
+        changed();
     }
 
     property int pending: -1

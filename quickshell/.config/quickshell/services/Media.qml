@@ -108,22 +108,32 @@ Singleton {
             player.raise();
     }
 
-    // The keyboard's media keys (hypr/binds.lua): `qs ipc call media playPause|next|previous`,
-    // acting on `player` like the island's controls.
+    // On `player`, for the island (middle-click, the wheel over the cover) and the media keys.
+    function playPause(): void {
+        if (player?.canTogglePlaying)
+            player.togglePlaying();
+    }
+    function next(): void {
+        if (player?.canGoNext)
+            player.next();
+    }
+    function previous(): void {
+        if (player?.canGoPrevious)
+            player.previous();
+    }
+
+    // The keyboard's media keys (hypr/binds.lua): `qs ipc call media playPause|next|previous`.
     IpcHandler {
         target: "media"
 
         function playPause(): void {
-            if (root.player?.canTogglePlaying)
-                root.player.togglePlaying();
+            root.playPause();
         }
         function next(): void {
-            if (root.player?.canGoNext)
-                root.player.next();
+            root.next();
         }
         function previous(): void {
-            if (root.player?.canGoPrevious)
-                root.player.previous();
+            root.previous();
         }
     }
 }

@@ -35,6 +35,8 @@ Scope {
     property bool quickEdit: false
     // Quick settings is to open on one of its pages ("system", "apps", ...; `island page`).
     property string quickPage: ""
+    // The today menu is to open on one of its parts ("timer": the island's timer alert).
+    property string todayPart: ""
 
     // After the shell reloads (a file in its folder changed), the island says so instead of
     // Quickshell's own pop-up: briefly when it worked, longer with the error when it didn't (the
@@ -110,6 +112,18 @@ Scope {
         onTriggered: root.reloadShown = false
     }
 
+    // Quick settings on one of its pages, or the today menu on one of its parts, on `screen`.
+    function openPage(page: string, screen: string): void {
+        screenName = screen;
+        panel = "settings";
+        quickPage = page;
+    }
+    function openToday(part: string, screen: string): void {
+        screenName = screen;
+        panel = "today";
+        todayPart = part;
+    }
+
     function toggle(name: string, screen: string): void {
         if (panel === name && screenName === screen) {
             panel = "";
@@ -165,9 +179,7 @@ Scope {
         // Quick settings on one of its pages: qs ipc call island page system (Ctrl+Shift+Esc, the
         // task manager) or apps (background apps).
         function page(name: string): void {
-            root.screenName = Hyprland.focusedMonitor?.name ?? "";
-            root.panel = "settings";
-            root.quickPage = name;
+            root.openPage(name, Hyprland.focusedMonitor?.name ?? "");
         }
 
         // Quick settings in its edit mode (the customize menu's Quick settings).

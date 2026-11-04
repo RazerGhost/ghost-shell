@@ -8,9 +8,15 @@ import qs.widgets
 // the timer's time left, the microphone, camera or screen in use (like Android's privacy dots),
 // and a low battery. Each shows only while it's going on. The glyph is the information, so each
 // says what it means to screen readers (StatusGlyph); `summary` is all
-// of them, for the island's button, which they sit inside.
+// of them, for the island's button, which they sit inside. A click on one goes where it leads
+// (IslandTap): the event and the timer to the today menu, the recording stops, the rest open
+// quick settings, whose status lines name the apps.
 Row {
     id: root
+
+    // The today menu, on one of its parts ("" or "timer"), and quick settings.
+    signal todayRequested(string part)
+    signal settingsRequested()
 
     // Focus mode's timer always shows: it's the only sign focus mode is on.
     readonly property bool timerShown: Countdown.active && (Focus.on || !Array.from(Settings.values.hiddenStatusIcons ?? []).includes("timer"))
@@ -33,81 +39,111 @@ Row {
 
     // A calendar event starts within 15 minutes: when, beside an event icon (its title is in the
     // today menu: the island is seen by anyone looking at the screen).
-    Row {
+    Item {
         anchors.verticalCenter: parent.verticalCenter
         visible: Agenda.soon !== null
-        spacing: Theme.spacing.xs
-
-        MaterialIcon {
-            anchors.verticalCenter: parent.verticalCenter
-            icon: "event_upcoming"
-            color: Colors.m3primary
-            font.pixelSize: Theme.icon.small
-        }
-
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            text: root.soonLabel
-            color: Colors.m3onSurface
-            font.family: Theme.font.sans
-            font.pixelSize: Theme.font.small
-            font.features: { "tnum": 1 }
-        }
-
+        implicitWidth: soonRow.implicitWidth
+        implicitHeight: soonRow.implicitHeight
         Accessible.role: Accessible.StaticText
         Accessible.name: "Up next: " + root.soonText
+
+        Row {
+            id: soonRow
+            spacing: Theme.spacing.xs
+
+            MaterialIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                icon: "event_upcoming"
+                color: Colors.m3primary
+                font.pixelSize: Theme.icon.small
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: root.soonLabel
+                color: Colors.m3onSurface
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.small
+                font.features: { "tnum": 1 }
+            }
+        }
+
+        IslandTap {
+            label: "See the event"
+            onTapped: root.todayRequested("")
+        }
     }
 
     // A screen recording is running: a red dot and the time (services/Recorder.qml).
-    Row {
+    Item {
         anchors.verticalCenter: parent.verticalCenter
         visible: Recorder.recording
-        spacing: Theme.spacing.xs
-
-        Rectangle {
-            anchors.verticalCenter: parent.verticalCenter
-            width: Theme.spacing.s
-            height: width
-            radius: width / 2
-            color: Colors.m3error
-        }
-
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            text: Recorder.time
-            color: Colors.m3onSurface
-            font.family: Theme.font.sans
-            font.pixelSize: Theme.font.small
-            font.features: { "tnum": 1 } // digits of equal width, so the time doesn't jitter
-        }
-
+        implicitWidth: recordingRow.implicitWidth
+        implicitHeight: recordingRow.implicitHeight
         Accessible.role: Accessible.StaticText
         Accessible.name: root.recordingText
+
+        Row {
+            id: recordingRow
+            spacing: Theme.spacing.xs
+
+            Rectangle {
+                anchors.verticalCenter: parent.verticalCenter
+                width: Theme.spacing.s
+                height: width
+                radius: width / 2
+                color: Colors.m3error
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: Recorder.time
+                color: Colors.m3onSurface
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.small
+                font.features: { "tnum": 1 } // digits of equal width, so the time doesn't jitter
+            }
+        }
+
+        IslandTap {
+            label: "Stop the recording"
+            onTapped: Recorder.stop()
+        }
     }
 
     // The today menu's timer is running: the time left.
-    Row {
+    Item {
         anchors.verticalCenter: parent.verticalCenter
         visible: root.timerShown
-        spacing: Theme.spacing.xs
-
-        MaterialIcon {
-            anchors.verticalCenter: parent.verticalCenter
-            icon: Focus.on ? "self_improvement" : Focus.onBreak ? "coffee" : "timer"
-            font.pixelSize: Theme.icon.small
-        }
-
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            text: Countdown.label
-            color: Colors.m3onSurface
-            font.family: Theme.font.sans
-            font.pixelSize: Theme.font.small
-            font.features: { "tnum": 1 } // digits of equal width, so the time doesn't jitter
-        }
-
+        implicitWidth: timerRow.implicitWidth
+        implicitHeight: timerRow.implicitHeight
         Accessible.role: Accessible.StaticText
         Accessible.name: root.timerText
+
+        Row {
+            id: timerRow
+            spacing: Theme.spacing.xs
+
+            MaterialIcon {
+                anchors.verticalCenter: parent.verticalCenter
+                icon: Focus.on ? "self_improvement" : Focus.onBreak ? "coffee" : "timer"
+                font.pixelSize: Theme.icon.small
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: Countdown.label
+                color: Colors.m3onSurface
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.small
+                font.features: { "tnum": 1 } // digits of equal width, so the time doesn't jitter
+            }
+        }
+
+        IslandTap {
+            label: "Open the timer"
+            onTapped: root.todayRequested("timer")
+        }
     }
 
     // An app is recording from the microphone; red and crossed out while it's muted (talking
@@ -117,6 +153,11 @@ Row {
         icon: Audio.micMuted ? "mic_off" : "mic"
         color: Audio.micMuted ? Colors.m3error : Colors.m3primary
         label: root.micText
+
+        IslandTap {
+            label: "See who's using the microphone"
+            onTapped: root.settingsRequested()
+        }
     }
 
     StatusGlyph {
@@ -124,6 +165,11 @@ Row {
         icon: "videocam"
         color: Colors.m3primary
         label: root.cameraText
+
+        IslandTap {
+            label: "See who's using the camera"
+            onTapped: root.settingsRequested()
+        }
     }
 
     StatusGlyph {
@@ -131,6 +177,11 @@ Row {
         icon: "screen_share"
         color: Colors.m3primary
         label: root.screenText
+
+        IslandTap {
+            label: "See the screen sharing"
+            onTapped: root.settingsRequested()
+        }
     }
 
     StatusGlyph {
@@ -138,5 +189,10 @@ Row {
         icon: Battery.icon
         color: Colors.m3error
         label: root.batteryText
+
+        IslandTap {
+            label: "Open quick settings"
+            onTapped: root.settingsRequested()
+        }
     }
 }
