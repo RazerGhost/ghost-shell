@@ -3,14 +3,13 @@ import Quickshell
 import Quickshell.Wayland
 import qs.services
 import qs.theme
-import qs.widgets
 import "DesktopWidgets.js" as DesktopWidgetsJs
 
-// Widgets on the wallpaper (the desktop editor's Widgets tab): a clock, the weather, the
-// media player (with nothing playing, it offers the music app last heard), the calendar's next events, the battery, the to-do list
-// the timer and how many notifications wait (ClockWidget, WeatherWidget, MediaWidget,
-// CalendarWidget, BatteryWidget, TodoWidget, TimerWidget, NotificationsWidget: one family of sizes; the list of them is DesktopWidgets.js's
-// `kinds`). On the first screen, on the layer just above the wallpaper, so windows cover them.
+// Widgets on the wallpaper (the desktop editor's Widgets tab): a clock, the weather, the media
+// player (with nothing playing, it offers the music app last heard), the calendar's next events,
+// the battery, the to-do list, the timer and how many notifications wait (ClockWidget,
+// WeatherWidget, MediaWidget, CalendarWidget, BatteryWidget, TodoWidget, TimerWidget,
+// NotificationsWidget: one family of sizes; the list of them is DesktopWidgets.js's `kinds`). On the first screen, on the layer just above the wallpaper, so windows cover them.
 // Each can be dragged by its handle (DesktopCard.qml). The widgets themselves are WidgetStage.qml,
 // which the lock screen draws too.
 Scope {
@@ -58,7 +57,7 @@ Scope {
             }
 
             // The widgets' area: the whole screen, or scaled into the card the wallpaper is drawn
-            // as while the desktop editor is open (customize/Editing.qml).
+            // as while the desktop editor is open (services/Editing.qml).
             WidgetStage {
                 id: widgetStage
 

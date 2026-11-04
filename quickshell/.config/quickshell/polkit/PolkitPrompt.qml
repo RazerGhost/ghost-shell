@@ -57,7 +57,7 @@ Scope {
             id: surface
 
             anchors.centerIn: parent
-            width: Theme.lock.fieldWidth + Theme.spacing.l * 4
+            width: Theme.polkit.field + Theme.spacing.l * 4
             height: content.implicitHeight + Theme.spacing.l * 2
             radius: Theme.radius.xl
 

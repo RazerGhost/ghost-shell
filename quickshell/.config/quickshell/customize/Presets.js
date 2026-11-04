@@ -1,5 +1,7 @@
 // Named looks for the on-screen editors (a gallery of picture cards, like the iOS lock screen
-// gallery; the lock screen is the desktop, locked, so it has none of its own): picking one sets several settings at once; each can still be changed after. Plain JavaScript, so it can be tested on its own (tests/tst_presets.qml).
+// gallery; the lock screen is the desktop, locked, so it has none of its own): picking one sets
+// several settings at once; each can still be changed after. Plain JavaScript, so it can be
+// tested on its own (tests/tst_presets.qml).
 .pragma library
 .import "../desktop/DesktopWidgets.js" as DesktopWidgets
 
@@ -48,7 +50,7 @@ const desktopWidgets = [
     { name: "Everything", values: widgetLayout({ clock: [80, 80], calendar: [448, 80], media: [80, 264], todo: [448, 264],
                                                 weather: [80, 448], battery: [264, 448], timer: [448, 448],
                                                 notifications: [632, 448] }) },
-    // A column on the left, centred top to bottom: the time, the sky and battery, the player
+    // A column on the left, centred top to bottom: the time, the sky and battery, the player.
     { name: "Side", values: widgetLayout({ clock: [80, 272], weather: [80, 456], battery: [264, 456], media: [80, 640] }) }
 ];
 

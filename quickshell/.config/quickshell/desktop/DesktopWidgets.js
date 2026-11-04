@@ -115,8 +115,9 @@ function withPlace(saved, name, place) {
     return places;
 }
 
-// Sizes at 100 % (Theme.desktop: a small widget's side, a medium one twice it plus the gap) and
-// the room kept from the screen's edges: the island's band at the top, the dock's at the bottom.
+// Sizes at 100 % (Theme.desktop scales these: a small widget's side, a medium one twice it plus
+// the gap) and the room kept from the screen's edges: the island's band at the top (its
+// Theme.island.reserved with room to spare), the dock's at the bottom.
 const unit = { size: 168, gap: 16, side: 32, top: 80, bottom: 100 };
 
 function box(name) {

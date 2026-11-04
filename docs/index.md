@@ -219,7 +219,7 @@ draws the same stage, locked. `desktop/DesktopWidgets.qml/.js`, `WidgetStage.qml
 
 | Feature | Files |
 |---|---|
-| Lock screen: the desktop locked (its wallpaper and widgets, glass behind them), PAM, grace period, message line | `lock/Lock.qml`, `LockContent.qml`, `desktop/WidgetStage.qml` |
+| Lock screen: the desktop locked (its wallpaper and widgets, glass behind them), PAM, grace period (`LockMotion.js`), message line | `lock/Lock.qml`, `LockContent.qml`, `LockMotion.js`, `desktop/WidgetStage.qml` |
 | The island opens into the password field (shake on error, caps lock and layout hints) | `lock/LockIsland.qml` |
 | Boot and logout log in and lock at once (greetd, `GHOST_AUTOLOGIN`, a per-instance lock mark); no login screen | `system/etc/greetd/config.toml`, `hypr/hyprland.lua`, `lock/Lock.qml` |
 | Idle: dim, lock, screen off, suspend (battery / plugged in) | `idle/Idle.qml`, `hypridle.conf` |

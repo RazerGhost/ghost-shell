@@ -48,9 +48,8 @@ Item {
 
     anchors.fill: parent
     focus: true
-    // Takes the keyboard itself for Escape and Enter: what an editor shows can claim it (the lock
-    // screen's password field, `focus: true` in the same window, won it and then, switched off,
-    // gave the keys to nothing).
+    // Takes the keyboard itself for Escape and Enter, so a control in what an editor shows can't
+    // claim it first.
     Component.onCompleted: forceActiveFocus()
 
     Keys.onEscapePressed: root.cancelled()
@@ -67,7 +66,6 @@ Item {
         id: navigation
         area: root.parent ?? root
     }
-
 
     function switchTab(by: int): void {
         const i = root.tabs.findIndex(t => t.value === root.tab);

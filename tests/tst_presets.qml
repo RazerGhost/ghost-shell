@@ -64,7 +64,7 @@ TestCase {
                 compare(preset.values[kind.key], place !== undefined, preset.name + " " + kind.name);
                 if (!place)
                     continue;
-                const r = { n: kind.name, x: place.x * 1920, y: place.y * 1080, w: kind.medium ? 352 : 168, h: 168 };
+                const r = { n: kind.name, x: place.x * 1920, y: place.y * 1080, w: DesktopWidgets.box(kind.name).w, h: DesktopWidgets.box(kind.name).h };
                 verify(r.x >= 32 && r.x + r.w <= 1920 - 32, preset.name + " " + r.n);
                 verify(r.y >= 80 && r.y + r.h <= 1080 - 100, preset.name + " " + r.n);
                 rects.push(r);

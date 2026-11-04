@@ -6,6 +6,7 @@ import QtQuick
 import Quickshell
 import qs.services
 import "../settings/HyprlandConfig.js" as HyprlandConfig
+import "../desktop/DesktopWidgets.js" as DesktopWidgetsJs
 import "ThemeScale.js" as ThemeScale
 
 Singleton {
@@ -145,7 +146,8 @@ Singleton {
         readonly property int openRadius: root.round(32)  // bottom corners when open (closed: half the height)
         // The menus' widths (user's choice, 2026-11-04: each its own, so the island morphs into
         // a shape that fits it): wider for the grids and lists, narrower for the power menu.
-        // panelWidth is the rest's (the hover player, notification and attention pop-ups).
+        // panelWidth is the rest's (the hover player, notification and attention pop-ups, the
+        // lock screen's password field).
         readonly property int panelWidth: root.px(380)
         readonly property var menuWidths: ({
             settings: root.px(460), clipboard: root.px(460), emoji: root.px(460),
@@ -204,11 +206,12 @@ Singleton {
     // one twice as wide, the same height, corners and padding.
     readonly property QtObject desktop: QtObject {
         // Through text(), not px(): the widgets are mostly text, and grow with its size too.
-        readonly property int size:    root.text(168) // a small widget's side; every widget's height
-        readonly property int gap:     root.px(16)  // between widgets snapped side by side
+        // At 100 % from DesktopWidgets.js's `unit`, which lays them out (and is tested) in those px.
+        readonly property int size:    root.text(DesktopWidgetsJs.unit.size) // a small widget's side; every widget's height
+        readonly property int gap:     root.px(DesktopWidgetsJs.unit.gap)    // between widgets snapped side by side
         readonly property int medium:  size * 2 + gap
         // How large the widgets are against 100 %: their places zoom by it (DesktopWidgets.js).
-        readonly property real zoom:   size / 168
+        readonly property real zoom:   size / DesktopWidgetsJs.unit.size
         readonly property int padding: root.text(20)
         readonly property int radius:  root.round(28)
         readonly property int margin:  root.px(32)  // from the screen's edges, when snapped
@@ -263,11 +266,14 @@ Singleton {
     }
 
     readonly property QtObject lock: QtObject {
-        readonly property int fieldWidth: root.px(340) // the polkit prompt's card is sized from it
         readonly property int blur:       64  // the glass behind the island and the widgets
         readonly property int shake:      root.px(12) // how far a wrong password shakes the island
         readonly property int islandAwake: 10000      // ms the island stays open after a key or a pointer move
         readonly property int moved:      24  // px the pointer must move to end the grace period
+    }
+
+    readonly property QtObject polkit: QtObject {
+        readonly property int field: root.px(340) // the password prompt's field; its card is a little wider
     }
 
     readonly property QtObject wallpaper: QtObject {
@@ -316,7 +322,6 @@ Singleton {
         readonly property int slider: root.px(240)    // a slider's width in a sheet
         readonly property int pictureCard: root.px(160) // the desktop editor's pictures
         readonly property int tile: root.px(200)      // an editor tile's height (SheetTile.qml)
-        readonly property int tileChrome: root.px(96)  // a tile's header, margins and card labels
         readonly property int fontChip: root.px(56)   // a font's chip, "Aa" over its name
         readonly property int label: root.px(40)      // a short label before a control in a tile
         readonly property int sample: root.px(360) // the windows editor's sample window

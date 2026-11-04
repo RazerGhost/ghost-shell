@@ -1764,6 +1764,21 @@ desktop, not a screen of its own, and the login screen and the lock screen edito
   first (sourced bare under `set -u` it stopped the module before the boot menu and greetd steps).
   The HP logo still goes blank when the graphics driver takes over (nothing redraws it without
   Plymouth; the user chose to leave it).
+- Review of all this (two read-only reviews, findings checked, then fixed): on the lock screen
+  the media widget keeps only its playback buttons (it could open the music app or bring the
+  player forward) and the weather hides the town; the backup hyprlock loads the keybinds only
+  after an unlock with the password (it touched the mark 2 s after starting, unlocked or not);
+  the touchpad gestures moved into binds.lua so they wait for the lock too; the first lock reads
+  its mark in-process; the boot is greetd's `initial_session` again (a user session; after a
+  logout its greeter slot, `Class=greeter`) and neither sees `GREETD_SOCK`. Pop-ups wait while
+  locked and through a shell reload, a critical one goes to the back of the line while others
+  wait, the first screen counts until Hyprland names one. The lock screen's glass sits on its
+  cards (`MultiEffect`'s auto padding stretched the mask). Screen readers hear the lock and its
+  messages; disabled locked widgets read as text. Leftovers of the login screen and the lock
+  editor removed (Theme tokens, `ProgressRing.span`, `ChoiceCards.chosenValues`, tuigreet
+  comments, the Super+U description); the widgets' 100 % sizes are `DesktopWidgets.unit`,
+  which Theme scales. Kept on purpose: the lock island's own password field (the shared
+  TextField would need hooks for the island's wake keys, Tab and the busy state).
 - Settings -> Account (user's request): "Change your password" opens `passwd` in the default
   terminal (`settings/AccountPage.qml`), so the shell never handles the password; it's the one
   for logging in, the lock screen and sudo (sudo asks for your own; a separate root password
@@ -1782,9 +1797,11 @@ windows).
 - **No global NVIDIA env vars:** the wiki's NVIDIA page sets `LIBVA_DRIVER_NAME=nvidia` and
   `__GLX_VENDOR_LIBRARY_NAME=nvidia`, but those are for setups where NVIDIA renders the desktop. Here
   `prime-run` sets them per app.
-- **No Plymouth:** it leaves tty1 in graphics mode, so tuigreet was invisible (black screen at boot).
-  `install.sh` appends `plymouth.enable=0` to `/etc/default/limine`. The Phase 5 greeter is the first
-  themed screen instead.
+- **No Plymouth:** it left tty1 in graphics mode (the text greeter of the first days was
+  invisible). The system module appends `plymouth.enable=0` and a quiet console to
+  `/etc/default/limine`; the session, logged in and locked at once, is the first thing drawn.
+  The HP logo goes blank when the graphics driver takes over (only Plymouth's bgrt theme would
+  redraw it; the user chose to leave it, 2026-11-04).
 - **Early KMS:** CachyOS's chwd removes the `kms` mkinitcpio hook on NVIDIA laptops, so
   `system/etc/mkinitcpio.conf.d/20-early-amdgpu.conf` adds `amdgpu` to MODULES.
 
@@ -1903,10 +1920,9 @@ windows).
   settings' round buttons fit six to a row at 460 when there are more than five. The island's
   window spans the screen's width; the wallpaper picker is its own surface.
 - **The bottom edge belongs to the dock:** nothing else goes there.
-- **Settings window title bar** (user's request: like the other apps): drawn by the window
-  itself, GTK style: "Settings" over the sidebar, the page name, maximize and close (round
-  buttons); drag to move, double-click to maximize. Maximizing goes through Hyprland, not
-  `FloatingWindow.maximized` (see NOTES.md).
+- **Settings is a page of the launcher** (since 2026-10-31, see "Settings, Wallpapers and
+  Customize grow out of the launcher"): its header has Back, the page's name, three sizes and
+  close; the window with its own title bar is gone.
 
 ### Colors and look
 

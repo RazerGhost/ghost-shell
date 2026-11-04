@@ -45,8 +45,8 @@ if ! cmp -s "$kms" "/etc/mkinitcpio.conf.d/$(basename "$kms")"; then
     rebuild_boot=true
 fi
 
-# Plymouth leaves tty1 in graphics mode when it quits, so tuigreet draws to a console that
-# shows nothing (black screen at boot). /etc/default/limine is bash; each
+# No boot splash: Plymouth left tty1 in graphics mode when it quit, and the session (straight to
+# its lock screen) is the first thing drawn. /etc/default/limine is bash; each
 # KERNEL_CMDLINE[default]+= line appends to the kernel command line.
 no_splash='KERNEL_CMDLINE[default]+=" plymouth.enable=0"'
 if ! grep -qxF "$no_splash" /etc/default/limine; then

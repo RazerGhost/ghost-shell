@@ -14,9 +14,6 @@ Column {
     // [{ value, label }]
     required property var options
     property var current
-    // Several chosen at once (on/off cards: the desktop widgets) instead of `current`; picked()
-    // then means "toggle this one".
-    property var chosenValues: null
     property Component art
     // One row that scrolls sideways (many choices: the wallpapers), instead of wrapping rows.
     property bool scrolls: false
@@ -27,7 +24,7 @@ Column {
     signal picked(var value)
 
     property real cardWidth: Theme.settings.card
-    property real cardHeight: Math.round(cardWidth * 10 / 16)
+    readonly property real cardHeight: Math.round(cardWidth * 10 / 16)
 
     // As wide as its cards in one row; a scrolling row takes the whole row of its sheet (the
     // tile, less the side margins).
@@ -112,13 +109,12 @@ Column {
 
             required property var modelData
             required property int index
-            readonly property bool chosen: root.chosenValues ? root.chosenValues.includes(modelData.value)
-                                                                 : modelData.value === root.current
+            readonly property bool chosen: modelData.value === root.current
 
             spacing: Theme.spacing.xs
 
             // A card that does something (an option with `action`, "Save this look") is a button.
-            Accessible.role: modelData.action ? Accessible.Button : root.chosenValues ? Accessible.CheckBox : Accessible.RadioButton
+            Accessible.role: modelData.action ? Accessible.Button : Accessible.RadioButton
             Accessible.name: modelData.label
             Accessible.checked: chosen
             Accessible.onPressAction: root.picked(modelData.value)

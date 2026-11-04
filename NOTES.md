@@ -369,7 +369,6 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   apply; `spicetify config color_scheme <name>` picks a `color.ini` section.
 - Yazi 26.9: sections `[mgr] [tabs] [mode] [indicator] [status] [input] [pick] [cmp] [tasks] ...`. A
   partial `theme.toml` is merged with the defaults; Yazi reads it at startup.
-- tuigreet 0.11 (`greetd-tuigreet`): `--time --remember --asterisks --cmd <command>`.
 
 - Hyprland sends `screencast>>1,monitor` / `screencast>>0,monitor` (and `screencastv2` with the
   output) for any screencopy client, grim included, so it can't tell real screen sharing apart.

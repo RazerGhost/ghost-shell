@@ -1,6 +1,6 @@
 // Moving items within a list you put in order: quick settings' tiles and buttons
-// (controlcenter/QuickSettings.qml) and the dock's pins (dock/Dock.qml). Plain JavaScript, so it can be tested on its own
-// (tests/tst_orderedlist.qml).
+// (controlcenter/QuickSettings.qml) and the dock's pins (dock/Dock.qml). Plain JavaScript, so it
+// can be tested on its own (tests/tst_orderedlist.qml).
 .pragma library
 
 // `list` with the item at `from` moved to `to` (clamped into the list); the same list when
