@@ -2,6 +2,7 @@ import QtQuick
 import qs.services
 import qs.theme
 import qs.widgets
+import "../services/Weather.js" as WeatherJs
 
 // The hourly weather widget (medium), like iOS's: the temperature and the sky now with today's
 // high and low at the top, the next six hours below (services/Weather.qml's `hours`). No town:
@@ -82,11 +83,14 @@ WidgetSurface {
                 spacing: Theme.spacing.xs
 
                 Accessible.role: Accessible.StaticText
-                Accessible.name: modelData.hour + ":00, " + modelData.temperature + "°"
+                readonly property string label: WeatherJs.hourLabel(modelData.hour, Settings.values.clock24Hour)
+
+                Accessible.name: label + ", " + modelData.temperature + "°"
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: parent.modelData.hour
+                    // As the clock shows hours (Settings' 24-hour clock).
+                    text: parent.label
                     color: Colors.m3onSurfaceVariant
                     font.family: Theme.font.sans
                     font.pixelSize: Theme.font.small

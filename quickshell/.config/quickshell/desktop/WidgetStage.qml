@@ -135,6 +135,11 @@ Item {
         TasksWidget {
             id: todoWidget
             hidesTitles: stage.locked
+            // One field at a time: starting in this one ends the other's typing.
+            onWantsKeyboardChanged: {
+                if (wantsKeyboard)
+                    tasksWidget.stopTyping();
+            }
         }
     }
 
@@ -181,6 +186,10 @@ Item {
             id: tasksWidget
             large: true
             hidesTitles: stage.locked
+            onWantsKeyboardChanged: {
+                if (wantsKeyboard)
+                    todoWidget.stopTyping();
+            }
         }
     }
 }

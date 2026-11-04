@@ -19,7 +19,7 @@ WidgetSurface {
     // The cover is the card: everything over it turns light.
     readonly property bool onCover: art.status === Image.Ready
     readonly property color text: onCover ? Colors.onPicture : Colors.m3onSurface
-    readonly property color subtext: onCover ? Qt.rgba(Colors.onPicture.r, Colors.onPicture.g, Colors.onPicture.b, 0.75) : Colors.m3onSurfaceVariant
+    readonly property color subtext: onCover ? Colors.onPictureVariant : Colors.m3onSurfaceVariant
 
     // On the lock screen (desktop/WidgetStage.qml): only previous, play or pause, and next.
     // Opening the music app or bringing the player's window forward would act on the desktop
@@ -59,7 +59,7 @@ WidgetSurface {
         Rectangle {
             anchors.fill: parent
             gradient: Gradient {
-                GradientStop { position: 0; color: Qt.rgba(0, 0, 0, Colors.pictureShade.a * 0.35) }
+                GradientStop { position: 0; color: Colors.pictureShadeTop }
                 GradientStop { position: 1; color: Colors.pictureShade }
             }
         }
@@ -136,7 +136,7 @@ WidgetSurface {
             IconButton {
                 anchors.centerIn: parent
                 icon: widget.player?.isPlaying ? "pause" : "play_arrow"
-                color: widget.onCover ? Qt.rgba(0, 0, 0, 0.85) : Colors.m3onPrimary
+                color: widget.onCover ? Colors.onPictureButton : Colors.m3onPrimary
                 label: widget.player ? (widget.player.isPlaying ? "Pause" : "Play") : widget.app ? "Open " + widget.app.name : "Play"
                 enabled: widget.player ? widget.player.canTogglePlaying : widget.app !== null && !widget.locked
                 onClicked: widget.player ? widget.player.togglePlaying() : widget.open()

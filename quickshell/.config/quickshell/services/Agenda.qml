@@ -1,6 +1,6 @@
-// Calendar events for the today menu, from the calendars `ghost calendar add` subscribed to
+// Calendar events for the today menu and the calendar and month widgets, from the calendars `ghost calendar add` subscribed to
 // (modules/calendar/calendar.sh). Only once khal's config exists: then `vdirsyncer sync` runs
-// at start and every 15 minutes, and khal lists the events of the month the calendar shows and
+// at start and every 15 minutes, and khal lists the events of this month and
 // the coming week. Parsing in CalendarEvents.js (tested). The links themselves are never read
 // here.
 pragma Singleton
@@ -14,9 +14,9 @@ Singleton {
     id: root
 
     readonly property bool enabled: khalConfig.loaded && khalConfig.text().includes("[[")
-    // The month the today menu's calendar shows (0-11), for its event dots.
-    property int year: clock.date.getFullYear()
-    property int month: clock.date.getMonth()
+    // This month (0-11), for the month widget's event dots.
+    readonly property int year: clock.date.getFullYear()
+    readonly property int month: clock.date.getMonth()
 
     property var events: [] // [{ start, startTime, end, endTime, title, allDay }]
     // Why the calendars couldn't be updated ("" when they were). vdirsyncer's own message isn't

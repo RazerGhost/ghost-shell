@@ -82,3 +82,12 @@ function hours(answer, count) {
     }
     return list;
 }
+
+// An hour from `hours` ("00"-"23") as the clock shows it: "15" with the 24-hour clock, else
+// "3 PM" ("12 AM" for midnight, "12 PM" for noon).
+function hourLabel(hour, twentyFour) {
+    const h = Number(hour);
+    if (twentyFour)
+        return String(hour);
+    return (h % 12 || 12) + (h < 12 ? " AM" : " PM");
+}

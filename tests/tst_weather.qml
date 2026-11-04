@@ -50,4 +50,13 @@ TestCase {
         answer.current.time = "2026-11-05T01:30";
         compare(Weather.hours(answer, 6), []);
     }
+
+    function test_hourLabel() {
+        compare(Weather.hourLabel("15", true), "15");
+        compare(Weather.hourLabel("00", true), "00");
+        compare(Weather.hourLabel("15", false), "3 PM");
+        compare(Weather.hourLabel("00", false), "12 AM");
+        compare(Weather.hourLabel("12", false), "12 PM");
+        compare(Weather.hourLabel("09", false), "9 AM");
+    }
 }

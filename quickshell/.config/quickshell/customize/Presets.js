@@ -45,7 +45,8 @@ const desktopWidgets = [
     // sky and battery side by side, so its edges are even.
     { name: "Workday", values: widgetLayout({ clock: [1488, 180], calendar: [1488, 364], todo: [1488, 548],
                                              weather: [1488, 732], battery: [1672, 732] }) },
-    // The first eight in three rows across the top left, keeping to the upper half (pictures often
+    // The first eight widgets (not the hourly weather, month or to-do list: see Planner) in three
+    // rows across the top left, keeping to the upper half (pictures often
     // have the ground and their subject lower down).
     { name: "Everything", values: widgetLayout({ clock: [80, 80], calendar: [448, 80], media: [80, 264], todo: [448, 264],
                                                 weather: [80, 448], battery: [264, 448], timer: [448, 448],

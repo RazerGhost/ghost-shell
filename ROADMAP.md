@@ -107,7 +107,7 @@ notifications in the corner".
   from the island (`NotificationCard`) on the focused monitor, one at a time, 5 s each (paused on
   hover; critical ones stay until dismissed), and stay in the history in the "today" menu until
   dismissed or "Clear all". The menu opens with the month calendar folded (user's choice); click
-  the date to show it. Click a card for the app's default action; its other actions
+  the date to show it (until 2026-11-04: the month is a desktop widget now). Click a card for the app's default action; its other actions
   are buttons. Bodies are shown as plain text (no markup). In the today menu they're grouped by app (`NotificationGroups.js`, tested): a
   group shows its newest card, "+N more" the rest, and × clears the app's notifications. A progress bar shows when the app sends a progress value (the `value`
   hint, `notify-send -h int:value:64`; `NotificationProgress.js`, tested), updating as the app
@@ -1816,6 +1816,15 @@ and light mode:
   the date, the weather, the next events, the note and timer, and notifications. Tasks are added
   in the to-do widgets, so the medium one is the same widget as the large one (`TasksWidget`, its
   field and as many rows as fit; `TodoWidget` is gone).
+- Review of all this (read-only, findings checked, then fixed): typing in one to-do widget and
+  then clicking the other left the keyboard on neither (one field at a time now, and a layer
+  that already has the keyboard counts at once); the to-do field takes no clicks in the desktop
+  editor; the medium to-do at small sizes showed "+2 more" with no task (one row shows the first
+  task); a notification without a name or desktop entry no longer gets a fuzzy-matched app's
+  name, and the entry's name follows the app list once it's loaded; the hourly weather's hours
+  follow the 12/24-hour clock (`Weather.hourLabel`, tested); the media widget's colors over the
+  cover are `Colors` tokens; stale comments about the today menu's calendar. The "Everything"
+  widget layout keeps the first eight widgets (the larger ones have the Planner layout).
 
 ### Ending and starting the session (built 2026-11-04)
 User's find after the lock screen work: logging out and shutting down gave no feedback, and being

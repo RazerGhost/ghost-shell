@@ -1,4 +1,4 @@
-// The today menu's to-do list and note, kept in ~/.local/state/quickshell/today.json. Changes
+// The to-do list (the desktop's to-do widgets) and the today menu's note, kept in ~/.local/state/quickshell/today.json. Changes
 // are written half a second after the last one (the note is saved while typing). List logic in
 // Planner.js (tested).
 pragma Singleton

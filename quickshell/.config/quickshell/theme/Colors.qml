@@ -57,7 +57,10 @@ Singleton {
     // Text and buttons over a darkened picture (the media widget's cover): light in both modes,
     // since the picture under them is darkened in both.
     readonly property color onPicture: "#ffffff"
-    readonly property color pictureShade: Qt.rgba(0, 0, 0, 0.55)
+    readonly property color onPictureVariant: Qt.rgba(1, 1, 1, 0.75) // the artist under the title
+    readonly property color pictureShade: Qt.rgba(0, 0, 0, 0.55)     // the bottom, under the buttons
+    readonly property color pictureShadeTop: Qt.rgba(0, 0, 0, 0.2)   // the top, under the title
+    readonly property color onPictureButton: Qt.rgba(0, 0, 0, 0.85)  // the icon in a white button
 
     // A faint shade over a panel: the editors' tiles and chips, and the fades into them.
     readonly property color tint: Qt.rgba(m3onSurface.r, m3onSurface.g, m3onSurface.b, 0.05)

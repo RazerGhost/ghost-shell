@@ -49,7 +49,7 @@ WidgetSurface {
 
             Text {
                 id: name
-                // English names even with Dutch regional formats, like the today menu.
+                // English names even with Dutch regional formats, like the island's date.
                 text: Qt.locale(Qt.uiLanguage).toString(clock.date, "MMMM").toUpperCase()
                 color: Colors.m3primary
                 font.family: Theme.font.sans
@@ -68,7 +68,7 @@ WidgetSurface {
             }
         }
 
-        // DayOfWeekRow and MonthGrid come with Qt Quick Controls, as in the today menu; the first
+        // DayOfWeekRow and MonthGrid come with Qt Quick Controls; the first
         // day of the week follows the UI language (en_GB: Monday).
         DayOfWeekRow {
             id: weekdays
@@ -107,7 +107,7 @@ WidgetSurface {
                 required property int month
                 required property int year
                 required property bool today
-                // Agenda reads the month the today menu shows (this one, unless you're browsing).
+                // Agenda's events cover this month and the coming week.
                 readonly property bool hasEvent: Agenda.days[`${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`] === true
 
                 implicitHeight: grid.cell

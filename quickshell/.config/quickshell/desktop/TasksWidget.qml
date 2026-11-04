@@ -24,13 +24,19 @@ WidgetSurface {
     readonly property var open: Planner.todos.map((t, i) => ({ text: t.text, done: t.done, index: i })).filter(t => !t.done)
     readonly property int done: Planner.todos.length - open.length
     // As many rows as fit between the heading and the field; when there are more tasks, the
-    // last row says how many more.
+    // last row says how many more. With room for one row only (the medium size at small text
+    // sizes), the first task, without the line.
     readonly property int fit: Math.max(Math.floor(list.height / list.row), 1)
     readonly property bool overflows: open.length > fit
-    readonly property var shown: overflows ? open.slice(0, fit - 1) : open
+    readonly property bool showsMore: overflows && fit > 1
+    readonly property var shown: overflows ? open.slice(0, showsMore ? fit - 1 : 1) : open
 
     function startTyping(): void {
         wantsKeyboard = true;
+        // The layer may have the keyboard already (the other to-do widget was typed in): then
+        // there's no change of window focus to wait for.
+        if (field.Window.active)
+            hasKeyboard = true;
         field.focusInput();
     }
 
@@ -63,7 +69,7 @@ WidgetSurface {
             font.letterSpacing: 1
         }
 
-        // Done ones stay in the list (the today menu shows them ticked) until cleared.
+        // Ticked-off tasks are kept (in today.json) until cleared here.
         Text {
             anchors.right: parent.right
             visible: !widget.hidesTitles && widget.done > 0
@@ -145,7 +151,7 @@ WidgetSurface {
 
         Text {
             id: more
-            visible: widget.overflows || widget.open.length === 0
+            visible: widget.showsMore || widget.open.length === 0
             text: widget.open.length === 0 ? (widget.done > 0 ? "All done" : "Nothing to do")
                 : "+" + (widget.open.length - widget.shown.length) + " more"
             color: Colors.m3onSurfaceVariant
@@ -171,7 +177,10 @@ WidgetSurface {
         }
         onEscaped: widget.stopTyping()
 
-        // The click asks for the keyboard (the field can't have it before the layer does).
+        // The click asks for the keyboard (the field can't have it before the layer does). Not in
+        // the desktop editor: its widgets are being placed there, and the editor has the keyboard.
+        enabled: !Editing.desktop
+
         MouseArea {
             anchors.fill: parent
             visible: !widget.wantsKeyboard

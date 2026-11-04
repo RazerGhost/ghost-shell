@@ -141,7 +141,11 @@ Singleton {
             return "";
         if (n.appName)
             return n.appName;
-        return DesktopEntries.heuristicLookup(n.desktopEntry)?.name || n.desktopEntry || "";
+        if (!n.desktopEntry)
+            return "";
+        // The app list read too, so a name found once it has filled in replaces the id (NOTES).
+        return DesktopEntries.applications.values.length >= 0
+            && DesktopEntries.heuristicLookup(n.desktopEntry)?.name || n.desktopEntry;
     }
 
     // A pop-up is done (timed out, dismissed or clicked).
