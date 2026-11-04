@@ -1882,6 +1882,15 @@ User's picks.
   the widgets (the desktop, locked, where nobody is working). Ending it cancels only the timer
   it started, not one started over it since (`Countdown.runs`). Checked: on and off through
   the IPC, the widgets gone and back, pop-ups held and the bell off.
+- Focus lengths and breaks (user's pick, 2026-11-04): the today menu's timer part has a Focus
+  row (15, 25 or 50 minutes) under the timer's lengths; quick settings' button starts the length
+  picked last (`focusMinutes`). (A right-click on the button was the first idea: not reachable by
+  keyboard or a screen reader.) When a session's time is up, a notification offers "Take a
+  5-minute break" (its own timer, "Break" with a cup in the island) or "Focus again"; a break's
+  end offers another session (`Focus.timeUp`, through notify-send's actions; Countdown leaves
+  its own "Time's up" to it). Normal urgency: critical's error red read as a failure. Checked: a
+  1-minute session ran in the island and ended with the notification and its two buttons. The
+  buttons only work while the shell that sent it runs: a reload in between leaves them dead.
 - Up next: a timed calendar event starting within 15 minutes shows in the island as an event
   icon and "in 12 min" (`CalendarEvents.soon`, tested); not its title, which anyone at the
   screen would see (the today menu has it). Checked with a stand-in event (no calendar

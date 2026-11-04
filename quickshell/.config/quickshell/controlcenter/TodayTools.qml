@@ -39,7 +39,7 @@ Column {
             width: (parent.width - parent.spacing) / 2
             icon: "timer"
             title: "Timer"
-            subtitle: Countdown.active ? Countdown.label + (Countdown.paused ? " · paused" : " left") : "Not running"
+            subtitle: Countdown.active ? (Focus.on ? "Focus · " : Focus.onBreak ? "Break · " : "") + Countdown.label + (Countdown.paused ? " · paused" : " left") : "Not running"
             active: Countdown.active || root.open === "timer"
             Accessible.checkable: true
             Accessible.checked: root.open === "timer"
@@ -90,24 +90,63 @@ Column {
         }
     }
 
-    // Timer: a few lengths to start from; while it runs, the time left with pause and cancel.
+    // Timer: a few lengths to start from, and focus mode's (services/Focus.qml); while it runs,
+    // the time left with pause and cancel.
     Item {
         visible: root.open === "timer"
         width: parent.width
-        implicitHeight: Theme.island.height
+        implicitHeight: Countdown.active ? Theme.island.height : choices.implicitHeight
 
-        Row {
+        Column {
+            id: choices
             visible: !Countdown.active
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacing.xs
 
-            Repeater {
-                model: Countdown.lengths
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: Theme.spacing.xs
 
-                TextButton {
-                    required property int modelData
-                    text: modelData + " min"
-                    onClicked: Countdown.start(modelData)
+                Repeater {
+                    model: Countdown.lengths
+
+                    TextButton {
+                        required property int modelData
+                        text: modelData + " min"
+                        onClicked: Countdown.start(modelData)
+                    }
+                }
+            }
+
+            // Focus mode: the timer with pop-ups held back and the desktop widgets hidden.
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: Theme.spacing.xs
+
+                MaterialIcon {
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon: "self_improvement"
+                    color: Colors.m3primary
+                    font.pixelSize: Theme.icon.small
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "Focus"
+                    color: Colors.m3onSurfaceVariant
+                    font.family: Theme.font.sans
+                    font.pixelSize: Theme.font.normal
+                }
+
+                Repeater {
+                    model: Focus.lengths
+
+                    TextButton {
+                        required property int modelData
+                        text: modelData + " min"
+                        Accessible.name: "Focus for " + modelData + " minutes"
+                        onClicked: Focus.start(modelData)
+                    }
                 }
             }
         }
@@ -117,7 +156,7 @@ Column {
             anchors.left: parent.left
             anchors.leftMargin: Theme.spacing.m
             anchors.verticalCenter: parent.verticalCenter
-            text: Countdown.label + (Countdown.paused ? " (paused)" : "")
+            text: (Focus.on ? "Focus " : Focus.onBreak ? "Break " : "") + Countdown.label + (Countdown.paused ? " (paused)" : "")
             color: Colors.m3onSurface
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.title

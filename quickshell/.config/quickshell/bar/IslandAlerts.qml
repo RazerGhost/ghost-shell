@@ -17,7 +17,7 @@ Row {
     readonly property bool lowBattery: Battery.present && Battery.low
 
     readonly property string recordingText: Recorder.recording ? "Recording the screen, " + Recorder.time : ""
-    readonly property string timerText: timerShown ? (Focus.on ? "Focus, " : "Timer, ") + Countdown.label + " left" : ""
+    readonly property string timerText: timerShown ? (Focus.on ? "Focus, " : Focus.onBreak ? "Break, " : "Timer, ") + Countdown.label + " left" : ""
     readonly property string micText: Audio.recordingApps.length === 0 ? ""
         : (Audio.micMuted ? "Microphone muted, but in use by " : "Microphone in use by ") + Audio.recordingApps.join(", ")
     readonly property string cameraText: Privacy.cameraInUse ? "Camera in use" : ""
@@ -93,7 +93,7 @@ Row {
 
         MaterialIcon {
             anchors.verticalCenter: parent.verticalCenter
-            icon: Focus.on ? "self_improvement" : "timer"
+            icon: Focus.on ? "self_improvement" : Focus.onBreak ? "coffee" : "timer"
             font.pixelSize: Theme.icon.small
         }
 

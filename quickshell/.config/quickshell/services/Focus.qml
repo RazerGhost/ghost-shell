@@ -1,11 +1,15 @@
-// Focus mode (quick settings' round button): a 25-minute timer (the today menu's, shown in the
-// island), pop-ups held back like Do Not Disturb (critical ones and apps set to "Always pop up"
-// still show; one notification says how many came in when it ends), and the desktop widgets
-// hidden. It lasts as long as the timer: it ends when time's up, when the timer is cancelled, or
-// from the button (which also cancels the timer it started). A timer already running is used
-// as it is. Hyprland's bell for apps is quiet too (settings/HyprlandSettings.qml). The lock
-// screen still shows the widgets: it's the desktop, locked, where nobody is working. Kept
-// across shell reloads, like the timer.
+// Focus mode (quick settings' round button, the today menu's timer part, `qs ipc call focus
+// toggle`): a timer of 15, 25 or 50 minutes (the today menu's, shown in the island; the button
+// starts the length used last, `focusMinutes`), pop-ups held back like Do Not Disturb (critical
+// ones and apps set to "Always pop up" still show; one notification says how many came in when
+// it ends), and the desktop widgets hidden. It lasts as long as the timer: it ends when time's
+// up, when the timer is cancelled, or from the button (which also cancels the timer it
+// started). A timer already running is used as it is. Hyprland's bell for apps is quiet too
+// (settings/HyprlandSettings.qml). The lock screen still shows the widgets: it's the desktop,
+// locked, where nobody is working.
+// When its time is up, a notification offers a 5-minute break (a timer of its own, "Break" in
+// the island) or another session; when a break is up, another session. Kept across shell
+// reloads, like the timer.
 pragma Singleton
 
 import QtQuick
@@ -16,15 +20,26 @@ Singleton {
     id: root
 
     readonly property bool on: saved.on
-    readonly property int minutes: 25
+    readonly property int minutes: Settings.values.focusMinutes ?? 25
+    readonly property var lengths: [15, 25, 50]
+    readonly property int breakMinutes: 5
+    // The running timer is a break started from the notification.
+    readonly property bool onBreak: Countdown.active && saved.breakTimer === Countdown.runs
+    // The running timer is this session's own (Countdown.runs of it), for Countdown: its end is
+    // announced here instead.
+    function owns(runs: int): bool {
+        return (saved.on && saved.timer === runs) || saved.breakTimer === runs;
+    }
 
-    function start(): void {
-        if (!Countdown.active) {
-            Countdown.run(minutes);
+    function start(length: int): void {
+        Settings.values.focusMinutes = length;
+        if (!Countdown.active || onBreak) {
+            Countdown.run(length);
             saved.timer = Countdown.runs;
         } else {
             saved.timer = -1;
         }
+        saved.breakTimer = -1;
         saved.on = true;
     }
 
@@ -36,18 +51,50 @@ Singleton {
         saved.timer = -1;
     }
 
+    // Countdown's timer of this session (or its break) reached zero.
+    function timeUp(runs: int): void {
+        const wasBreak = saved.breakTimer === runs;
+        saved.breakTimer = -1;
+        ask.command = ["notify-send", "--app-name=Focus", "--icon=appointment-soon", "--urgency=normal", // not critical: its error red read as a failure
+                       "--hint=string:sound-name:alarm-clock-elapsed",
+                       ...(wasBreak ? [] : ["--action=break=Take a " + breakMinutes + "-minute break"]),
+                       "--action=again=Focus again",
+                       wasBreak ? "Break's over" : "Focus time is over",
+                       wasBreak ? "Ready for another " + minutes + " minutes?" : "Well done. Time for a short break?"];
+        ask.running = true;
+    }
+
+    // notify-send waits for the button pressed and prints its name.
+    Process {
+        id: ask
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const choice = text.trim();
+                if (choice === "break" && !Countdown.active) {
+                    Countdown.run(root.breakMinutes);
+                    saved.breakTimer = Countdown.runs;
+                } else if (choice === "again") {
+                    root.start(root.minutes);
+                }
+            }
+        }
+    }
+
     PersistentProperties {
         id: saved
         reloadableId: "focus"
         property bool on: false
-        property int timer: -1 // Countdown.runs of the timer it started, else -1
+        property int timer: -1      // Countdown.runs of the timer it started, else -1
+        property int breakTimer: -1 // Countdown.runs of the break it started, else -1
     }
+
+
 
     IpcHandler {
         target: "focus"
 
         function toggle(): void {
-            root.on ? root.stop() : root.start();
+            root.on ? root.stop() : root.start(root.minutes);
         }
     }
 

@@ -74,7 +74,14 @@ Singleton {
         onTriggered: {
             root.now = Date.now();
             if (root.now >= saved.endsAt) {
+                // Focus mode's session or break says so itself, with what to do next.
+                const focus = Focus.owns(saved.runs);
+                const runs = saved.runs;
                 root.cancel();
+                if (focus) {
+                    Focus.timeUp(runs);
+                    return;
+                }
                 Notifications.send("Timer", "appointment-soon", "Time's up", "The timer has finished", true,
                                    ["string:sound-name:alarm-clock-elapsed"]);
             }

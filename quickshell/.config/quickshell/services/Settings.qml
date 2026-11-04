@@ -206,6 +206,7 @@ Singleton {
             property bool desktopTasks: false
             property bool desktopNote: false
             property bool desktopClipboard: false
+            property int focusMinutes: 25 // focus mode's length, the one picked last
             // The music app last heard (its desktop entry id), which the media widget offers to
             // open while nothing plays (services/Media.qml).
             property string lastMediaApp: ""

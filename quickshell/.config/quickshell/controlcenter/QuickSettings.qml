@@ -248,7 +248,7 @@ Item {
             icon: "self_improvement"
             title: Focus.on ? "Focus, " + Countdown.label + " left: end" : "Focus for " + Focus.minutes + " min"
             active: Focus.on
-            onClicked: Focus.on ? Focus.stop() : Focus.start()
+            onClicked: Focus.on ? Focus.stop() : Focus.start(Focus.minutes)
         }
     }
 
