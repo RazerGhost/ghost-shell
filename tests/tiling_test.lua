@@ -267,5 +267,10 @@ test("damaged lines are left out", function()
     eq(back, T.decode(good))
 end)
 
+test("special workspaces (by name) aren't saved", function()
+    local s = T.sync(nil, { "a" }, nil)
+    eq(T.encode({ [1] = s, ["special:magic"] = T.sync(nil, { "b" }, nil) }), T.encode({ [1] = s }))
+end)
+
 print(string.format("%d passed, %d failed", count - failures, failures))
 os.exit(failures == 0 and 0 or 1)

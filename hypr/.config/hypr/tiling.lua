@@ -435,6 +435,9 @@ end
 function M.encode(states)
     local lines = {}
     for ws, state in pairs(states) do
+        if type(ws) ~= "number" then
+            goto continue -- a special workspace, by name (layout.lua): not kept across reloads
+        end
         local columns, slots = {}, {}
         for c, column in ipairs(state.columns) do
             local h = {}
@@ -448,6 +451,7 @@ function M.encode(states)
         end
         table.insert(lines, string.format("%d %s %s %s", ws, state.auto and "auto" or "chosen",
             table.concat(columns, ";"), table.concat(slots, ",")))
+        ::continue::
     end
     table.sort(lines)
     return table.concat(lines, "\n") .. (#lines > 0 and "\n" or "")

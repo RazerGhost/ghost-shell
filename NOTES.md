@@ -397,6 +397,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   8 px under the island showed through its glass as light streaks. The `xray` layer rule makes a
   layer blur only the wallpaper, and it applies to ext-background-effect's blur too (checked
   2026-11-04 with a white window under the island).
+- Hyprland 0.57.1's Lua gives special workspaces no `id` (`hl.get_workspaces()`: name
+  "special:magic", id nil; `window.workspace.id` nil too; hyprctl's JSON leaves it out), while
+  numbered ones keep theirs. A layout keyed by id skips the scratchpad's windows: they kept a
+  size of -10 x -10. Checked 2026-11-04 with `hyprctl eval` writing the values to a file.
 - `qs ipc call <target> show` never reaches an IPC function named `show`: qs reads it as its own
   `qs ipc show` and prints the target's functions, exit 0 (`-- show` works). The welcome tour's
   function was `show`, so Settings' "Show the welcome tour" did nothing; it's `open` now.

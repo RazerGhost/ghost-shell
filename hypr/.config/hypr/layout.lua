@@ -18,7 +18,10 @@
 -- e.g. hyprctl dispatch 'hl.dsp.layout("snap left")'.
 local tiling = require("tiling")
 
--- Each workspace's arrangement and its last area, by workspace id.
+-- Each workspace's arrangement and its last area, by workspace id; special workspaces (the
+-- scratchpad) by name: Hyprland 0.57.1's Lua gives them no id (nil), and the layout skipped
+-- their windows, which kept a size of -10 x -10 (the drop-down terminal didn't show; user's
+-- find, 2026-11-04). Only the numbered ones are saved (tiling.encode).
 local states, areas = {}, {}
 
 -- A config reload runs this file again, which emptied `states`: every workspace went back to
@@ -91,10 +94,14 @@ end, { timeout = 1000, type = "repeat" })
 -- How far one resize step moves a border, as a share of the screen.
 local resize_step = 0.05
 
+local function key_of(workspace)
+    return workspace and (workspace.id or workspace.name)
+end
+
 local function workspace_of(ctx)
     local target = ctx.targets[1]
     local window = target and target.window
-    return window and window.workspace and window.workspace.id
+    return window and key_of(window.workspace)
 end
 
 -- Windows by address; a target without a window (rare, see the wiki) gets a stand-in.
@@ -187,6 +194,7 @@ ShellLayout = {
 -- For drag.lua: a workspace's arrangement and the area it was last placed in (nil, nil before
 -- the workspace had tiled windows).
 return {
+    key = key_of,
     workspace = function(ws)
         return states[ws], areas[ws]
     end,

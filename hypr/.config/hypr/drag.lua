@@ -75,7 +75,7 @@ local function start_drag()
     end_drag()
     local pos = hl.get_cursor_pos()
     local window = pos and tiled_window_at(pos)
-    local state, area = layout.workspace(window and window.workspace.id)
+    local state, area = layout.workspace(window and layout.key(window.workspace))
     if not (window and state and area) then
         return -- a floating window: Hyprland's own resize bind handles it
     end
