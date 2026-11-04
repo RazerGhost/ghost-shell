@@ -65,16 +65,13 @@ The full plan and every decision behind it: [ROADMAP.md](ROADMAP.md). Keybinds:
 
 ## Install
 
-On Arch or CachyOS, log in to GitHub once (the repo is private), then one command (it installs
-git if needed, clones the repo to `~/Projects/ghost-shell` and runs the install):
+On Arch or CachyOS, one command (it installs git if needed, clones the repo to
+`~/Projects/ghost-shell` and runs the install; fish or bash):
 
 ```sh
-sudo pacman -S --needed github-cli; and gh auth login
-gh api repos/RazerGhost/ghost-shell/contents/bootstrap.sh -H "Accept: application/vnd.github.raw" > /tmp/bootstrap.sh
+curl -fsSL https://raw.githubusercontent.com/RazerGhost/ghost-shell/main/bootstrap.sh -o /tmp/bootstrap.sh
 bash /tmp/bootstrap.sh desktop
 ```
-
-(fish, CachyOS's shell; in bash write `&&` for `; and`.)
 
 `desktop` or `laptop` picks the machine's modules from `machines/` (they become
 `~/.config/ghost/modules`, which you can edit); leave it out for all of them but the opt-in ones.
@@ -179,3 +176,8 @@ loaded last and aren't in git, so `ghost update` never conflicts with them:
 | `docs/` | keybinds and screenshots |
 
 [NOTES.md](NOTES.md) has the Hyprland and Quickshell API facts this was built on.
+
+## Licence
+
+MIT (`LICENSE`). Wallpapers aren't part of the repo: `ghost wallpapers` downloads art from
+wallhaven.cc into your own folder, and the art in the screenshots belongs to its artists.

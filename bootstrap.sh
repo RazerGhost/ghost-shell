@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# A fresh machine in one command (Arch or CachyOS). The repo is private, so through GitHub's CLI,
-# logged in once (`sudo pacman -S github-cli` and `gh auth login`):
-#   bash <(gh api repos/RazerGhost/ghost-shell/contents/bootstrap.sh -H "Accept: application/vnd.github.raw") desktop
+# A fresh machine in one command (Arch or CachyOS), in fish or bash:
+#   curl -fsSL https://raw.githubusercontent.com/RazerGhost/ghost-shell/main/bootstrap.sh -o /tmp/bootstrap.sh
+#   bash /tmp/bootstrap.sh desktop
 # Installs git if it's missing, clones the repo to ~/Projects/ghost-shell (or pulls it if it's
 # there and has no uncommitted changes), then runs install.sh with the same arguments: a machine
 # profile (machines/: laptop, desktop), a wallpaper or "#rrggbb", --yes.
@@ -16,10 +16,6 @@ if [[ -d $repo/.git ]]; then
     fi
 else
     mkdir -p "$(dirname "$repo")"
-    if command -v gh >/dev/null && gh auth status >/dev/null 2>&1; then
-        gh repo clone RazerGhost/ghost-shell "$repo"
-    else
-        git clone https://github.com/RazerGhost/ghost-shell "$repo" # asks for your GitHub login
-    fi
+    git clone https://github.com/RazerGhost/ghost-shell "$repo"
 fi
 exec "$repo/install.sh" "$@"

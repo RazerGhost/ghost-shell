@@ -2275,6 +2275,17 @@ effort"), along with a theme of our own. The system module removes it again (pac
 `splash`, the drop-in). Seen that boot: the RTX missing from the PCI bus after a warm restart (its
 slot empty), which Hyprland skips ("Explicit device ... not found"); harmless.
 
+### Going public (2026-11-04)
+User's request: no private data in the repo, then public. Checked the files and the whole history
+(names, email addresses, the home network, places, devices, links, keys, the screenshots): no
+secrets anywhere; personal were the author's full name and two email addresses on most commits,
+the home Wi-Fi's name (a test and the quick settings screenshot: a unique network name can be
+looked up on public Wi-Fi maps) and the first name in the greeting examples. User's picks: the
+history rewritten rather than started over (every commit's author is the GitHub noreply address,
+the name and the network scrubbed from every version), "Ghosty" for the examples' name, and the
+MIT licence. The install no longer needs `gh`: `bootstrap.sh` from raw.githubusercontent.com and
+a plain `git clone`.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
