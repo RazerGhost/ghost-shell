@@ -58,6 +58,7 @@ Scope {
             root.loginLock = false;
             sessionLock.locked = false;
             root.unlocking = false;
+            root.mirrorLocked();
             Session.unlocked(first);
         }
     }
@@ -77,7 +78,7 @@ Scope {
 
     WlSessionLock {
         id: sessionLock
-        onLockedChanged: Session.locked = locked
+        onLockedChanged: root.mirrorLocked()
         onSecureChanged: {
             if (!secure || !root.lockingFirst)
                 return;
@@ -163,6 +164,17 @@ Scope {
         else
             grace.stop();
         sessionLock.locked = true;
+        mirrorLocked();
+    }
+
+    // Session.locked follows the lock (pop-ups, the greeting, screen time and the live wallpaper
+    // read it). Set here too, not only from the lock's change signal: the lock made while the
+    // shell starts (the boot's) left it saying "locked" after the unlock, so no pop-up showed
+    // until a shell reload reset it (2026-11-04). Again a moment later, in case the lock's own
+    // state settles after this.
+    function mirrorLocked(): void {
+        Session.locked = sessionLock.locked;
+        Qt.callLater(() => Session.locked = sessionLock.locked);
     }
 
     Timer {

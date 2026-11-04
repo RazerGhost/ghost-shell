@@ -1838,7 +1838,12 @@ let in was just the desktop appearing.
   by firing the unlock signal; a real unlock needs your password.
 - Hyprland's splash (a random sentence at the bottom of its background, seen for a moment at
   login before the lock screen covers it; user's find) is off: `misc.disable_splash_rendering`
-  in look.lua. Verified by the user: the unlock, the greeting and Cancel work, and the boot now
+  in look.lua. Fixed after (user's find: a notification's sound, but no pop-up): after the boot's
+  unlock the shell still counted the screen as locked (`Session.locked`, which pop-ups and the
+  greeting wait on), set only from the lock's change signal, which didn't follow the unlock of
+  the lock made while the shell starts; a shell reload reset it. The lock now sets it itself when
+  it locks and lets you in (`Lock.mirrorLocked`). `qs ipc call island state` prints what decides
+  a pop-up, to catch the next one without a reload. Verified by the user: the unlock, the greeting and Cancel work, and the boot now
   goes black (the graphics driver taking over, with Limine's menu skipped), then the theme's plain
   background, then the lock screen.
 
