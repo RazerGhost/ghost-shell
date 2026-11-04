@@ -542,7 +542,8 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   opacity now goes down to 20 % (was 35, for the rules' `ignore_alpha`; user's choice).
 - The island blurs only the wallpaper (layer rule `xray`, 2026-11-04; user's find): its blur
   reached the window just below it, and a white one (Discord reloading) showed through as light
-  streaks. Its menus over a window blur the wallpaper too, not the window.
+  streaks. Its menus over a window blur the wallpaper too, not the window (user's choice after
+  comparing both over a white window: dark and readable over any app).
 
 ### Elgato Wave:3 (built 2026-10-29; reviewed by the user, untested: the microphone is on the desktop)
 - The opt-in `wave3` module (`modules/wave3/`, its README has the details): openxlr (AUR)
