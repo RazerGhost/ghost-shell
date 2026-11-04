@@ -438,6 +438,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   SHOWING state (Qt Quick's tree is flat under each window, hidden items included) and call
   `clear_cache()` before reading roles. A child's `enabled` stays true under a disabled parent
   for `Accessible.role` bindings; a password field's `Accessible.name` doesn't reach AT-SPI.
+- After a failed reload (a QML error), fixing the broken file doesn't always reload the shell
+  (seen when the fix was written with `sed -i`, a new inode); an in-place write to shell.qml
+  (add a newline, then take it away) does.
 - `qs ipc call <target> show` never reaches an IPC function named `show`: qs reads it as its own
   `qs ipc show` and prints the target's functions, exit 0 (`-- show` works). The welcome tour's
   function was `show`, so Settings' "Show the welcome tour" did nothing; it's `open` now.

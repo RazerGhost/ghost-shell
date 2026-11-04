@@ -1939,6 +1939,11 @@ User's picks from a look at every menu and modal:
   `Wallpaper.pickerOpen` follows its "wallpaper" menu both ways (quick settings' button, the IPC,
   the slideshow's pause). Its own surface (`WallpaperPicker.qml`) and layer rule are gone; its key
   is Super+Shift+W (it had none). Checked on screen.
+- Emoji is a mode of the launcher: `:` and words (`Fuzzy.mode`, tested), the same grid with the
+  recently used first (`launcher/EmojiGrid.qml`), the arrow keys and Enter from the search field;
+  Super+. opens the launcher in it (`qs ipc call launcher emoji`, `LauncherState.showEmoji`, also
+  while it's open). The island's emoji menu (`EmojiPanel.qml`) is gone; `island toggle emoji`
+  opens the launcher's. Checked on screen: the grid, a search.
 
 ### Keybinds reworked (2026-11-04)
 User's request: list them all and see what to rework; user's picks, following Windows 11:

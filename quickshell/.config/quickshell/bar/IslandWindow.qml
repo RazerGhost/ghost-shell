@@ -364,19 +364,6 @@ PanelWindow {
         }
 
         MenuSlot {
-            shown: pill.shown === "emoji"
-            content: Component {
-                EmojiPanel {
-                    width: parent.width
-                    onPicked: emoji => {
-                        root.island.panel = "";
-                        Emoji.type(emoji);
-                    }
-                }
-            }
-        }
-
-        MenuSlot {
             shown: pill.shown === "wallpaper"
             content: Component {
                 WallpaperPanel {

@@ -22,11 +22,11 @@ machine can take what it needs.
   it one at a time. It opens into menus (click: today, right-click: quick settings): quick
   settings (status icons, Wi-Fi, Bluetooth, sound, power mode, game mode, focus mode, system
   stats), today (date, weather, the next events, note, timer, notifications), background apps,
-  media, clipboard, emoji. An event starting soon shows as "in 12 min" beside the time.
+  media, clipboard, wallpapers (a row of your pictures). An event starting soon shows as "in 12 min" beside the time.
 - **Windows**: a tiling layout of its own (halves, thirds, quarters from the window menu, or by
   the number of windows), Snap Assist, window tabs, Alt+Tab with live previews, an overview
   (Super+Tab, a three-finger swipe or the top-left corner), minimize, a dock with window previews.
-- **The rest of a desktop**: notifications (with sounds), launcher (apps, windows, files with `/`, commands with `>`, a calculator), on-screen
+- **The rest of a desktop**: notifications (with sounds), launcher (apps, windows, files with `/`, commands with `>`, emoji with `:`, a calculator), on-screen
   volume and brightness, a lock screen that is your desktop locked (it logs in at boot and locks;
   no login screen), idle and night light, screenshots and screen
   recording, a password prompt for apps (polkit), an equalizer, screen time, web apps

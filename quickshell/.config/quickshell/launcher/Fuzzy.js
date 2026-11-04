@@ -169,6 +169,8 @@ function mode(query) {
         return { mode: "command", text: trimmed.slice(1).trim() };
     if (trimmed.startsWith("?"))
         return { mode: "keys", text: trimmed.slice(1).trim() };
+    if (trimmed.startsWith(":"))
+        return { mode: "emoji", text: trimmed.slice(1).trim() };
     return { mode: "apps", text: query };
 }
 

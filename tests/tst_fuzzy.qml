@@ -138,6 +138,9 @@ TestCase {
     }
 
     function test_mode() {
+        compare(Fuzzy.mode(": smile"), { mode: "emoji", text: "smile" });
+        compare(Fuzzy.mode(":"), { mode: "emoji", text: "" });
+        compare(Fuzzy.mode("12:30"), { mode: "apps", text: "12:30" }); // a time is no emoji search
         compare(Fuzzy.mode("/ report"), { mode: "files", text: "report" });
         compare(Fuzzy.mode("  >htop -d 5"), { mode: "command", text: "htop -d 5" });
         compare(Fuzzy.mode("zen"), { mode: "apps", text: "zen" });

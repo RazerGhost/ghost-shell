@@ -122,7 +122,7 @@ Recovery procedures (lock screen crash, a session that can't start) are in ROADM
 | Today: a header (weekday, date, the weather with its town to change), agenda, the note and timer as tiles, grouped notifications (the month and the to-do list are desktop widgets) | `controlcenter/TodayPanel.qml`, `TodayHeader.qml`, `TodayTools.qml`, `AgendaList.qml` |
 | Media menu: cover colors, seek, shuffle/repeat | `controlcenter/MediaPanel.qml`, `MediaAccent.js` |
 | Clipboard: history, images, search, pins, paste into the previous window | `controlcenter/ClipboardPanel.qml`, `services/Clipboard.qml`, `ClipboardEntries.js` |
-| Emoji picker | `controlcenter/EmojiPanel.qml`, `services/EmojiData.js` |
+| Emoji picker: the launcher's `:` mode (Super+.) | `launcher/EmojiGrid.qml`, `services/Emoji.qml`, `services/EmojiData.js` |
 | Power menu (lock, screen off, suspend, log out, restart, shut down) | `controlcenter/PowerPanel.qml` |
 | Logging out, restarting, shutting down: the apps are asked to close first, a dimmed screen says what's happening, apps that don't close are listed (show, go ahead anyway, cancel) | `lock/SessionEnd.qml`, `services/Session.qml` (`ending`, `finish`, `cancel`) |
 | The greeting after an unlock ("Good morning" after the login, "Welcome back" later) with what's waiting; the lock opens on screen first | `bar/WelcomeCard.qml`, `Greeting.js`, `Island.qml` (`welcomeShown`), `lock/Lock.qml` (`letIn`) |
@@ -281,8 +281,8 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 
 | Target | Functions |
 |---|---|
-| `island` | `toggle <settings\|today\|media\|clipboard\|emoji\|power\|tray>`, `close`, `page <system\|wifi\|...>` (quick settings on a page), `editQuickSettings`, `state` (what decides whether a pop-up shows, as JSON) |
-| `launcher` | `toggle` |
+| `island` | `toggle <settings\|today\|media\|clipboard\|wallpaper\|power>` (`tray` opens quick settings' Background apps, `emoji` the launcher's emoji mode), `close`, `page <system\|wifi\|...>` (quick settings on a page), `editQuickSettings`, `state` (what decides whether a pop-up shows, as JSON) |
+| `launcher` | `toggle`, `emoji` (the search in its emoji mode) |
 | `apps` | `open <kind>`, `terminal <command>` |
 | `settings` | `open`, `page <id>` |
 | `wallpapers` | `browse` |

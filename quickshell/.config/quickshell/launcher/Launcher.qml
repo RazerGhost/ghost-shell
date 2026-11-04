@@ -146,6 +146,11 @@ Scope {
         function toggle(): void {
             LauncherState.toggle();
         }
+
+        // Super+.: the search in its emoji mode.
+        function emoji(): void {
+            LauncherState.showEmoji();
+        }
     }
 
     // The default apps, for the keybinds: qs ipc call apps open terminal|browser|fileManager,
@@ -204,11 +209,24 @@ Scope {
             onCleared: LauncherState.open = false
         }
 
+        // Super+. while it's already open: the search switches to emoji.
+        Connections {
+            target: LauncherState
+            function onStartTextChanged(): void {
+                if (window.visible && LauncherState.startText !== "") {
+                    search.text = LauncherState.startText;
+                    LauncherState.startText = "";
+                    search.focusInput();
+                }
+            }
+        }
+
         // The search starts fresh every time it opens; a page keeps its place.
         onVisibleChanged: {
             if (!visible)
                 return;
-            search.text = "";
+            search.text = LauncherState.startText;
+            LauncherState.startText = "";
             if (root.page === "")
                 Qt.callLater(root.customizeFocus);
             else if (root.page === "settings")
@@ -291,7 +309,7 @@ Scope {
                     readonly property var query: Fuzzy.mode(text)
 
                     width: parent.width
-                    placeholder: "Search apps and windows,  / files,  > run,  ? keys"
+                    placeholder: "Search apps and windows,  / files,  > run,  ? keys,  : emoji"
                     fontSize: Theme.font.large
 
                     // New results: select the best match again (the answer, while there is one).
@@ -307,6 +325,15 @@ Scope {
                             fileSearch.ask(now.text);
                     }
                     onKeyPressed: event => {
+                        // Emoji mode: the arrow keys move through the grid, Enter picks.
+                        if (query.mode === "emoji" && event.key !== Qt.Key_Escape) {
+                            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
+                                emojiGrid.pick();
+                            else if (!emojiGrid.move(event.key))
+                                return; // typing goes to the field
+                            event.accepted = true;
+                            return;
+                        }
                         switch (event.key) {
                         case Qt.Key_Escape:
                             LauncherState.open = false;
@@ -448,9 +475,21 @@ Scope {
                     current: search.query.mode === "files" ? search.query.text : ""
                 }
 
+                EmojiGrid {
+                    id: emojiGrid
+                    width: parent.width
+                    visible: search.query.mode === "emoji"
+                    query: visible ? search.query.text : ""
+                    onPicked: emoji => {
+                        LauncherState.open = false;
+                        Emoji.type(emoji);
+                    }
+                }
+
                 ListView {
                     id: list
 
+                    visible: search.query.mode !== "emoji"
                     width: parent.width
                     implicitHeight: Math.min(count, Theme.launcher.rows) * Theme.launcher.rowHeight
                     clip: true
@@ -484,7 +523,7 @@ Scope {
                 }
 
                 Text {
-                    visible: list.count === 0
+                    visible: list.count === 0 && search.query.mode !== "emoji"
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter
                     topPadding: Theme.spacing.s

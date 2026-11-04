@@ -16,6 +16,8 @@ Singleton {
     property alias settingsPage: persist.settingsPage
     // Super+U: the customize tiles take the keyboard when it opens.
     property bool customize: false
+    // What the search starts with when it opens (":" for emoji, Super+.); cleared once used.
+    property string startText: ""
 
     // Stays open on the same page when the shell reloads (after editing its files).
     PersistentProperties {
@@ -47,6 +49,14 @@ Singleton {
             customize = false;
             open = true;
         }
+    }
+
+    // The search in its emoji mode (Super+., `qs ipc call launcher emoji`).
+    function showEmoji(): void {
+        page = "";
+        customize = false;
+        startText = ":";
+        open = true;
     }
 
     function show(name: string): void {

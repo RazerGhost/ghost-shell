@@ -42,7 +42,7 @@ hl.bind(mainMod .. " + SHIFT + F", hl.dsp.exec_cmd("qs ipc call focus toggle"), 
 -- Like Windows' Ctrl+Shift+Esc: the task manager is quick settings' System page (End task).
 hl.bind("CTRL + SHIFT + Escape", hl.dsp.exec_cmd("qs ipc call island page system"), { description = "Menus: System and apps (task manager)" })
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("qs ipc call island toggle clipboard"), { description = "Menus: Clipboard history" })
-hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("qs ipc call island toggle emoji"), { description = "Menus: Emoji" })
+hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("qs ipc call launcher emoji"), { description = "Menus: Emoji" })
 hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("qs ipc call customize menu"), { description = "Menus: Customize (desktop, dock and island, windows, quick settings)" })
 hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("qs ipc call widgets browse"), { description = "Menus: Show the desktop, its widgets taking the keyboard (arrows, Enter, Escape)" })
 
