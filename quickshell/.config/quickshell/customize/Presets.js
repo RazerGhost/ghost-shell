@@ -1,43 +1,7 @@
 // Named looks for the on-screen editors (a gallery of picture cards, like the iOS lock screen
-// gallery): picking one sets several settings at once; each can still be changed after. Plain JavaScript, so it can be tested on its own (tests/tst_presets.qml).
+// gallery; the lock screen is the desktop, locked, so it has none of its own): picking one sets several settings at once; each can still be changed after. Plain JavaScript, so it can be tested on its own (tests/tst_presets.qml).
 .pragma library
 .import "../desktop/DesktopWidgets.js" as DesktopWidgets
-
-// The lock and login screens: the clock's style, place, size and font, the picture's blur and
-// darkening, and the widgets under the clock and where they sit (never the next event: its
-// title would show to anyone at the screen).
-const clockLook = (style, layout, size, font, blur, dim) => ({ lockClockStyle: style, lockLayout: layout, lockClockSize: size,
-                                                              lockClockFont: font, lockBlur: blur, lockDim: dim });
-const lock = [
-    { name: "Classic", values: Object.assign(clockLook("big", "top", 100, "", 100, 25),
-        { lockWidgets: ["weather", "battery", "notifications"], lockPlaces: null, lockClockOffset: null, lockWidgetsOffset: null }) },
-    { name: "Minimal", values: Object.assign(clockLook("thin", "top", 100, "", 100, 40),
-        { lockWidgets: [], lockPlaces: null, lockClockOffset: null, lockWidgetsOffset: null }) },
-    { name: "Analog", values: Object.assign(clockLook("analog", "left", 100, "", 60, 30),
-        { lockWidgets: ["weather", "notifications"], lockPlaces: null, lockClockOffset: null, lockWidgetsOffset: null }) },
-    { name: "Bold", values: Object.assign(clockLook("stacked", "top", 125, "Inter Display", 100, 25),
-        { lockWidgets: ["weather", "battery", "notifications", "todo"], lockPlaces: null, lockClockOffset: null, lockWidgetsOffset: null }) },
-    // A serif clock in the bottom-left corner, like a magazine cover, the middle left to the art.
-    { name: "Editorial", values: Object.assign(clockLook("big", "left", 125, "C059", 80, 35),
-        { lockWidgets: ["weather"], lockPlaces: null, lockClockOffset: null, lockWidgetsOffset: null }) },
-    // The clock in the bottom-left corner, the widgets apart from it to the right.
-    { name: "Split", values: Object.assign(clockLook("big", "left", 100, "", 100, 30),
-        { lockWidgets: ["weather", "battery", "notifications", "timer"], lockClockOffset: null, lockWidgetsOffset: null,
-          lockPlaces: { player: { x: 0.6, y: 0 }, weather: { x: 0.6, y: 0 }, battery: { x: 0.6, y: 0 },
-                        notifications: { x: 0.6, y: 0 }, timer: { x: 0.6, y: 0 } } }) },
-    // Everything in one column on the left third (a thin clock, the date, the player and four
-    // widgets), the rest of the picture left to the art; with the quiet side on, it moves to
-    // whichever side is calmer.
-    { name: "Side", values: Object.assign(clockLook("thin", "top", 100, "", 100, 35),
-        { lockWidgets: ["weather", "battery", "notifications", "todo"], lockClockOffset: null, lockWidgetsOffset: null,
-          lockPlaces: { clock: { x: -0.33, y: 0 }, date: { x: -0.33, y: 0 }, player: { x: -0.33, y: 0 },
-                        weather: { x: -0.33, y: 0 }, battery: { x: -0.33, y: 0 }, notifications: { x: -0.33, y: 0 },
-                        todo: { x: -0.33, y: 0 } } }) },
-    // A bold clock in the middle, the weather and the battery close on either side of it.
-    { name: "Flanked", values: Object.assign(clockLook("big", "top", 125, "Inter Display", 100, 30),
-        { lockWidgets: ["weather", "battery"], lockClockOffset: null, lockWidgetsOffset: null,
-          lockPlaces: { weather: { x: -0.135, y: -0.24 }, battery: { x: 0.135, y: -0.24 } } }) }
-];
 
 // The desktop's style, over your wallpaper, accent and widgets: the glass, blur, corners and how
 // the colors are drawn.
@@ -84,7 +48,6 @@ const desktopWidgets = [
     { name: "Everything", values: widgetLayout({ clock: [80, 80], calendar: [448, 80], media: [80, 264], todo: [448, 264],
                                                 weather: [80, 448], battery: [264, 448], timer: [448, 448] }) },
     // A column on the left, centred top to bottom: the time, the sky and battery, the player
-    // (the lock screen's Side look on the desktop).
     { name: "Side", values: widgetLayout({ clock: [80, 272], weather: [80, 456], battery: [264, 456], media: [80, 640] }) }
 ];
 
@@ -104,10 +67,6 @@ const windows = [
     { name: "Playful", values: { borderSize: 3, rounding: 20, borderSpin: true, windowGlow: true, windowKindBorders: true, gapsIn: 8, gapsOut: 24, animationSpeed: 1, windowAnimation: "gnomed", workspaceAnimation: "slidevert", wobble: true } },
     { name: "Still", values: { borderSize: 1, rounding: 10, borderSpin: false, windowGlow: false, windowKindBorders: false, gapsIn: 5, gapsOut: 20, animationSpeed: 0, windowAnimation: "popin", workspaceAnimation: "fade", wobble: false } }
 ];
-
-// Every setting the lock screen editor changes, for its Cancel.
-const lockKeys = ["lockClockStyle", "lockLayout", "lockPlaces", "lockQuietSide", "lockClockOffset", "lockWidgetsOffset", "lockClockSize", "lockClockFont", "lockBlur", "lockDim",
-                  "lockWallpaper", "lockClock", "lockDate", "lockWidgets", "lockMedia", "lockLooks"];
 
 // Every setting the desktop editor changes, for its Cancel (the wallpaper is put back apart:
 // it isn't a setting). Themes saved, renamed or deleted in it are put back too.

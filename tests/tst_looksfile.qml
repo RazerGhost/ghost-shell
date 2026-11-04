@@ -15,11 +15,9 @@ TestCase {
 
     function test_exported() {
         const settings = { themes: [{ name: "Night", wallpaper: "/home/a/w.png", values: { glass: true } }],
-                           lockLooks: [{ name: "Mine", values: { lockWallpaper: "/home/a/l.png", lockBlur: 10 } }],
                            dockLooks: "broken" };
         const file = LooksFile.exported(settings, "/home/a");
         compare(file.themes[0].wallpaper, "~/w.png");
-        compare(file.lockLooks[0].values.lockWallpaper, "~/l.png");
         compare(file.dockLooks, []);
         compare(file.windowLooks, []);
         // The settings themselves aren't changed.
@@ -35,7 +33,7 @@ TestCase {
         // Same name replaced (in its place), new ones after, mine kept, nameless dropped.
         compare(merged.themes.map(t => t.name), ["Night", "Only here", "New"]);
         compare(merged.themes[0].wallpaper, "/home/b/new.png");
-        compare(merged.lockLooks, []);
+        compare(merged.windowLooks, []);
         // Two of one name in the file: the first counts.
         const twice = LooksFile.imported({}, { dockLooks: [{ name: "A", values: { a: 1 } }, { name: "A", values: { a: 2 } }] }, "/h");
         compare(twice.dockLooks, [{ name: "A", values: { a: 1 } }]);

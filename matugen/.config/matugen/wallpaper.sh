@@ -47,7 +47,7 @@ from_image() {
     fi
 }
 # The picture to make colors from: the picture itself, or for a video (a live wallpaper) a frame
-# of it, kept as video-frame.jpg (the lock and login screens show that frame).
+# of it, kept as video-frame.jpg (the lock screen shows that frame).
 picture_of() {
     case "$1" in
         *.[mM][pP]4 | *.[wW][eE][bB][mM] | *.[mM][kK][vV] | *.[mM][oO][vV])

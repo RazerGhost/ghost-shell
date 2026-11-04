@@ -37,7 +37,7 @@ Scope {
           text: "Super + ` brings a terminal down over everything and hides it again. Super + Shift + ` tucks any window away there, and brings it back.",
           keys: [["Super", "`"], ["Super", "Shift", "`"]] },
         { icon: "palette", title: "Make it yours",
-          text: "Super + U picks what to customize: the lock screen, the desktop (wallpaper, colors, widgets, themes), the dock and island, how windows look, or quick settings. You change them on the screen itself and see each change at once; each starts with ready-made looks, and the keyboard works throughout.",
+          text: "Super + U picks what to customize: the desktop (wallpaper, colors, widgets, themes; the lock screen is your desktop, locked), the dock and island, how windows look, or quick settings. You change them on the screen itself and see each change at once; each starts with ready-made looks, and the keyboard works throughout.",
           keys: [["Super", "U"]] },
         { icon: "settings", title: "Everything else is in Settings",
           text: "Display, sound, notifications per app, power and sleep, every keybind, and this tour again (under Keybinds). Each Customize button opens its editor.",

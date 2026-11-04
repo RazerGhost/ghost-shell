@@ -263,18 +263,11 @@ Singleton {
     }
 
     readonly property QtObject lock: QtObject {
-        readonly property int clock:      root.text(112) // the big clock
-        readonly property int fieldWidth: root.px(340) // password field
-        readonly property int blur:       64  // wallpaper blur radius
-        readonly property int face:       root.px(96) // your picture on the login screen
+        readonly property int fieldWidth: root.px(340) // the polkit prompt's card is sized from it
+        readonly property int blur:       64  // the glass behind the island and the widgets
         readonly property int shake:      root.px(12) // how far a wrong password shakes the island
         readonly property int islandAwake: 10000      // ms the island stays open after a key or a pointer move
         readonly property int moved:      24  // px the pointer must move to end the grace period
-        readonly property int widget:     root.text(72) // a lock screen widget's height, a round one's width (LockWidget.qml)
-        readonly property int widgetGap:  root.px(12)
-        readonly property int ringWidth:  root.px(6)  // the timer's ring in them
-        readonly property int gaugeWidth: root.px(3)  // the battery's gauge, thinner, like iOS's
-        readonly property int widgetInset: root.px(20) // the wide event widget's text from its ends
     }
 
     readonly property QtObject wallpaper: QtObject {
@@ -320,9 +313,8 @@ Singleton {
 
     // The on-screen editors (customize/).
     readonly property QtObject editor: QtObject {
-        readonly property int clockCard: root.px(120) // the lock screen editor's clock style and font cards
         readonly property int slider: root.px(240)    // a slider's width in a sheet
-        readonly property int pictureCard: root.px(160) // the lock screen editor's pictures
+        readonly property int pictureCard: root.px(160) // the desktop editor's pictures
         readonly property int tile: root.px(200)      // an editor tile's height (SheetTile.qml)
         readonly property int tileChrome: root.px(96)  // a tile's header, margins and card labels
         readonly property int fontChip: root.px(56)   // a font's chip, "Aa" over its name

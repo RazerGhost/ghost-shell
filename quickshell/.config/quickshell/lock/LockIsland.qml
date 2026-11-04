@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import qs.bar
 import qs.services
 import qs.theme
@@ -14,24 +13,17 @@ import qs.widgets
 Item {
     id: root
 
-    // The wallpaper as drawn under the lock screen: blurred behind the island's shape, since
-    // Hyprland's blur can't reach inside the lock screen's own surface.
-    required property Item backdrop
     property string message
     property bool messageIsError
     property bool busy
-    // In the lock screen editor: shown open, no input.
-    property bool editing
 
     signal submitted(string password)
     // A key in the field: the lock screen's activity (the idle lock's grace period).
     signal typed()
 
     readonly property alias field: password
-    // Where the island reaches when open, for the parts to keep clear of (fixed, so they don't
-    // move as it opens and closes).
-    readonly property rect area: Qt.rect((width - Theme.island.panelWidth) / 2, 0, Theme.island.panelWidth,
-                                         Theme.island.reserved + body.implicitHeight)
+    // Its shape, for the lock screen's glass behind it (LockContent.qml).
+    readonly property alias pill: pill
 
     // Opens it for a while (a key, a pointer move, the lock screen appearing).
     function wake(): void {
@@ -46,7 +38,7 @@ Item {
     }
 
     property bool awake: false
-    readonly property bool open: editing || awake || password.text !== "" || busy || message !== ""
+    readonly property bool open: awake || password.text !== "" || busy || message !== ""
 
     Timer {
         id: sleep
@@ -59,35 +51,6 @@ Item {
         running: true
         interval: Theme.anim.normal
         onTriggered: root.wake()
-    }
-
-    // The wallpaper blurred, cut to the island's shape (a solid copy of its outline as the mask).
-    MultiEffect {
-        anchors.fill: parent
-        visible: root.backdrop !== null
-        source: root.backdrop
-        blurEnabled: true
-        blur: 1
-        blurMax: Theme.lock.blur
-        maskEnabled: true
-        maskSource: mask
-    }
-
-    Item {
-        id: mask
-        anchors.fill: parent
-        visible: false
-        layer.enabled: true
-
-        PillShape {
-            x: pill.x + pill.outline.x
-            y: pill.y + pill.outline.y
-            attached: Theme.island.attached
-            bodyWidth: pill.outline.bodyWidth
-            bodyHeight: pill.outline.bodyHeight
-            radius: pill.outline.radius
-            color: "white"
-        }
     }
 
     IslandPill {
@@ -142,7 +105,7 @@ Item {
                     height: Theme.slider.height + Theme.spacing.s
                     radius: Theme.radius.full
                     color: Colors.tint
-                    border.width: password.activeFocus && !root.editing ? Theme.outline.normal : 0
+                    border.width: password.activeFocus ? Theme.outline.normal : 0
                     border.color: root.messageIsError ? Colors.m3error : Colors.m3primary
 
                     TextInput {
@@ -153,7 +116,6 @@ Item {
                         anchors.leftMargin: Theme.spacing.l
                         anchors.rightMargin: Theme.spacing.l
                         anchors.verticalCenter: parent.verticalCenter
-                        enabled: !root.editing
                         echoMode: TextInput.Password
                         passwordCharacter: "●"
                         readOnly: root.busy

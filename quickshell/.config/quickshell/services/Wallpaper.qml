@@ -21,14 +21,12 @@ Singleton {
     // Its file has been read (or isn't there): until then `path` is "" whatever was chosen.
     property bool loaded: false
     // A live wallpaper (a video), and the still picture for it: a frame that matugen's
-    // wallpaper.sh made (the colors come from it; the lock and login screens show it).
+    // wallpaper.sh made (the colors come from it; the lock screen shows it).
     readonly property bool isVideo: WallpapersJs.isVideo(path)
     function isVideoPath(file: string): bool {
         return WallpapersJs.isVideo(file);
     }
     readonly property string stillPath: isVideo ? Quickshell.env("HOME") + "/.local/state/quickshell/video-frame.jpg" : path
-    // The lock and login screens' picture: the one chosen in settings, or else the desktop's.
-    readonly property string lockPath: Settings.values.lockWallpaper || stillPath
     // The picker strip is open (wallpaper/WallpaperPicker.qml): quick settings' button, or
     // `qs ipc call wallpaper picker`.
     property bool pickerOpen: false

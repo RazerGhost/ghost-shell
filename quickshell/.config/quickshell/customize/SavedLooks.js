@@ -1,5 +1,5 @@
 // Your own looks in an editor's Looks gallery (customize/LooksTile.qml), beside its presets:
-// [{ name, values }] in a setting per gallery (lockLooks, dockLooks, windowLooks, widgetLooks).
+// [{ name, values }] in a setting per gallery (dockLooks, windowLooks, widgetLooks).
 // Desktop themes (Themes.js) are the same idea with a wallpaper. Plain JavaScript, so it can be
 // tested on its own (tests/tst_savedlooks.qml).
 .pragma library

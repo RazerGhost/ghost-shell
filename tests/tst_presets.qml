@@ -4,34 +4,33 @@ import "../quickshell/.config/quickshell/customize/Presets.js" as Presets
 import "../quickshell/.config/quickshell/settings/HyprlandConfig.js" as HyprlandConfig
 import "../quickshell/.config/quickshell/theme/ThemeScale.js" as ThemeScale
 import "../quickshell/.config/quickshell/desktop/DesktopWidgets.js" as DesktopWidgets
-import "../quickshell/.config/quickshell/lock/LockWidgets.js" as LockWidgets
 
 TestCase {
     name: "Presets"
 
     function test_current() {
-        const classic = Object.assign({ other: 1 }, Presets.lock[0].values);
-        compare(Presets.current(classic, Presets.lock), "Classic");
+        const tight = Object.assign({ other: 1 }, Presets.windows[1].values);
+        compare(Presets.current(tight, Presets.windows), "Tight");
         // One value changed by hand: a look of your own.
-        compare(Presets.current(Object.assign({}, classic, { lockDim: 30 }), Presets.lock), "");
-        compare(Presets.current(undefined, Presets.lock), "");
+        compare(Presets.current(Object.assign({}, tight, { gapsOut: 30 }), Presets.windows), "");
+        compare(Presets.current(undefined, Presets.windows), "");
     }
 
     function test_apply() {
-        const values = { lockClockStyle: "big", unrelated: true };
-        Presets.apply(values, Presets.lock, "Analog");
-        compare(values.lockClockStyle, "analog");
-        compare(values.lockLayout, "left");
+        const values = { windowAnimation: "popin", unrelated: true };
+        Presets.apply(values, Presets.windows, "Playful");
+        compare(values.windowAnimation, "gnomed");
+        compare(values.wobble, true);
         verify(values.unrelated);
-        compare(Presets.current(values, Presets.lock), "Analog");
-        Presets.apply(values, Presets.lock, "Nope");
-        compare(values.lockClockStyle, "analog");
+        compare(Presets.current(values, Presets.windows), "Playful");
+        Presets.apply(values, Presets.windows, "Nope");
+        compare(values.windowAnimation, "gnomed");
     }
 
     // Each editor's presets set only what that editor's Cancel puts back, with values its controls
     // offer, and no two are the same.
     function test_editorPresets() {
-        const sets = [[Presets.lock, Presets.lockKeys], [Presets.desktop, Presets.desktopKeys],
+        const sets = [[Presets.desktop, Presets.desktopKeys],
                       [Presets.desktopWidgets, Presets.desktopKeys],
                       [Presets.dockIsland, Presets.dockIslandKeys], [Presets.windows, Presets.windowsKeys]];
         for (const [presets, keys] of sets) {
@@ -83,16 +82,6 @@ TestCase {
         compare(Presets.current(fresh, Presets.desktopWidgets), "Clean");
     }
 
-    // The lock looks' widgets: known ones, at most the row's limit, never the next event (its
-    // title would show to anyone at the screen).
-    function test_lockLooksWidgets() {
-        for (const preset of Presets.lock) {
-            const list = preset.values.lockWidgets;
-            compare(LockWidgets.shown(list, {}), list, preset.name);
-            verify(!list.includes("event"), preset.name);
-        }
-    }
-
     // settings.json comes back with object keys sorted: still the same preset.
     function test_sameIgnoresKeyOrder() {
         verify(Presets.same({ clock: { x: 0.1, y: 0.2 }, battery: { y: 0.6, x: 0.5 } },
@@ -123,22 +112,18 @@ TestCase {
     }
 
     function test_presetsAreDistinct() {
-        const seen = Presets.lock.map(p => JSON.stringify(p.values));
-        compare(new Set(seen).size, Presets.lock.length);
+        for (const presets of [Presets.desktop, Presets.desktopWidgets, Presets.dockIsland, Presets.windows])
+            compare(new Set(presets.map(p => JSON.stringify(p.values))).size, presets.length);
     }
 
     function test_snapshotRestore() {
-        const values = { lockClockStyle: "big", lockBlur: 100, other: 1 };
-        const saved = Presets.snapshot(values, ["lockClockStyle", "lockBlur"]);
-        Presets.apply(values, Presets.lock, "Analog");
-        values.lockBlur = 10;
+        const values = { rounding: 10, gapsOut: 20, other: 1 };
+        const saved = Presets.snapshot(values, ["rounding", "gapsOut"]);
+        Presets.apply(values, Presets.windows, "Spacious");
+        values.gapsOut = 40;
         Presets.restore(values, saved);
-        compare(values.lockClockStyle, "big");
-        compare(values.lockBlur, 100);
+        compare(values.rounding, 10);
+        compare(values.gapsOut, 20);
         compare(values.other, 1);
-        // Every key a lock preset sets is one Cancel puts back.
-        for (const p of Presets.lock)
-            for (const key of Object.keys(p.values))
-                verify(Presets.lockKeys.includes(key), key);
     }
 }

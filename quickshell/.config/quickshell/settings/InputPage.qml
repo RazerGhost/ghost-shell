@@ -8,7 +8,7 @@ import qs.widgets
 import "XkbLayouts.js" as XkbLayouts
 import "HyprlandConfig.js" as HyprlandConfig
 
-// Keyboard and touchpad: the keyboard layout (also the login screen's), touchpad scrolling and
+// Keyboard and touchpad: the keyboard layout, touchpad scrolling and
 // tapping, pointer speed. Applied through Hyprland (HyprlandSettings.qml).
 Column {
     id: root

@@ -5,11 +5,13 @@ import qs.theme
 
 // The calendar widget (medium), like iOS's: today's date on the left (the month in the accent,
 // the day large), the next events on the right (services/Agenda.qml, from the calendars
-// `ghost calendar add` subscribed to). Clicking it opens the today menu.
+// `ghost calendar add` subscribed to). Clicking it opens the today menu. On the lock screen
+// (`hidesTitles`) each event reads "Event": when, not what.
 WidgetSurface {
     id: widget
 
     medium: true
+    property bool hidesTitles: false
 
     readonly property var events: Agenda.upcoming.slice(0, 3)
 
@@ -98,7 +100,7 @@ WidgetSurface {
 
                     Text {
                         width: parent.width
-                        text: event.modelData.title
+                        text: widget.hidesTitles ? "Event" : event.modelData.title
                         color: Colors.m3onSurface
                         font.family: Theme.font.sans
                         font.pixelSize: Theme.font.normal

@@ -7,14 +7,10 @@ import "LooksFile.js" as LooksFile
 // The on-screen editors (user's choice over pickers inside Settings: Android's customization
 // with iOS's and macOS's way of editing on the screen itself). Opened from the launcher's
 // customize tiles (Super+U), Settings and the launcher's search:
-// `qs ipc call customize menu|lock|desktop|dock|windows|quick`; `close` closes an open one, keeping its
+// `qs ipc call customize menu|desktop|dock|windows|quick`; `close` closes an open one, keeping its
 // changes.
 Scope {
     id: root
-
-    LockEditor {
-        id: lockEditor
-    }
 
     DesktopEditor {
         id: desktopEditor
@@ -29,7 +25,6 @@ Scope {
     }
 
     function closeAll(): void {
-        lockEditor.close();
         desktopEditor.close();
         dockIslandEditor.close();
         windowsEditor.close();
@@ -39,7 +34,7 @@ Scope {
     // opening one closes any other, keeping its changes.
     function only(editor: var): void {
         LauncherState.open = false; // a Customize button in Settings, or a tile, opened it
-        for (const other of [lockEditor, desktopEditor, dockIslandEditor, windowsEditor])
+        for (const other of [desktopEditor, dockIslandEditor, windowsEditor])
             if (other !== editor)
                 other.close();
         editor.open();
@@ -75,7 +70,7 @@ Scope {
                 for (const key of LooksFile.keys)
                     Settings.values[key] = merged[key];
                 // An editor open now keeps them through its Cancel: they're part of its "before".
-                for (const editor of [lockEditor, desktopEditor, dockIslandEditor, windowsEditor]) {
+                for (const editor of [desktopEditor, dockIslandEditor, windowsEditor]) {
                     const before = Object.assign({}, editor.saved);
                     for (const key of LooksFile.keys)
                         if (key in before)
@@ -110,10 +105,6 @@ Scope {
         function quick(): void {
             root.closeAll();
             Quickshell.execDetached(["qs", "ipc", "call", "island", "editQuickSettings"]);
-        }
-
-        function lock(): void {
-            root.only(lockEditor);
         }
 
         function desktop(): void {

@@ -47,7 +47,6 @@ TestCase {
 
     // Each gallery's saved looks are in its editor's Cancel list, so Cancel puts them back.
     function test_cancelKeepsThem() {
-        verify(Presets.lockKeys.includes("lockLooks"));
         verify(Presets.dockIslandKeys.includes("dockLooks"));
         verify(Presets.windowsKeys.includes("windowLooks"));
         verify(Presets.desktopKeys.includes("widgetLooks"));

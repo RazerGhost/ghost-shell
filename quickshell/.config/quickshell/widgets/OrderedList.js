@@ -1,6 +1,5 @@
 // Moving items within a list you put in order: quick settings' tiles and buttons
-// (controlcenter/QuickSettings.qml), the lock screen's widgets (customize/LockEditor.qml) and the
-// dock's pins (dock/Dock.qml). Plain JavaScript, so it can be tested on its own
+// (controlcenter/QuickSettings.qml) and the dock's pins (dock/Dock.qml). Plain JavaScript, so it can be tested on its own
 // (tests/tst_orderedlist.qml).
 .pragma library
 

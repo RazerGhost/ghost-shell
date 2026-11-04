@@ -9,7 +9,8 @@ import "DesktopWidgets.js" as DesktopWidgets
 // on it (or the desktop editor being open) shows a handle in its top-right corner; drag that to
 // move it, and a drop near the screen's edges or another widget lines up with them, or with the
 // grid while it's on (Settings' desktopGrid). Only the
-// handle: the media widget's buttons keep their clicks.
+// handle: the media widget's buttons keep their clicks. On the lock screen (the stage's
+// `locked`) there's no handle, and only the media widget takes clicks.
 Item {
     id: root
 
@@ -18,6 +19,7 @@ Item {
     // On (its setting, and for media something to play); it stays visible while fading out.
     property bool shown: true
     default property alias content: body.data
+    readonly property bool locked: parent?.locked === true
 
     readonly property var spot: DesktopWidgets.place(Settings.values.desktopWidgets, name)
     // Where that is at the shell's size: places zoom with the widgets, a group of them together
@@ -47,6 +49,7 @@ Item {
     height: body.childrenRect.height
 
     visible: opacity > 0
+    enabled: !locked || name === "media"
     opacity: shown ? 1 : 0
     scale: !shown ? 0.92 : hover.hovered && !drag.active ? 1.02 : 1
     Behavior on opacity { NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing } }
@@ -65,7 +68,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         anchors.margins: -Theme.spacing.xs
-        visible: Editing.widget === root.name
+        visible: Editing.widget === root.name && !root.locked
         radius: Theme.desktop.radius + Theme.spacing.xs
         color: "transparent"
         border.width: Theme.focus.width / (root.parent?.scale ?? 1)
@@ -81,6 +84,7 @@ Item {
         height: width
         radius: width / 2
         color: Colors.m3surfaceContainerHighest
+        visible: !root.locked
         opacity: hover.hovered || drag.active || Editing.desktop ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: Theme.anim.fast } }
 

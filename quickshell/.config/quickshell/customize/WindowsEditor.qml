@@ -222,7 +222,6 @@ Scope {
                 id: chrome
                 tabs: [{ value: "looks", label: "Looks" }, { value: "borders", label: "Borders" }, { value: "space", label: "Space" },
                        { value: "motion", label: "Motion" }]
-                glass: true
                 cardTop: Theme.island.reserved + Theme.spacing.l * 2
                 onCancelled: root.cancel()
                 onFinished: root.close()

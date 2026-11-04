@@ -136,7 +136,6 @@ Scope {
                     { value: "style", label: "Style" },
                     { value: "text", label: "Size and text" }
                 ]
-                glass: true
                 cardTop: Theme.island.reserved + Theme.spacing.l * 2
                 // The colors take about a second to be made again after these changes.
                 status: Wallpaper.busy || ColorScheme.busy ? "Making the colors…" : ""

@@ -6,7 +6,7 @@
 .pragma library
 
 // The settings that hold them: the desktop's themes and each editor's own looks.
-const keys = ["themes", "lockLooks", "dockLooks", "windowLooks", "widgetLooks"];
+const keys = ["themes", "dockLooks", "windowLooks", "widgetLooks"];
 
 // A path in the home folder written with "~" (`home` -> "~"), or back (`toHome`).
 function path(value, home, toHome) {
@@ -17,13 +17,11 @@ function path(value, home, toHome) {
     return value === home || value.startsWith(home + "/") ? "~" + value.slice(home.length) : value;
 }
 
-// One look with its picture paths moved: a theme's wallpaper, a lock look's picture.
+// One look with its picture path moved: a theme's wallpaper.
 function moved(look, home, toHome) {
     const out = JSON.parse(JSON.stringify(look));
     if ("wallpaper" in out)
         out.wallpaper = path(out.wallpaper, home, toHome);
-    if (out.values && "lockWallpaper" in out.values)
-        out.values.lockWallpaper = path(out.values.lockWallpaper, home, toHome);
     return out;
 }
 

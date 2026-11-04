@@ -76,7 +76,6 @@ Scope {
             EditorChrome {
                 id: chrome
                 tabs: [{ value: "looks", label: "Looks" }, { value: "island", label: "Island" }, { value: "dock", label: "Dock" }]
-                glass: true
                 centered: true
                 onCancelled: root.cancel()
                 onFinished: root.close()

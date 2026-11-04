@@ -116,31 +116,8 @@ Singleton {
             property int idleAcScreenOff: 6
             property int idleAcSuspend: 0
 
-            // The lock screen and the login screen (both drawn by lock/LockContent.qml; the login
-            // screen gets a copy of this file, see greeter/sync.sh).
-            property string lockWallpaper: "" // a picture's path; "" = the desktop's wallpaper
-            property int lockBlur: 0          // percent of Theme.lock.blur (sharp: the desktop, locked)
-            property int lockDim: 10          // percent darker
-            property bool lockClock: true
-            property bool lockDate: true
-            // The clock's look and place (lock/LockClock.js has the choices).
-            property string lockClockStyle: "big" // big, stacked, thin, analog
-            property int lockClockSize: 100       // percent
-            property string lockClockFont: ""     // "" = the shell's text font
-            property string lockLayout: "top"     // top, center, left (the bottom-left corner)
-            // Where each part was dragged in the lock screen editor: { clock: { x, y }, date, player,
-            // weather, ..., field } as fractions of the screen (lock/LockClock.js placeOf).
-            property var lockPlaces: null
-            // The parts mirrored to the picture's quieter side when the clock sits on its busier
-            // one (lock/LockContent.qml); not in the editor, which shows the places as saved.
-            property bool lockQuietSide: false
-            // Before lockPlaces, two moves (the clock with its date, the player with the widgets):
-            // only read while lockPlaces isn't set.
-            property var lockClockOffset: null
-            property var lockWidgetsOffset: null
-            property string lockMessage: ""       // a line at the bottom, "If found, call ..."
-            property bool greeterShowName: true     // your user name above the password field
-            property bool greeterPowerButtons: true // suspend, restart and shut down
+            // The lock screen (lock/LockContent.qml): your desktop, locked, with this line at the bottom.
+            property string lockMessage: ""       // "If found, call ..."
 
             // Quick settings' tiles and round buttons, in order (controlcenter/QuickItems.js);
             // until edited, its defaults.
@@ -237,7 +214,6 @@ Singleton {
             // Your saved looks (customize/Themes.js): [{ name, wallpaper, primary, values }].
             property var themes: []
             // Your own looks in the editors' Looks galleries (customize/SavedLooks.js): [{ name, values }].
-            property var lockLooks: []
             property var dockLooks: []
             property var windowLooks: []
             property var widgetLooks: []
@@ -265,17 +241,6 @@ Singleton {
             property bool soundDevices: true    // charger, USB
             property bool soundFeedback: true   // volume keys, screenshots
             property bool soundBattery: true    // low battery
-            // The lock screen's player and widgets (lock/LockStatus.qml); never on the login screen.
-            property bool lockMedia: true
-            // The round widgets in your order (lock/LockWidgets.js); null until picked in the
-            // lock screen editor. "event" shows the next event's title to anyone at the locked
-            // screen (the editor says so).
-            property var lockWidgets: null
-            // The switches lockWidgets replaced: only read while it's null (lock/LockWidgets.js).
-            property bool lockNotificationCount: true
-            property bool lockWeather: true
-            property bool lockBattery: true
-            property bool lockEvent: false
             // Seconds after the idle lock in which a touch unlocks without the password; 0 = off.
             property int lockGrace: 0
             property bool welcomeSeen: false // the welcome tour (welcome/Welcome.qml) has been shown

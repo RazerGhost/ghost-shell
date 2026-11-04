@@ -8,8 +8,7 @@ import "../services/FileUrl.js" as FileUrl
 
 // An editor's "Looks" tab: its presets (Presets.js) as picture cards in one row, like the iOS
 // lock screen gallery; picking one sets its settings at once, and each can still be changed
-// after. `art` draws a card over `picture` (a file path: the wallpaper or the lock screen's
-// picture): it gets `parent.option.values`, the look's settings.
+// after. `art` draws a card over `picture` (a file path: the wallpaper): it gets `parent.option.values`, the look's settings.
 //
 // With `savedKey` (the setting holding them), your own looks follow the presets (`savedKeys`:
 // what one keeps), and the row starts with an empty "New look" card: it's the chosen one while

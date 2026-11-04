@@ -18,7 +18,8 @@ Scope {
     property bool busy
     // The password waiting for PAM to ask for it.
     property string pending
-    readonly property string wallpaper: Wallpaper.lockPath
+    // The desktop's picture (a live wallpaper's still frame): the lock screen is the desktop, locked.
+    readonly property string wallpaper: Wallpaper.stillPath
 
     signal tried()
 
@@ -66,12 +67,15 @@ Scope {
         }
 
         WlSessionLockSurface {
+            id: surface
             color: "black"
 
             LockContent {
                 id: content
                 anchors.fill: parent
                 wallpaper: root.wallpaper
+                // The desktop widgets show on the first screen, like the desktop's.
+                showsWidgets: surface.screen === Quickshell.screens[0]
                 message: root.message
                 messageIsError: root.messageIsError
                 busy: root.busy
@@ -79,11 +83,6 @@ Scope {
                 onActivity: {
                     if (grace.running)
                         sessionLock.locked = false;
-                }
-
-                LockStatus {
-                    lock: content
-                    width: parent.width
                 }
 
                 Connections {
@@ -203,11 +202,6 @@ Scope {
                 wallpaper: root.wallpaper
                 message: "Preview: nothing is locked"
                 onSubmitted: preview.active = false
-
-                LockStatus {
-                    lock: previewContent
-                    width: parent.width
-                }
             }
         }
     }

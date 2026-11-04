@@ -29,10 +29,8 @@ Scope {
     readonly property var shellCommands: [
         { name: "Edit quick settings", command: "qs ipc call island editQuickSettings",
           icon: "preferences-system", subtitle: "Your tiles and buttons, in your order" },
-        { name: "Customize the lock screen", command: "qs ipc call customize lock",
-          icon: "preferences-desktop-screensaver", subtitle: "Its clock, picture and look, on the screen itself" },
         { name: "Customize the desktop", command: "qs ipc call customize desktop",
-          icon: "preferences-desktop-wallpaper", subtitle: "Wallpaper, colors, widgets and style, on the desktop itself" },
+          icon: "preferences-desktop-wallpaper", subtitle: "Wallpaper, colors, widgets and style, on the desktop and lock screen" },
         { name: "Customize the dock and island", command: "qs ipc call customize dock",
           icon: "preferences-desktop-theme", subtitle: "The dock, workspace dots, clock and status icons, in place" },
         { name: "Customize the windows", command: "qs ipc call customize windows",
@@ -48,7 +46,6 @@ Scope {
 
     // The customize tiles (Super+U), with nothing typed.
     readonly property var customizeTiles: [
-        { id: "lock", icon: "lock", title: "Lock screen", run: ["qs", "ipc", "call", "customize", "lock"] },
         { id: "desktop", icon: "wallpaper", title: "Desktop", run: ["qs", "ipc", "call", "customize", "desktop"] },
         { id: "dock", icon: "dock_to_bottom", title: "Dock and island", run: ["qs", "ipc", "call", "customize", "dock"] },
         { id: "windows", icon: "select_window", title: "Windows", run: ["qs", "ipc", "call", "customize", "windows"] },

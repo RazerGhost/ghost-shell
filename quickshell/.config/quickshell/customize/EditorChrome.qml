@@ -10,20 +10,18 @@ import qs.widgets
 //
 // Made for the keyboard as much as the pointer (user's request), with the keys shown at the
 // sheet's foot: the arrow keys move to the nearest control that way (ArrowNavigation, also
-// onto what the card shows, like the lock screen's outlines), Enter or Space use it, Ctrl+Tab
+// onto what the card shows), Enter or Space use it, Ctrl+Tab
 // and Ctrl+Shift+Tab switch tabs, Ctrl+Enter is Done and Escape Cancel from anywhere; Enter
 // with no control chosen is Done too.
 //
-// The sheet is a panel like the shell's own: with `glass` Hyprland blurs behind it (the
-// editor's window must ask for that, see DesktopEditor.qml), so the glass settings show on it
-// while they're changed; without, it's nearly solid (the lock screen editor's, over its card).
+// The sheet is a panel like the shell's own: Hyprland blurs behind it (the editor's window must
+// ask for that, see DesktopEditor.qml), so the glass settings show on it while they're changed.
 Item {
     id: root
 
     // [{ value, label }]
     required property var tabs
     property string tab: tabs[0]?.value ?? ""
-    property bool glass: false
     // In the middle of the screen instead of at the bottom (the dock and island editor: the
     // dock is at the bottom).
     property bool centered: false
@@ -39,17 +37,14 @@ Item {
 
     // The card the edited screen is shown as (GNOME's workspaces, Android's widget editing):
     // between `cardTop` and the sheet, at the screen's shape, following the sheet's height as
-    // tabs change. The lock screen editor scales its lock screen into it; the desktop and
-    // windows editors publish it for the wallpaper and widgets (Editing.card).
+    // tabs change. The desktop and windows editors publish it for the wallpaper and widgets
+    // (Editing.card).
     property real cardTop: Theme.spacing.l * 2
     readonly property real cardScale: Math.min((width - Theme.spacing.l * 4) / Math.max(width, 1),
                                                Math.max(sheet.y - Theme.spacing.l * 1.5 - cardTop, 1) / Math.max(height, 1))
     readonly property rect card: Qt.rect((width - width * cardScale) / 2,
                                          cardTop + (sheet.y - Theme.spacing.l * 1.5 - cardTop - height * cardScale) / 2,
                                          width * cardScale, height * cardScale)
-
-    readonly property color solid: Qt.rgba(Colors.m3surfaceContainer.r, Colors.m3surfaceContainer.g,
-                                           Colors.m3surfaceContainer.b, 0.94)
 
     anchors.fill: parent
     focus: true
@@ -73,10 +68,6 @@ Item {
         area: root.parent ?? root
     }
 
-    // For controls outside the frame (the lock screen's outlines on the card): their arrow keys.
-    function navigate(key: int): bool {
-        return navigation.move(key);
-    }
 
     function switchTab(by: int): void {
         const i = root.tabs.findIndex(t => t.value === root.tab);
@@ -111,7 +102,7 @@ Item {
         Surface {
             anchors.fill: parent
             radius: sheet.radius
-            color: root.glass ? Colors.surfaceTranslucent : root.solid
+            color: Colors.surfaceTranslucent
         }
 
         Column {
