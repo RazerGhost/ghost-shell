@@ -33,6 +33,8 @@ WidgetSurface {
             TextButton {
                 required property int modelData
                 width: (parent.width - Theme.spacing.s) / 2
+                // Tinted, so they read as buttons on the glass (bare text looked unfinished).
+                color: Colors.tint
                 text: modelData + " min"
                 onClicked: Countdown.start(modelData)
             }

@@ -45,6 +45,7 @@ WidgetSurface {
 
         Text {
             anchors.right: parent.right
+            visible: !widget.hidesTitles // the large count below says it
             text: widget.open.length
             color: Colors.m3onSurfaceVariant
             font.family: Theme.font.sans
@@ -102,13 +103,38 @@ WidgetSurface {
         }
 
         Text {
-            visible: widget.hidesTitles || widget.open.length > widget.rows || widget.open.length === 0
+            visible: !widget.hidesTitles && (widget.open.length > widget.rows || widget.open.length === 0)
             text: widget.open.length === 0 ? (Planner.todos.length > 0 ? "All done" : "Nothing to do")
-                : widget.hidesTitles ? (widget.open.length === 1 ? "1 open" : widget.open.length + " open")
                 : "+" + (widget.open.length - widget.rows) + " more"
             color: Colors.m3onSurfaceVariant
             font.family: Theme.font.sans
-            font.pixelSize: widget.open.length === 0 || widget.hidesTitles ? Theme.font.large : Theme.font.small
+            font.pixelSize: widget.open.length === 0 ? Theme.font.large : Theme.font.small
+        }
+    }
+
+    // On the lock screen: only how many, large, like the notifications widget.
+    Column {
+        visible: widget.hidesTitles
+        anchors.bottom: parent.bottom
+        width: parent.width
+
+        Text {
+            text: widget.open.length
+            color: Colors.m3onSurface
+            font.family: Theme.font.sans
+            font.pixelSize: Theme.desktop.clock
+            font.weight: Font.DemiBold
+            font.features: { "tnum": 1 }
+        }
+
+        Text {
+            width: parent.width
+            text: widget.open.length === 0 ? (Planner.todos.length > 0 ? "All done" : "Nothing to do")
+                : widget.open.length === 1 ? "Task open" : "Tasks open"
+            color: Colors.m3onSurfaceVariant
+            font.family: Theme.font.sans
+            font.pixelSize: Theme.font.normal
+            elide: Text.ElideRight
         }
     }
 }

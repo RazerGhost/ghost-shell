@@ -216,8 +216,7 @@ Singleton {
         readonly property int radius:  root.round(28)
         readonly property int margin:  root.px(32)  // from the screen's edges, when snapped
         readonly property int reach:   root.px(24)  // how close a drop snaps
-        readonly property int clock:   root.text(64) // the time
-        readonly property int weather: root.text(44) // the temperature
+        readonly property int clock:   root.text(64) // the big value: the time, the day, the temperature, the counts
         readonly property int cover:   size - padding * 2 // the media widget's cover
         readonly property int ring:    root.text(80) // the battery and timer widgets' ring
         readonly property int ringWidth: root.px(8)

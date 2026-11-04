@@ -124,7 +124,7 @@ WidgetSurface {
         Text {
             width: parent.width
             visible: widget.events.length === 0
-            text: Agenda.enabled ? "Nothing coming up" : "No calendar yet"
+            text: Agenda.enabled || widget.hidesTitles ? "Nothing coming up" : "No calendar yet"
             color: Colors.m3onSurface
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.normal
@@ -134,7 +134,8 @@ WidgetSurface {
 
         Text {
             width: parent.width
-            visible: widget.events.length === 0 && !Agenda.enabled
+            // How to add one: on the desktop, not to whoever is at the lock screen.
+            visible: widget.events.length === 0 && !Agenda.enabled && !widget.hidesTitles
             text: "Add one in a terminal:"
             color: Colors.m3onSurfaceVariant
             font.family: Theme.font.sans
@@ -143,7 +144,7 @@ WidgetSurface {
 
         Text {
             width: parent.width
-            visible: widget.events.length === 0 && !Agenda.enabled
+            visible: widget.events.length === 0 && !Agenda.enabled && !widget.hidesTitles
             text: "ghost calendar add"
             color: Colors.m3onSurfaceVariant
             font.family: Theme.font.mono

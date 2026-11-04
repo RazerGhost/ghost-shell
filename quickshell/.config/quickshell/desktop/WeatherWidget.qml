@@ -18,11 +18,17 @@ WidgetSurface {
         visible: widget.now !== null
 
         Text {
+            // Shrinks to fit beside the sky's icon ("104°" in Fahrenheit) rather than run into it.
+            width: widget.width - Theme.desktop.padding * 2 - Theme.desktop.icon - Theme.spacing.s
+            fontSizeMode: Text.HorizontalFit
+            minimumPixelSize: Theme.font.title
             text: (widget.now?.temperature ?? "") + "°"
             color: Colors.m3onSurface
             font.family: Theme.font.sans
-            font.pixelSize: Theme.desktop.weather
-            font.weight: Font.Light
+            font.features: { "tnum": 1 }
+            // The same as every widget's big value (the time, the day, the counts).
+            font.pixelSize: Theme.desktop.clock
+            font.weight: Font.DemiBold
         }
     }
 
