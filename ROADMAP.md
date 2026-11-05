@@ -2491,6 +2491,33 @@ brackets and quotes.
 Machine-local additions: `~/.config/zsh/local.zsh`. Checked: the config loads without errors in a
 terminal (about 0.2 s with fastfetch), the greeting's tests pass.
 
+### Machines that differ (2026-11-05)
+The desktop's first install (fresh CachyOS, `bootstrap.sh desktop`) found problems that weren't
+the desktop's own but gaps for any machine, so each got a general fix (user's call: "a global
+fix, not one for this case"), with Omarchy's hardware layer as the model (user's pick):
+- The shell didn't start: Qt Multimedia, which the wallpaper layer imports, was never declared;
+  the laptop had it through other packages. `tests/deps_test.sh` (also in `ghost doctor`) checks
+  that every QML import and every program the code names comes from a declared package.
+- Hyprland drew on the Ryzen's small iGPU: "an AMD card" meant "the laptop". `ghost-hw` is now the
+  one place that tests hardware (sysfs only): the display GPU is the firmware's `boot_vga` one,
+  first in `AQ_DRM_DEVICES` through a udev link per PCI slot; NVIDIA's variables only where it
+  drives the display.
+- Per-machine fixes are files in `modules/system/hardware/`, each starting with its check;
+  hardware packages come from `modules/system/packages.sh` (`nvidia-prime` on a hybrid laptop,
+  `libva-nvidia-driver` where NVIDIA drives the display).
+- One-time cleanups of older setups are `migrations/`, run once per machine (`ghost migrate`).
+- Programs a module adds start from its own `autostart.lua` (`~/.config/hypr/autostart.d/`).
+- stow links whole folders only where the repo alone writes (Claude Code's installer had put its
+  `claude` into the repo through `~/.local/bin`).
+- The install skipped the dev module (its setup.sh had no executable bit) and stopped at the first
+  failing module; now every setup runs through bash, a failure doesn't stop the others, and the
+  failures are listed at the end. `grep -q` at the end of a pipe under `pipefail` gave false
+  "no match"es (doctor's services check never ran); replaced everywhere.
+- `ghost doctor` checks the machine can commit and push (a fresh install had no git name or
+  GitHub login).
+To check on the laptop: `ghost update`, `ghost-hw facts` (laptop yes, display GPU amd), the
+`gpu-pci-*` links, Hyprland on the AMD chip after a re-login, KDE Connect's tray still starting.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
