@@ -2203,6 +2203,19 @@ screens (`hyprctl output create headless`, removed after each test).
   100 % screen's edges); `DesktopWidgets.dropped` keeps them on the screen as shown. And per-screen
   parts no longer throw while a screen is unplugged.
 
+### Edge cases fixed (2026-11-05, user's request: all ten found)
+Twin monitors (same description) go by port (`DisplayModes.key`); a shell crash with noise
+removal on leaves no filter behind (cleared at start and before each start); a USB device back
+after sleep takes over only if it was in use when it left, and a USB microphone only with an
+output of the same device, which brings it along (`AudioDevices.takeovers`, tested; checked with a
+fake USB output); per-screen wallpapers are kept per monitor; saved positions settle against the
+screens' sizes now (`DisplayModes.settled`); the battery's lower rate is set live, not by
+reloading Hyprland's config; nearby sharing runs LocalSend as its own user service, so off stops
+only that one; open workspaces move to their screen when the main screen or the screens change
+(`workspaceMoves`, checked on a virtual screen); the lid closed with another screen on turns the
+laptop's screen off (Hyprland's `switch:on:Lid Switch` binds, `qs ipc call display lid`; not
+tried live: it would have blanked the only visible screen).
+
 ### Quick settings additions (2026-11-05; the buttons and the 60 Hz rule verified by the user)
 User's picks from the ideas (all of them), each optional: offered under "Available" in quick
 settings' edit mode, so the panel only grows by what you add.

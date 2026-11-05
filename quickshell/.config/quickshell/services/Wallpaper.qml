@@ -10,6 +10,7 @@ import Quickshell.Io
 import "CaptureFolders.js" as CaptureFolders
 import "Wallpapers.js" as WallpapersJs
 import "../desktop/DesktopWidgets.js" as DesktopWidgetsJs
+import "../settings/DisplayModes.js" as DisplayModes
 
 Singleton {
     id: root
@@ -69,10 +70,16 @@ Singleton {
     // from `screenWallpapers` (by output name) or, until one is picked for it, the main one's.
     // A live one plays there by the same rules; its thumbnail is its still frame (stillFor).
     readonly property bool perScreen: Settings.values.wallpaperPerScreen === true && Screens.several
+    // Saved per monitor (its make, model and serial: DisplayModes.key), so it follows the monitor
+    // to another port; under the port's name before that.
+    function screenKey(screenName: string): string {
+        const m = Display.monitors.find(m => m.name === screenName);
+        return m ? DisplayModes.key(m, Display.monitors) : screenName;
+    }
     function pathFor(screenName: string): string {
         if (!perScreen || screenName === (Screens.main?.name ?? ""))
             return path;
-        const own = Settings.values.screenWallpapers?.[screenName];
+        const own = Settings.values.screenWallpapers?.[screenKey(screenName)] ?? Settings.values.screenWallpapers?.[screenName];
         return typeof own === "string" && own !== "" ? own : path;
     }
     // The still picture for another screen's own wallpaper: a video's thumbnail (made when the
@@ -88,7 +95,7 @@ Singleton {
             set(picture);
             return;
         }
-        Settings.values.screenWallpapers = Object.assign({}, Settings.values.screenWallpapers, { [screenName]: picture });
+        Settings.values.screenWallpapers = Object.assign({}, Settings.values.screenWallpapers, { [screenKey(screenName)]: picture });
     }
 
     // No wallpaper again (Hyprland's default shows), colors from the last seed color: the desktop

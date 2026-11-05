@@ -1,7 +1,8 @@
 // Nearby sharing (quick settings' round button): LocalSend (the phone module) running hidden in
 // the background, so phones, tablets and computers nearby with LocalSend can send files here,
-// like AirDrop's "receive". On starts it hidden (`localsend --hidden`, from its launcher), off
-// stops it; whether it runs is read with pgrep while quick settings shows (`watching`).
+// like AirDrop's "receive". On starts it hidden (`localsend --hidden`, from its launcher) as a
+// user service of its own, so off stops that one and never a LocalSend you opened yourself, and
+// it outlives a shell reload; whether it runs is asked while quick settings shows (`watching`).
 pragma Singleton
 
 import QtQuick
@@ -15,18 +16,21 @@ Singleton {
     property bool running: false
     property bool watching: false
 
+    readonly property string unit: "ghost-nearby-sharing"
+
     function toggle(): void {
         if (running)
-            Quickshell.execDetached(["pkill", "-x", "localsend"]);
+            Quickshell.execDetached(["systemctl", "--user", "stop", unit]);
         else
-            Apps.run(["localsend", "--hidden"], "localsend", "");
+            Quickshell.execDetached(["systemd-run", "--user", "--unit=" + unit, "--collect", "--quiet",
+                                     "localsend", "--hidden"]);
         running = !running; // shown at once; the next check corrects it
         checkSoon.restart();
     }
 
     Process {
         id: check
-        command: ["pgrep", "-x", "localsend"]
+        command: ["systemctl", "--user", "is-active", "--quiet", root.unit]
         onExited: code => root.running = code === 0
     }
 

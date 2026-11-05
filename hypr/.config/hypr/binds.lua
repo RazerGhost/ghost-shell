@@ -92,6 +92,11 @@ for direction, short in pairs({ left = "l", right = "r", up = "u", down = "d" })
     hl.bind(mainMod .. " + CTRL + SHIFT + " .. direction, hl.dsp.window.move({ into_group = short }), { description = "Windows: Move into the tab group next to it" })
 end
 
+-- The lid with another screen on: the laptop's screen off while it's closed, back when it opens
+-- (services/Display.qml; logind doesn't suspend then). Alone, closing it suspends as before.
+hl.bind("switch:on:Lid Switch",  hl.dsp.exec_cmd("qs ipc call display lid closed"), { locked = true, description = "Session: Laptop screen off while the lid is closed (with another screen)" })
+hl.bind("switch:off:Lid Switch", hl.dsp.exec_cmd("qs ipc call display lid open"),   { locked = true, description = "Session: Laptop screen off while the lid is closed (with another screen)" })
+
 -- With several screens: the window to the screen on the left or right (it goes with it).
 hl.bind(mainMod .. " + SHIFT + ALT + left",  hl.dsp.window.move({ monitor = "l" }), { description = "Windows: Move to the screen on the left or right" })
 hl.bind(mainMod .. " + SHIFT + ALT + right", hl.dsp.window.move({ monitor = "r" }), { description = "Windows: Move to the screen on the left or right" })

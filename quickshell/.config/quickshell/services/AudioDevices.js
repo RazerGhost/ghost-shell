@@ -44,3 +44,33 @@ function headphones(name, shownName) {
     return n.startsWith("alsa_output.usb-") || n.startsWith("bluez_output.")
         || String(shownName ?? "").toLowerCase().includes("head");
 }
+
+// The USB device a node belongs to ("usb-<id>"), so a headset's output and microphone are paired;
+// "" for others.
+function deviceOf(name) {
+    const m = String(name ?? "").match(/^alsa_(?:output|input)\.(usb-.+)\.[^.]+$/);
+    return m ? m[1] : "";
+}
+
+// What takes over among the nodes `added` (names) now that `all` are there: { sink, source }
+// (names, or "" for none). An output as takesOver says; a USB microphone only with an output of
+// the same device (a headset or DAC with a microphone, not a webcam or a microphone of its own:
+// pick those in the Sound page, and WirePlumber brings them back by itself), and it comes along
+// when that output takes over even if it appeared first. A node seen before in this session
+// takes over again only if it was in use when it left (`left`: { name: wasDefault }), so waking
+// from sleep (USB devices reconnect) doesn't undo a choice of the speakers.
+function takeovers(added, all, left) {
+    const names = Array.from(all ?? []);
+    const back = name => left?.[name] === false;
+    const outputs = Array.from(added ?? []).filter(n => takesOver(n, true) && !back(n));
+    const sink = outputs[0] ?? "";
+    const pairedInput = dev => dev !== "" ? names.find(n => n.startsWith("alsa_input.") && deviceOf(n) === dev) ?? "" : "";
+    let source = sink !== "" ? pairedInput(deviceOf(sink)) : "";
+    if (source === "") {
+        source = Array.from(added ?? []).find(n => takesOver(n, false) && !back(n)
+            && names.some(o => o.startsWith("alsa_output.") && deviceOf(o) === deviceOf(n))) ?? "";
+    }
+    if (source !== "" && back(source))
+        source = "";
+    return { sink: sink, source: source };
+}

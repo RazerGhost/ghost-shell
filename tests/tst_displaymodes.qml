@@ -61,6 +61,44 @@ TestCase {
         compare(DisplayModes.lua("eDP-1", { mode: "1920x1080@165", scale: 1, transform: 0, vrr: 0, position: "1x2; os.exit()" }), "");
     }
 
+    function test_twins() {
+        // Two of the same model without a serial: told apart by their ports.
+        const a = { name: "DP-1", description: "Dell U2723QE" }, b = { name: "DP-2", description: "Dell U2723QE" };
+        compare(DisplayModes.key(a, [a, b]), "DP-1");
+        compare(DisplayModes.key(b, [a, b]), "DP-2");
+        compare(DisplayModes.key(a, [a]), "desc:Dell U2723QE");
+        verify(DisplayModes.setKey([a, b]) !== DisplayModes.setKey([a]));
+    }
+
+    function test_settled() {
+        // Arranged at 100 %, then the laptop's scale went to 1.25 (1536 wide): the screen on its
+        // right moves in against it, no gap.
+        compare(DisplayModes.settled([{ key: "eDP-1", position: "0x0", w: 1536, h: 864 },
+                                      { key: "desc:Dell", position: "1920x0", w: 2560, h: 1440 }]),
+                { "eDP-1": "0x0", "desc:Dell": "1536x0" });
+        // Already touching: as it was.
+        compare(DisplayModes.settled([{ key: "desc:Dell", position: "-2560x0", w: 2560, h: 1440 },
+                                      { key: "eDP-1", position: "0x0", w: 1920, h: 1080 }]),
+                { "eDP-1": "0x0", "desc:Dell": "-2560x0" });
+    }
+
+    function test_workspaceMoves() {
+        const homes = DisplayModes.workspaceHomes("DP-2", [{ name: "eDP-1", x: 0, y: 0 }, { name: "DP-2", x: 1920, y: 0 }]);
+        compare(homes["1"], "DP-2");
+        compare(homes["6"], "eDP-1");
+        // 1 is on the laptop (the old main screen), 7 on DP-2, 9 has no home: 1 and 7 move.
+        compare(DisplayModes.workspaceMoves(homes, [{ id: 1, monitor: "eDP-1" }, { id: 2, monitor: "DP-2" },
+                                                    { id: 7, monitor: "DP-2" }, { id: 12, monitor: "eDP-1" }]),
+                [{ workspace: "1", monitor: "DP-2" }, { workspace: "7", monitor: "eDP-1" }]);
+        compare(DisplayModes.workspaceMoves({}, [{ id: 1, monitor: "eDP-1" }]), []);
+    }
+
+    function test_lid() {
+        // The lid closed with a second screen: the laptop's off. Alone: never.
+        compare(DisplayModes.effective({}, [laptopScreen, external], { lidClosed: true })["eDP-1"], { disabled: true });
+        compare(DisplayModes.effective({}, [laptopScreen], { lidClosed: true }), {});
+    }
+
     function test_arranged() {
         const main = { key: "eDP-1", x: 0, y: 0, w: 1920, h: 1080 };
         const other = { key: "desc:Dell", x: 1920, y: 0, w: 2560, h: 1440 };

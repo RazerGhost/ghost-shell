@@ -54,9 +54,17 @@ Singleton {
         blockWrites: true // written before the filter starts reading it
     }
 
+    // A filter left running (the shell crashed while it was on) would keep its microphone the
+    // default while this says off, and a second one would start next to it: it goes first, at
+    // start and before every start (pkill -x -f: exactly its command line).
+    Process {
+        running: true
+        command: ["pkill", "-x", "-f", "pipewire -c " + root.configPath]
+    }
+
     Process {
         id: filter
-        command: ["pipewire", "-c", root.configPath]
+        command: ["sh", "-c", "pkill -x -f \"pipewire -c $0\"; exec pipewire -c \"$0\"", root.configPath]
         onExited: code => {
             if (code !== 0 && code !== 143)
                 Notifications.send("Noise removal", "audio-input-microphone", "Noise removal stopped",

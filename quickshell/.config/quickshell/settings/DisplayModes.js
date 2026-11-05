@@ -103,10 +103,14 @@ function effective(saved, monitors, opts) {
     const o = opts ?? {};
     // The connected screens' saved setups by output name (saved under a monitor's description
     // too), with this set of screens' arrangement (`opts.layouts`, screenLayouts).
+    // The positions are settled against the screens' sizes now: a resolution or scale changed
+    // since they were arranged would leave a gap or an overlap.
     const layout = list.length > 1 ? (o.layouts ?? {})[setKey(list)] : undefined;
+    const positions = layout ? settled(list.filter(m => !m.disabled && layout[key(m, list)])
+        .map(m => Object.assign({ key: key(m, list), position: layout[key(m, list)] }, logicalSize(m)))) : {};
     for (const m of list) {
-        const setup = savedFor(saved, m);
-        const position = layout?.[key(m)];
+        const setup = savedFor(saved, m, list);
+        const position = positions[key(m, list)];
         if (setup || position)
             out[m.name] = Object.assign({}, setup ?? current(m, undefined), position ? { position: position } : {});
     }
@@ -117,7 +121,9 @@ function effective(saved, monitors, opts) {
     }
     const others = list.filter(m => m !== own);
     if (own && others.length > 0) {
-        if (o.project === "external")
+        // The lid closed with another screen on (logind doesn't suspend then): the laptop's
+        // screen off until it opens, whatever the projection.
+        if (o.project === "external" || o.lidClosed === true)
             out[own.name] = { disabled: true };
         for (const other of others) {
             if (o.project === "laptop")
@@ -134,39 +140,34 @@ function effective(saved, monitors, opts) {
 // rules as Lua lines; none with one screen. `main` is the main screen's output name, `monitors`
 // `hyprctl monitors all -j`'s entries.
 function workspaceRules(main, monitors) {
-    const list = Array.from(monitors ?? []).filter(m => !m.disabled && /^[A-Za-z0-9_.-]+$/.test(m.name));
-    if (list.length < 2)
-        return [];
-    const first = list.find(m => m.name === main) ?? list[0];
-    const order = [first, ...list.filter(m => m !== first).sort((a, b) => a.x - b.x || a.y - b.y)];
-    const lines = [];
-    order.forEach((m, i) => {
-        for (let n = 1; n <= 5; n++) {
-            const ws = i * 5 + n;
-            lines.push(`hl.workspace_rule({ workspace = "${ws}", monitor = "${m.name}"${n === 1 ? ", default = true" : ""} })`);
-        }
-    });
-    return lines;
+    return Object.entries(workspaceHomes(main, monitors)).map(([ws, monitor]) =>
+        `hl.workspace_rule({ workspace = "${ws}", monitor = "${monitor}"${(Number(ws) - 1) % 5 === 0 ? ", default = true" : ""} })`);
 }
 
 // The key a screen's setup is saved under: the monitor's description (make, model, serial) when
 // it has one, so a monitor gets its setup back on any port, else its output name (the laptop's
 // own screen, a virtual one).
-function key(monitor) {
+// `all`, the connected screens: two that report the same description (the same model without
+// a serial) can't be told apart by it, so they go by their ports.
+function key(monitor, all) {
     const d = String(monitor?.description ?? "").trim();
-    return d !== "" && /^[A-Za-z0-9 _.,()\/+-]+$/.test(d) && !/^(eDP|LVDS)/.test(monitor.name) ? "desc:" + d : String(monitor?.name ?? "");
+    const twin = Array.from(all ?? []).some(m => m !== monitor && m.name !== monitor?.name
+                                                 && String(m.description ?? "").trim() === d);
+    return d !== "" && !twin && /^[A-Za-z0-9 _.,()\/+-]+$/.test(d) && !/^(eDP|LVDS)/.test(monitor.name)
+        ? "desc:" + d : String(monitor?.name ?? "");
 }
 
 // The saved setup for a connected screen: under its key, else under its output name (saved
 // before keys).
-function savedFor(saved, monitor) {
-    return saved?.[key(monitor)] ?? saved?.[monitor.name];
+function savedFor(saved, monitor, all) {
+    return saved?.[key(monitor, all)] ?? saved?.[monitor.name];
 }
 
 // Which screens are connected, as one key for their arrangement (sorted, so the order they
 // were found in doesn't matter): each set of screens keeps its own (screenLayouts).
 function setKey(monitors) {
-    return Array.from(monitors ?? []).map(key).sort().join(" | ");
+    const list = Array.from(monitors ?? []);
+    return list.map(m => key(m, list)).sort().join(" | ");
 }
 
 // A screen's size on the desktop, in Hyprland's layout pixels: its mode over its scale, turned
@@ -219,4 +220,52 @@ function arranged(rects, moved, x, y, reach) {
     for (const r of placed)
         out[r.key] = `${Math.round(r.x - origin.x)}x${Math.round(r.y - origin.y)}`;
     return out;
+}
+
+// Saved positions ("XxY" for each { key, position, w, h }) settled against the screens' sizes
+// now: from the one at 0, 0 (the main one), each other screen goes against the nearest side of
+// those already placed (arranged), so a screen whose size changed since leaves no gap or overlap.
+// { key: "XxY" }; a layout already touching comes back as it was.
+function settled(rects) {
+    const list = Array.from(rects).map(r => {
+        const m = String(r.position).match(/^(-?\d+)x(-?\d+)$/);
+        return { key: r.key, x: m ? Number(m[1]) : 0, y: m ? Number(m[2]) : 0, w: r.w, h: r.h };
+    });
+    if (list.length === 0)
+        return {};
+    list.sort((a, b) => (a.x === 0 && a.y === 0 ? -1 : 0) - (b.x === 0 && b.y === 0 ? -1 : 0));
+    const placed = [list[0]];
+    for (const r of list.slice(1)) {
+        const at = arranged([...placed, r], r.key, r.x, r.y, 0)[r.key].split("x").map(Number);
+        placed.push(Object.assign({}, r, { x: at[0] + placed[0].x, y: at[1] + placed[0].y }));
+    }
+    const out = {};
+    for (const r of placed)
+        out[r.key] = `${r.x - placed[0].x}x${r.y - placed[0].y}`;
+    return out;
+}
+
+// Where each workspace lives with workspaces per screen: { "1": "eDP-1", ..., "6": "DP-2" } (the
+// main screen 1-5, then left to right); {} with one screen.
+function workspaceHomes(main, monitors) {
+    const list = Array.from(monitors ?? []).filter(m => !m.disabled && /^[A-Za-z0-9_.-]+$/.test(m.name));
+    if (list.length < 2)
+        return {};
+    const first = list.find(m => m.name === main) ?? list[0];
+    const order = [first, ...list.filter(m => m !== first).sort((a, b) => a.x - b.x || a.y - b.y)];
+    const homes = {};
+    order.forEach((m, i) => {
+        for (let n = 1; n <= 5; n++)
+            homes[String(i * 5 + n)] = m.name;
+    });
+    return homes;
+}
+
+// The workspaces open now ([{ id, monitor }], monitor its screen's name) that aren't on their
+// screen: [{ workspace, monitor }] to move (a new main screen, workspaces per screen turned on, a
+// screen plugged in). Rules only place new workspaces; these were open before.
+function workspaceMoves(homes, workspaces) {
+    return Array.from(workspaces ?? [])
+        .filter(w => homes[String(w.id)] !== undefined && homes[String(w.id)] !== w.monitor)
+        .map(w => ({ workspace: String(w.id), monitor: homes[String(w.id)] }));
 }

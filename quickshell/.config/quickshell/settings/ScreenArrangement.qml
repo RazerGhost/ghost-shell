@@ -16,7 +16,7 @@ Item {
 
     // The screens as rects in Hyprland's layout pixels, the main one first.
     readonly property var rects: {
-        const list = monitors.map(m => Object.assign({ key: DisplayModes.key(m), name: m.name, x: m.x, y: m.y }, DisplayModes.logicalSize(m)));
+        const list = monitors.map(m => Object.assign({ key: DisplayModes.key(m, monitors), name: m.name, x: m.x, y: m.y }, DisplayModes.logicalSize(m)));
         const main = list.find(r => r.name === Screens.main?.name);
         return main ? [main, ...list.filter(r => r !== main)] : list;
     }

@@ -40,7 +40,7 @@ Column {
         countdown.stop();
         // Under the monitor's own key (its description), so it gets this back on any port.
         const monitor = monitors.find(m => m.name === trial.output);
-        const key = monitor ? DisplayModes.key(monitor) : trial.output;
+        const key = monitor ? DisplayModes.key(monitor, monitors) : trial.output;
         Settings.values.monitors = Object.assign({}, Settings.values.monitors, { [key]: trial.setup });
         trial = null;
         read.running = true;
@@ -212,7 +212,7 @@ Column {
             readonly property bool trying: root.trial?.output === output
             // What the steppers show: the change being tried, else what the screen runs now.
             readonly property var setup: trying ? root.trial.setup
-                : DisplayModes.current(modelData, DisplayModes.savedFor(Settings.values.monitors, modelData)?.vrr)
+                : DisplayModes.current(modelData, DisplayModes.savedFor(Settings.values.monitors, modelData, root.monitors)?.vrr)
             readonly property var modes: DisplayModes.modes(modelData.availableModes).reverse()
 
             title: output.startsWith("eDP") ? "Built-in screen" : (modelData.description || output)

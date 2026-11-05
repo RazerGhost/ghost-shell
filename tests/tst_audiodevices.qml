@@ -46,6 +46,33 @@ TestCase {
         verify(!AudioDevices.headphones("alsa_output.pci-0000_05_00.6.HiFi__Speaker__sink", "Speaker"));
     }
 
+    readonly property string out: "alsa_output.usb-LE_XIAN_SIMGOT_EW300_DSP-00.analog-stereo"
+    readonly property string mic: "alsa_input.usb-LE_XIAN_SIMGOT_EW300_DSP-00.mono-fallback"
+    readonly property string cam: "alsa_input.usb-Logitech_C920-02.analog-stereo"
+    readonly property string wave: "alsa_input.usb-Elgato_Wave_3-00.mono-fallback"
+
+    function test_deviceOf() {
+        compare(AudioDevices.deviceOf(out), "usb-LE_XIAN_SIMGOT_EW300_DSP-00");
+        compare(AudioDevices.deviceOf(mic), "usb-LE_XIAN_SIMGOT_EW300_DSP-00");
+        compare(AudioDevices.deviceOf("alsa_output.pci-0000_05_00.6.HiFi__Speaker__sink"), "");
+    }
+
+    function test_takeovers() {
+        // A headset plugged in: its output and microphone, in either order.
+        compare(AudioDevices.takeovers([out, mic], [out, mic], {}), { sink: out, source: mic });
+        compare(AudioDevices.takeovers([out], [mic, out], {}), { sink: out, source: mic });   // the mic came first
+        compare(AudioDevices.takeovers([mic], [mic, out], {}), { sink: "", source: mic });    // the mic came last
+        // A webcam's or a Wave:3's microphone alone: nothing (picked by hand, WirePlumber keeps it).
+        compare(AudioDevices.takeovers([cam], [cam], {}), { sink: "", source: "" });
+        compare(AudioDevices.takeovers([wave], [wave], {}), { sink: "", source: "" });
+        // Back after sleep: again only if it was in use when it left.
+        compare(AudioDevices.takeovers([out, mic], [out, mic], { [out]: false, [mic]: false }), { sink: "", source: "" });
+        compare(AudioDevices.takeovers([out, mic], [out, mic], { [out]: true, [mic]: true }), { sink: out, source: mic });
+        // Bluetooth: the sound, never its microphone.
+        compare(AudioDevices.takeovers(["bluez_output.AC.1", "bluez_input.AC.0"], ["bluez_output.AC.1", "bluez_input.AC.0"], {}),
+                { sink: "bluez_output.AC.1", source: "" });
+    }
+
     function test_added() {
         compare(AudioDevices.added(["a", "b"], ["a", "b", "c"]), ["c"]);
         compare(AudioDevices.added(["a", "b"], ["b"]), []);   // one went away: nothing new

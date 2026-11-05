@@ -50,6 +50,7 @@ ShellRoot {
         BatteryAlerts.check();
         DiskAlerts.given;
         OomAlerts.watching;
+        NoiseRemoval.installed; // clears a filter left by a crash (services/NoiseRemoval.qml)
         Touchpad.enabled;
         Equalizer.gains;
         ScreenTime.loaded;

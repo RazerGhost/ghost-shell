@@ -96,8 +96,8 @@ Singleton {
     }
 
     // Headphones take over when they're plugged in or connect, like on a phone (user's pick,
-    // 2026-11-05): USB ones for the sound and their microphone, Bluetooth ones for the sound
-    // (AudioDevices.js). WirePlumber keeps the output chosen last for as long as it exists, so a
+    // 2026-11-05): USB ones for the sound and their microphone (a microphone alone, a webcam's,
+    // doesn't), Bluetooth ones for the sound (AudioDevices.takeovers). WirePlumber keeps the output chosen last for as long as it exists, so a
     // new one never took over by itself (the jack does: it switches the laptop's own card). The
     // devices there when PipeWire finishes its first sync count as there already, so a shell
     // start or reload switches nothing. Unplugging goes back by itself: WirePlumber remembers the
@@ -105,19 +105,46 @@ Singleton {
     readonly property var nodeNames: Pipewire.ready
         ? Pipewire.nodes.values.filter(n => !n.isStream).map(n => n.name) : []
     property var knownNodes: null // null until PipeWire's first sync
+    // Devices that left this session: { name: whether it was in use } (AudioDevices.takeovers:
+    // one coming back takes over only if it was, so waking from sleep keeps your choice).
+    property var left: ({})
+    // In use when it left: the default now, or until a moment ago (the default moves off a
+    // device as it goes, possibly before the list changes). When each stopped being the default.
+    property var defaultUntil: ({})
+    readonly property string sinkName: Pipewire.defaultAudioSink?.name ?? ""
+    readonly property string sourceName: Pipewire.defaultAudioSource?.name ?? ""
+    property string lastSink: ""
+    property string lastSource: ""
+    onSinkNameChanged: {
+        if (lastSink)
+            defaultUntil = Object.assign({}, defaultUntil, { [lastSink]: Date.now() });
+        lastSink = sinkName;
+    }
+    onSourceNameChanged: {
+        if (lastSource)
+            defaultUntil = Object.assign({}, defaultUntil, { [lastSource]: Date.now() });
+        lastSource = sourceName;
+    }
+    function wasInUse(name: string): bool {
+        return name === sinkName || name === sourceName || Date.now() - (defaultUntil[name] ?? 0) < 3000;
+    }
     onNodeNamesChanged: {
         if (!Pipewire.ready)
             return;
         if (knownNodes !== null) {
-            for (const name of AudioDevices.added(knownNodes, nodeNames)) {
-                const node = Pipewire.nodes.values.find(n => n.name === name && !n.isStream);
-                if (!node || !AudioDevices.takesOver(name, node.isSink))
-                    continue;
-                if (node.isSink)
-                    Pipewire.preferredDefaultAudioSink = node;
-                else
-                    Pipewire.preferredDefaultAudioSource = node;
+            const gone = AudioDevices.added(nodeNames, knownNodes);
+            if (gone.length > 0) {
+                const now = Object.assign({}, left);
+                for (const name of gone)
+                    now[name] = wasInUse(name);
+                left = now;
             }
+            const pick = AudioDevices.takeovers(AudioDevices.added(knownNodes, nodeNames), nodeNames, left);
+            const node = name => Pipewire.nodes.values.find(n => n.name === name && !n.isStream) ?? null;
+            if (pick.sink !== "" && node(pick.sink))
+                Pipewire.preferredDefaultAudioSink = node(pick.sink);
+            if (pick.source !== "" && node(pick.source))
+                Pipewire.preferredDefaultAudioSource = node(pick.source);
         }
         knownNodes = nodeNames;
     }
