@@ -73,7 +73,7 @@ updated) · Boy Scout Rule within touched lines · end each change with a summar
 |---|---|
 | GPU | the display GPU (firmware's `boot_vga`, `ghost-hw`) first in `AQ_DRM_DEVICES`, the others after; NVIDIA's env vars only where NVIDIA drives the display, `prime-run` per app on a hybrid laptop (`env.lua`, udev rule `61-gpu-symlinks.rules`: a link per PCI slot) |
 | Hardware | Only `bin/.local/bin/ghost-hw` tests hardware (laptop, battery, lid, GPUs, model); everything else asks it (sysfs only, never `lspci`, which wakes a sleeping RTX; `tests/hw_test.sh`) |
-| Boot | No Plymouth (`plymouth.enable=0`); early KMS adds `amdgpu` where AMD drives the display (`modules/system/hardware/amd-early-kms.sh`); quiet kernel line; Hyprland output to the journal |
+| Boot | Limine's menu from Settings -> Lock and power (Hidden, Shown 3 s, Remember last; `bootMenu`): root's file, changed by `/usr/local/lib/ghost-boot-menu` through pkexec, whose polkit action allows only that program (`system/usr/share/polkit-1/actions/org.ghost-shell.boot-menu.policy`; `tests/boot_menu_test.sh`); No Plymouth (`plymouth.enable=0`); early KMS adds `amdgpu` where AMD drives the display (`modules/system/hardware/amd-early-kms.sh`); quiet kernel line; Hyprland output to the journal |
 | Hardware fixes | One file per fix in `modules/system/hardware/`, each starting with its hardware check (`hw board 8BCA`, `hw display-gpu`), sourced by the system module; a new machine's quirk is a new file (`tests/hardware_fixes_test.sh`) |
 | Windows | Own tiling layout (`layout.lua`, `tiling.lua`); dialogs float; floating stays above tiled |
 | Focus | Click to focus, raise on focus (`input.follow_mouse = 2`, `windows.lua`); apps can't steal focus, urgent shows an `AttentionCard` |

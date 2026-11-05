@@ -2589,6 +2589,17 @@ User's question after the Settings work: what else assumes the laptop. Checked o
   saved per device (`audioTakeover`); without a choice every device takes over but the known
   microphones with a jack (the Wave:3; `AudioDevices.mayTakeOver`, tested).
 
+### The boot menu from Settings (2026-11-05)
+User's request: still choose what to boot (Windows, another kernel, a snapshot), from Settings.
+Settings -> Lock and power -> Starting up: Hidden (as before: any key within 1 s shows it),
+Shown 3 s, or Remember last (shown, on the entry booted last; Limine's `remember_last_entry`),
+saved per machine (`bootMenu`). limine.conf is root's: the system module installs
+`/usr/local/lib/ghost-boot-menu` (takes only those three words, `tests/boot_menu_test.sh`) and a
+polkit action allowing only that program, which Settings runs with pkexec (the shell's own
+password prompt). The system module no longer forces the menu's options; it only fills them in
+where there are none. Option names and behaviour checked in Limine's CONFIG.md. Needs
+`ghost install system`; the row shows once the helper is there.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).
