@@ -27,8 +27,8 @@
 #   ghost modules     list the modules, and which this machine uses
 #   ghost keybinds    Hyprland's keybinds as a Markdown table (docs/keybinds.md is made with it)
 #
-# Modules are the folders in modules/: their packages (packages.txt, aur.txt) and setup
-# (setup.sh). Which ones this machine gets: ~/.config/ghost/modules, one name per line (not in
+# Modules are the folders in modules/: their packages (packages.txt, aur.txt; packages.sh prints
+# the ones that depend on the hardware) and setup (setup.sh). Which ones this machine gets: ~/.config/ghost/modules, one name per line (not in
 # the repo, so each machine has its own; machines/ has the profiles to start from); without that
 # file, all of them but the opt-in ones (hardware plugged into one machine, like wave3).
 set -euo pipefail
@@ -85,6 +85,15 @@ machine() {
     fi
 }
 
+# A module's pacman packages: its packages.txt, and what its packages.sh prints for this machine's
+# hardware (the system module's NVIDIA packages).
+module_packages() {
+    entries "modules/$1/packages.txt"
+    if [[ -x modules/$1/packages.sh ]]; then
+        "modules/$1/packages.sh"
+    fi
+}
+
 is_module() {
     [[ -n ${about[$1]+set} ]]
 }
@@ -134,7 +143,7 @@ cmd_install() {
     step "Packages"
     local pacman_pkgs=() aur_pkgs=()
     for m in "${modules[@]}"; do
-        mapfile -t -O "${#pacman_pkgs[@]}" pacman_pkgs < <(entries "modules/$m/packages.txt")
+        mapfile -t -O "${#pacman_pkgs[@]}" pacman_pkgs < <(module_packages "$m")
         mapfile -t -O "${#aur_pkgs[@]}" aur_pkgs < <(entries "modules/$m/aur.txt")
     done
     # As arguments, not on stdin: pacman and paru read their "Proceed?" answers from stdin.
@@ -222,7 +231,7 @@ cmd_doctor() {
 
     step "Packages of this machine's modules"
     for m in $(machine); do
-        missing=$({ entries "modules/$m/packages.txt"; entries "modules/$m/aur.txt"; } | xargs -r pacman -T || true)
+        missing=$({ module_packages "$m"; entries "modules/$m/aur.txt"; } | xargs -r pacman -T || true)
         if [[ -n $missing ]]; then
             bad "$m: missing $(echo $missing) (ghost install $m)"
         else

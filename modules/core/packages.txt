@@ -10,7 +10,6 @@ hyprpolkitagent
 hypridle
 hyprlock
 hyprsunset
-nvidia-prime
 
 # The Quickshell shell, and what it runs or reads
 quickshell
