@@ -15,7 +15,7 @@ fi
 
 step "Snapshots: the system"
 # Created by the CachyOS installer; made here on other machines.
-sudo snapper list-configs | grep -q '^root ' || sudo snapper -c root create-config /
+sudo snapper list-configs | grep '^root ' >/dev/null || sudo snapper -c root create-config /
 sudo snapper -c root set-config "ALLOW_USERS=$USER" SYNC_ACL=yes
 sudo systemctl enable --now limine-snapper-sync.service snapper-cleanup.timer
 
@@ -45,7 +45,7 @@ else
     to_subvolume "$HOME/.local/share/Steam/steamapps"
 fi
 
-sudo snapper list-configs | grep -q '^home ' || sudo snapper -c home create-config /home
+sudo snapper list-configs | grep '^home ' >/dev/null || sudo snapper -c home create-config /home
 sudo snapper -c home set-config "ALLOW_USERS=$USER" SYNC_ACL=yes TIMELINE_CREATE=yes TIMELINE_CLEANUP=yes \
     TIMELINE_LIMIT_HOURLY=10 TIMELINE_LIMIT_DAILY=7 TIMELINE_LIMIT_WEEKLY=4 \
     TIMELINE_LIMIT_MONTHLY=0 TIMELINE_LIMIT_YEARLY=0

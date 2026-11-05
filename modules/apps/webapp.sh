@@ -32,7 +32,7 @@ wm_class() {
 }
 
 is_image() {
-    [[ -s $1 ]] && file --brief --mime-type "$1" | grep -q '^image/'
+    [[ -s $1 ]] && file --brief --mime-type "$1" | grep '^image/' >/dev/null
 }
 
 # Into $2: $1 (a file or URL), or the site's own icon, or its favicon from DuckDuckGo's icon

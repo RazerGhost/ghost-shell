@@ -17,7 +17,7 @@ step "Spotify: the Ghost Spicetify theme"
 if [[ -f $HOME/.config/spotify/prefs ]]; then
     # Spicetify patches a backup of the original Spotify; the first run has to make it.
     # The [Backup] version in its config stays empty until then.
-    if ! grep -A1 '^\[Backup\]' "$HOME/.config/spicetify/config-xpui.ini" 2>/dev/null | grep -q 'version *= *[0-9]'; then
+    if ! grep -A1 '^\[Backup\]' "$HOME/.config/spicetify/config-xpui.ini" 2>/dev/null | grep 'version *= *[0-9]' >/dev/null; then
         spicetify backup apply
     fi
     curl -fsSL https://raw.githubusercontent.com/RazerGhost/spicetify-ghost/main/install.sh | sh

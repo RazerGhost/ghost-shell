@@ -5,7 +5,7 @@ set -euo pipefail
 source "$(dirname "$0")/../lib.sh"
 
 step "Aider"
-if uv tool list 2>/dev/null | grep -q '^aider-chat '; then
+if uv tool list 2>/dev/null | grep '^aider-chat ' >/dev/null; then
     uv tool upgrade aider-chat
 else
     uv tool install --python 3.12 aider-chat

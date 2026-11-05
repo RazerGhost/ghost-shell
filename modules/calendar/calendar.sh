@@ -136,7 +136,7 @@ cmd_add() {
     local name link
     name=$(slug "${1:-google}")
     [[ -n $name ]] || fail "\"$1\" isn't a usable name"
-    names | grep -qx "$name" && fail "there's already a calendar called $name (ghost calendar remove $name)"
+    names | grep -x "$name" >/dev/null && fail "there's already a calendar called $name (ghost calendar remove $name)"
     tools
     # The clipboard first: pasting into a prompt that shows nothing looked like it hadn't worked.
     local copied answer
@@ -180,7 +180,7 @@ cmd_remove() {
     (($# == 1)) || fail "usage: ghost calendar remove <name>"
     local name
     name=$(slug "$1")
-    names | grep -qx "$name" || fail "no calendar called \"$1\" (ghost calendar list)"
+    names | grep -x "$name" >/dev/null || fail "no calendar called \"$1\" (ghost calendar list)"
     forget "$name"
     echo "Removed $name"
 }

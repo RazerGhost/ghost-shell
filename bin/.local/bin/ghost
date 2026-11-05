@@ -129,7 +129,7 @@ cmd_install() {
     if ((${#wanted[@]})); then
         # In setup order, whatever order they were named in.
         for m in "${all_modules[@]}"; do
-            printf '%s\n' "${wanted[@]}" | grep -qx "$m" && modules+=("$m")
+            printf '%s\n' "${wanted[@]}" | grep -x "$m" >/dev/null && modules+=("$m")
         done
     else
         mapfile -t modules < <(machine)
@@ -156,7 +156,7 @@ cmd_install() {
     fi
     if ((${#aur_pkgs[@]})); then
         # rustup installs no toolchain by itself; some AUR packages build with Rust (millennium).
-        if command -v rustup >/dev/null && ! rustup toolchain list | grep -q stable; then
+        if command -v rustup >/dev/null && ! rustup toolchain list | grep stable >/dev/null; then
             rustup default stable
         fi
         mapfile -t aur_pkgs < <(printf '%s\n' "${aur_pkgs[@]}" | sort -u)
@@ -165,18 +165,26 @@ cmd_install() {
         paru -S --needed --removemake --cleanafter "${confirm_aur[@]}" "${aur_pkgs[@]}"
     fi
 
+    # Every module's setup, through bash (a setup.sh committed without its executable bit was
+    # skipped without a word: the dev module's, until 2026-11-05). One that fails doesn't stop the
+    # others: they're listed at the end and the install fails then (a missing Wave:3 used to end
+    # the desktop's first install before its last steps).
+    local failed_modules=()
     for m in "${modules[@]}"; do
-        [[ -x modules/$m/setup.sh ]] || continue
+        [[ -f modules/$m/setup.sh ]] || continue
         if [[ $m == core ]]; then
-            "modules/$m/setup.sh" "${theme[@]}"
+            bash "modules/$m/setup.sh" "${theme[@]}" || failed_modules+=("$m")
         else
-            "modules/$m/setup.sh"
+            bash "modules/$m/setup.sh" || failed_modules+=("$m")
         fi
     done
     if [[ ${#theme[@]} -gt 0 && ! " ${modules[*]} " =~ " core " ]]; then
         cmd_theme "${theme[@]}"
     fi
     cmd_migrate
+    if ((${#failed_modules[@]})); then
+        fail "these modules' setup failed (their messages are above): ${failed_modules[*]}; fix it and run ghost install ${failed_modules[*]}"
+    fi
 
     step "Done"
     echo "Log out and back in if this was the first run or env.lua changed (GPU settings apply at Hyprland start)."
@@ -242,7 +250,7 @@ cmd_doctor() {
     for pkg in $(stow_packages); do
         # In simulation, stow prints nothing but its notice when everything is linked already.
         # shellcheck disable=SC2046 # no flag or one
-        if stow -n -v $(stow_flags "$pkg") -t "$HOME" "$pkg" 2>&1 | grep -qv "in simulation mode"; then
+        if stow -n -v $(stow_flags "$pkg") -t "$HOME" "$pkg" 2>&1 | grep -v "in simulation mode" >/dev/null; then
             bad "$pkg: not linked or in conflict (ghost install core links it)"
         else
             ok "$pkg"
@@ -274,13 +282,27 @@ cmd_doctor() {
     else bad "no colors yet (ghost theme <wallpaper>)"; fi
 
     step "Services"
-    if machine | grep -qx system; then
+    if machine | grep -x system >/dev/null; then
         for unit in greetd.service NetworkManager.service bluetooth.service power-profiles-daemon.service; do
             if systemctl is-enabled "$unit" >/dev/null 2>&1; then ok "$unit"; else bad "$unit isn't enabled (ghost install system)"; fi
         done
     fi
-    if machine | grep -qx dev; then
+    if machine | grep -x dev >/dev/null; then
         if systemctl is-enabled docker.socket >/dev/null 2>&1; then ok "docker.socket"; else bad "docker.socket isn't enabled (ghost install dev)"; fi
+    fi
+
+    step "Everything the repo uses is declared (tests/deps_test.sh)"
+    local deps
+    if deps=$(bash tests/deps_test.sh 2>&1); then ok "${deps##*$'\n'}"
+    else bad "$(sed 's/^/  /' <<<"$deps" | sed '1s/^  //')"; fi
+
+    step "Committing and pushing from this machine"
+    if [[ -n $(git config user.name) && -n $(git config user.email) ]]; then ok "git knows your name and email"
+    else bad "git has no name or email (git config --global user.name ...; user.email: GitHub's noreply address keeps yours private)"; fi
+    if git ls-remote --exit-code origin HEAD >/dev/null 2>&1 && GIT_TERMINAL_PROMPT=0 git push --dry-run --quiet origin HEAD >/dev/null 2>&1; then
+        ok "pushing to GitHub works"
+    else
+        bad "can't push to GitHub (gh auth login, then gh auth setup-git)"
     fi
 
     echo

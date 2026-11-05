@@ -152,7 +152,7 @@ case ${1:-} in
     nvidia-offload) has_nvidia && ! nvidia_display ;;
     match)
         [[ -n ${2:-} ]] || { echo "ghost-hw match needs a text" >&2; exit 2; }
-        printf '%s\n' "$(dmi sys_vendor)" "$(dmi product_name)" "$(dmi board_name)" | grep -qiF -- "$2"
+        printf '%s\n' "$(dmi sys_vendor)" "$(dmi product_name)" "$(dmi board_name)" | grep -iF -- "$2" >/dev/null
         ;;
     board)
         [[ -n ${2:-} ]] || { echo "ghost-hw board needs a name" >&2; exit 2; }

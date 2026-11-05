@@ -10,4 +10,4 @@ step "Dev tools: Docker"
 sudo systemctl enable --now docker.socket
 # The docker group lets you run docker without sudo. Membership is equivalent to root access
 # (containers can mount /), so only your own user is added. It applies after logging in again.
-id -nG "$USER" | grep -qw docker || sudo usermod -aG docker "$USER"
+id -nG "$USER" | grep -w docker >/dev/null || sudo usermod -aG docker "$USER"
