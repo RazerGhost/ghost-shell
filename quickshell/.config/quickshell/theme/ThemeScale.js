@@ -3,8 +3,10 @@
 // (tests/tst_themescale.qml).
 .pragma library
 
-const sizes = [0.85, 0.9, 1, 1.1, 1.25];       // the shell: spacing, icons, panels
-const textSizes = [0.9, 1, 1.1, 1.2, 1.3];     // on top of that, the text
+// Down to 75 % and 80 %: the same 1920 x 1080 is about 1.5 times bigger on a 24" monitor than on
+// the laptop's 16" screen (2026-11-05), and the size is per machine (settings.json).
+const sizes = [0.75, 0.8, 0.85, 0.9, 1, 1.1, 1.25];  // the shell: spacing, icons, panels
+const textSizes = [0.8, 0.9, 1, 1.1, 1.2, 1.3];      // on top of that, the text
 const corners = [0, 0.5, 1, 1.5];              // 0 is square, 1 the normal roundness
 const dockIcons = [36, 44, 52, 60];            // the dock's app icons, px at 100 %
 const launcherWidths = [480, 560, 640, 720];   // px at 100 %

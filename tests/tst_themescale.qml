@@ -7,6 +7,9 @@ TestCase {
 
     function test_pick() {
         compare(ThemeScale.pick(1.25, ThemeScale.sizes), 1.25);
+        compare(ThemeScale.pick(0.75, ThemeScale.sizes), 0.75);
+        compare(ThemeScale.pick(0.8, ThemeScale.textSizes), 0.8);
+        compare(ThemeScale.pick(0.7, ThemeScale.sizes), 1);
         compare(ThemeScale.pick(3, ThemeScale.sizes), 1);
         compare(ThemeScale.pick("1.1", ThemeScale.textSizes), 1);
         compare(ThemeScale.pick(undefined, ThemeScale.corners), 1);

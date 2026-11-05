@@ -2519,6 +2519,9 @@ fix, not one for this case"), with Omarchy's hardware layer as the model (user's
   idle times ("When idle") and Sound drops the charger and low battery sounds; without a
   touchpad (`Touchpad.present`, from Hyprland's devices) Keyboard and mouse keeps pointer speed.
   Quick settings already hid the battery and brightness. Checked on the desktop.
+- Smaller shell sizes: 75 % and 80 % (text 80 %), since the same 1080p is about 1.5 times bigger on
+  the desktop's 24" monitors than on the laptop's 16" screen; the size is per machine. Settings ->
+  Display's Scale (everything, apps too, 100 % and up) points to it.
 To check on the laptop: `ghost update`, `ghost-hw facts` (laptop yes, display GPU amd), the
 `gpu-pci-*` links, Hyprland on the AMD chip after a re-login, KDE Connect's tray still starting.
 

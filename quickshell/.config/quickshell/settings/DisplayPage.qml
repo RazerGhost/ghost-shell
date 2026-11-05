@@ -234,7 +234,7 @@ Column {
 
             SettingRow {
                 title: "Scale"
-                subtitle: "Makes everything bigger; Hyprland rounds to the nearest size that fits"
+                subtitle: "Makes everything bigger, apps too. Only the shell, smaller too: Super+U, Desktop, Size and text"
 
                 Stepper {
                     label: "Scale"
