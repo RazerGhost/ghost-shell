@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # A fresh machine in one command (Arch or CachyOS), in zsh, fish or bash:
-#   curl -fsSL https://raw.githubusercontent.com/RazerGhost/ghost-shell/main/bootstrap.sh -o /tmp/bootstrap.sh
-#   bash /tmp/bootstrap.sh desktop
+#   curl -fsSL https://raw.githubusercontent.com/RazerGhost/ghost-shell/main/bootstrap.sh -o /tmp/bootstrap.sh && bash /tmp/bootstrap.sh desktop
 # Installs git if it's missing, clones the repo to ~/Projects/ghost-shell (or pulls it if it's
 # there and has no uncommitted changes), then runs install.sh with the same arguments: a machine
 # profile (machines/: laptop, desktop), a wallpaper or "#rrggbb", --yes.
