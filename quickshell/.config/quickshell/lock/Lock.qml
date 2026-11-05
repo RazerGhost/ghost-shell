@@ -10,7 +10,7 @@ import qs.theme
 // The lock screen. `qs ipc call lock lock` locks the session (Super+L, the power menu, hypridle
 // when idle or before suspend); the password is checked through PAM's "login" config, the same
 // as a console login. Hyprland keeps the session locked even if this crashes;
-// misc.allow_session_lock_restore (look.lua) lets a new lock screen take over, see ROADMAP.md.
+// misc.allow_session_lock_restore (look.lua) lets a new lock screen take over, see "If something breaks" in README.md.
 Scope {
     id: root
 

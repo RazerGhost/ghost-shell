@@ -1,7 +1,8 @@
 # Ghost Shell index
 
 Every feature and rule in one place, each with where it lives. This is a map, not the full story:
-the reasons and history are in [ROADMAP.md](../ROADMAP.md), verified API facts in
+the standing decisions are in [ROADMAP.md](../ROADMAP.md), the history of each feature in
+[history.md](history.md), verified API facts in
 [NOTES.md](../NOTES.md), keybinds in [keybinds.md](keybinds.md). Shell paths are relative to
 `quickshell/.config/quickshell/`, Hyprland paths to `hypr/.config/hypr/`.
 
@@ -39,7 +40,7 @@ the reasons and history are in [ROADMAP.md](../ROADMAP.md), verified API facts i
 | Browser is Zen (`zen-browser-bin`), never Firefox | |
 | Commit and push after each phase or fix | |
 | LF line endings everywhere | `.gitattributes` |
-| Update ROADMAP.md when a phase finishes or a decision changes; add verified API facts to NOTES.md | |
+| Add a section to docs/history.md when a phase finishes, update ROADMAP.md when a decision changes; add verified API facts to NOTES.md | |
 | Generated output (matugen, `shell-settings.lua`) is gitignored; templates are committed | |
 
 ### Shell code conventions (ROADMAP "Look and architecture")
@@ -95,7 +96,7 @@ updated) · Boy Scout Rule within touched lines · end each change with a summar
 | Third-party code | Pinned (`clone_at`); the user's own Ghost repos follow main |
 | Not doing | Hibernation, fingerprint login, dictation, letting games take Super |
 
-Recovery procedures (lock screen crash, a session that can't start) are in ROADMAP Phase 5.
+Recovery procedures (lock screen crash, a session that can't start) are in README.md, "If something breaks".
 
 ---
 

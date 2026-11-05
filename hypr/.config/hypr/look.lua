@@ -91,7 +91,7 @@ hl.config({
         -- login before the lock screen covers it (user's find, 2026-11-04).
         disable_splash_rendering = true,
         -- If the lock screen (Quickshell) crashes, the session stays locked; this lets a new
-        -- lock screen take over (see "Lock screen recovery" in ROADMAP.md).
+        -- lock screen take over (see "If something breaks" in README.md).
         allow_session_lock_restore = true,
     },
 })

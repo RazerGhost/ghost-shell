@@ -1,4 +1,4 @@
-# The HP logo through the boot, tried and dropped on 2026-11-04 (ROADMAP "The HP logo through the
+# The HP logo through the boot, tried and dropped on 2026-11-04 (docs/history.md "The HP logo through the
 # boot"): its plymouth-quit drop-in (it kept the logo on screen and crashed Hyprland's first
 # start), greetd's ordering after Plymouth (greetd's own unit has it), and the `splash` line it
 # added to Limine's kernel line.

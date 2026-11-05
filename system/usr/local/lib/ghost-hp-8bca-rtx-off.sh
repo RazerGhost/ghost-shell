@@ -2,7 +2,7 @@
 # The HP Omen 16-xf0 (board 8BCA): at a power-off (not a restart), switch the RTX fully off through
 # its slot's firmware power switch (\_SB.PCI0.GPP0.PG00), the way Windows leaves it. Powered off
 # with the card on, the next boot often has no RTX: the firmware's power-on skips setting up a card
-# it finds enabled (ROADMAP: "The RTX missing after a shutdown"). Run by
+# it finds enabled (docs/history.md: "The RTX missing after a shutdown"). Run by
 # ghost-hp-8bca-rtx-off.service when it stops, after the sessions, PipeWire, the sound card state
 # and Ollama have stopped. Takes the card and its HDMI sound device off the device list (nothing at
 # shutdown can wake them then) and lets the slot power down. Never waits on a card still in use.

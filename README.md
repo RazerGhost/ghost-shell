@@ -65,7 +65,8 @@ machine can take what it needs.
   trail in the accent color and a notification when a long command ends (Settings -> Terminal); fish
   stays installed.
 
-The full plan and every decision behind it: [ROADMAP.md](ROADMAP.md). Keybinds:
+The plan and every decision behind it: [ROADMAP.md](ROADMAP.md); how each feature came about:
+[docs/history.md](docs/history.md). Keybinds:
 [docs/keybinds.md](docs/keybinds.md). Every feature and rule with its files: [docs/index.md](docs/index.md).
 
 ## Install
