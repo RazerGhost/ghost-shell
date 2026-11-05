@@ -302,6 +302,9 @@ PanelWindow {
         autoPaddingEnabled: false // padded, the mask was stretched and sat off the shape
         maskEnabled: true
         maskSource: backdropMask
+        // The mask's own smoothing: by default any trace of the shape counts as inside, so the
+        // glass ended in hard steps just past the smoothed edge.
+        maskSpreadAtMin: 1
     }
 
     Item {

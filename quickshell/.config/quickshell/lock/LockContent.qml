@@ -95,6 +95,7 @@ Item {
         autoPaddingEnabled: false
         maskEnabled: true
         maskSource: glass
+        maskSpreadAtMin: 1 // smooth edges (by default any trace of a shape counts as inside)
     }
 
     Item {
