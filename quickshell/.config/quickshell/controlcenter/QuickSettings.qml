@@ -49,7 +49,11 @@ Item {
         screenshot: { icon: "screenshot_region", title: "Screenshot", control: screenshotToggle },
         wallpaper: { icon: "wallpaper", title: "Wallpaper", control: wallpaperToggle },
         timer: { icon: "timer", title: "Timer", control: timerToggle },
-        focus: { icon: "self_improvement", title: "Focus", control: focusToggle }
+        focus: { icon: "self_improvement", title: "Focus", control: focusToggle },
+        hotspot: { icon: "wifi_tethering", title: "Hotspot", control: hotspotToggle },
+        layout: { icon: "keyboard", title: "Keyboard layout", control: layoutToggle },
+        picker: { icon: "colorize", title: "Color picker", control: pickerToggle },
+        nearby: { icon: "share", title: "Nearby sharing", control: nearbyToggle }
     })
 
     // The island grows and shrinks to fit the current page.
@@ -285,6 +289,70 @@ Item {
             title: Focus.on ? "Focus, " + Countdown.label + " left: end" : "Focus for " + Focus.minutes + " min"
             active: Focus.on
             onClicked: Focus.on ? Focus.stop() : Focus.start(Focus.minutes)
+        }
+    }
+
+    // The Wi-Fi page's hotspot: shares a cable connection over Wi-Fi (it takes the Wi-Fi card off
+    // its network, so only with a cable; the Wi-Fi page has its QR code).
+    Component {
+        id: hotspotToggle
+
+        RoundToggle {
+            icon: "wifi_tethering"
+            title: NetworkExtras.hotspot ? "Hotspot on" : NetworkStatus.wired ? "Hotspot" : "Hotspot: needs a cable connection"
+            active: NetworkExtras.hotspot
+            onClicked: {
+                if (NetworkExtras.hotspot || NetworkStatus.wired)
+                    NetworkExtras.setHotspot(!NetworkExtras.hotspot);
+            }
+        }
+    }
+
+    // The next keyboard layout (Settings -> Keyboard and mouse sets them); the pop-up names it.
+    Component {
+        id: layoutToggle
+
+        RoundToggle {
+            icon: "keyboard"
+            title: Keyboard.layout ? "Keyboard: " + Keyboard.layout : "Keyboard layout"
+            active: Keyboard.layoutCount > 1
+            onClicked: Quickshell.execDetached(["hyprctl", "switchxkblayout", "all", "next"])
+        }
+    }
+
+    // The screenshot tool's color picker: click anywhere, the #rrggbb is copied.
+    Component {
+        id: pickerToggle
+
+        RoundToggle {
+            icon: "colorize"
+            title: "Color picker"
+            onClicked: {
+                root.openMenu("");
+                Quickshell.execDetached(["sh", Quickshell.shellDir + "/screenshot/capture.sh", "color"]);
+            }
+        }
+    }
+
+    // LocalSend in the background, so devices nearby can send files here.
+    Component {
+        id: nearbyToggle
+
+        RoundToggle {
+            icon: "share"
+            title: !NearbySharing.installed ? "Nearby sharing: needs LocalSend (ghost install phone)"
+                 : NearbySharing.running ? "Nearby sharing on: visible to LocalSend" : "Nearby sharing"
+            active: NearbySharing.running
+            onClicked: {
+                if (NearbySharing.installed)
+                    NearbySharing.toggle();
+            }
+
+            Binding {
+                target: NearbySharing
+                property: "watching"
+                value: root.visible
+            }
         }
     }
 

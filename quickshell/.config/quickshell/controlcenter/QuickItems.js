@@ -7,7 +7,7 @@
 // showed before it could be edited.
 const tiles = ["wifi", "bluetooth", "sound", "power", "phone", "display", "vpn"];
 const toggles = ["mic", "dnd", "nightlight", "awake", "game", "airplane", "dark", "record", "screenshot", "wallpaper",
-                 "timer", "focus"];
+                 "timer", "focus", "hotspot", "layout", "picker", "nearby"];
 const defaultTiles = ["wifi", "bluetooth", "sound", "power"];
 const defaultToggles = ["mic", "dnd", "nightlight", "awake", "game"];
 

@@ -118,6 +118,7 @@ Recovery procedures (lock screen crash, a session that can't start) are in ROADM
 | Sound page: output, microphone, per-app volume, equalizer preset | `controlcenter/SoundPage.qml`, `DeviceList.qml` |
 | Quick settings' Display tile and page: brightness, refresh rate (lower on battery), night light warmth, a second screen (extend, duplicate, one only; not saved) | `controlcenter/ScreenPage.qml`, `services/Display.qml`, `settings/DisplayModes.js` (`effective`) |
 | Quick settings' VPN tile and page: the switch reconnects the VPN used last (`lastVpn`) or disconnects; every saved VPN; Open Proton VPN | `controlcenter/VpnPage.qml`, `VpnList.qml` (also on the Wi-Fi page), `services/NetworkExtras.qml` (`switchVpn`) |
+| Quick settings' round buttons for the hotspot, the next keyboard layout, the color picker and nearby sharing (LocalSend hidden in the background) | `controlcenter/QuickSettings.qml`, `services/NearbySharing.qml` |
 | The output chooser in the volume slider (outputs, and microphones when there are several) | `controlcenter/QuickSettings.qml` (`devicesOpen`), `widgets/LevelSlider.qml` (`actionIcon`), `DeviceList.qml` |
 | System page: CPU, memory, GPUs, disk, busiest apps with End task | `controlcenter/SystemPage.qml`, `services/SystemStats.qml`, `system-stats.sh` |
 | Phone page: ring, send files, clipboard, browse; files dropped on the island and Nautilus's "Send to phone" go through `phone.sh share` | `controlcenter/PhonePage.qml`, `services/Phone.qml`, `phone.sh` |

@@ -2180,6 +2180,12 @@ settings' edit mode, so the panel only grows by what you add.
   Wi-Fi page). Proton VPN's app makes its NetworkManager connection while connected and removes
   it after (none saved here), so the page also opens its app to pick a server. Checked on
   screen: the page with no VPN saved and the Open Proton VPN row.
+- Round buttons: the hotspot (the Wi-Fi page's; only with a cable connection), the next keyboard
+  layout (`hyprctl switchxkblayout all next`), the color picker (`capture.sh color`) and nearby
+  sharing (`services/NearbySharing.qml`: LocalSend started hidden, `localsend --hidden`, found in
+  its launcher; stopped with pkill; whether it runs read with pgrep only while quick settings
+  shows, since a second Quickshell can't see the tray to check it there). Checked on screen: all
+  six new items under "Available" in edit mode. Pressing them is the user's to try.
 
 ### Headphones take over when plugged in (2026-11-05)
 User's question with USB-C IEMs (a SIMGOT EW300 DSP): they connected, but the sound stayed on
