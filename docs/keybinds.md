@@ -56,7 +56,8 @@ Generated from Hyprland's binds with `ghost keybinds`, by category; every bind i
 | `Super` + `Shift` + `G` | Take the window out of its tab group |
 | `Alt` + ``` | Next tab |
 | `Alt` + `Shift` + ``` | Previous tab |
-| `Super` + `Ctrl` + `Shift` + `←` or `Super` + `Ctrl` + `Shift` + `↓` or `Super` + `Ctrl` + `Shift` + `→` or `Super` + `Ctrl` + `Shift` + `↑` | Move into the tab group next to it |
+| `Super` + `Ctrl` + `Shift` + `←` or `Super` + `Ctrl` + `Shift` + `→` or `Super` + `Ctrl` + `Shift` + `↑` or `Super` + `Ctrl` + `Shift` + `↓` | Move into the tab group next to it |
+| `Super` + `Alt` + `Shift` + `←` or `Super` + `Alt` + `Shift` + `→` | Move to the screen on the left or right |
 | `Alt` + `Tab` | Switch windows |
 | `Alt` + `Shift` + `Tab` | Switch windows, backwards |
 | `Super` + `Tab` | Overview |
