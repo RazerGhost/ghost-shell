@@ -115,3 +115,23 @@ function effective(saved, monitors, opts) {
     }
     return out;
 }
+
+// Workspaces per screen (Settings -> Display): the main screen 1-5, the next screen (left to
+// right) 6-10, a third 11-15; each screen opens on the first of its own. Hyprland's workspace
+// rules as Lua lines; none with one screen. `main` is the main screen's output name, `monitors`
+// `hyprctl monitors all -j`'s entries.
+function workspaceRules(main, monitors) {
+    const list = Array.from(monitors ?? []).filter(m => !m.disabled && /^[A-Za-z0-9_.-]+$/.test(m.name));
+    if (list.length < 2)
+        return [];
+    const first = list.find(m => m.name === main) ?? list[0];
+    const order = [first, ...list.filter(m => m !== first).sort((a, b) => a.x - b.x || a.y - b.y)];
+    const lines = [];
+    order.forEach((m, i) => {
+        for (let n = 1; n <= 5; n++) {
+            const ws = i * 5 + n;
+            lines.push(`hl.workspace_rule({ workspace = "${ws}", monitor = "${m.name}"${n === 1 ? ", default = true" : ""} })`);
+        }
+    });
+    return lines;
+}

@@ -14,6 +14,7 @@ Scope {
     readonly property bool bell: Settings.values.soundEvents && Settings.values.soundNotifications
                                  && !Notifications.doNotDisturb && !GameMode.on && !Focus.on
     readonly property string text: HyprlandConfig.lua(Settings.values, GameMode.on, Wallpaper.path !== "", bell, Display.setups)
+        + (Display.workspaceLua ? "\n-- Workspaces per screen (services/Display.qml).\n" + Display.workspaceLua + "\n" : "")
         + (HyprlandRuntime.lua ? "\n-- While the windows editor is open (services/HyprlandRuntime.qml).\n" + HyprlandRuntime.lua + "\n" : "")
 
     // Not before the wallpaper's file is read either: a moment without it would write Hyprland's

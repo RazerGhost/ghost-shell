@@ -101,6 +101,17 @@ Column {
         }
 
         SettingRow {
+            title: "Workspaces per screen"
+            subtitle: "The main screen 1-5, the next 6-10. Super + Shift + Alt + Left or Right moves a window to the screen that way"
+
+            Switch {
+                label: "Workspaces per screen"
+                checked: Settings.values.workspacesPerScreen !== false
+                onToggled: Settings.values.workspacesPerScreen = !checked
+            }
+        }
+
+        SettingRow {
             title: "Dock on every screen"
             subtitle: "Off: only on the main screen"
 

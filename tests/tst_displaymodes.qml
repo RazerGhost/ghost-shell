@@ -46,6 +46,24 @@ TestCase {
         compare(DisplayModes.laptop([external]), null);
     }
 
+    function test_workspaceRules() {
+        // One screen: nothing.
+        compare(DisplayModes.workspaceRules("eDP-1", [laptopScreen]), []);
+        const right = Object.assign({}, external, { x: 1920, y: 0 });
+        const left = { name: "DP-2", x: -2560, y: 0 };
+        const lines = DisplayModes.workspaceRules("eDP-1", [right, laptopScreen, left]);
+        compare(lines.length, 15);
+        // The main screen first (1-5), then left to right: DP-2 6-10, HDMI-A-1 11-15.
+        compare(lines[0], 'hl.workspace_rule({ workspace = "1", monitor = "eDP-1", default = true })');
+        compare(lines[4], 'hl.workspace_rule({ workspace = "5", monitor = "eDP-1" })');
+        compare(lines[5], 'hl.workspace_rule({ workspace = "6", monitor = "DP-2", default = true })');
+        compare(lines[10], 'hl.workspace_rule({ workspace = "11", monitor = "HDMI-A-1", default = true })');
+        // The main screen chosen otherwise, a screen that's off left out.
+        const off = Object.assign({}, right, { disabled: true });
+        compare(DisplayModes.workspaceRules("DP-2", [laptopScreen, left, off])[0], 'hl.workspace_rule({ workspace = "1", monitor = "DP-2", default = true })');
+        compare(DisplayModes.workspaceRules("DP-2", [laptopScreen, left, off]).length, 10);
+    }
+
     function test_effective() {
         const saved = { "eDP-1": { mode: "1920x1080@165", scale: 1.25, transform: 0, vrr: 0 } };
         // Plugged in: as saved.

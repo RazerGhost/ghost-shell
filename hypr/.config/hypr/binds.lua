@@ -93,6 +93,10 @@ for direction, short in pairs({ left = "l", right = "r", up = "u", down = "d" })
     hl.bind(mainMod .. " + CTRL + SHIFT + " .. direction, hl.dsp.window.move({ into_group = short }), { description = "Windows: Move into the tab group next to it" })
 end
 
+-- With several screens: the window to the screen on the left or right (it goes with it).
+hl.bind(mainMod .. " + SHIFT + ALT + left",  hl.dsp.window.move({ monitor = "l" }), { description = "Windows: Move to the screen on the left or right" })
+hl.bind(mainMod .. " + SHIFT + ALT + right", hl.dsp.window.move({ monitor = "r" }), { description = "Windows: Move to the screen on the left or right" })
+
 -- Alt+Tab switcher: Tab steps through the windows, releasing Alt switches (Quickshell sees that).
 hl.bind("ALT + Tab",         hl.dsp.exec_cmd("qs ipc call switcher next"), { description = "Windows: Switch windows" })
 hl.bind("ALT + SHIFT + Tab", hl.dsp.exec_cmd("qs ipc call switcher previous"), { description = "Windows: Switch windows, backwards" })

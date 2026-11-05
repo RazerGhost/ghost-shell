@@ -39,6 +39,11 @@ Singleton {
         project: project
     })
 
+    // Workspaces per screen (Settings -> Display): Hyprland's rules for them while there are
+    // several screens and the setting is on (DisplayModes.workspaceRules).
+    readonly property string workspaceLua: Settings.values.workspacesPerScreen === false ? ""
+        : DisplayModes.workspaceRules(Screens.main?.name ?? "", monitors).join("\n")
+
     function setRate(hz: int): void {
         if (!laptop)
             return;

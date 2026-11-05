@@ -252,6 +252,8 @@ Singleton {
             // and the dock on every screen instead of only there.
             property string mainScreen: ""
             property bool dockEverywhere: false
+            // With several screens, each its own workspaces: the main one 1-5, the next 6-10 (Display.qml).
+            property bool workspacesPerScreen: true
             // The VPN connected last, by name: quick settings' VPN switch reconnects it.
             property string lastVpn: ""
             // Per-app notifications, by app name: { mode } (services/NotificationRules.js).
