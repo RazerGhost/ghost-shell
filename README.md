@@ -60,7 +60,7 @@ machine can take what it needs.
 - **One color scheme** from the wallpaper (matugen) for the shell, Hyprland, Ghostty, GTK apps,
   Zed, Yazi, Zen, Discord, Spotify, Steam and MangoHud.
 - **zsh** as the login shell, set up like fish (suggestions as you type, highlighting, history
-  search on Up and Down, fzf on Ctrl+R) with a [Starship](https://starship.rs) prompt in the
+  search on Up and Down, fzf on Ctrl+R) with a [Starship](https://starship.rs) prompt of rounded pills in the
   wallpaper's colors; fish stays installed.
 
 The full plan and every decision behind it: [ROADMAP.md](ROADMAP.md). Keybinds:

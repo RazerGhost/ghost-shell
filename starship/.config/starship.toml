@@ -1,33 +1,50 @@
-# The prompt (Starship, starship.rs), for zsh, fish or bash alike.
+# The prompt (Starship, starship.rs), for zsh, fish or bash alike: rounded pills (user's pick
+# 2026-11-05, over plain colored text, a clock on the right and a two-line info bar).
 # Colors are the terminal's palette names, not hex: matugen sets Ghostty's palette from the
-# wallpaper (templates/ghostty: green = primary, blue = secondary, yellow = tertiary, red = error,
-# bright-black = outline), so the prompt follows the wallpaper without a template of its own.
+# wallpaper (templates/ghostty: green = primary, blue = secondary, yellow = tertiary, purple =
+# primary_fixed, red = error, black = surface_container_high, used for the text on the pills), so
+# the prompt follows the wallpaper without a template of its own.
+# Icons are written as escapes ( is a pill's rounded left end,  its right end, 
+# the git branch,  a clock, \U000f024b a folder): typed as characters, the private-use ones
+# were lost once on the way into this file.
 #
-#   ~/Projects/ghost-shell  main !2 ?1  took 3s
+#   (󰉋 ~/Projects/ghost-shell) ( main !2) ( 4s)
 #   ❯
 
 add_newline = true
-format = "$directory$git_branch$git_state$git_status$all$cmd_duration$line_break$character"
+format = "$directory$git_branch$git_status$nodejs$python$rust$lua$cmd_duration$line_break$character"
 
 [directory]
-style = "bold green"
+format = "[](fg:green)[\U000f024b $path$read_only](fg:black bg:green bold)[](fg:green) "
 truncation_length = 4
 truncate_to_repo = false
-read_only = " 󰌾"
+read_only = " \U000f033e"
 
+# The branch and its changes share one pill: the branch opens it, git_status closes it (git_status
+# shows inside every repository, so the pill always gets its end).
 [git_branch]
-format = "[$symbol$branch]($style) "
+format = "[](fg:blue)[$symbol$branch](fg:black bg:blue)"
 symbol = " "
-style = "blue"
 
 [git_status]
-format = "([$all_status$ahead_behind]($style) )"
-style = "yellow"
+format = "([ $all_status$ahead_behind](fg:black bg:blue))[](fg:blue) "
 
 [cmd_duration]
-format = "took [$duration]($style) "
-style = "bright-black"
+format = "[](fg:yellow)[ $duration](fg:black bg:yellow)[](fg:yellow) "
 min_time = 2000
+
+# A project's language version, in its own pill
+[nodejs]
+format = "[](fg:purple)[$symbol$version](fg:black bg:purple)[](fg:purple) "
+
+[python]
+format = "[](fg:purple)[$symbol$version](fg:black bg:purple)[](fg:purple) "
+
+[rust]
+format = "[](fg:purple)[$symbol$version](fg:black bg:purple)[](fg:purple) "
+
+[lua]
+format = "[](fg:purple)[$symbol$version](fg:black bg:purple)[](fg:purple) "
 
 [character]
 success_symbol = "[❯](bold green)"

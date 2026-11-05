@@ -2302,11 +2302,14 @@ the same plugins straight from their packages (suggestions as you type, highligh
 search history for what's typed, zsh-completions, fzf's Ctrl+R / Ctrl+T / Alt+C, pkgfile's
 "which package has this command"), a completion menu that ignores case like fish, history shared
 between terminals in `~/.local/state/zsh`, and CachyOS's eza listing aliases. The prompt is
-Starship (`extra`, ISC; user's pick after it was explained): `starship/.config/starship.toml` uses
+Starship (`extra`, ISC; user's pick after it was explained), as rounded pills (user's pick from
+four looks rendered side by side: the folder, the branch with its changes, a slow command's time,
+a project's language version): `starship/.config/starship.toml` uses
 the terminal's palette names, which matugen sets from the wallpaper, so it needs no template. The
 terminal greeting is one script for both shells now (`bin/.local/bin/ghost-greeting`, tested by
 `tests/greeting_test.sh`). The core module moves an earlier `~/.zshrc` to `~/.zshrc.pre-ghost`
 and makes zsh the login shell (`sudo chsh`); fish stays installed as a fallback.
+fish's history (198 commands) was merged into zsh's, so the suggestions as you type know it.
 Machine-local additions: `~/.config/zsh/local.zsh`. Checked: the config loads without errors in a
 terminal (about 0.2 s with fastfetch), the greeting's tests pass.
 
