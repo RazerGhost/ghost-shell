@@ -62,6 +62,21 @@ TestCase {
         compare(DesktopWidgets.place({ clock: edge }, "clock"), edge);
     }
 
+    function test_screens() {
+        const saved = { clock: { x: 0.1, y: 0.1, screen: "DP-2" }, weather: { x: 0.2, y: 0.2 } };
+        compare(DesktopWidgets.screenOf(saved, "clock", ["eDP-1", "DP-2"], "eDP-1"), "DP-2");
+        // Its screen unplugged, or none saved: the main screen.
+        compare(DesktopWidgets.screenOf(saved, "clock", ["eDP-1"], "eDP-1"), "eDP-1");
+        compare(DesktopWidgets.screenOf(saved, "weather", ["eDP-1", "DP-2"], "eDP-1"), "eDP-1");
+        compare(DesktopWidgets.screenOf(undefined, "clock", ["eDP-1"], "eDP-1"), "eDP-1");
+        // The laptop at 0,0 and a 4K screen at 1.5 to its right (2560 x 1440 layout pixels).
+        const monitors = [{ name: "eDP-1", x: 0, y: 0, width: 1920, height: 1080, scale: 1, transform: 0 },
+                          { name: "DP-2", x: 1920, y: 0, width: 3840, height: 2160, scale: 1.5, transform: 0 }];
+        compare(DesktopWidgets.screenAt(monitors, 100, 100), { name: "eDP-1", x: 100, y: 100, w: 1920, h: 1080 });
+        compare(DesktopWidgets.screenAt(monitors, 2000, 1200), { name: "DP-2", x: 80, y: 1200, w: 2560, h: 1440 });
+        compare(DesktopWidgets.screenAt(monitors, 100, 1200), null);   // below the laptop: no screen
+    }
+
     function test_withPlace() {
         const saved = { clock: { x: 0.5, y: 0.5 } };
         const places = DesktopWidgets.withPlace(saved, "weather", { x: 0.1, y: 0.2 });

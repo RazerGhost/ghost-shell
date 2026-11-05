@@ -28,6 +28,8 @@ Item {
     property string wallpaper
     // The desktop widgets: only on the screen the desktop shows them on.
     property bool showsWidgets: true
+    // The screen this is on: its desktop widgets show (WidgetStage.screenName; "" all of them).
+    property string screenName: ""
 
     signal submitted(string password)
     // A key or a real pointer move: Lock.qml unlocks during the idle lock's grace period.
@@ -134,6 +136,7 @@ Item {
 
     WidgetStage {
         id: widgets
+        screenName: root.screenName
         anchors.fill: parent
         visible: root.showsWidgets
         locked: true

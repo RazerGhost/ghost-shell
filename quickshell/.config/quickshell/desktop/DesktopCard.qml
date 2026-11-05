@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import qs.services
 import qs.theme
 import qs.widgets
@@ -17,7 +18,13 @@ Item {
     // Its key in desktopWidgets (DesktopWidgets.js's `kinds`: "clock", "weather", "media", ...).
     required property string name
     // On (its setting, and for media something to play); it stays visible while fading out.
-    property bool shown: true
+    property bool wanted: true
+    // On this stage's screen (DesktopWidgets.screenOf: the screen saved with its place, else the
+    // main one); a stage without a screen (the editor's gallery) shows every widget.
+    readonly property bool here: (parent?.screenName ?? "") === ""
+        || DesktopWidgets.screenOf(Settings.values.desktopWidgets, name, Quickshell.screens.map(s => s.name),
+                                   Screens.main?.name ?? "") === parent.screenName
+    readonly property bool shown: wanted && here
     default property alias content: body.data
     // The widget inside (a WidgetSurface), for the keyboard mode (WidgetStage).
     readonly property Item widget: body.children[0] ?? null
@@ -145,8 +152,23 @@ Item {
                                                  Theme.px(DesktopWidgets.gridSize(Settings.values.desktopGridSize)))
                     : DesktopWidgets.snapped(x, y, root.width, root.height, area.width, area.height, others,
                                              Theme.desktop.margin, Theme.desktop.gap, Theme.desktop.reach);
-                const place = DesktopWidgets.dropped(at.x, at.y, root.width, root.height, area.width, area.height,
+                // Let go past this screen's edge onto another (its middle there): it moves to that
+                // screen, placed where it was let go (not while the editor shows it in its card).
+                const here = area.screenName ?? "";
+                const own = Display.monitors.find(m => m.name === here);
+                const middle = own && area.scale === 1
+                    ? DesktopWidgets.screenAt(Display.monitors, own.x + x + root.width / 2, own.y + y + root.height / 2) : null;
+                const moved = middle !== null && middle.name !== here;
+                const target = moved ? middle : { name: here, w: area.width, h: area.height };
+                const local = moved
+                    ? DesktopWidgets.snapped(middle.x - root.width / 2, middle.y - root.height / 2, root.width, root.height,
+                                             target.w, target.h, [], Theme.desktop.margin, Theme.desktop.gap, Theme.desktop.reach)
+                    : at;
+                const place = DesktopWidgets.dropped(local.x, local.y, root.width, root.height, target.w, target.h,
                                                      Theme.desktop.zoom);
+                // The screen goes with the place, except the main one's, so those follow a new main.
+                if (target.name !== "" && target.name !== (Screens.main?.name ?? ""))
+                    place.screen = target.name;
                 root.settling = true;
                 Settings.values.desktopWidgets = DesktopWidgets.withPlace(Settings.values.desktopWidgets, root.name, place);
                 root.moving = false;

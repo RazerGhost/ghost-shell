@@ -12,7 +12,7 @@ import "DesktopWidgets.js" as DesktopWidgetsJs
 // the battery, the to-do list, the timer, how many notifications wait, the next hours' weather,
 // the month and a larger to-do list (ClockWidget, WeatherWidget, MediaWidget, CalendarWidget,
 // BatteryWidget, TasksWidget for both to-dos, TimerWidget, NotificationsWidget, ForecastWidget,
-// MonthWidget, NoteWidget, ClipboardWidget: one family of sizes; the list of them is DesktopWidgets.js's `kinds`). On the first screen, on the layer just above the wallpaper, so windows cover them.
+// MonthWidget, NoteWidget, ClipboardWidget: one family of sizes; the list of them is DesktopWidgets.js's `kinds`). On the main screen, and on any other screen a widget was dropped onto (DesktopWidgets.screenOf; each screen its own layer and stage), on the layer just above the wallpaper, so windows cover them.
 // Each can be dragged by its handle (DesktopCard.qml). The widgets themselves are WidgetStage.qml,
 // which the lock screen draws too.
 Scope {
@@ -68,80 +68,92 @@ Scope {
         }
     }
 
+    // The screens with widgets: the main one, and any a widget was dropped onto.
+    readonly property var screens: Quickshell.screens.filter(s => s === Screens.main
+        || Object.values(Settings.values.desktopWidgets ?? {}).some(p => p?.screen === s.name))
+
     LazyLoader {
         // Hidden during focus mode (services/Focus.qml), except in the desktop editor.
         active: root.shown
 
-        PanelWindow {
-            id: window
+        Variants {
+            model: root.screens
 
-            screen: Screens.main // Settings -> Display's main screen
-            anchors { top: true; bottom: true; left: true; right: true }
-            exclusionMode: ExclusionMode.Ignore
-            color: "transparent"
-            WlrLayershell.layer: WlrLayer.Bottom
-            WlrLayershell.namespace: "qs-desktop"
-            // No keyboard, except while the to-do list's field is typed in: Exclusive takes it
-            // (OnDemand alone doesn't until the pointer moves), then OnDemand keeps it until a
-            // click elsewhere (verified on a Bottom layer, NOTES).
-            WlrLayershell.keyboardFocus: widgetStage.keyboard === "take" ? WlrKeyboardFocus.Exclusive
-                                       : widgetStage.keyboard === "keep" ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+            PanelWindow {
+                id: window
 
-            // Input and blur only on the widgets; the rest of the desktop stays click-through.
-            mask: Region {
-                WidgetRegion { stage: widgetStage; widget: widgetStage.clockCard }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.weatherCard }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.mediaCard }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.calendarCard }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.batteryCard }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.todoCard }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.timerCard }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.notificationsCard }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.forecastCard }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.monthCard }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.tasksCard }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.noteCard }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.clipboardCard }
-            }
+                required property ShellScreen modelData
+                readonly property bool main: modelData === Screens.main
+                screen: modelData
+                anchors { top: true; bottom: true; left: true; right: true }
+                exclusionMode: ExclusionMode.Ignore
+                color: "transparent"
+                WlrLayershell.layer: WlrLayer.Bottom
+                WlrLayershell.namespace: "qs-desktop"
+                // No keyboard, except while the to-do list's field is typed in: Exclusive takes it
+                // (OnDemand alone doesn't until the pointer moves), then OnDemand keeps it until a
+                // click elsewhere (verified on a Bottom layer, NOTES).
+                WlrLayershell.keyboardFocus: widgetStage.keyboard === "take" ? WlrKeyboardFocus.Exclusive
+                                           : widgetStage.keyboard === "keep" ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
-            BackgroundEffect.blurRegion: Region {
-                WidgetRegion { stage: widgetStage; widget: widgetStage.clockCard; corner: Theme.desktop.radius }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.weatherCard; corner: Theme.desktop.radius }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.mediaCard; corner: Theme.desktop.radius }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.calendarCard; corner: Theme.desktop.radius }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.batteryCard; corner: Theme.desktop.radius }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.todoCard; corner: Theme.desktop.radius }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.timerCard; corner: Theme.desktop.radius }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.notificationsCard; corner: Theme.desktop.radius }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.forecastCard; corner: Theme.desktop.radius }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.monthCard; corner: Theme.desktop.radius }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.tasksCard; corner: Theme.desktop.radius }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.noteCard; corner: Theme.desktop.radius }
-                WidgetRegion { stage: widgetStage; widget: widgetStage.clipboardCard; corner: Theme.desktop.radius }
-                // Never empty: Hyprland 0.57 blurs the whole surface for an empty region (NOTES).
-                Region { width: 1; height: 1 }
-            }
+                // Input and blur only on the widgets; the rest of the desktop stays click-through.
+                mask: Region {
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.clockCard }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.weatherCard }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.mediaCard }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.calendarCard }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.batteryCard }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.todoCard }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.timerCard }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.notificationsCard }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.forecastCard }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.monthCard }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.tasksCard }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.noteCard }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.clipboardCard }
+                }
 
-            // The widgets' area: the whole screen, or scaled into the card the wallpaper is drawn
-            // as while the desktop editor is open (services/Editing.qml).
-            WidgetStage {
-                id: widgetStage
+                BackgroundEffect.blurRegion: Region {
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.clockCard; corner: Theme.desktop.radius }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.weatherCard; corner: Theme.desktop.radius }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.mediaCard; corner: Theme.desktop.radius }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.calendarCard; corner: Theme.desktop.radius }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.batteryCard; corner: Theme.desktop.radius }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.todoCard; corner: Theme.desktop.radius }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.timerCard; corner: Theme.desktop.radius }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.notificationsCard; corner: Theme.desktop.radius }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.forecastCard; corner: Theme.desktop.radius }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.monthCard; corner: Theme.desktop.radius }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.tasksCard; corner: Theme.desktop.radius }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.noteCard; corner: Theme.desktop.radius }
+                    WidgetRegion { stage: widgetStage; widget: widgetStage.clipboardCard; corner: Theme.desktop.radius }
+                    // Never empty: Hyprland 0.57 blurs the whole surface for an empty region (NOTES).
+                    Region { width: 1; height: 1 }
+                }
 
-                browsing: root.browsing
-                onLeave: goBack => root.stopBrowsing(goBack)
+                // The widgets' area: the whole screen, or scaled into the card the wallpaper is drawn
+                // as while the desktop editor is open (services/Editing.qml).
+                WidgetStage {
+                    id: widgetStage
 
-                readonly property bool carded: Editing.cardScreen === (window.screen?.name ?? "")
+                    screenName: window.modelData?.name ?? ""
+                    // The keyboard mode (Super+D) is the main screen's widgets.
+                    browsing: root.browsing && window.main
+                    onLeave: goBack => root.stopBrowsing(goBack)
 
-                width: window.width
-                height: window.height
-                x: carded ? Editing.card.x : 0
-                y: carded ? Editing.card.y : 0
-                scale: carded ? Editing.card.width / Math.max(window.width, 1) : 1
-                transformOrigin: Item.TopLeft
+                    readonly property bool carded: Editing.cardScreen === (window.screen?.name ?? "")
 
-                Behavior on x { NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
-                Behavior on y { NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
-                Behavior on scale { NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+                    width: window.width
+                    height: window.height
+                    x: carded ? Editing.card.x : 0
+                    y: carded ? Editing.card.y : 0
+                    scale: carded ? Editing.card.width / Math.max(window.width, 1) : 1
+                    transformOrigin: Item.TopLeft
+
+                    Behavior on x { NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+                    Behavior on y { NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+                    Behavior on scale { NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }
+                }
             }
         }
     }

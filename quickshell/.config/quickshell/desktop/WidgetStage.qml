@@ -14,6 +14,8 @@ Item {
     id: stage
 
     property bool locked: false
+    // The screen whose widgets show here ("": all of them, the editor's gallery).
+    property string screenName: ""
 
     readonly property alias clockCard: clockCard
     readonly property alias weatherCard: weatherCard
@@ -270,7 +272,7 @@ Item {
     DesktopCard {
         id: clockCard
         name: "clock"
-        shown: Settings.values.desktopClock
+        wanted: Settings.values.desktopClock
 
         ClockWidget {}
     }
@@ -278,7 +280,7 @@ Item {
     DesktopCard {
         id: weatherCard
         name: "weather"
-        shown: Settings.values.desktopWeather
+        wanted: Settings.values.desktopWeather
 
         WeatherWidget {
             hidesPlace: stage.locked
@@ -288,7 +290,7 @@ Item {
     DesktopCard {
         id: mediaCard
         name: "media"
-        shown: Settings.values.desktopMedia
+        wanted: Settings.values.desktopMedia
 
         MediaWidget {
             locked: stage.locked
@@ -298,7 +300,7 @@ Item {
     DesktopCard {
         id: calendarCard
         name: "calendar"
-        shown: Settings.values.desktopCalendar
+        wanted: Settings.values.desktopCalendar
 
         CalendarWidget {
             hidesTitles: stage.locked
@@ -308,7 +310,7 @@ Item {
     DesktopCard {
         id: batteryCard
         name: "battery"
-        shown: Settings.values.desktopBattery && Battery.present
+        wanted: Settings.values.desktopBattery && Battery.present
 
         BatteryWidget {}
     }
@@ -316,7 +318,7 @@ Item {
     DesktopCard {
         id: todoCard
         name: "todo"
-        shown: Settings.values.desktopTodo
+        wanted: Settings.values.desktopTodo
 
         TasksWidget {
             id: todoWidget
@@ -327,7 +329,7 @@ Item {
     DesktopCard {
         id: timerCard
         name: "timer"
-        shown: Settings.values.desktopTimer
+        wanted: Settings.values.desktopTimer
 
         TimerWidget {}
     }
@@ -335,7 +337,7 @@ Item {
     DesktopCard {
         id: notificationsCard
         name: "notifications"
-        shown: Settings.values.desktopNotifications
+        wanted: Settings.values.desktopNotifications
 
         NotificationsWidget {
             hidesTitles: stage.locked
@@ -345,7 +347,7 @@ Item {
     DesktopCard {
         id: forecastCard
         name: "forecast"
-        shown: Settings.values.desktopForecast
+        wanted: Settings.values.desktopForecast
 
         ForecastWidget {}
     }
@@ -353,7 +355,7 @@ Item {
     DesktopCard {
         id: monthCard
         name: "month"
-        shown: Settings.values.desktopMonth
+        wanted: Settings.values.desktopMonth
 
         MonthWidget {
             hidesTitles: stage.locked
@@ -363,7 +365,7 @@ Item {
     DesktopCard {
         id: tasksCard
         name: "tasks"
-        shown: Settings.values.desktopTasks
+        wanted: Settings.values.desktopTasks
 
         TasksWidget {
             id: tasksWidget
@@ -375,7 +377,7 @@ Item {
     DesktopCard {
         id: noteCard
         name: "note"
-        shown: Settings.values.desktopNote
+        wanted: Settings.values.desktopNote
 
         NoteWidget {
             id: noteWidget
@@ -386,7 +388,7 @@ Item {
     DesktopCard {
         id: clipboardCard
         name: "clipboard"
-        shown: Settings.values.desktopClipboard
+        wanted: Settings.values.desktopClipboard
 
         ClipboardWidget {
             hidesTitles: stage.locked

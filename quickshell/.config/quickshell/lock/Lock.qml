@@ -94,8 +94,9 @@ Scope {
                 id: content
                 anchors.fill: parent
                 wallpaper: root.wallpaper
-                // The desktop widgets show on the main screen, like the desktop's.
-                showsWidgets: surface.screen === Screens.main
+                // Each screen its own desktop widgets, like the desktop's (the main screen's, and
+                // any dropped onto another screen).
+                screenName: surface.screen?.name ?? ""
                 message: root.message
                 messageIsError: root.messageIsError
                 busy: root.busy

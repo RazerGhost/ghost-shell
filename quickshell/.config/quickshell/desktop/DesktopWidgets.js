@@ -321,3 +321,26 @@ function nudged(place, dx, dy, w, h, sw, sh, cell, zoom) {
     }
     return dropped(x, y, w, h, sw, sh, zoom);
 }
+
+// Which screen widget `name` is on: the one saved with its place (a drop past a screen's edge
+// moves it to the screen there) while that's connected, else the main screen, so a widget is
+// never lost with its screen unplugged. `screens` the connected output names.
+function screenOf(saved, name, screens, main) {
+    const own = saved?.[name]?.screen;
+    return typeof own === "string" && Array.from(screens ?? []).includes(own) ? own : main;
+}
+
+// The screen (`hyprctl monitors -j` entry) holding the point (x, y) in Hyprland's layout pixels,
+// with the point in its own pixels: { name, x, y, w, h }; null when it's on none (between them).
+function screenAt(monitors, x, y) {
+    for (const m of Array.from(monitors ?? [])) {
+        if (m.disabled)
+            continue;
+        const s = m.scale > 0 ? m.scale : 1;
+        const w = (m.transform % 2 === 1 ? m.height : m.width) / s;
+        const h = (m.transform % 2 === 1 ? m.width : m.height) / s;
+        if (x >= m.x && x < m.x + w && y >= m.y && y < m.y + h)
+            return { name: m.name, x: x - m.x, y: y - m.y, w: w, h: h };
+    }
+    return null;
+}
