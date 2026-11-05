@@ -77,11 +77,22 @@ Singleton {
         }
     }
 
-    // Workspaces per screen: the ones open already go to their screen too (a new main screen,
-    // the setting turned on, a screen plugged in), after the rules are in.
+    // Workspaces per screen: the ones open already go to their screen too, only when the homes
+    // themselves change (a new main screen, the setting turned on, a screen plugged in or out),
+    // after the rules are in. Not on every look at the screens (each config reload): that undid
+    // a workspace you'd moved yourself. The homes last applied outlive a shell reload.
     readonly property var workspaceHomes: Settings.values.workspacesPerScreen === false ? ({})
         : DisplayModes.workspaceHomes(Screens.main?.name ?? "", monitors)
-    onWorkspaceHomesChanged: moveSoon.restart()
+    readonly property string homesKey: JSON.stringify(workspaceHomes)
+    onHomesKeyChanged: {
+        if (monitors.length > 0 && homesKey !== kept.homes)
+            moveSoon.restart();
+    }
+    PersistentProperties {
+        id: kept
+        reloadableId: "displayWorkspaceHomes"
+        property string homes: ""
+    }
     Timer {
         id: moveSoon
         interval: 1500 // after shell-settings.lua is written and Hyprland has reloaded
@@ -89,6 +100,7 @@ Singleton {
             // Ids through WorkspaceSlots.idOf: Quickshell reads them as -1 until the first switch.
             const open = Hyprland.workspaces.values.filter(w => WorkspaceSlots.idOf(w) > 0 && w.monitor)
                 .map(w => ({ id: WorkspaceSlots.idOf(w), monitor: w.monitor.name }));
+            kept.homes = root.homesKey;
             for (const move of DisplayModes.workspaceMoves(root.workspaceHomes, open))
                 Quickshell.execDetached(["hyprctl", "dispatch",
                     `hl.dsp.workspace.move({ workspace = "${move.workspace}", monitor = "${move.monitor}" })`]);
