@@ -68,3 +68,20 @@ function renamed(themes, from, to) {
 function removed(themes, name) {
     return SavedLooks.removed(themes, name);
 }
+
+// Themes per screen, like the widget layouts: a theme keeps the widgets of the screen it's saved
+// on (Presets.screenLayout), and its widgets go on the screen the desktop editor is on, the other
+// screens' staying as they are (Presets.forScreen); the rest of the look is the whole desktop's.
+// The settings to save a theme from: `values` with only screen `here`'s widgets.
+function screenValues(values, here, main, screens) {
+    const out = {};
+    for (const key of keys)
+        out[key] = values[key];
+    return Object.assign(out, Presets.screenLayout(values, here, main, screens));
+}
+
+// `theme` as it applies on screen `here` with the settings `values` now (to match and apply).
+function onScreen(theme, values, here, main, screens) {
+    const widgets = Presets.forScreen([{ name: theme.name, values: theme.values }], values, here, main, screens)[0].values;
+    return Object.assign({}, theme, { values: Object.assign({}, theme.values, widgets) });
+}

@@ -241,4 +241,16 @@ TestCase {
         compare(DesktopWidgets.quietSide(new Array(w * h).fill(100), w, h), "");
         compare(DesktopWidgets.quietSide([1, 2, 3], w, h), "");
     }
+
+    function test_putBack() {
+        const screens = ["eDP-1", "DP-2"];
+        const saved = { clock: { x: 0.9, y: 0.9, screen: "DP-2" }, weather: { x: 0.7, y: 0.7 } };
+        // On the laptop: its weather back to its first place (no entry), DP-2's clock kept.
+        compare(DesktopWidgets.putBack(saved, "eDP-1", "eDP-1", screens), { clock: { x: 0.9, y: 0.9, screen: "DP-2" } });
+        // On DP-2: its clock to the first place, still on DP-2; the laptop's weather kept.
+        const back = DesktopWidgets.putBack(saved, "DP-2", "eDP-1", screens);
+        compare(back.clock.screen, "DP-2");
+        compare(back.weather, { x: 0.7, y: 0.7 });
+        verify(back.clock.x !== 0.9);
+    }
 }

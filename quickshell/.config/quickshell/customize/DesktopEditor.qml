@@ -288,7 +288,12 @@ Scope {
                     id: themesTab
 
                     readonly property var themes: Themes.valid(Settings.values.themes)
-                    readonly property string current: Themes.current(themes, Settings.values, Wallpaper.path)
+                    // Per screen like the widget layouts (Themes.onScreen): this screen's widgets.
+                    readonly property var screenNames: Quickshell.screens.map(s => s.name)
+                    function here(theme: var): var {
+                        return Themes.onScreen(theme, Settings.values, root.editScreen?.name ?? "", Screens.main?.name ?? "", screenNames);
+                    }
+                    readonly property string current: Themes.current(themes.map(t => here(t)), Settings.values, Wallpaper.path)
 
                     // Whether a theme's picture is still there (none counts as there): a deleted one
                     // can't be set, so its theme isn't applied halfway.
@@ -302,7 +307,7 @@ Scope {
                         const theme = themes.find(t => t.name === name);
                         if (!theme || !hasPicture(theme))
                             return;
-                        Presets.restore(Settings.values, Themes.applicable(theme.values, Settings.values));
+                        Presets.restore(Settings.values, Themes.applicable(here(theme).values, Settings.values));
                         if (theme.wallpaper !== Wallpaper.target) {
                             if (theme.wallpaper !== "")
                                 Wallpaper.set(theme.wallpaper);
@@ -438,7 +443,9 @@ Scope {
                                 text: "Save as a theme"
                                 filled: true
                                 onClicked: Settings.values.themes = themesTab.themes.concat(
-                                    [Themes.made(themesTab.themes, Settings.values, Wallpaper.path, Colors.primaryTarget.toString())])
+                                    [Themes.made(themesTab.themes,
+                                                 Themes.screenValues(Settings.values, root.editScreen?.name ?? "", Screens.main?.name ?? "", themesTab.screenNames),
+                                                 Wallpaper.path, Colors.primaryTarget.toString())])
                             }
 
                             TextButton {
@@ -894,7 +901,10 @@ Scope {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: "Put them back"
                                 enabled: Object.keys(Settings.values.desktopWidgets ?? {}).length > 0
-                                onClicked: Settings.values.desktopWidgets = ({})
+                                // This screen's widgets only (DesktopWidgets.putBack).
+                                onClicked: Settings.values.desktopWidgets = DesktopWidgetsJs.putBack(
+                                    Settings.values.desktopWidgets, root.editScreen?.name ?? "", Screens.main?.name ?? "",
+                                    Quickshell.screens.map(s => s.name))
                             }
                         }
                     }

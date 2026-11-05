@@ -2212,6 +2212,10 @@ screens (`hyprctl output create headless`, removed after each test).
   goes on whichever screen the editor is on like a preset (`LooksTile`'s `toLook` / `fromLook`;
   the other galleries keep theirs as they are). Layouts saved before count their widgets that
   were on (tested).
+- Then the rest of the desktop editor (found checking for edge cases): "Put them back" puts only
+  the editor's screen's widgets back, still on it (`DesktopWidgets.putBack`), and desktop themes
+  keep and apply their widgets per screen too (`Themes.screenValues`, `onScreen`; the colors,
+  glass, fonts and wallpaper stay the whole desktop's), both tested.
 - Presets are laid out on the grid's size whether it shows or not, so switching the grid doesn't
   move them; a group pushed back onto the screen at another size moves by whole cells and stays
   on the grid (`DesktopWidgets.arrange`'s `cell`, tested).

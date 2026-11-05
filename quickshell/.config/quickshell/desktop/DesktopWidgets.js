@@ -364,3 +364,16 @@ function screenAt(monitors, x, y) {
     }
     return null;
 }
+
+// "Put them back" on one screen: the widgets on screen `here` to their first places, still on
+// it; the other screens' as they are.
+function putBack(saved, here, main, screens) {
+    const out = {};
+    for (const [name, place] of Object.entries(saved ?? {})) {
+        if (screenOf(saved, name, screens, main) !== here)
+            out[name] = place;
+        else if (here !== main)
+            out[name] = Object.assign({}, defaults[name] ?? { x: 0, y: 0 }, { screen: here });
+    }
+    return out;
+}

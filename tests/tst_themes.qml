@@ -50,4 +50,21 @@ TestCase {
         compare(Themes.renamed(themes, "Theme 1", " ").map(t => t.name), ["Theme 1", "Theme 2"]);
         compare(Themes.renamed(themes, "Theme 1", "Theme 2").map(t => t.name), ["Theme 1", "Theme 2"]);
     }
+
+    // Per screen: a theme keeps one screen's widgets and applies them on the editor's screen.
+    function test_onScreen() {
+        const screens = ["eDP-1", "DP-2"];
+        const values = { glass: true, desktopClock: true, desktopWeather: true,
+                         desktopWidgets: { clock: { x: 0.1, y: 0.1, screen: "DP-2" }, weather: { x: 0.2, y: 0.2 } } };
+        const saved = Themes.screenValues(values, "eDP-1", "eDP-1", screens);
+        compare(saved.desktopWeather, true);
+        compare(saved.desktopClock, false);   // on DP-2: not this screen's
+        compare(saved.glass, true);
+        const theme = { name: "T", wallpaper: "", values: saved };
+        // Applied on DP-2: the weather goes there, DP-2's clock (not in it) off, the laptop untouched.
+        const there = Themes.onScreen(theme, values, "DP-2", "eDP-1", screens).values;
+        compare(there.desktopWidgets.weather.screen, "DP-2");
+        compare(there.desktopClock, false);
+        compare(there.glass, true);
+    }
 }
