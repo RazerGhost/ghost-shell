@@ -308,6 +308,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 | `updates` | `check`, `summary` |
 | `welcome` | `open` |
 | `focus` | `toggle` (focus mode), `takeBreak`, `again` (its end notification's buttons) |
+| `display` | `lid <closed\|open>` (Hyprland's lid switch binds: the laptop's screen off while closed with another screen on; `services/Display.qml`) |
 
 ---
 
