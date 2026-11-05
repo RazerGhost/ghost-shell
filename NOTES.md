@@ -56,6 +56,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   also have a `blur` layer rule. An empty region (Quickshell sends it as NULL, or one that lies
   outside the surface) made Hyprland 0.57 blur the whole surface, though the protocol says NULL
   removes the effect (seen with the hidden dock): keep a 1x1 region in a transparent corner.
+  Hyprland clips the blur to the region in whole pixels, unsmoothed (Quickshell's rounded
+  corners are exact quarter circles, so the steps are Hyprland's): where the blur differs from
+  what's right outside (the island blurs only the wallpaper, `xray`, over a window), the corners
+  showed stair-steps. The island keeps its blur 1 px inside its drawn edge (`IslandPill.inset`).
 - Window groups (tabs) in 0.57: `hl.dsp.group.toggle/next/prev/active({ index })/lock/
   move_window({ forward })`; into or out of a group is `hl.dsp.window.move({ into_group = "l"|"r"|"u"|"d" })`
   (`into_or_create_group`, `out_of_group = true`); `group.move_window` only reorders tabs. A

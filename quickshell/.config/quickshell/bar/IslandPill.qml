@@ -25,14 +25,22 @@ Item {
     readonly property bool hovered: content.containsMouse
     // The row's button carries the island's padding itself, so its highlight fills the shape.
     readonly property real closedWidth: row.implicitWidth
-    // Blur behind exactly the shape (ext-background-effect): the body with its round corners, and
-    // the fillets (squares with the fillet's circle cut out).
+    // Blur behind the shape (ext-background-effect): the body with its round corners, and the
+    // fillets (squares with the fillet's circle cut out). Hyprland cuts the blur off in whole
+    // pixels, without smoothing, and the island blurs only the wallpaper (rules.lua's xray), so
+    // where its corners met a window right outside them the steps showed against it: the body's
+    // blur stays `inset` inside the drawn edge, under its smoothed pixels and edge line.
+    readonly property int inset: 1
     readonly property Region blur: Region {
-        item: content
-        topLeftRadius: Theme.island.attached ? 0 : shape.drawnRadius
-        topRightRadius: Theme.island.attached ? 0 : shape.drawnRadius
-        bottomLeftRadius: shape.drawnRadius
-        bottomRightRadius: shape.drawnRadius
+        readonly property int top: Theme.island.attached ? 0 : pill.inset
+        x: pill.x + shape.bodyX + pill.inset
+        y: pill.y + top
+        width: Math.max(0, shape.bodyWidth - pill.inset * 2)
+        height: Math.max(0, shape.bodyHeight - pill.inset - top)
+        topLeftRadius: Theme.island.attached ? 0 : Math.max(0, shape.drawnRadius - pill.inset)
+        topRightRadius: Theme.island.attached ? 0 : Math.max(0, shape.drawnRadius - pill.inset)
+        bottomLeftRadius: Math.max(0, shape.drawnRadius - pill.inset)
+        bottomRightRadius: Math.max(0, shape.drawnRadius - pill.inset)
 
         // The fillet into the top edge on the left (attached).
         Region {
