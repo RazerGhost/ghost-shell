@@ -3,26 +3,39 @@ import Quickshell
 import qs.services
 import qs.theme
 import qs.widgets
-import "../theme/ThemeScale.js" as ThemeScale
 
-// Appearance: what isn't edited on the desktop itself (the desktop editor, customize/, has the
-// wallpaper, colors, widgets, the panels' style, sizes and fonts): the wallpaper folder and
-// slideshow, and the launcher's size. The other editors have the rest: the dock and island
-// (workspace dots, status icons), the windows (border, corners, gaps, animations).
+// Appearance: the on-screen editors (customize/; the same four as the launcher's tiles), each
+// for what's best picked by sight, and what isn't seen: the wallpaper folder and slideshow.
 Column {
     id: page
 
     spacing: Theme.spacing.l
 
+    // Every editor in one place (they were on Appearance and Windows, quick settings' on none).
     SettingGroup {
-        SettingRow {
-            title: "Customize the desktop"
-            subtitle: "Wallpaper, colors, widgets, style, size and fonts, on the desktop itself"
+        title: "Customize"
 
-            TextButton {
-                text: "Customize"
-                filled: true
-                onClicked: Quickshell.execDetached(["qs", "ipc", "call", "customize", "desktop"])
+        Repeater {
+            model: [
+                { editor: "desktop", title: "Desktop", subtitle: "Wallpaper, colors, widgets, the panels' style, fonts" },
+                { editor: "windows", title: "Windows", subtitle: "Borders, corners, gaps and animations, shown on your windows" },
+                { editor: "dock", title: "Dock and island", subtitle: "When the dock shows, its icons, the workspace dots, the island's clock and status icons" },
+                { editor: "quick", title: "Quick settings", subtitle: "Which tiles and buttons it has, and their order" }
+            ]
+
+            SettingRow {
+                id: editorRow
+
+                required property var modelData
+
+                title: modelData.title
+                subtitle: modelData.subtitle
+
+                TextButton {
+                    text: "Customize"
+                    filled: true
+                    onClicked: Quickshell.execDetached(["qs", "ipc", "call", "customize", editorRow.modelData.editor])
+                }
             }
         }
     }
@@ -76,35 +89,6 @@ Column {
                 label: "Wallpaper follows light and dark"
                 checked: Settings.values.wallpaperFollowsMode
                 onToggled: Settings.values.wallpaperFollowsMode = !checked
-            }
-        }
-    }
-
-    SettingGroup {
-        title: "Launcher"
-
-        SettingRow {
-            title: "Launcher"
-            subtitle: "Its width, and how many results show before the list scrolls"
-
-            Row {
-                spacing: Theme.spacing.s
-
-                Stepper {
-                    label: "Launcher width"
-                    values: ThemeScale.launcherWidths
-                    value: ThemeScale.pick(Settings.values.launcherWidth, ThemeScale.launcherWidths, 560)
-                    format: v => ({ 480: "Narrow", 560: "Normal", 640: "Wide", 720: "Wider" })[v] ?? v
-                    onPicked: v => Settings.values.launcherWidth = v
-                }
-
-                Stepper {
-                    label: "Launcher rows"
-                    values: ThemeScale.launcherRows
-                    value: Theme.launcher.rows
-                    format: v => v + " rows"
-                    onPicked: v => Settings.values.launcherRows = v
-                }
             }
         }
     }

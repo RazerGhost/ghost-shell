@@ -17,7 +17,19 @@ TestCase {
     }
 
     function test_find() {
-        compare(SettingsPages.find("lock").title, "Lock screen");
+        compare(SettingsPages.find("power").title, "Lock and power");
         compare(SettingsPages.find("nope"), null);
+    }
+
+    function test_aliases() {
+        // Pages merged into Lock and power keep their ids.
+        compare(SettingsPages.resolve("lock"), "power");
+        compare(SettingsPages.resolve("account"), "power");
+        compare(SettingsPages.find("account").title, "Lock and power");
+        compare(SettingsPages.resolve("display"), "display");
+        // Their settings are still found by search.
+        compare(SettingsPages.matching("grace period")[0].id, "power");
+        compare(SettingsPages.matching("password")[0].id, "power");
+        compare(SettingsPages.matching("launcher width")[0].id, "display");
     }
 }

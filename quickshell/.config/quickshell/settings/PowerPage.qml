@@ -1,12 +1,16 @@
 import QtQuick
+import Quickshell
 import Quickshell.Services.UPower
 import qs.services
 import qs.theme
 import qs.widgets
 
-// Power: the low battery warning's power saver, and after how long without input the screen dims,
-// locks, turns off and the laptop suspends; separately on battery and plugged in (idle/Idle.qml
-// does it). Without a battery (the desktop) only the plugged-in times show.
+// Lock and power: after how long without input the screen dims, locks, turns off and the machine
+// suspends, separately on battery and plugged in (idle/Idle.qml does it; without a battery, the
+// desktop, only the plugged-in times show), the low battery warning's power saver, the grace
+// period after an idle lock, the lock screen's message line and the password. (Until 2026-11-05
+// three pages: Power, Lock screen, Account.) The lock screen's look is the desktop's: it's your
+// desktop, locked (lock/LockContent.qml).
 Column {
     id: root
 
@@ -85,6 +89,55 @@ Column {
                 label: "Power saver when the battery is low"
                 checked: Settings.values.batterySaver
                 onToggled: Settings.values.batterySaver = !checked
+            }
+        }
+    }
+
+    SettingGroup {
+        title: "Unlocking"
+
+        SettingRow {
+            title: "Grace period"
+            subtitle: "After locking by itself, a touch unlocks without the password"
+
+            Stepper {
+                label: "Grace period"
+                values: [0, 5, 10, 30, 60]
+                value: Settings.values.lockGrace
+                format: v => v === 0 ? "Off" : v + " s"
+                onPicked: v => Settings.values.lockGrace = v
+            }
+        }
+    }
+
+    SettingGroup {
+        title: "Lock screen"
+
+        SettingRow {
+            title: "A line at the bottom"
+            subtitle: "Like \"If found, call ...\""
+
+            TextField {
+                width: Theme.settings.stepperWide * 1.5
+                placeholder: "None"
+                Component.onCompleted: text = Settings.values.lockMessage
+                input.onTextEdited: Settings.values.lockMessage = text
+            }
+        }
+    }
+
+    SettingGroup {
+        title: "Password"
+
+        SettingRow {
+            title: "Change your password"
+            subtitle: "For the lock screen and sudo (signed in as " + Quickshell.env("USER") + "). Opens a terminal that asks for the old one, then the new one twice."
+
+            TextButton {
+                text: "Change"
+                filled: true
+                // The terminal stays open after passwd until Enter, so its answer can be read.
+                onClicked: Apps.runInTerminal(["sh", "-c", "passwd; echo; printf 'Press Enter to close. '; read -r _"])
             }
         }
     }

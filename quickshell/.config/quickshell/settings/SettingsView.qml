@@ -21,7 +21,7 @@ Item {
     readonly property bool showsList: !compact || listing
     readonly property bool showsPage: !compact || !listing
 
-    readonly property string page: LauncherState.settingsPage
+    readonly property string page: SettingsPages.resolve(LauncherState.settingsPage)
     readonly property var pages: SettingsPages.pages
 
     function choose(id: string): void {
@@ -225,17 +225,15 @@ Item {
             // Centered when the panel is wider than a page (full size).
             x: Math.max(Theme.spacing.l, (content.width - width) / 2)
             width: Math.min(Theme.settings.content, content.width - Theme.spacing.l * 2)
-            sourceComponent: ({ appearance: appearancePage, display: displayPage, lock: lockPage, sound: soundPage, windows: windowsPage, notifications: notificationsPage, power: powerPage, input: inputPage, account: accountPage, terminal: terminalPage, snapshots: snapshotsPage, apps: appsPage, screentime: screentimePage, keybinds: keybindsPage, capture: capturePage, clock: clockPage })[root.page] ?? null
+            sourceComponent: ({ appearance: appearancePage, display: displayPage, sound: soundPage, windows: windowsPage, notifications: notificationsPage, power: powerPage, input: inputPage, terminal: terminalPage, snapshots: snapshotsPage, apps: appsPage, screentime: screentimePage, keybinds: keybindsPage, capture: capturePage, clock: clockPage })[root.page] ?? null
 
             Component { id: appearancePage; AppearancePage {} }
             Component { id: displayPage; DisplayPage {} }
-            Component { id: lockPage; LockPage {} }
             Component { id: soundPage; SoundSettingsPage {} }
             Component { id: windowsPage; WindowsPage {} }
             Component { id: notificationsPage; NotificationsPage {} }
             Component { id: powerPage; PowerPage {} }
             Component { id: inputPage; InputPage {} }
-            Component { id: accountPage; AccountPage {} }
             Component { id: terminalPage; TerminalPage {} }
             Component { id: snapshotsPage; SnapshotsPage {} }
             Component { id: appsPage; AppsPage {} }

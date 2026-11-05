@@ -2526,6 +2526,16 @@ fix, not one for this case"), with Omarchy's hardware layer as the model (user's
 To check on the laptop: `ghost update`, `ghost-hw facts` (laptop yes, display GPU amd), the
 `gpu-pci-*` links, Hyprland on the AMD chip after a re-login, KDE Connect's tray still starting.
 
+### Settings reorganised (2026-11-05)
+User's request after the size setting turned out to live apart from Display: every page reviewed,
+then (user: "all of it"):
+- What belongs together on one page: Appearance has all four editors' Customize buttons (they
+  were on Appearance and Windows, quick settings' on none); the launcher's width and rows moved
+  to Display's Size group; Power, Lock screen and Account are one page, Lock and power (idle
+  times, grace period, the lock screen's message, the password); Weather and clock moved to
+  Personalize as Date, time and weather; Default apps is Apps and launcher; Keybinds and Screen
+  time moved to System. 17 pages are 14. The old ids stay as aliases (`lock`, `account`).
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

@@ -9,7 +9,7 @@ import "DisplayModes.js" as DisplayModes
 import "../theme/ThemeScale.js" as ThemeScale
 
 // Display: the shell's size and its text's (the same settings as the desktop editor's Size and
-// text tab), each screen's resolution and refresh rate, scale, rotation and variable refresh
+// text tab) and the launcher's, each screen's resolution and refresh rate, scale, rotation and variable refresh
 // rate; night light (on/off, how warm, and an optional daily schedule).
 //
 // A screen change is tried live (`hyprctl eval` of an `hl.monitor` call) and only saved when
@@ -120,6 +120,31 @@ Column {
                     format: v => Math.round(v * 100) + " %"
                     onPicked: v => Settings.values[sizeRow.modelData.key] = v
                 }
+            }
+        }
+
+        SettingRow {
+            title: "Launcher width"
+
+            Stepper {
+                label: "Launcher width"
+                values: ThemeScale.launcherWidths
+                value: ThemeScale.pick(Settings.values.launcherWidth, ThemeScale.launcherWidths, 560)
+                format: v => ({ 480: "Narrow", 560: "Normal", 640: "Wide", 720: "Wider" })[v] ?? v
+                onPicked: v => Settings.values.launcherWidth = v
+            }
+        }
+
+        SettingRow {
+            title: "Launcher rows"
+            subtitle: "How many results show before the list scrolls"
+
+            Stepper {
+                label: "Launcher rows"
+                values: ThemeScale.launcherRows
+                value: Theme.launcher.rows
+                format: v => v + " rows"
+                onPicked: v => Settings.values.launcherRows = v
             }
         }
     }

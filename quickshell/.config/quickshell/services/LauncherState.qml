@@ -5,6 +5,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import "../settings/SettingsPages.js" as SettingsPages
 
 Singleton {
     id: root
@@ -67,7 +68,7 @@ Singleton {
 
     function showSettings(id: string): void {
         if (id !== "")
-            settingsPage = id;
+            settingsPage = SettingsPages.resolve(id); // a merged page's old id opens the page it joined
         show("settings");
     }
 
