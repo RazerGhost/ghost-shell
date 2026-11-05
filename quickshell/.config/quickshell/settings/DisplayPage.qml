@@ -81,6 +81,45 @@ Column {
         }
     }
 
+    // With several screens: which is the main one (the dock, the desktop widgets) and where the
+    // dock goes (services/Screens.qml).
+    SettingGroup {
+        visible: Screens.several
+        title: "Screens"
+
+        SettingRow {
+            title: "Main screen"
+            subtitle: "The desktop widgets and the dock show here"
+
+            Stepper {
+                label: "Main screen"
+                values: Quickshell.screens.map(s => s.name)
+                value: Screens.main?.name ?? ""
+                format: v => root.screenName(v)
+                onPicked: v => Settings.values.mainScreen = v
+            }
+        }
+
+        SettingRow {
+            title: "Dock on every screen"
+            subtitle: "Off: only on the main screen"
+
+            Switch {
+                label: "Dock on every screen"
+                checked: Settings.values.dockEverywhere === true
+                onToggled: Settings.values.dockEverywhere = !checked
+            }
+        }
+    }
+
+    // "Built-in screen", or the monitor's own name ("Dell U2723QE"), for an output.
+    function screenName(output: string): string {
+        if (/^(eDP|LVDS)/.test(output))
+            return "Built-in screen";
+        const m = monitors.find(m => m.name === output);
+        return m && (m.make || m.model) ? [m.make, m.model].filter(s => s).join(" ") : output;
+    }
+
     SettingGroup {
         visible: root.trial !== null
         title: "Keep these display settings?"

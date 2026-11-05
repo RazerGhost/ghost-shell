@@ -102,7 +102,7 @@ Singleton {
         running: true
         stdout: StdioCollector {
             onStreamFinished: {
-                const screen = Quickshell.screens[0];
+                const screen = Screens.main;
                 root.pictures = WallpapersJs.entries(text, screen?.width ?? 1920, screen?.height ?? 1080, root.folder);
             }
         }

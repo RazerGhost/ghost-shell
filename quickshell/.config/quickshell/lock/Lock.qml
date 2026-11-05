@@ -94,8 +94,8 @@ Scope {
                 id: content
                 anchors.fill: parent
                 wallpaper: root.wallpaper
-                // The desktop widgets show on the first screen, like the desktop's.
-                showsWidgets: surface.screen === Quickshell.screens[0]
+                // The desktop widgets show on the main screen, like the desktop's.
+                showsWidgets: surface.screen === Screens.main
                 message: root.message
                 messageIsError: root.messageIsError
                 busy: root.busy

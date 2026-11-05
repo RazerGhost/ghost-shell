@@ -55,9 +55,10 @@ Scope {
         }
     }
 
-    // Settings -> Windows -> Dock: "off" shows none.
+    // Settings -> Windows -> Dock: "off" shows none. On the main screen, or every screen
+    // (Settings -> Display, Screens.dockScreens).
     Variants {
-        model: Settings.values.dockMode === "off" ? [] : Quickshell.screens
+        model: Settings.values.dockMode === "off" ? [] : Screens.dockScreens
 
         DockBar {
             required property ShellScreen modelData

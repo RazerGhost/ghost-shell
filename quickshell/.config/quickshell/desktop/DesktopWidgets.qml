@@ -75,7 +75,7 @@ Scope {
         PanelWindow {
             id: window
 
-            screen: Quickshell.screens[0] ?? null
+            screen: Screens.main // Settings -> Display's main screen
             anchors { top: true; bottom: true; left: true; right: true }
             exclusionMode: ExclusionMode.Ignore
             color: "transparent"

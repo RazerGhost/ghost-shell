@@ -248,6 +248,10 @@ Singleton {
             property var monitors: ({})
             // The laptop's screen at its lowest refresh rate while on battery (quick settings' Display page).
             property bool displayLowRefreshOnBattery: false
+            // The main screen by output name ("": the laptop's own, else the first; services/Screens.qml),
+            // and the dock on every screen instead of only there.
+            property string mainScreen: ""
+            property bool dockEverywhere: false
             // The VPN connected last, by name: quick settings' VPN switch reconnects it.
             property string lastVpn: ""
             // Per-app notifications, by app name: { mode } (services/NotificationRules.js).
