@@ -158,7 +158,7 @@ Singleton {
         // The top band the island takes: what's below it (menus' cards, the OSD at the top, the
         // wallpaper strip, the launcher and editors) starts here, and windows below it.
         readonly property int reserved:   gap + height
-        readonly property int openRadius: root.round(32)  // bottom corners when open (closed: half the height)
+        readonly property int openRadius: root.round(20)  // corners when open (closed: half the height); 32 looked stepped at 1080p
         // The menus' widths (user's choice, 2026-11-04: each its own, so the island morphs into
         // a shape that fits it): wider for the grids and lists, narrower for the power menu.
         // panelWidth is the rest's (the hover player, notification and attention pop-ups, the

@@ -551,6 +551,8 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   island draws that glass itself (the wallpaper blurred by Qt, masked to its shape, like the lock
   screen's): Hyprland cuts its blur off in whole pixels, and over a window the island's corners
   showed the steps (user's find). Hyprland's blur stays for the island without a picture.
+  Its open corners went from 32 to 20 (user's call: on a 1080p screen the large radius looked
+  stepped however smoothly it was drawn).
 
 ### Elgato Wave:3 (built 2026-10-29; reviewed by the user, untested: the microphone is on the desktop)
 - The opt-in `wave3` module (`modules/wave3/`, its README has the details): openxlr (AUR)
