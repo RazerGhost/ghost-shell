@@ -2158,6 +2158,39 @@ the profile's headroom (1.65x in) with peaks held under -1 dB, so they're as lou
 profile without clipping. Found on the way: after a shell reload the equalizer sent nothing (the
 filter was already running, no change to react to); it applies once at start now.
 
+### Several screens (2026-11-05; tested on a virtual screen, the desktop is the real test)
+User's picks, all five, built for the desktop's two monitors. Tested here on Hyprland's virtual
+screens (`hyprctl output create headless`, removed after each test).
+- Main screen (`services/Screens.qml`, Settings -> Display's Screens group, with several): your
+  choice, else the laptop's own screen, else the first. The desktop widgets, the lock screen's
+  and the dock go there (the dock on every screen with "Dock on every screen"); notifications and
+  menus stay on the screen you're on. Checked: the widgets stayed on the laptop's screen.
+- Workspaces per screen (on by default with several): the main screen 1-5, the next left to right
+  6-10, a third 11-15 (Hyprland workspace rules written into shell-settings.lua,
+  `DisplayModes.workspaceRules`, tested). Super+Shift+Alt+Left/Right moves the window to the screen
+  that way (`hl.dsp.window.move({ monitor = "l" })`, checked in Hyprland's source). Checked: the
+  rules applied, focus crossed with `monitor = "r"` / `"l"`, the rules gone with the screen.
+- Arrangement and remembered setups (`settings/ScreenArrangement.qml`): drag the screens; a drop
+  lines up beside the nearest screen, sharing at least a quarter of a side (a corner alone, the
+  pointer can't cross), the main one at 0, 0 (`DisplayModes.arranged`, tested). Setups are saved
+  per physical monitor (`desc:` with its make, model and serial: Hyprland matches it on any port)
+  and each set of screens keeps its own arrangement (`screenLayouts`, `DisplayModes.setKey`).
+  Checked: the view, a position rule applied by Hyprland. Dragging is the user's to try.
+- A wallpaper per screen (off by default: the same picture on every screen, each filled without
+  stretching): the strip (Super+Shift+W) picks for the screen it's open on, the main screen's
+  makes the colors and may be live; others show pictures (`Wallpaper.pathFor`, `setFor`).
+  Checked: a different picture on the virtual screen.
+- Desktop widgets on any screen (the user's question): a widget dropped past its screen's edge
+  moves to the screen under its middle, placed there (`DesktopWidgets.screenAt`, `screenOf`,
+  tested); each screen with widgets has its own layer and stage (`WidgetStage.screenName`), on the
+  lock screen too; a widget whose screen is unplugged shows on the main screen. The keyboard mode
+  (Super+D) is the main screen's widgets; the desktop editor shows the main screen's. Checked: the
+  clock moved to the virtual screen and back.
+- Fixed on the way (user's find): widgets stopped about 7 % in from the screen's edges at a shell
+  size under 100 % (places are kept at 100 % and zoom toward the middle; a drop capped them at the
+  100 % screen's edges); `DesktopWidgets.dropped` keeps them on the screen as shown. And per-screen
+  parts no longer throw while a screen is unplugged.
+
 ### Quick settings additions (2026-11-05; the buttons and the 60 Hz rule verified by the user)
 User's picks from the ideas (all of them), each optional: offered under "Available" in quick
 settings' edit mode, so the panel only grows by what you add.
