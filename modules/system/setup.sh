@@ -132,6 +132,14 @@ rm -f "${TMPDIR:-/tmp}/ghost-greetd.toml"
 sudo systemctl daemon-reload
 # Enable only, don't start: starting it now would take over tty1 under the running session.
 # It takes effect on the next boot.
+# Only one display manager can be enabled (display-manager.service): another one (SDDM on a fresh
+# CachyOS) makes enabling greetd fail. It's disabled, not stopped, so a session it runs now stays.
+other=$(readlink /etc/systemd/system/display-manager.service || true)
+other=${other##*/}
+if [[ -n $other && $other != greetd.service ]]; then
+    echo "Replacing the login screen $other with greetd (from the next boot)"
+    sudo systemctl disable "$other"
+fi
 sudo systemctl enable greetd.service
 
 step "Name lookup: one mDNS service (Avahi)"
