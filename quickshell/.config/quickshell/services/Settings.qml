@@ -257,6 +257,9 @@ Singleton {
             // Where the screens sit, per set of connected screens: { setKey: { key: "XxY" } }
             // (settings/DisplayModes.js `setKey`, `key`, `arranged`; Settings -> Display).
             property var screenLayouts: ({})
+            // A wallpaper per screen: other screens' pictures by output name (services/Wallpaper.qml).
+            property bool wallpaperPerScreen: false
+            property var screenWallpapers: ({})
             // The VPN connected last, by name: quick settings' VPN switch reconnects it.
             property string lastVpn: ""
             // Per-app notifications, by app name: { mode } (services/NotificationRules.js).

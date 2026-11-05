@@ -15,6 +15,10 @@ Column {
 
     // Shown in the island.
     property bool active
+    // The screen it's open on (the island's menu opens on the screen you're on): with a
+    // wallpaper per screen, a pick is for that screen.
+    readonly property string screenName: QsWindow.window?.screen?.name ?? ""
+    readonly property string shownPath: Wallpaper.pathFor(screenName)
     // Thumbnails only load once the picker has been opened: pictures are large (up to 5K), and
     // decoding them all at login would keep the CPU busy for nothing.
     property bool opened: false
@@ -40,7 +44,7 @@ Column {
             opened = true;
             Wallpaper.rescan();
             // Start on the current wallpaper.
-            list.currentIndex = Math.max(0, Wallpaper.pictures.findIndex(p => p.filePath === Wallpaper.path));
+            list.currentIndex = Math.max(0, Wallpaper.pictures.findIndex(p => p.filePath === root.shownPath));
             list.positionViewAtIndex(list.currentIndex, ListView.Center);
         }
     }
@@ -63,7 +67,7 @@ Column {
         case Qt.Key_Return:
         case Qt.Key_Enter:
             if (list.currentItem)
-                Wallpaper.set(list.currentItem.filePath);
+                Wallpaper.setFor(root.screenName, list.currentItem.filePath);
             break;
         default:
             return;
@@ -81,19 +85,19 @@ Column {
         required property int index
         readonly property string filePath: modelData.filePath
         readonly property string fileName: modelData.fileName
-        readonly property bool current: filePath === Wallpaper.path
+        readonly property bool current: filePath === root.shownPath
 
         width: root.thumbWidth
         height: root.thumbHeight
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onEntered: list.currentIndex = index
-        onClicked: Wallpaper.set(filePath)
+        onClicked: Wallpaper.setFor(root.screenName, filePath)
 
         Accessible.role: Accessible.ListItem
         Accessible.name: fileName + (current ? ", current wallpaper" : "")
         Accessible.selected: ListView.isCurrentItem
-        Accessible.onPressAction: Wallpaper.set(filePath)
+        Accessible.onPressAction: Wallpaper.setFor(root.screenName, filePath)
 
         ClippingRectangle {
             anchors.fill: parent

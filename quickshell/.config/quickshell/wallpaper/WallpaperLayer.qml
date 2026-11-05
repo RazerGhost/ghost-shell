@@ -21,8 +21,12 @@ Variants {
 
         required property ShellScreen modelData
         readonly property HyprlandMonitor monitor: Hyprland.monitorFor(modelData)
-        readonly property bool playing: Wallpaper.isVideo && !GameMode.on && !UPower.onBattery && !Session.locked
+        readonly property bool playing: Wallpaper.isVideo && own === "" && !GameMode.on && !UPower.onBattery && !Session.locked
                                         && (monitor?.activeWorkspace?.toplevels.values.length ?? 1) === 0
+        // This screen's own picture, with one per screen ("" when it shows the main wallpaper,
+        // which may be a live one).
+        readonly property string own: { const p = Wallpaper.pathFor(modelData?.name ?? ""); return p !== Wallpaper.path ? p : ""; }
+        readonly property string still: own !== "" ? own : Wallpaper.stillPath
         // Drawn as a card while the desktop editor is open on this screen (customize/Editing.qml).
         readonly property bool carded: Editing.cardScreen === modelData?.name // null while it's unplugged
 
@@ -90,9 +94,9 @@ Variants {
                 anchors.fill: parent
                 // Every video's frame has the same name: the video's path after the # makes each a new
                 // address, so the next video's frame loads (and isn't kept from the last one).
-                source: !Wallpaper.stillPath ? ""
-                      : FileUrl.of(Wallpaper.stillPath) + (Wallpaper.isVideo ? "#" + encodeURIComponent(Wallpaper.path) : "")
-                cache: !Wallpaper.isVideo
+                source: !window.still ? ""
+                      : FileUrl.of(window.still) + (Wallpaper.isVideo && window.own === "" ? "#" + encodeURIComponent(Wallpaper.path) : "")
+                cache: !(Wallpaper.isVideo && window.own === "")
                 fillMode: Image.PreserveAspectCrop
                 asynchronous: true
                 // Decode at the screen's size, not the picture's (a 6K photo would use ~100 MB).
@@ -118,7 +122,7 @@ Variants {
             // The live wallpaper, only built while one is chosen.
             Loader {
                 anchors.fill: parent
-                active: Wallpaper.isVideo
+                active: Wallpaper.isVideo && window.own === ""
 
                 sourceComponent: Video {
                     id: video

@@ -64,6 +64,27 @@ Singleton {
         run(path, path);
     }
 
+    // A wallpaper per screen (Settings -> Display, with several screens: `wallpaperPerScreen`):
+    // the main screen's is `path`, which makes the colors; another screen shows its own picture
+    // from `screenWallpapers` (by output name) or, until one is picked for it, the main one's.
+    // Pictures only there: a live wallpaper plays on the screens showing the main one.
+    readonly property bool perScreen: Settings.values.wallpaperPerScreen === true && Screens.several
+    function pathFor(screenName: string): string {
+        if (!perScreen || screenName === (Screens.main?.name ?? ""))
+            return path;
+        const own = Settings.values.screenWallpapers?.[screenName];
+        return typeof own === "string" && own !== "" && !WallpapersJs.isVideo(own) ? own : path;
+    }
+    // Picking a wallpaper on a screen (the island's strip opens on the screen you're on): the
+    // main screen's, or with one per screen another's.
+    function setFor(screenName: string, picture: string): void {
+        if (!perScreen || screenName === (Screens.main?.name ?? "") || WallpapersJs.isVideo(picture)) {
+            set(picture);
+            return;
+        }
+        Settings.values.screenWallpapers = Object.assign({}, Settings.values.screenWallpapers, { [screenName]: picture });
+    }
+
     // No wallpaper again (Hyprland's default shows), colors from the last seed color: the desktop
     // editor's Cancel when none was chosen before it opened.
     function clear(): void {

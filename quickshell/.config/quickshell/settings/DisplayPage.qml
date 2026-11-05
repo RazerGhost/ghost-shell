@@ -122,6 +122,17 @@ Column {
         }
 
         SettingRow {
+            title: "A wallpaper per screen"
+            subtitle: "Off: the same picture on every screen, each filled without stretching. On: pick one for each screen in the wallpaper strip (Super + Shift + W) on that screen; the main screen's makes the colors"
+
+            Switch {
+                label: "A wallpaper per screen"
+                checked: Settings.values.wallpaperPerScreen === true
+                onToggled: Settings.values.wallpaperPerScreen = !checked
+            }
+        }
+
+        SettingRow {
             title: "Dock on every screen"
             subtitle: "Off: only on the main screen"
 
