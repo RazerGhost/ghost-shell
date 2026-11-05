@@ -2563,6 +2563,19 @@ then (user: "all of it"):
   module. It found zenity (only Steam brought it) and qrencode (only the capture module), now in
   core, and Ghostty moved to core: it's the terminal every machine falls back to.
 
+### Low-level edge cases on the desktop (2026-11-05)
+User's question after the Settings work: what else assumes the laptop. Checked on the desktop:
+- Caps lock: the shell read the first keyboard's LED only; the desktop has two keyboards (a
+  wired K10 and a wireless one), and Hyprland keeps caps lock per keyboard, so typing on the
+  other never showed it. Every keyboard's LED is read now (on while any is), and the list again
+  when udev adds or removes an LED. Untested by a real key press: a virtual one (wtype) lights no
+  keyboard's LED.
+- Fine there: power modes (all three, through amd_pstate), a wired connection with Wi-Fi off,
+  the System page's GPUs (the RTX always awake there, so always asked), the keyboard layout
+  (Hyprland's main keyboard; switching goes to all).
+- Not checked: the night light's tint on NVIDIA (hyprsunset runs without errors), a recording on
+  the RTX's screens.
+
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
 windows).

@@ -7,7 +7,10 @@
 // - Caps lock: no event at all, and Hyprland doesn't run a bind on the key (tried: a release
 //   bind that leaves the key alone never fired). Its light follows it: the keyboard's
 //   `::capslock` LED in sysfs, read in-process 4 times a second (sysfs files send no change
-//   events, like the backlight's).
+//   events, like the backlight's). Every keyboard's: with two (the desktop's wired and wireless
+//   ones) only the first was read, so caps lock typed on the other never showed (2026-11-05). On
+//   while any is on; the list is read again when udev adds or removes an LED (a keyboard
+//   plugged in later).
 pragma Singleton
 
 import QtQuick
@@ -22,8 +25,8 @@ Singleton {
     property string layout: ""
     property string mainKeyboard: ""
     property int layoutCount: 1 // more than one: the lock screen names the active one
-    property string capsLed: ""
-    property string capsState: "" // the LED's brightness; "" until first read
+    property list<string> capsLeds: [] // every keyboard's caps lock LED folder
+    property string capsState: "" // "1" or "0" once read; "" until then
     readonly property bool capsLock: capsState !== "" && capsState !== "0"
 
     signal layoutSwitched(string name)
@@ -59,32 +62,62 @@ Singleton {
     }
 
     Process {
-        command: ["sh", "-c", "ls -d /sys/class/leds/*::capslock 2>/dev/null | head -n 1"]
+        id: listLeds
+        command: ["sh", "-c", "ls -d /sys/class/leds/*::capslock 2>/dev/null"]
         running: true
         stdout: StdioCollector {
-            onStreamFinished: root.capsLed = text.trim()
+            onStreamFinished: root.capsLeds = text.split("\n").filter(line => line !== "")
         }
     }
 
-    FileView {
-        id: capsFile
-        path: root.capsLed !== "" ? root.capsLed + "/brightness" : ""
-        blockLoading: true // read right away in the timer
+    // A keyboard plugged in or out adds or removes its LEDs: list them again a moment after.
+    Process {
+        command: ["udevadm", "monitor", "--kernel", "--subsystem-match=leds"]
+        running: true
+        stdout: SplitParser {
+            onRead: relist.restart()
+        }
+    }
+
+    Timer {
+        id: relist
+        interval: 1000
+        onTriggered: listLeds.running = true
+    }
+
+    Instantiator {
+        id: capsFiles
+        model: root.capsLeds
+
+        FileView {
+            required property string modelData
+            path: modelData + "/brightness"
+            blockLoading: true // read right away in the timer
+        }
     }
 
     Timer {
         interval: 250
-        running: root.capsLed !== ""
+        running: root.capsLeds.length > 0
         repeat: true
         onTriggered: {
-            capsFile.reload();
-            const state = capsFile.text().trim();
-            if (state === "" || state === root.capsState)
+            let read = false, on = false;
+            for (let i = 0; i < capsFiles.count; i++) {
+                const file = capsFiles.objectAt(i);
+                file.reload();
+                const value = file.text().trim();
+                if (value === "")
+                    continue;
+                read = true;
+                on = on || value !== "0";
+            }
+            const state = on ? "1" : "0";
+            if (!read || state === root.capsState)
                 return;
             const first = root.capsState === "";
             root.capsState = state;
             if (!first)
-                root.capsLockSwitched(state !== "0");
+                root.capsLockSwitched(on);
         }
     }
 }
