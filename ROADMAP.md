@@ -2158,6 +2158,20 @@ the profile's headroom (1.65x in) with peaks held under -1 dB, so they're as lou
 profile without clipping. Found on the way: after a shell reload the equalizer sent nothing (the
 filter was already running, no change to react to); it applies once at start now.
 
+### Headphones take over when plugged in (2026-11-05)
+User's question with USB-C IEMs (a SIMGOT EW300 DSP): they connected, but the sound stayed on
+the speakers. WirePlumber keeps the output chosen last for as long as it exists, so a new device
+never takes over by itself; the jack does (it switches the laptop's own card from its Speaker
+setup to Headphones, which ranks higher). User's pick: like a phone, USB headphones take the
+sound and their microphone when plugged in, Bluetooth ones the sound when they connect (not
+their microphone: using it puts the headset in call mode, music in low quality). `Audio` notes
+the devices there when PipeWire finishes its first sync (`Pipewire.ready`), so a shell start or
+reload switches nothing, and makes a new one the default (`AudioDevices.takesOver`, `added`,
+tested); unplugging goes back through WirePlumber's own memory of earlier choices, and the volume
+pop-up names the new output. Checked with a silent sink named like a USB device: it became the
+default, and removing it brought the speakers back. Each output keeps its own equalizer; the
+speaker profile stays on the speakers.
+
 ### The recording's notification beside the screenshots' (2026-11-04)
 User's pick from the ideas: the shell's notifications with buttons the same way. Looked at first:
 the screenshot's ("Open", "Draw on it") and the recording's ("Play") already wait for their

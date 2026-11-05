@@ -4,8 +4,11 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.Pipewire
+import "AudioDevices.js" as AudioDevices
 
 Singleton {
+    id: root
+
     readonly property PwNode sink: Pipewire.defaultAudioSink
     readonly property PwNode source: Pipewire.defaultAudioSource
 
@@ -79,5 +82,32 @@ Singleton {
     // tracks it, so bind both default nodes here.
     PwObjectTracker {
         objects: [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource]
+    }
+
+    // Headphones take over when they're plugged in or connect, like on a phone (user's pick,
+    // 2026-11-05): USB ones for the sound and their microphone, Bluetooth ones for the sound
+    // (AudioDevices.js). WirePlumber keeps the output chosen last for as long as it exists, so a
+    // new one never took over by itself (the jack does: it switches the laptop's own card). The
+    // devices there when PipeWire finishes its first sync count as there already, so a shell
+    // start or reload switches nothing. Unplugging goes back by itself: WirePlumber remembers the
+    // earlier choices. The volume pop-up names the new output (Osd.qml).
+    readonly property var nodeNames: Pipewire.ready
+        ? Pipewire.nodes.values.filter(n => !n.isStream).map(n => n.name) : []
+    property var knownNodes: null // null until PipeWire's first sync
+    onNodeNamesChanged: {
+        if (!Pipewire.ready)
+            return;
+        if (knownNodes !== null) {
+            for (const name of AudioDevices.added(knownNodes, nodeNames)) {
+                const node = Pipewire.nodes.values.find(n => n.name === name && !n.isStream);
+                if (!node || !AudioDevices.takesOver(name, node.isSink))
+                    continue;
+                if (node.isSink)
+                    Pipewire.preferredDefaultAudioSink = node;
+                else
+                    Pipewire.preferredDefaultAudioSource = node;
+            }
+        }
+        knownNodes = nodeNames;
     }
 }

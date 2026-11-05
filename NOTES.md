@@ -626,3 +626,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `qs -p` reading the player at start sees all of it (checked 2026-11-05). `playerctl -p spotify
   metadata --format` reads it at any time. Asking busctl for `org.mpris.MediaPlayer2.playerctld`
   starts playerctld (D-Bus activation), which then shows as a third, mirroring player.
+- `Pipewire.ready` (Quickshell 0.3.2) turns true once the first sync is done, with the whole node
+  list there (12 nodes at once here, checked with a throwaway `qs -p`); before it the list fills in
+  bit by bit. `Pipewire.preferredDefaultAudioSink = node` sets WirePlumber's configured default
+  (saved in `~/.local/state/wireplumber/default-nodes` with the earlier ones as `.0`, `.1`...), so
+  when that node goes, WirePlumber falls back to the earlier choice by itself. A null sink
+  (`pactl load-module module-null-sink sink_name=<name>`) stands in for a plugged-in device.
+
