@@ -1,0 +1,6 @@
+# The system module's packages (packages.sh adds the ones the hardware needs).
+# pacman packages; # lines and blank lines are skipped.
+
+# Builds the initramfs with this module's drop-ins (mkinitcpio.conf.d/); CachyOS's installer
+# brings it, a plain Arch install may use another
+mkinitcpio
