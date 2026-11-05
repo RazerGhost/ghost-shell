@@ -103,19 +103,25 @@ if $limine; then
     ! grep -vqF 'plymouth.enable=0' <<<"$cmdlines" \
         || fail "a kernel entry in $esp/limine.conf has no plymouth.enable=0; check /etc/default/limine and run sudo limine-mkinitcpio"
 
-    step "Boot menu: the firmware's logo stays, the menu only on a key"
+    step "Boot menu: the firmware's logo stays; how the menu shows is Settings' choice"
     # Limine's own options, at the top of its config (limine-entry-tool, which rewrites the boot
-    # entries, keeps them): firmware_logo puts the firmware's logo back when Limine hands over; quiet hides the menu unless a key is pressed during
-    # the timeout (to pick Windows or a snapshot). $esp is read in the step above.
+    # entries, keeps them): firmware_logo puts the firmware's logo back when Limine hands over.
+    # How the menu shows (hidden until a key, shown, remembering the last entry) is chosen in
+    # Settings -> Lock and power, which runs ghost-boot-menu through pkexec (its polkit action
+    # allows only that program); here only a machine that has none of it yet gets the hidden
+    # menu, so a re-run never undoes the choice. $esp is read in the step above.
+    sudo install -Dm755 system/usr/local/lib/ghost-boot-menu /usr/local/lib/ghost-boot-menu
+    sudo install -Dm644 system/usr/share/polkit-1/actions/org.ghost-shell.boot-menu.policy \
+        /usr/share/polkit-1/actions/org.ghost-shell.boot-menu.policy
     limine_conf=$esp/limine.conf
-    for option in "timeout: 1" "quiet: yes" "firmware_logo: yes"; do
-        key=${option%%:*}
-        if sudo grep -q "^$key:" "$limine_conf"; then
-            sudo sed -i "s/^$key:.*/$option/" "$limine_conf"
-        else
-            sudo sed -i "1i $option" "$limine_conf"
-        fi
-    done
+    if sudo grep -q '^firmware_logo:' "$limine_conf"; then
+        sudo sed -i 's/^firmware_logo:.*/firmware_logo: yes/' "$limine_conf"
+    else
+        sudo sed -i '1i firmware_logo: yes' "$limine_conf"
+    fi
+    if ! sudo grep -q '^timeout:' "$limine_conf"; then
+        sudo /usr/local/lib/ghost-boot-menu hidden
+    fi
     # A config enrolled into Limine's binary must be enrolled again after a change, or it won't
     # boot (off by default on CachyOS).
     if grep -qs '^ENABLE_ENROLL_LIMINE_CONFIG=yes' /etc/default/limine /etc/limine-entry-tool.conf; then

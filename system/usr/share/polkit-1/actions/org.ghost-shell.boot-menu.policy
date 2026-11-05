@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<!-- Settings -> Lock and power's boot menu: lets pkexec run ghost-boot-menu, and only that, with
+     your password (admin), so the prompt names what it's for. Installed by the system module. -->
+<policyconfig>
+  <action id="org.ghost-shell.boot-menu">
+    <description>Change the boot menu</description>
+    <message>Changing the boot menu needs your password</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_admin</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/local/lib/ghost-boot-menu</annotate>
+  </action>
+</policyconfig>

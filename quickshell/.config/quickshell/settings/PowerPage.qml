@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.UPower
 import qs.services
 import qs.theme
@@ -8,7 +9,7 @@ import qs.widgets
 // Lock and power: after how long without input the screen dims, locks, turns off and the machine
 // suspends, separately on battery and plugged in (idle/Idle.qml does it; without a battery, the
 // desktop, only the plugged-in times show), the low battery warning's power saver, the grace
-// period after an idle lock, the lock screen's message line and the password. (Until 2026-11-05
+// period after an idle lock, the lock screen's message line, the password and the boot menu. (Until 2026-11-05
 // three pages: Power, Lock screen, Account.) The lock screen's look is the desktop's: it's your
 // desktop, locked (lock/LockContent.qml).
 Column {
@@ -89,6 +90,60 @@ Column {
                 label: "Power saver when the battery is low"
                 checked: Settings.values.batterySaver
                 onToggled: Settings.values.batterySaver = !checked
+            }
+        }
+    }
+
+    // How Limine's boot menu shows, to start Windows, another kernel or a snapshot: only where the
+    // system module installed its helper (machines that boot with Limine). Root's file, so it's
+    // changed through pkexec (your password in the shell's own prompt; the polkit action allows
+    // only ghost-boot-menu), and the choice is saved once that worked.
+    SettingGroup {
+        id: boot
+
+        property bool available: false
+        property string pending: ""
+        property string note: ""
+
+        visible: available
+        title: "Starting up"
+
+        Process {
+            running: true
+            command: ["test", "-x", "/usr/local/lib/ghost-boot-menu"]
+            onExited: code => boot.available = code === 0
+        }
+
+        SettingRow {
+            title: "Boot menu"
+            subtitle: boot.note !== "" ? boot.note
+                : "To start Windows, another kernel or a snapshot. Hidden: press a key as the machine starts"
+
+            Segmented {
+                label: "Boot menu"
+                enabled: !apply.running
+                options: [{ value: "hidden", label: "Hidden" }, { value: "shown", label: "Shown 3 s" },
+                          { value: "remember", label: "Remember last" }]
+                current: boot.pending !== "" ? boot.pending : Settings.values.bootMenu
+                onPicked: v => {
+                    if (v === Settings.values.bootMenu)
+                        return;
+                    boot.pending = v;
+                    boot.note = "";
+                    apply.command = ["pkexec", "/usr/local/lib/ghost-boot-menu", v];
+                    apply.running = true;
+                }
+            }
+        }
+
+        Process {
+            id: apply
+            onExited: code => {
+                if (code === 0)
+                    Settings.values.bootMenu = boot.pending;
+                else
+                    boot.note = "Not changed: the password was cancelled or the boot menu couldn't be written";
+                boot.pending = "";
             }
         }
     }

@@ -269,6 +269,9 @@ Singleton {
             // Whether a USB or Bluetooth device takes the sound when it connects, where you chose:
             // { device key: bool } (AudioDevices.mayTakeOver; Settings -> Sound).
             property var audioTakeover: ({})
+            // Limine's boot menu: "hidden" (a key while starting shows it), "shown" or "remember"
+            // (shown, on the entry booted last); applied by ghost-boot-menu (Lock and power).
+            property string bootMenu: "hidden"
             // Sound events (services/Sounds.qml): all of them, then each kind.
             property bool soundEvents: true
             property bool soundNotifications: true

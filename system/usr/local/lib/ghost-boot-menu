@@ -1,0 +1,31 @@
+#!/bin/bash
+# ghost-boot-menu <hidden|shown|remember>: how Limine's boot menu behaves, run as root through
+# pkexec from Settings -> Lock and power (polkit action org.ghost-shell.boot-menu, only this
+# program). Installed root-owned by the system module; takes only these three words.
+#   hidden    the menu hides: any key within 1 second shows it (quiet: Limine shows nothing)
+#   shown     the menu shows for 3 seconds, then boots the default
+#   remember  the same, starting on the entry booted last (remember_last_entry)
+# Option names and behaviour from Limine's CONFIG.md (checked 2026-11-05).
+set -euo pipefail
+case ${1:-} in
+    hidden) options=("timeout: 1" "quiet: yes" "remember_last_entry: no") ;;
+    shown) options=("timeout: 3" "quiet: no" "remember_last_entry: no") ;;
+    remember) options=("timeout: 3" "quiet: no" "remember_last_entry: yes") ;;
+    *) echo "usage: ghost-boot-menu hidden|shown|remember" >&2; exit 2 ;;
+esac
+# /etc/default/limine is bash for limine-entry-tool, which declares KERNEL_CMDLINE as a named array.
+esp=$(declare -A KERNEL_CMDLINE; . /etc/default/limine; echo "${ESP_PATH:-/boot}")
+conf=$esp/limine.conf
+[[ -f $conf ]] || { echo "ghost-boot-menu: $conf is missing" >&2; exit 1; }
+for option in "${options[@]}"; do
+    key=${option%%:*}
+    if grep -q "^$key:" "$conf"; then
+        sed -i "s/^$key:.*/$option/" "$conf"
+    else
+        sed -i "1i $option" "$conf"
+    fi
+done
+# A config enrolled into Limine's binary must be enrolled again after a change, or it won't boot.
+if grep -qs '^ENABLE_ENROLL_LIMINE_CONFIG=yes' /etc/default/limine /etc/limine-entry-tool.conf; then
+    limine-enroll-config
+fi

@@ -20,7 +20,7 @@ const pages = [
     { id: "notifications", section: "System", icon: "notifications", title: "Notifications",
       words: "do not disturb dnd quiet fullscreen game film missed schedule apps silent mute always priority pop-up popup time seconds osd volume brightness position top bottom" },
     { id: "power", section: "System", icon: "lock_clock", title: "Lock and power",
-      words: "idle dim lock screen off suspend sleep battery plugged low power saver warning message if found grace period unlock touch password password change passwd sudo user login unlock lock screen" },
+      words: "idle dim lock screen off suspend sleep battery plugged low power saver warning message if found grace period unlock touch password password change passwd sudo user login unlock lock screen boot menu limine windows dual boot start startup snapshot kernel" },
     { id: "input", section: "System", icon: "touchpad_mouse", title: "Keyboard and mouse",
       words: "keyboard layout language touchpad natural scrolling tap click pointer speed mouse off cursor theme size hide typing still" },
     { id: "snapshots", section: "System", icon: "history", title: "Snapshots", needs: "snapshots",
