@@ -268,8 +268,8 @@ recording (gpu-screen-recorder), draw on it (satty), folders and quality setting
 The login shell: zsh (`zsh/.zshrc`; the core module moves an earlier `~/.zshrc` to
 `~/.zshrc.pre-ghost` and runs `chsh`), the prompt `starship/.config/starship.toml` (the terminal's
 palette colors; earlier prompts collapse to `❯`, `_ghost_collapse_prompt` in `.zshrc`), fzf-tab
-and zoxide (`.zshrc`); Ghostty's cursor trail `ghostty/.config/ghostty/shaders/cursor-trail.glsl`; fish stays as a fallback (`fish/`). The terminal greeting (a system summary, one
-line or nothing; Settings -> Default apps, `terminalGreeting`): `bin/.local/bin/ghost-greeting`
+and zoxide (`.zshrc`); Ghostty's cursor trail `ghostty/.config/ghostty/shaders/cursor-trail.glsl`; Settings -> Terminal (`settings/TerminalPage.qml`: prompt style, trail, long-command notifications, greeting; `GhosttySettings.qml` writes `~/.config/ghostty/shell-settings`; prompt styles in `starship/.config/starship/`); atuin and zsh-autopair (`.zshrc`); fish stays as a fallback (`fish/`). The terminal greeting (a system summary, one
+line or nothing; Settings -> Default apps, `terminalGreeting`, Settings -> Terminal): `bin/.local/bin/ghost-greeting`
 (tested by `tests/greeting_test.sh`), run by `.zshrc` and by `fish/.config/fish/ghost-greeting.fish`
 (sourced from config.fish by the core module), and `fastfetch/.config/fastfetch/`. Welcome tour (`welcome/Welcome.qml`), web apps (`ghost webapp`, Chromium `--app`), snapshots
 (snapper, Settings page), Nautilus "Send to phone" script (`nautilus/`), Proton apps, Wave:3

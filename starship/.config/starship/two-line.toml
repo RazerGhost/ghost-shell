@@ -1,0 +1,55 @@
+# Two-line prompt (Settings -> Terminal): you@host, folder, git and how long, battery and clock on
+# the right, the line to type on below.
+# Colors are the terminal's palette names (see ../starship.toml).
+add_newline = true
+format = "[╭─](bright-black)$username$hostname$directory$git_branch$git_status$all$cmd_duration$fill$battery$time$line_break[╰─](bright-black)$character"
+[fill]
+symbol = " "
+
+[username]
+show_always = true
+format = "[$user]($style)"
+style_user = "bold blue"
+[hostname]
+ssh_only = false
+format = "[@$hostname]($style) "
+style = "blue"
+[directory]
+format = "in [\U000f024b $path]($style) "
+style = "bold green"
+truncation_length = 4
+truncate_to_repo = false
+[git_branch]
+format = "on [$symbol$branch]($style) "
+symbol = "\ue0a0 "
+style = "purple"
+[git_status]
+format = "([$all_status$ahead_behind]($style) )"
+style = "yellow"
+[cmd_duration]
+format = "took [$duration]($style) "
+style = "yellow"
+[battery]
+format = "[$symbol$percentage]($style) "
+[[battery.display]]
+threshold = 100
+style = "bright-black"
+[time]
+disabled = false
+format = "[\uf017 $time]($style)"
+style = "bright-black"
+time_format = "%H:%M"
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+
+# The last command failed: its exit code. sudo still unlocked.
+[status]
+disabled = false
+format = "[\uf00d $status]($style) "
+style = "red"
+
+[sudo]
+disabled = false
+format = "[\uf023 sudo]($style) "
+style = "yellow"

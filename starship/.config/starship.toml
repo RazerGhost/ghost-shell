@@ -1,5 +1,5 @@
 # The prompt (Starship, starship.rs), for zsh, fish or bash alike: rounded pills (user's pick
-# 2026-11-05, over plain colored text, a clock on the right and a two-line info bar).
+# 2026-11-05; Settings -> Terminal switches to starship/minimal.toml or starship/two-line.toml).
 # Colors are the terminal's palette names, not hex: matugen sets Ghostty's palette from the
 # wallpaper (templates/ghostty: green = primary, blue = secondary, yellow = tertiary, purple =
 # primary_fixed, red = error, black = surface_container_high, used for the text on the pills), so
@@ -12,7 +12,9 @@
 #   ❯
 
 add_newline = true
-format = "$directory$git_branch$git_status$nodejs$python$rust$lua$cmd_duration$line_break$character"
+format = "$username$hostname$directory$git_branch$git_status$nodejs$python$rust$lua$jobs$sudo$status$cmd_duration$battery$line_break$character"
+# The clock on the right (the line you type on only: earlier prompts collapse to ❯, .zshrc).
+right_format = "$time"
 
 [directory]
 format = "[](fg:green)[\U000f024b $path$read_only](fg:black bg:green bold)[](fg:green) "
@@ -45,6 +47,38 @@ format = "[](fg:purple)[$symbol$version](fg:black bg:purple)[](fg:purple) 
 
 [lua]
 format = "[](fg:purple)[$symbol$version](fg:black bg:purple)[](fg:purple) "
+
+# Who and where, only over SSH (or as root): a pill before the folder.
+[username]
+format = "[\ue0b6](fg:purple)[$user](fg:black bg:purple)"
+[hostname]
+format = "[@$hostname](fg:black bg:purple)[\ue0b4](fg:purple) "
+
+# Background jobs (Ctrl+Z, &), how many.
+[jobs]
+format = "[\ue0b6](fg:blue)[\uf013 $number](fg:black bg:blue)[\ue0b4](fg:blue) "
+number_threshold = 1
+
+# sudo still unlocked (its password won't be asked for again yet).
+[sudo]
+disabled = false
+format = "[\ue0b6](fg:yellow)[\uf023 sudo](fg:black bg:yellow)[\ue0b4](fg:yellow) "
+
+# The last command failed: its exit code.
+[status]
+disabled = false
+format = "[\ue0b6](fg:red)[\uf00d $status](fg:black bg:red)[\ue0b4](fg:red) "
+
+# The battery only when it's low.
+[battery]
+format = "[\ue0b6](fg:red)[$symbol$percentage](fg:black bg:red)[\ue0b4](fg:red) "
+[[battery.display]]
+threshold = 20
+
+[time]
+disabled = false
+format = "[\uf017 $time](bright-black)"
+time_format = "%H:%M"
 
 [character]
 success_symbol = "[❯](bold green)"

@@ -62,7 +62,9 @@ machine can take what it needs.
 - **zsh** as the login shell, set up like fish (suggestions as you type, highlighting, history
   search on Up and Down, fzf on Ctrl+R) with a [Starship](https://starship.rs) prompt of rounded pills in the
   wallpaper's colors (earlier prompts collapse to `❯`), Tab completions in fzf (fzf-tab), `z` to
-  jump to folders (zoxide), and a cursor trail in the accent color in Ghostty; fish stays installed.
+  jump to folders (zoxide), Ctrl+R history search (atuin), brackets that close themselves, a cursor
+  trail in the accent color and a notification when a long command ends (Settings -> Terminal); fish
+  stays installed.
 
 The full plan and every decision behind it: [ROADMAP.md](ROADMAP.md). Keybinds:
 [docs/keybinds.md](docs/keybinds.md). Every feature and rule with its files: [docs/index.md](docs/index.md).

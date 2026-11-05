@@ -2158,7 +2158,7 @@ the profile's headroom (1.65x in) with peaks held under -1 dB, so they're as lou
 profile without clipping. Found on the way: after a shell reload the equalizer sent nothing (the
 filter was already running, no change to react to); it applies once at start now.
 
-### Quick settings additions (2026-11-05)
+### Quick settings additions (2026-11-05; the buttons and the 60 Hz rule verified by the user)
 User's picks from the ideas (all of them), each optional: offered under "Available" in quick
 settings' edit mode, so the panel only grows by what you add.
 - Display tile and page (`controlcenter/ScreenPage.qml`; Settings has its own `DisplayPage`, and
@@ -2383,6 +2383,17 @@ shader: it compiles with glslang against Ghostty 1.4's documented uniforms; Ghos
 so the look is the user's to check). Ghostty redraws a focused window continuously while a shader
 is set: measured 0 ticks of CPU in 10 s before, 1 after. Starship can't animate (a prompt is
 printed once); Ghostty's shaders are where motion can live.
+Then (user's picks, all of them): more pills (a failed command's exit code, sudo still
+unlocked, background jobs, you@host over SSH, the battery under 20 %; the clock on the right),
+Settings -> Terminal (`settings/TerminalPage.qml`; the greeting moved there from Default apps):
+the prompt's style (pills, minimal, two lines: `starship/.config/starship/*.toml`, `.zshrc` reads
+`terminalPrompt` before every prompt so open terminals follow; checked in a pseudo-terminal), and
+Ghostty's cursor trail and command-finished notifications, which the shell writes into
+`~/.config/ghostty/shell-settings` (`GhosttySettings.qml`, `TerminalConfig.js`, tested; Ghostty's
+config includes it, optional): Ghostty 1.3's own `notify-on-command-finish = unfocused` after 10 s,
+which knows which window has focus, through its shell integration. atuin (extra, MIT) takes
+Ctrl+R for a full-screen history search (its Up arrow off), zsh-autopair (AUR, MIT) closes
+brackets and quotes.
 Machine-local additions: `~/.config/zsh/local.zsh`. Checked: the config loads without errors in a
 terminal (about 0.2 s with fastfetch), the greeting's tests pass.
 

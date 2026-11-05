@@ -1,0 +1,39 @@
+# Minimal prompt (Settings -> Terminal): colored text, a folder icon, the clock on the right.
+# Colors are the terminal's palette names (see ../starship.toml).
+add_newline = true
+format = "$directory$git_branch$git_status$all$cmd_duration$line_break$character"
+right_format = "$time"
+[directory]
+format = "[\U000f024b $path]($style)[$read_only]($read_only_style) "
+style = "bold green"
+truncation_length = 4
+truncate_to_repo = false
+[git_branch]
+format = "[$symbol$branch]($style) "
+symbol = "\ue0a0 "
+style = "blue"
+[git_status]
+format = "([$all_status$ahead_behind]($style) )"
+style = "yellow"
+[cmd_duration]
+format = "took [$duration]($style) "
+style = "bright-black"
+[time]
+disabled = false
+format = "[$time]($style)"
+style = "bright-black"
+time_format = "%H:%M"
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+
+# The last command failed: its exit code. sudo still unlocked.
+[status]
+disabled = false
+format = "[\uf00d $status]($style) "
+style = "red"
+
+[sudo]
+disabled = false
+format = "[\uf023 sudo]($style) "
+style = "yellow"

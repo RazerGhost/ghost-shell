@@ -209,6 +209,11 @@ Singleton {
             // What a new terminal shows (bin/.local/bin/ghost-greeting reads it from this
             // file): "ghost" (fastfetch with the Ghost look), "line" (one line) or "none".
             property string terminalGreeting: "ghost"
+            // Settings -> Terminal: the prompt's style (settings/TerminalConfig.js `prompts`; .zshrc
+            // reads it), Ghostty's cursor trail and notifications when a long command ends.
+            property string terminalPrompt: "pills"
+            property bool terminalCursorTrail: true
+            property bool terminalNotify: true
             property int focusMinutes: 25 // focus mode's length, the one picked last
             // The music app last heard (its desktop entry id), which the media widget offers to
             // open while nothing plays (services/Media.qml).

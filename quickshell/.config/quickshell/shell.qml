@@ -41,6 +41,7 @@ ShellRoot {
     Switcher {}
     Idle {}
     HyprlandSettings {}
+    GhosttySettings {}
 
     // Background services that are singletons, so they only run once something uses them: low
     // battery, disk space and out-of-memory warnings, the touchpad's mouse rule, the equalizer's gains, screen

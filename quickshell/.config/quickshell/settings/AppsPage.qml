@@ -45,23 +45,6 @@ Column {
         kind: "terminal"
     }
 
-    SettingGroup {
-        title: "Terminal · greeting"
-
-        SettingRow {
-            title: "When a terminal opens"
-            subtitle: "Applies to terminals opened from now on"
-
-            Stepper {
-                label: "Terminal greeting"
-                values: ["ghost", "line", "none"]
-                value: Settings.values.terminalGreeting
-                format: v => v === "ghost" ? "System summary" : v === "line" ? "One line" : "Nothing"
-                onPicked: v => Settings.values.terminalGreeting = v
-            }
-        }
-    }
-
     Choice {
         title: "Browser · Super + B"
         kind: "browser"

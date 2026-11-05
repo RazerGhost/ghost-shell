@@ -8,3 +8,5 @@ bibata-cursor-theme-bin
 # zsh's Tab completions in fzf, with a folder's contents beside them (zsh/.zshrc); MIT, upstream
 # Aloxaf/fzf-tab, this package follows its releases
 fzf-tab
+# Brackets and quotes close themselves in zsh (zsh/.zshrc); MIT, a small finished plugin
+zsh-autopair-git

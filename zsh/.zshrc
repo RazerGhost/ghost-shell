@@ -51,6 +51,10 @@ bindkey -e
 bindkey '^[[H' beginning-of-line '^[[F' end-of-line '^[[3~' delete-char
 bindkey '^[[1;5C' forward-word '^[[1;5D' backward-word '^H' backward-kill-word
 
+# Brackets and quotes close themselves: ( gives (), and typing ) over it moves past (zsh-autopair).
+# After compinit, before the highlighting below, as its README asks; it sets itself up.
+[[ -r /usr/share/zsh/plugins/zsh-autopair/autopair.zsh ]] && source /usr/share/zsh/plugins/zsh-autopair/autopair.zsh
+
 # Fish-like: suggestions from history as you type (Right arrow or End takes them), highlighting
 # (loaded after everything that adds keys), and Up / Down search history for what's typed
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
@@ -61,6 +65,10 @@ bindkey '^[OA' history-substring-search-up '^[OB' history-substring-search-down
 
 # fzf: Ctrl+R searches history, Ctrl+T picks a file, Alt+C goes into a folder
 (( $+commands[fzf] )) && source <(fzf --zsh)
+# atuin, when installed, takes Ctrl+R: a full-screen history search that can filter by folder, by
+# session and by commands that failed (Ctrl+R again cycles the filter). Its Up arrow stays off,
+# so Up keeps searching for what's typed (above).
+(( $+commands[atuin] )) && eval "$(atuin init zsh --disable-up-arrow)"
 
 # A command that isn't installed says which package has it
 [[ -r /usr/share/doc/pkgfile/command-not-found.zsh ]] && source /usr/share/doc/pkgfile/command-not-found.zsh
@@ -76,6 +84,19 @@ alias grep='grep --color=auto'
 alias ..='cd ..' ...='cd ../..' ....='cd ../../..'
 
 (( $+commands[starship] )) && eval "$(starship init zsh)"
+
+# Settings -> Terminal's prompt style (`terminalPrompt` in the shell's settings.json), read before
+# every prompt so open terminals follow a change: pills is ~/.config/starship.toml, the others
+# are in ~/.config/starship/ (settings/TerminalConfig.js `prompts`).
+_ghost_prompt_style() {
+    local settings=${XDG_STATE_HOME:-$HOME/.local/state}/quickshell/settings.json style=pills
+    [[ -r $settings && "$(<$settings)" =~ '"terminalPrompt": *"([a-z-]+)"' ]] && style=$match[1]
+    case $style in
+        minimal|two-line) export STARSHIP_CONFIG=~/.config/starship/$style.toml ;;
+        *) unset STARSHIP_CONFIG ;;
+    esac
+}
+precmd_functions=(_ghost_prompt_style $precmd_functions)
 
 # Old prompts collapse to a plain ❯ once a command is entered, so the pills only show on the line
 # you're typing in and the scrollback stays clean. zsh has no transient prompt of its own: the
