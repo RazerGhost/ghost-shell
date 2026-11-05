@@ -26,17 +26,19 @@ In order, on the Wave:3's strip (Mic 1, id `xlr1`):
 
 | | What | Starting values |
 |---|---|---|
-| 1 | Noise removal (openxlr's own, RNNoise) | strength 100 |
-| 2 | LSP Parametric Equalizer x8 Mono | high-pass 90 Hz (24 dB/oct); −2 dB at 275 Hz, wide (Q 0.7); +2.5 dB at 4 kHz (Q 0.8) |
-| 3 | LSP Compressor Mono | 3:1, attack 10 ms, release 100 ms, threshold −34 dB, makeup +12 dB |
-| 4 | De-esser: a second LSP Compressor Mono | listens above 6 kHz only (sidechain high-pass, 24 dB/oct), 4:1, attack 1 ms, release 50 ms, threshold −32 dB |
-| 5 | LSP Limiter Mono | threshold −1 dBFS |
+| 1 | Noise removal (openxlr's own, DeepFilterNet 3) | strength 100 |
+| 2 | Expander (openxlr's own, software; its place in the chain is openxlr's, not checked) | below −55 dB, 4:1, at most 30 dB down, hold 100 ms, release 200 ms |
+| 3 | LSP Parametric Equalizer x8 Mono | high-pass 70 Hz (24 dB/oct); +4 dB low shelf at 150 Hz; −1 dB at 275 Hz, wide (Q 0.7); +1 dB at 4 kHz (Q 0.8) |
+| 4 | LSP Compressor Mono | 3:1, attack 10 ms, release 100 ms, threshold −34 dB, makeup +12 dB |
+| 5 | De-esser: a second LSP Compressor Mono | listens above 5 kHz only (sidechain high-pass, 24 dB/oct), 6:1, attack 1 ms, release 50 ms, threshold −42 dB |
+| 6 | LSP Limiter Mono | threshold −1 dBFS |
 
 Why it differs from the Windows chain:
 
 - Noise removal is built into openxlr (RNNoise or DeepFilterNet 3), always first in a
   microphone's chain, so `noise-suppression-for-voice` and a separate DeepFilterNet aren't needed.
-  Switch to DeepFilterNet in the strip's noise removal if RNNoise sounds too aggressive.
+  DeepFilterNet it is: RNNoise left the desktop's fan noise audible once the compressor's makeup
+  lifted it (about 50 ms of delay instead of 30).
 - Calf's Deesser is stereo only, and openxlr only offers mono plugins for a microphone. The
   de-esser is LSP's mono compressor with its detection filtered to the sibilance range, which is
   how a wideband de-esser works.
@@ -48,7 +50,10 @@ Why it differs from the Windows chain:
 Measured on the desktop (2026-11-05): with the Wave:3's gain at 24 dB (it was at its 40 dB
 maximum and clipped), speech peaks at −13 to −18 dBFS before the chain. At −34 dB the compressor
 takes 3–6 dB off normal speech, and the makeup brings Chat to −20.7 LUFS with peaks around −8 dB.
-The de-esser is on, gently: compression lifted the "s" sounds by up to 10 dB. The gain is the
+Then by ear: more bass (the low shelf, the high-pass lower, less of the 275 Hz cut and the 4 kHz
+lift), a firmer de-esser (the "s" sounds went from 14 to 22 dB under the loudest speech), and
+DeepFilterNet with the expander: the room's noise, −24 to −29 dB peaks at the raw mic, ends
+around −57 dB after DeepFilterNet and is turned down further in the pauses. The gain is the
 microphone's own and stays in it (and in a profile saved from openxlr); the repo's copy holds
 only the chain.
 

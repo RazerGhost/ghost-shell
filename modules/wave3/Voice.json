@@ -1,7 +1,10 @@
 {
   "mixer": {
     "noiseRemoval": {
-      "xlr1": { "enabled": true, "engine": "rnnoise", "strength": 100 }
+      "xlr1": { "enabled": true, "engine": "deepfilternet", "strength": 100 }
+    },
+    "expander": {
+      "xlr1": { "enabled": true, "threshold": -55, "ratio": 4, "range": 30, "attack": 1, "release": 200, "hold": 100 }
     },
     "inserts": {
       "xlr1": [
@@ -12,9 +15,10 @@
           "label": "EQ",
           "bypass": false,
           "params": {
-            "ft_0": 2, "f_0": 90, "s_0": 1,
-            "ft_1": 1, "f_1": 275, "g_1": 0.794, "q_1": 0.7,
-            "ft_2": 1, "f_2": 4000, "g_2": 1.334, "q_2": 0.8
+            "ft_0": 2, "f_0": 70, "s_0": 1,
+            "ft_1": 1, "f_1": 275, "g_1": 0.891, "q_1": 0.7,
+            "ft_2": 1, "f_2": 4000, "g_2": 1.122, "q_2": 0.8,
+            "ft_3": 5, "f_3": 150, "g_3": 1.585, "q_3": 0.7
           }
         },
         {
@@ -31,7 +35,7 @@
           "plugin": "http://lsp-plug.in/plugins/lv2/compressor_mono",
           "label": "De-esser",
           "bypass": false,
-          "params": { "cr": 4, "at": 1, "rt": 50, "al": 0.025, "mk": 1, "scm": 0, "shpm": 2, "shpf": 6000 }
+          "params": { "cr": 6, "at": 1, "rt": 50, "al": 0.008, "mk": 1, "scm": 0, "shpm": 2, "shpf": 5000 }
         },
         {
           "id": "limiter",

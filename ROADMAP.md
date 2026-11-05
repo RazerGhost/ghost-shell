@@ -575,6 +575,9 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   gain was at its 40 dB maximum and clipped, now 24 dB (peaks −13 to −18 dBFS); the compressor's
   threshold −34 dB with +12 dB makeup (Chat at −20.7 LUFS); the de-esser on at −32 dB. Done over
   openxlr's control socket (the module's README); the repo's Voice.json has the chain's values.
+  Then by ear (user's review): more bass (a 150 Hz low shelf), a firmer de-esser, DeepFilterNet
+  instead of RNNoise and openxlr's expander, since the fan noise RNNoise left was lifted by the
+  compressor's makeup. Verified by the user: the voice sounds good.
 
 ### Proton apps (built 2026-10-29)
 - The `proton` module (user's request): Proton VPN (`proton-vpn-gtk-app`, extra), Proton Mail
