@@ -53,7 +53,8 @@ Item {
         hotspot: { icon: "wifi_tethering", title: "Hotspot", control: hotspotToggle },
         layout: { icon: "keyboard", title: "Keyboard layout", control: layoutToggle },
         picker: { icon: "colorize", title: "Color picker", control: pickerToggle },
-        nearby: { icon: "share", title: "Nearby sharing", control: nearbyToggle }
+        nearby: { icon: "share", title: "Nearby sharing", control: nearbyToggle },
+        noise: { icon: "noise_control_off", title: "Noise removal", control: noiseToggle }
     })
 
     // The island grows and shrinks to fit the current page.
@@ -353,6 +354,19 @@ Item {
                 property: "watching"
                 value: root.visible
             }
+        }
+    }
+
+    // RNNoise on the microphone for calls (services/NoiseRemoval.qml).
+    Component {
+        id: noiseToggle
+
+        RoundToggle {
+            icon: NoiseRemoval.on ? "noise_aware" : "noise_control_off"
+            title: !NoiseRemoval.installed ? "Noise removal: needs noise-suppression-for-voice (ghost install core)"
+                 : NoiseRemoval.on ? "Noise removal on" : "Microphone noise removal"
+            active: NoiseRemoval.on
+            onClicked: NoiseRemoval.toggle()
         }
     }
 

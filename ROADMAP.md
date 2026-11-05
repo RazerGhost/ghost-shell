@@ -2186,6 +2186,14 @@ settings' edit mode, so the panel only grows by what you add.
   its launcher; stopped with pkill; whether it runs read with pgrep only while quick settings
   shows, since a second Quickshell can't see the tray to check it there). Checked on screen: all
   six new items under "Available" in edit mode. Pressing them is the user's to try.
+- Microphone noise removal (a round button; `noise-suppression-for-voice`, extra, GPL-3.0, core
+  module): on writes a PipeWire config naming the microphone in use (`NoiseRemoval.config`,
+  tested: names that could break out of the file are refused) and runs it as its own client
+  (`pipewire -c`): RNNoise between that microphone and a new "Noise-cancelled microphone", which
+  becomes the default; off (or the filter stopping, a shell restart) gives the microphone back.
+  Not one config always loaded: a filter fed by the default microphone that becomes the default
+  would feed itself. Checked: PipeWire reads the config up to the missing plugin (not installed
+  yet); the sound itself is the user's to try once it is.
 
 ### Headphones take over when plugged in (2026-11-05)
 User's question with USB-C IEMs (a SIMGOT EW300 DSP): they connected, but the sound stayed on

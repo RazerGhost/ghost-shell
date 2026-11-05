@@ -23,6 +23,8 @@ qt6-imageformats
 pipewire-audio
 # The limiter at the end of the equalizer (ghost-equalizer.conf, LSP's limiter_mono)
 lsp-plugins-lv2
+# Microphone noise removal (RNNoise's LADSPA plugin; quick settings' button, services/NoiseRemoval.qml)
+noise-suppression-for-voice
 pipewire-pulse
 pipewire-alsa
 wireplumber
