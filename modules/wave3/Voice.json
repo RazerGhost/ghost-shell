@@ -23,15 +23,15 @@
           "plugin": "http://lsp-plug.in/plugins/lv2/compressor_mono",
           "label": "Compressor",
           "bypass": false,
-          "params": { "cr": 3, "at": 10, "rt": 100, "al": 0.126, "mk": 1.413 }
+          "params": { "cr": 3, "at": 10, "rt": 100, "al": 0.02, "mk": 3.981 }
         },
         {
           "id": "deesser",
           "kind": "lv2",
           "plugin": "http://lsp-plug.in/plugins/lv2/compressor_mono",
           "label": "De-esser",
-          "bypass": true,
-          "params": { "cr": 4, "at": 1, "rt": 50, "al": 0.1, "mk": 1, "scm": 0, "shpm": 2, "shpf": 6000 }
+          "bypass": false,
+          "params": { "cr": 4, "at": 1, "rt": 50, "al": 0.025, "mk": 1, "scm": 0, "shpm": 2, "shpf": 6000 }
         },
         {
           "id": "limiter",

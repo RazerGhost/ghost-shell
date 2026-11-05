@@ -28,8 +28,8 @@ In order, on the Wave:3's strip (Mic 1, id `xlr1`):
 |---|---|---|
 | 1 | Noise removal (openxlr's own, RNNoise) | strength 100 |
 | 2 | LSP Parametric Equalizer x8 Mono | high-pass 90 Hz (24 dB/oct); −2 dB at 275 Hz, wide (Q 0.7); +2.5 dB at 4 kHz (Q 0.8) |
-| 3 | LSP Compressor Mono | 3:1, attack 10 ms, release 100 ms, threshold −18 dB, makeup +3 dB |
-| 4 | De-esser: a second LSP Compressor Mono | listens above 6 kHz only (sidechain high-pass, 24 dB/oct), 4:1, attack 1 ms, release 50 ms, threshold −20 dB; **bypassed** to start |
+| 3 | LSP Compressor Mono | 3:1, attack 10 ms, release 100 ms, threshold −34 dB, makeup +12 dB |
+| 4 | De-esser: a second LSP Compressor Mono | listens above 6 kHz only (sidechain high-pass, 24 dB/oct), 4:1, attack 1 ms, release 50 ms, threshold −32 dB |
 | 5 | LSP Limiter Mono | threshold −1 dBFS |
 
 Why it differs from the Windows chain:
@@ -44,6 +44,23 @@ Why it differs from the Windows chain:
   net after the chain.
 
 ## Tuning
+
+Measured on the desktop (2026-11-05): with the Wave:3's gain at 24 dB (it was at its 40 dB
+maximum and clipped), speech peaks at −13 to −18 dBFS before the chain. At −34 dB the compressor
+takes 3–6 dB off normal speech, and the makeup brings Chat to −20.7 LUFS with peaks around −8 dB.
+The de-esser is on, gently: compression lifted the "s" sounds by up to 10 dB. The gain is the
+microphone's own and stays in it (and in a profile saved from openxlr); the repo's copy holds
+only the chain.
+
+openxlr's daemon can be driven over its socket, which is how this was tuned (the instance id is
+in `waveInterfaces` in `/api/v1/state`):
+
+```sh
+x() { curl -s --unix-socket "$XDG_RUNTIME_DIR/openxlr/control.sock" -H 'Content-Type: application/json' "$@"; }
+x -d '{"cmd":"setWaveControl","device":"0fd9:0070@<id>","control":"gain","value":24}' http://x/api/v1/commands
+x -d '{"cmd":"setInsertParam","channel":"xlr1","insertId":"compressor","symbol":"al","value":0.02}' http://x/api/v1/commands
+x -d '{"cmd":"saveProfile","name":"Voice"}' http://x/api/v1/commands
+```
 
 Open openxlr (the app menu, or `openxlr`), then the Mic 1 strip's inserts: every plugin has its
 editor or generated sliders, and **Mic setup** loops a recorded take through the chain while you

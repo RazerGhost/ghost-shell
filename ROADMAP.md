@@ -571,6 +571,10 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   tested). The device lists scroll past six rows and the page below its header past the island.
   Its Apps list shows only streams that play (`PwNodeType.AudioOutStream`; `isSink` let in
   openxlr's 15 `parec` level meters) and none of openxlr's own (`AudioDevices.openxlr`).
+- Tuned on the desktop (2026-11-05), measured from recordings rather than by ear alone: the
+  gain was at its 40 dB maximum and clipped, now 24 dB (peaks −13 to −18 dBFS); the compressor's
+  threshold −34 dB with +12 dB makeup (Chat at −20.7 LUFS); the de-esser on at −32 dB. Done over
+  openxlr's control socket (the module's README); the repo's Voice.json has the chain's values.
 
 ### Proton apps (built 2026-10-29)
 - The `proton` module (user's request): Proton VPN (`proton-vpn-gtk-app`, extra), Proton Mail
