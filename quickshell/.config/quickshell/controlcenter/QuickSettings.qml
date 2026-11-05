@@ -897,6 +897,7 @@ Item {
         id: soundPage
         x: root.page === "sound" ? root.padding : root.width
         width: root.width - root.padding * 2
+        maxHeight: Theme.island.maxHeight - Theme.island.reserved - root.padding * 2
         visible: x < root.width
         onBack: root.page = "main"
 

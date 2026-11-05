@@ -12,6 +12,10 @@ import qs.widgets
 Column {
     id: root
 
+    // The most the page may take: the island's window, less its top row and quick settings'
+    // padding. Below the header the page scrolls past it (openxlr alone adds a dozen outputs).
+    property real maxHeight: Infinity
+
     signal back()
 
     // The apps that are playing sound (output streams; not the equalizer's own, see
@@ -33,6 +37,7 @@ Column {
     }
 
     PageHeader {
+        id: header
         width: parent.width
         title: "Sound"
         checked: !Audio.muted
@@ -45,113 +50,128 @@ Column {
         topPadding: Theme.spacing.xs
     }
 
-    Heading {
-        text: "Output"
-    }
-
-    DeviceList {
+    Flickable {
         width: root.width
-        outputs: true
-    }
-
-    // The chosen output's preset; the bands themselves are in Settings -> Sound.
-    Item {
-        visible: Equalizer.running
-        width: root.width
-        implicitHeight: Theme.list.rowHeight
-
-        Text {
-            anchors.left: parent.left
-            anchors.leftMargin: Theme.spacing.m
-            anchors.verticalCenter: parent.verticalCenter
-            text: "Equalizer"
-            color: Colors.m3onSurface
-            font.family: Theme.font.sans
-            font.pixelSize: Theme.font.normal
-        }
-
-        Stepper {
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            label: "Equalizer preset"
-            valueWidth: Theme.settings.stepperWide
-            // "Custom" (bands set by hand) only shows while it's the current one.
-            values: (Equalizer.preset === "Custom" ? ["Custom"] : []).concat(Equalizer.presets.map(p => p.name))
-            value: Equalizer.preset
-            onPicked: v => {
-                const preset = Equalizer.presets.find(p => p.name === v);
-                if (preset)
-                    Equalizer.setGains(preset.gains);
-            }
-        }
-    }
-
-    Heading {
-        visible: Audio.inputs.length > 1
-        text: "Microphone"
-    }
-
-    // Only worth a choice when there's more than one.
-    DeviceList {
-        width: root.width
-        visible: Audio.inputs.length > 1
-        outputs: false
-    }
-
-    Heading {
-        text: "Apps"
-    }
-
-    Text {
-        visible: root.apps.length === 0
-        width: parent.width
-        leftPadding: Theme.spacing.m
-        bottomPadding: Theme.spacing.s
-        text: "No app is playing sound"
-        color: Colors.m3onSurfaceVariant
-        font.family: Theme.font.sans
-        font.pixelSize: Theme.font.normal
-    }
-
-    // One per app: its icon and name, and its own volume.
-    Repeater {
-        model: root.apps
+        height: Math.min(body.implicitHeight, root.maxHeight - header.height - root.spacing)
+        contentHeight: body.implicitHeight
+        clip: true
+        boundsBehavior: Flickable.StopAtBounds
 
         Column {
-            id: app
-
-            required property PwNode modelData
+            id: body
 
             width: root.width
-            spacing: Theme.spacing.xs
+            spacing: root.spacing
 
-            Row {
-                leftPadding: Theme.spacing.m
-                spacing: Theme.spacing.s
+            Heading {
+                text: "Output"
+            }
 
-                IconImage {
-                    anchors.verticalCenter: parent.verticalCenter
-                    implicitSize: Theme.icon.small
-                    source: Quickshell.iconPath(app.modelData.properties["application.icon-name"]
-                                                || DesktopEntries.heuristicLookup(root.appName(app.modelData))?.icon
-                                                || "application-x-executable", "application-x-executable")
-                }
+            DeviceList {
+                width: root.width
+                outputs: true
+            }
+
+            // The chosen output's preset; the bands themselves are in Settings -> Sound.
+            Item {
+                visible: Equalizer.running
+                width: root.width
+                implicitHeight: Theme.list.rowHeight
 
                 Text {
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.spacing.m
                     anchors.verticalCenter: parent.verticalCenter
-                    text: root.appName(app.modelData)
+                    text: "Equalizer"
                     color: Colors.m3onSurface
                     font.family: Theme.font.sans
                     font.pixelSize: Theme.font.normal
                 }
+
+                Stepper {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    label: "Equalizer preset"
+                    valueWidth: Theme.settings.stepperWide
+                    // "Custom" (bands set by hand) only shows while it's the current one.
+                    values: (Equalizer.preset === "Custom" ? ["Custom"] : []).concat(Equalizer.presets.map(p => p.name))
+                    value: Equalizer.preset
+                    onPicked: v => {
+                        const preset = Equalizer.presets.find(p => p.name === v);
+                        if (preset)
+                            Equalizer.setGains(preset.gains);
+                    }
+                }
             }
 
-            LevelSlider {
-                width: parent.width
-                value: app.modelData.audio.volume
-                icon: app.modelData.audio.muted ? "volume_off" : "volume_up"
-                label: root.appName(app.modelData) + " volume"
-                onMoved: value => app.modelData.audio.volume = value
+            Heading {
+                visible: Audio.inputs.length > 1
+                text: "Microphone"
+            }
+
+            // Only worth a choice when there's more than one.
+            DeviceList {
+                width: root.width
+                visible: Audio.inputs.length > 1
+                outputs: false
+            }
+
+            Heading {
+                text: "Apps"
+            }
+
+            Text {
+                visible: root.apps.length === 0
+                width: root.width
+                leftPadding: Theme.spacing.m
+                bottomPadding: Theme.spacing.s
+                text: "No app is playing sound"
+                color: Colors.m3onSurfaceVariant
+                font.family: Theme.font.sans
+                font.pixelSize: Theme.font.normal
+            }
+
+            // One per app: its icon and name, and its own volume.
+            Repeater {
+                model: root.apps
+
+                Column {
+                    id: app
+
+                    required property PwNode modelData
+
+                    width: root.width
+                    spacing: Theme.spacing.xs
+
+                    Row {
+                        leftPadding: Theme.spacing.m
+                        spacing: Theme.spacing.s
+
+                        IconImage {
+                            anchors.verticalCenter: parent.verticalCenter
+                            implicitSize: Theme.icon.small
+                            source: Quickshell.iconPath(app.modelData.properties["application.icon-name"]
+                                                        || DesktopEntries.heuristicLookup(root.appName(app.modelData))?.icon
+                                                        || "application-x-executable", "application-x-executable")
+                        }
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: root.appName(app.modelData)
+                            color: Colors.m3onSurface
+                            font.family: Theme.font.sans
+                            font.pixelSize: Theme.font.normal
+                        }
+                    }
+
+                    LevelSlider {
+                        width: parent.width
+                        value: app.modelData.audio.volume
+                        icon: app.modelData.audio.muted ? "volume_off" : "volume_up"
+                        label: root.appName(app.modelData) + " volume"
+                        onMoved: value => app.modelData.audio.volume = value
+                    }
+                }
             }
         }
     }

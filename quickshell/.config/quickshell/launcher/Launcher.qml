@@ -109,7 +109,7 @@ Scope {
                                     { favorites: Settings.values.launcherFavorites, hidden: Settings.values.launcherHidden,
                                       commands: Settings.values.launcherCommands.concat(root.shellCommands) });
         // Settings' pages that have it, after the apps (from two letters: one finds them all).
-        const settings = text.trim().length >= 2 ? SettingsPages.matching(text).slice(0, 3).map(p => ({ setting: p })) : [];
+        const settings = text.trim().length >= 2 ? SettingsPages.matching(text, { snapshots: Snapshots.available }).slice(0, 3).map(p => ({ setting: p })) : [];
         return (color ? [{ color: color }] : []).concat(found, settings, text.trim() !== "" ? [{ web: text.trim() }] : []);
     }
 

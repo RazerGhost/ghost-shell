@@ -23,7 +23,7 @@ const pages = [
       words: "idle dim lock screen off suspend sleep battery plugged low power saver warning message if found grace period unlock touch password password change passwd sudo user login unlock lock screen" },
     { id: "input", section: "System", icon: "touchpad_mouse", title: "Keyboard and mouse",
       words: "keyboard layout language touchpad natural scrolling tap click pointer speed mouse off cursor theme size hide typing still" },
-    { id: "snapshots", section: "System", icon: "history", title: "Snapshots",
+    { id: "snapshots", section: "System", icon: "history", title: "Snapshots", needs: "snapshots",
       words: "backup restore btrfs snapper undo files home" },
     { id: "keybinds", section: "System", icon: "keyboard", title: "Keybinds",
       words: "shortcuts keys welcome tour help" },
@@ -51,12 +51,19 @@ function find(id) {
     return pages.find(p => p.id === own) ?? null;
 }
 
+// The pages that work on this machine: a page with `needs` only where `has` says yes (the
+// Snapshots page needs the snapshots module: services/Snapshots.qml). Without `has`, all.
+function available(has) {
+    return pages.filter(p => !p.needs || !has || has[p.needs] === true);
+}
+
 // The pages whose title or words hold the text (all of them without any), in their order; the
-// ones whose title holds it first.
-function matching(text) {
+// ones whose title holds it first. Only the available ones when `has` is given.
+function matching(text, has) {
+    const list = available(has);
     const q = String(text ?? "").trim().toLowerCase();
     if (q === "")
-        return pages.slice();
-    const inTitle = pages.filter(p => p.title.toLowerCase().includes(q));
-    return inTitle.concat(pages.filter(p => !inTitle.includes(p) && p.words.toLowerCase().includes(q)));
+        return list;
+    const inTitle = list.filter(p => p.title.toLowerCase().includes(q));
+    return inTitle.concat(list.filter(p => !inTitle.includes(p) && p.words.toLowerCase().includes(q)));
 }

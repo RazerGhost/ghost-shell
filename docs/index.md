@@ -197,7 +197,8 @@ sizes. `launcher/Launcher.qml`, `Fuzzy.js`, `Calc.js`, `CalcRow.qml`, `FileSearc
 | Apps | Apps and launcher (`apps`: default apps, the launcher's hidden apps and your commands), Terminal (`terminal`), Screenshots and recordings (`capture`) |
 
 Pages merged into others keep their ids as aliases (`SettingsPages.aliases`), so `qs ipc call
-settings page lock` still opens the right page.
+settings page lock` still opens the right page. A page that needs something the machine lacks is left
+out of the sidebar and the search (`needs` in `SettingsPages.js`: Snapshots, `services/Snapshots.qml`).
 
 Settings are saved in `~/.local/state/quickshell/settings.json` (`services/Settings.qml`);
 Hyprland options go to the generated `shell-settings.lua` (`settings/HyprlandSettings.qml`,

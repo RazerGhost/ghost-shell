@@ -23,8 +23,8 @@ Scope {
 
     Step {
         minutes: Settings.values["idle" + root.power + "Dim"]
-        onIsIdleChanged: Quickshell.execDetached(isIdle ? ["brightnessctl", "-s", "set", "10%"]
-                                                        : ["brightnessctl", "-r"])
+        onIsIdleChanged: Quickshell.execDetached(isIdle ? ["brightnessctl", "-c", "backlight", "-s", "set", "10%"]
+                                                        : ["brightnessctl", "-c", "backlight", "-r"])
     }
 
     Step {
@@ -41,7 +41,7 @@ Scope {
         minutes: Settings.values["idle" + root.power + "ScreenOff"]
         onIsIdleChanged: Quickshell.execDetached(isIdle
             ? ["hyprctl", "dispatch", "hl.dsp.dpms({ action = \"disable\" })"]
-            : ["sh", "-c", "hyprctl dispatch 'hl.dsp.dpms({ action = \"enable\" })' && brightnessctl -r"])
+            : ["sh", "-c", "hyprctl dispatch 'hl.dsp.dpms({ action = \"enable\" })' && brightnessctl -c backlight -r"])
     }
 
     Step {

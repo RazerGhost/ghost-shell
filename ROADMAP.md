@@ -2535,6 +2535,12 @@ then (user: "all of it"):
   times, grace period, the lock screen's message, the password); Weather and clock moved to
   Personalize as Date, time and weather; Default apps is Apps and launcher; Keybinds and Screen
   time moved to System. 17 pages are 14. The old ids stay as aliases (`lock`, `account`).
+- Only what the machine has: the Snapshots page only where the snapshots module set them up
+  (`services/Snapshots.qml`: snapper lists them for you; CachyOS has snapper everywhere), and the
+  brightness pop-up only with a backlight. Found on the way: brightnessctl without a class took
+  the first device it found, on the desktop a keyboard LED, so the brightness slider, the island's
+  Shift+wheel, the brightness keys and the idle dim worked that LED; every call asks for the
+  backlight now (`-c backlight`), and without one brightness hides.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

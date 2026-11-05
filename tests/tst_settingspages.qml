@@ -21,6 +21,16 @@ TestCase {
         compare(SettingsPages.find("nope"), null);
     }
 
+    function test_available() {
+        // Snapshots only where the module set them up.
+        compare(SettingsPages.available({ snapshots: false }).some(p => p.id === "snapshots"), false);
+        compare(SettingsPages.available({ snapshots: true }).some(p => p.id === "snapshots"), true);
+        compare(SettingsPages.available().length, SettingsPages.pages.length);
+        compare(SettingsPages.matching("snapshots", { snapshots: false }), []);
+        compare(SettingsPages.matching("snapshots", { snapshots: true })[0].id, "snapshots");
+        compare(SettingsPages.matching("", { snapshots: false }).length, SettingsPages.pages.length - 1);
+    }
+
     function test_aliases() {
         // Pages merged into Lock and power keep their ids.
         compare(SettingsPages.resolve("lock"), "power");

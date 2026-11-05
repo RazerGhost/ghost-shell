@@ -46,7 +46,7 @@ Singleton {
 
     function apply(): void {
         applied = pending;
-        write.command = ["brightnessctl", "-q", "set", pending + "%"];
+        write.command = ["brightnessctl", "-c", "backlight", "-q", "set", pending + "%"];
         write.running = true;
     }
 
@@ -61,11 +61,16 @@ Singleton {
     Process {
         id: read
         // -m prints machine-readable output: "amdgpu_bl1,backlight,128,50%,255"
-        // (device, class, current, percent, max).
-        command: ["brightnessctl", "-m"]
+        // (device, class, current, percent, max). Always the backlight class: without it
+        // brightnessctl takes the first device it finds, which on the desktop (no backlight) was a
+        // keyboard LED, so the slider, wheel and keys dimmed that (2026-11-05).
+        command: ["brightnessctl", "-c", "backlight", "-m"]
         running: true
         stdout: StdioCollector {
             onStreamFinished: {
+                // Nothing: no backlight (a desktop's monitors); `level` stays -1 and brightness hides.
+                if (text.trim() === "")
+                    return;
                 const fields = text.trim().split(",");
                 const current = Number(fields[2]);
                 const max = Number(fields[4]);

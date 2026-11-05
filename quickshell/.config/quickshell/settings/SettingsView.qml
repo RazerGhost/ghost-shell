@@ -22,7 +22,9 @@ Item {
     readonly property bool showsPage: !compact || !listing
 
     readonly property string page: SettingsPages.resolve(LauncherState.settingsPage)
-    readonly property var pages: SettingsPages.pages
+    // What this machine has, for pages that need it (SettingsPages.available).
+    readonly property var has: ({ snapshots: Snapshots.available })
+    readonly property var pages: SettingsPages.available(has)
 
     function choose(id: string): void {
         LauncherState.settingsPage = id;
@@ -46,7 +48,7 @@ Item {
     // The pages the search finds (all of them without one).
     readonly property var shown: {
         const q = search.trim().toLowerCase();
-        return q === "" ? root.pages : SettingsPages.matching(q);
+        return q === "" ? root.pages : SettingsPages.matching(q, root.has);
     }
 
     // The sidebar: search and the pages, scrolling when they're taller than the page. The whole

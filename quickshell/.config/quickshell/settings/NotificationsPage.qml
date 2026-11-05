@@ -52,7 +52,7 @@ Column {
         }
 
         SettingRow {
-            title: "Volume and brightness pop-up"
+            title: Brightness.level >= 0 ? "Volume and brightness pop-up" : "Volume pop-up"
             subtitle: "Also caps lock, keyboard layout and power mode"
 
             Stepper {
@@ -84,7 +84,7 @@ Column {
         Repeater {
             model: [
                 { key: "volume", title: "Volume" },
-                { key: "brightness", title: "Brightness" },
+                { key: "brightness", title: "Brightness", needs: "brightness" },
                 { key: "mic", title: "Microphone on or off" },
                 { key: "mutedMic", title: "An app recording while the microphone is muted" },
                 { key: "output", title: "A new sound output (headphones)" },
@@ -92,7 +92,7 @@ Column {
                 { key: "power", title: "Power mode" },
                 { key: "layout", title: "Keyboard layout" },
                 { key: "capsLock", title: "Caps lock" }
-            ]
+            ].filter(kind => kind.needs !== "brightness" || Brightness.level >= 0) // no backlight, no brightness (the desktop)
 
             SettingRow {
                 id: kindRow
