@@ -43,11 +43,10 @@ Column {
         SettingRow {
             title: "Temperature"
 
-            Stepper {
+            Segmented {
                 label: "Temperature unit"
-                values: ["celsius", "fahrenheit"]
-                value: Settings.values.temperatureUnit
-                format: v => v === "fahrenheit" ? "°F" : "°C"
+                options: [{ value: "celsius", label: "°C" }, { value: "fahrenheit", label: "°F" }]
+                current: Settings.values.temperatureUnit
                 onPicked: v => Settings.values.temperatureUnit = v
             }
         }

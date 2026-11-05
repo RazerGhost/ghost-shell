@@ -2541,6 +2541,12 @@ then (user: "all of it"):
   the first device it found, on the desktop a keyboard LED, so the brightness slider, the island's
   Shift+wheel, the brightness keys and the idle dim worked that LED; every call asks for the
   backlight now (`-c backlight`), and without one brightness hides.
+- Controls: a choice among a few named options is segmented buttons (temperature unit, pop-up
+  place, prompt style, greeting, main screen, rotation, variable refresh rate, frame rate, each
+  app's notifications), steppers stay for numbers, times and long lists; `Segmented.label`
+  names the group for screen readers. Folders are a row with the folder in use and Choose…
+  (zenity, now in core: only Steam had brought it) and Default, not a text field with its
+  instructions inside.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

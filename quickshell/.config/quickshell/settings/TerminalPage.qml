@@ -19,11 +19,10 @@ Column {
             title: "Style"
             subtitle: "Pills: the folder, branch and the rest in colored blocks. Minimal: colored text. Two lines: you, the folder and the rest above where you type."
 
-            Stepper {
+            Segmented {
                 label: "Prompt style"
-                values: Object.keys(TerminalConfig.prompts)
-                value: Settings.values.terminalPrompt
-                format: v => v === "pills" ? "Pills" : v === "minimal" ? "Minimal" : "Two lines"
+                options: Object.keys(TerminalConfig.prompts).map(v => ({ value: v, label: v === "pills" ? "Pills" : v === "minimal" ? "Minimal" : "Two lines" }))
+                current: Settings.values.terminalPrompt
                 onPicked: v => Settings.values.terminalPrompt = v
             }
         }
@@ -62,11 +61,10 @@ Column {
             title: "When a terminal opens"
             subtitle: "Applies to terminals opened from now on"
 
-            Stepper {
+            Segmented {
                 label: "Terminal greeting"
-                values: ["ghost", "line", "none"]
-                value: Settings.values.terminalGreeting
-                format: v => v === "ghost" ? "System summary" : v === "line" ? "One line" : "Nothing"
+                options: [{ value: "ghost", label: "System summary" }, { value: "line", label: "One line" }, { value: "none", label: "Nothing" }]
+                current: Settings.values.terminalGreeting
                 onPicked: v => Settings.values.terminalGreeting = v
             }
         }

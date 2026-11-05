@@ -9,6 +9,8 @@ Rectangle {
 
     // [{ value, label }]
     required property var options
+    // What it chooses, for screen readers ("Temperature unit"); the segments are its options.
+    property string label: ""
     property var current
     // Tabs (an editor's tab bar) or, by default, a choice of values (announced as radio buttons).
     property bool tabs: false
@@ -39,6 +41,7 @@ Rectangle {
     color: Colors.m3surfaceContainerHighest
 
     Accessible.role: tabs ? Accessible.PageTabList : Accessible.Grouping
+    Accessible.name: label
 
     Row {
         id: segments

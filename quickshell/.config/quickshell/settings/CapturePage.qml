@@ -18,48 +18,31 @@ Column {
     SettingGroup {
         title: "Screenshots"
 
-        Item {
-            width: parent.width
-            height: shots.height + Theme.spacing.m * 2
-
-            FolderField {
-                id: shots
-                x: Theme.spacing.m
-                y: Theme.spacing.m
-                width: parent.width - Theme.spacing.m * 2
-                key: "screenshotFolder"
-                fallback: page.home + "/Pictures/Screenshots"
-                home: page.home
-            }
+        FolderField {
+            title: "Folder"
+            key: "screenshotFolder"
+            fallback: page.home + "/Pictures/Screenshots"
+            home: page.home
         }
     }
 
     SettingGroup {
         title: "Recordings"
 
-        Item {
-            width: parent.width
-            height: clips.height + Theme.spacing.m * 2
-
-            FolderField {
-                id: clips
-                x: Theme.spacing.m
-                y: Theme.spacing.m
-                width: parent.width - Theme.spacing.m * 2
-                key: "recordingFolder"
-                fallback: page.home + "/Videos/Recordings"
-                home: page.home
-            }
+        FolderField {
+            title: "Folder"
+            key: "recordingFolder"
+            fallback: page.home + "/Videos/Recordings"
+            home: page.home
         }
 
         SettingRow {
             title: "Frame rate"
 
-            Stepper {
+            Segmented {
                 label: "Recording frame rate"
-                values: [30, 60]
-                value: Settings.values.recordingFps
-                format: v => v + " fps"
+                options: [30, 60].map(v => ({ value: v, label: v + " fps" }))
+                current: Settings.values.recordingFps
                 onPicked: v => Settings.values.recordingFps = v
             }
         }

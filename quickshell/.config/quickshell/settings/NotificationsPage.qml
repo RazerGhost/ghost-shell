@@ -55,11 +55,10 @@ Column {
             title: Brightness.level >= 0 ? "Volume and brightness pop-up" : "Volume pop-up"
             subtitle: "Also caps lock, keyboard layout and power mode"
 
-            Stepper {
+            Segmented {
                 label: "Volume and brightness pop-up position"
-                values: ["bottom", "top"]
-                value: Settings.values.osdPosition
-                format: v => v === "top" ? "Top" : "Bottom"
+                options: [{ value: "bottom", label: "Bottom" }, { value: "top", label: "Top" }]
+                current: Settings.values.osdPosition
                 onPicked: v => Settings.values.osdPosition = v
             }
         }
@@ -173,12 +172,10 @@ Column {
                         : Rules.mode(Settings.values.notificationApps, modelData) === "always" ? "Also during Do Not Disturb and game mode"
                         : ""
 
-                Stepper {
+                Segmented {
                     label: "Notifications from " + appRow.modelData
-                    values: Rules.modes
-                    valueWidth: Theme.settings.stepperWide
-                    value: Rules.mode(Settings.values.notificationApps, appRow.modelData)
-                    format: v => Rules.labels[v]
+                    options: Rules.modes.map(v => ({ value: v, label: Rules.labels[v] }))
+                    current: Rules.mode(Settings.values.notificationApps, appRow.modelData)
                     onPicked: v => Settings.values.notificationApps = Rules.withMode(Settings.values.notificationApps, appRow.modelData, v)
                 }
             }

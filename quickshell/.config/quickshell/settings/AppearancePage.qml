@@ -43,19 +43,11 @@ Column {
     SettingGroup {
         title: "Wallpaper"
 
-        Item {
-            width: parent.width
-            height: wallpaperFolder.height + Theme.spacing.m * 2
-
-            FolderField {
-                id: wallpaperFolder
-                x: Theme.spacing.m
-                y: Theme.spacing.m
-                width: parent.width - Theme.spacing.m * 2
-                key: "wallpaperFolder"
-                fallback: Quickshell.env("HOME") + "/Pictures/Wallpapers"
-                home: Quickshell.env("HOME")
-            }
+        FolderField {
+            title: "Your folder"
+            key: "wallpaperFolder"
+            fallback: Quickshell.env("HOME") + "/Pictures/Wallpapers"
+            home: Quickshell.env("HOME")
         }
 
         SettingRow {

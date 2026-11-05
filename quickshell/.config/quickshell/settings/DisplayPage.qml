@@ -159,11 +159,10 @@ Column {
             title: "Main screen"
             subtitle: "The desktop widgets and the dock show here"
 
-            Stepper {
+            Segmented {
                 label: "Main screen"
-                values: Quickshell.screens.map(s => s.name)
-                value: Screens.main?.name ?? ""
-                format: v => root.screenName(v)
+                options: Quickshell.screens.map(s => ({ value: s.name, label: root.screenName(s.name) }))
+                current: Screens.main?.name ?? ""
                 onPicked: v => Settings.values.mainScreen = v
             }
         }
@@ -306,12 +305,11 @@ Column {
             SettingRow {
                 title: "Rotation"
 
-                Stepper {
+                Segmented {
                     label: "Rotation"
-                    values: [0, 1, 2, 3] // Hyprland's transforms without the flipped ones
-                    wrap: true
-                    value: screen.setup.transform
-                    format: v => ["Normal", "90°", "180°", "270°"][v] ?? "Flipped"
+                    // Hyprland's transforms without the flipped ones.
+                    options: ["Normal", "90°", "180°", "270°"].map((name, v) => ({ value: v, label: name }))
+                    current: screen.setup.transform
                     onPicked: v => root.tryOut(screen.output, screen.setup, { transform: v })
                 }
             }
@@ -320,11 +318,10 @@ Column {
                 title: "Variable refresh rate"
                 subtitle: "Smoother games on screens that support it"
 
-                Stepper {
+                Segmented {
                     label: "Variable refresh rate"
-                    values: [0, 2, 1]
-                    value: screen.setup.vrr
-                    format: v => ({ 0: "Off", 1: "Always", 2: "Fullscreen" })[v] ?? "Off"
+                    options: [{ value: 0, label: "Off" }, { value: 2, label: "Fullscreen" }, { value: 1, label: "Always" }]
+                    current: screen.setup.vrr
                     onPicked: v => root.tryOut(screen.output, screen.setup, { vrr: v })
                 }
             }

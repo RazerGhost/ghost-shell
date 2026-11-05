@@ -47,6 +47,8 @@ wl-clipboard
 cliphist
 wtype
 libnotify
+# Folder and file pickers: Settings' folders, sending files to the phone
+zenity
 xdg-utils
 matugen
 unicode-emoji
