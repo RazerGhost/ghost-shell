@@ -15,6 +15,14 @@ step "Linking configs with stow"
 # into the repo: fish writes its own files there (fish_variables, and config.fish's greeting line
 # below), which would otherwise land in the repo.
 mkdir -p "$HOME/.config/fish"
+# The same for ~/.local/bin: installers put their programs there (Claude Code's `claude`). One
+# already linked whole into the repo is unlinked, and what others put in it moves back out.
+if [[ -L $HOME/.local/bin ]]; then
+    stow -D -t "$HOME" bin
+    mkdir -p "$HOME/.local/bin"
+    git ls-files --others -z bin/.local/bin | xargs -0 -r mv -t "$HOME/.local/bin"
+fi
+mkdir -p "$HOME/.local/bin"
 # zsh's .zshrc is the repo's: one written before (CachyOS's, which loads oh-my-zsh and
 # Powerlevel10k) is moved aside once, so stow can link it.
 if [[ -f $HOME/.zshrc && ! -L $HOME/.zshrc ]]; then
