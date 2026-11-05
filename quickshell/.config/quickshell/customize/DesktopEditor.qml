@@ -226,7 +226,9 @@ Scope {
                         // calmer side of the wallpaper.
                         presets: Presets.widgetPresets(Screens.main?.width ?? 1920, Screens.main?.height ?? 1080,
                                                        Wallpaper.quietSide,
-                                                       Settings.values.desktopGrid ? DesktopWidgetsJs.gridSize(Settings.values.desktopGridSize) : 0)
+                                                       // On the grid's lines whether it shows or not, so switching it on or off
+                                                       // doesn't move them (and a layout you have stays chosen).
+                                                       DesktopWidgetsJs.gridSize(Settings.values.desktopGridSize))
                         fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)
                         art: Component {
                             Item {

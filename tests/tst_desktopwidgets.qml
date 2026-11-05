@@ -169,6 +169,18 @@ TestCase {
         compare(DesktopWidgets.shown({ x: 0.25, y: 0.5 }, 10, 10, 1920, 1080, 0), { x: 480, y: 540 });
     }
 
+    function test_arrangeOnGrid() {
+        // A widget on a grid line 48 px from the left edge at 100 % (960 - 19 x 48). At 130 % the
+        // zoom around the middle would put it at -225.6; pulled back by whole cells of the shown
+        // grid (62.4 px), it lands at 24, itself a line of that grid (960 - 15 x 62.4).
+        const k = 1.3, cell = 48 * k;
+        const placed = DesktopWidgets.arrange([{ name: "clock", x: 48 / 1920, y: 0.5, w: 168 * k, h: 168 * k }], 1920, 1080, k, 32, cell);
+        fuzzyCompare(placed.clock.x, 24, 0.001);
+        verify(DesktopWidgets.gridLines(1920, cell).some(l => Math.abs(l - placed.clock.x) < 0.001));
+        // Without the grid: exactly against the edge, as before.
+        compare(DesktopWidgets.arrange([{ name: "clock", x: 48 / 1920, y: 0.5, w: 168 * k, h: 168 * k }], 1920, 1080, k, 32, 0).clock.x, 0);
+    }
+
     function test_arrange() {
         // A column at the bottom left at 100 %: clock over media, 16 px apart.
         const items = k => [

@@ -72,7 +72,7 @@ Item {
     // (DesktopWidgets.arrange); DesktopCard reads its own.
     readonly property var arranged: DesktopWidgetsJs.arrange(
         cards.filter(c => c.shown).map(c => ({ name: c.name, x: c.spot.x, y: c.spot.y, w: c.width, h: c.height })),
-        width, height, Theme.desktop.zoom, Theme.desktop.gap * 2)
+        width, height, Theme.desktop.zoom, Theme.desktop.gap * 2, Settings.values.desktopGrid ? Theme.desktop.cell : 0)
 
     // The grid, while it's on and the widgets are being placed (the desktop editor, a drag):
     // faint lines out from the middle, the middle ones stronger.

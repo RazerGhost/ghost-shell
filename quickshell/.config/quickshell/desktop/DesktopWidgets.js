@@ -84,7 +84,10 @@ function shown(place, w, h, sw, sh, zoom) {
 // together at 100 % (within `near` px) move as one group: zoomed around the middle, and a group
 // that would run past an edge is shifted back as a whole, so its widgets keep their places
 // against each other (each kept on the screen by itself, at a large size they piled up).
-function arrange(items, sw, sh, zoom, near) {
+// `cell` (the grid's spacing as shown, or 0): a group pushed back is moved by whole cells, so a
+// group lined up on the grid stays on it (zooming keeps it on the zoomed grid by itself: both
+// zoom around the middle).
+function arrange(items, sw, sh, zoom, near, cell) {
     const k = zoom > 0 ? zoom : 1;
     const rects = items.map(i => {
         const x = i.x * sw, y = i.y * sh, w = i.w / k, h = i.h / k; // at 100 %
@@ -107,8 +110,15 @@ function arrange(items, sw, sh, zoom, near) {
         s.x0 = Math.min(s.x0, r.zx); s.y0 = Math.min(s.y0, r.zy);
         s.x1 = Math.max(s.x1, r.zx + r.zw); s.y1 = Math.max(s.y1, r.zy + r.zh);
     });
-    // Back onto the screen: past the start edge first, else past the end edge.
-    const back = (a, b, size) => a < 0 ? -a : b > size ? Math.max(size - b, -a) : 0;
+    // Back onto the screen: past the start edge first, else past the end edge; by whole cells
+    // while that still fits (else exactly).
+    const cells = (shift, a, b, size) => {
+        if (!(cell > 0) || shift === 0)
+            return shift;
+        const whole = Math.sign(shift) * Math.ceil(Math.abs(shift) / cell - 0.001) * cell;
+        return a + whole >= 0 && b + whole <= size ? whole : shift;
+    };
+    const back = (a, b, size) => cells(a < 0 ? -a : b > size ? Math.max(size - b, -a) : 0, a, b, size);
     const placed = {};
     rects.forEach((r, i) => {
         const s = shifts[root(i)];
