@@ -2538,8 +2538,9 @@ fix, not one for this case"), with Omarchy's hardware layer as the model (user's
   the desktop's 24" monitors than on the laptop's 16" screen; the size is per machine. It's in
   Settings -> Display's Size group too, beside the screens' scale (user's find: only in the desktop
   editor, it was apart from the display settings), as well as the editor's Size and text tab.
-To check on the laptop: `ghost update`, `ghost-hw facts` (laptop yes, display GPU amd), the
-`gpu-pci-*` links, Hyprland on the AMD chip after a re-login, KDE Connect's tray still starting.
+Verified on the laptop by the user after `ghost update` (2026-11-05). Left on the desktop: a
+re-login (Hyprland on the RTX, the docker group), caps lock on the wireless keyboard, a Wave:3
+replug, the night light's tint on NVIDIA.
 
 ### Settings reorganised (2026-11-05)
 User's request after the size setting turned out to live apart from Display: every page reviewed,
