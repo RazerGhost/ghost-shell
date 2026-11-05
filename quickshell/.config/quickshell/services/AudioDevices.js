@@ -74,6 +74,32 @@ function deviceOf(name) {
     return m ? m[1] : "";
 }
 
+// The microphones with a monitoring jack this repo knows (USB device ids): their output is for
+// listening to the microphone, not where the sound should go, so by default it doesn't take over
+// (2026-11-05: replugging the Wave:3 took the sound from the desktop's IEMs). Settings -> Sound
+// switches any device either way (`audioTakeover`).
+const monitorJacks = [/^usb-Elgato_Systems_Elgato_Wave_3_/];
+
+// A device's key for its takeover choice: the USB device ("usb-<id>", deviceOf) or the Bluetooth
+// address ("bluez-AC_80_0A_..."); "" for others (the laptop's card, which never takes over).
+function deviceKey(name) {
+    const n = String(name ?? "");
+    const usb = deviceOf(n);
+    if (usb !== "")
+        return usb;
+    const bt = n.match(/^bluez_(?:output|input)\.([^.]+)/);
+    return bt ? "bluez-" + bt[1] : "";
+}
+
+// Whether a device may take over when it connects: your choice for it (`choices`, { key: bool })
+// if you made one, else yes unless it's a microphone with a monitoring jack.
+function mayTakeOver(name, choices) {
+    const key = deviceKey(name);
+    if (key !== "" && choices && Object.prototype.hasOwnProperty.call(choices, key))
+        return choices[key] === true;
+    return !monitorJacks.some(pattern => pattern.test(key));
+}
+
 // What takes over among the nodes `added` (names) now that `all` are there: { sink, source }
 // (names, or "" for none). An output as takesOver says; a USB microphone only with an output of
 // the same device (a headset or DAC with a microphone, not a webcam or a microphone of its own:
@@ -81,10 +107,11 @@ function deviceOf(name) {
 // when that output takes over even if it appeared first. A node seen before in this session
 // takes over again only if it was in use when it left (`left`: { name: wasDefault }), so waking
 // from sleep (USB devices reconnect) doesn't undo a choice of the speakers. A node the lists
-// leave out (listed) never takes over.
-function takeovers(added, all, left) {
+// leave out (listed) never takes over, nor one of a device that may not (mayTakeOver, `choices`).
+function takeovers(added, all, left, choices) {
     const names = Array.from(all ?? []);
-    const back = name => left?.[name] === false || !listed(name, name.startsWith("alsa_output."), names);
+    const back = name => left?.[name] === false || !listed(name, name.startsWith("alsa_output."), names)
+        || !mayTakeOver(name, choices);
     const outputs = Array.from(added ?? []).filter(n => takesOver(n, true) && !back(n));
     const sink = outputs[0] ?? "";
     const pairedInput = dev => dev !== "" ? names.find(n => n.startsWith("alsa_input.") && deviceOf(n) === dev) ?? "" : "";

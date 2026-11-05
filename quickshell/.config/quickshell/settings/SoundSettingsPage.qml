@@ -1,7 +1,9 @@
 import QtQuick
+import Quickshell.Services.Pipewire
 import qs.services
 import qs.theme
 import qs.widgets
+import "../services/AudioDevices.js" as AudioDevices
 
 // Sound: the equalizer, a preset or five bands by hand for the output that's playing (each
 // speaker or pair of headphones keeps its own; services/Equalizer.qml), heard at once; and sound
@@ -58,6 +60,43 @@ Column {
                     value: Equalizer.gains[band.index]
                     format: v => (v > 0 ? "+" : "") + v + " dB"
                     onPicked: v => Equalizer.setBand(band.index, v)
+                }
+            }
+        }
+    }
+
+    // Which plugged-in or connected devices take the sound, like headphones on a phone. Only
+    // the ones that can (USB and Bluetooth; AudioDevices.deviceKey), as they're connected now.
+    SettingGroup {
+        id: takeover
+
+        readonly property var devices: Audio.outputs.filter(node => AudioDevices.deviceKey(node.name) !== "")
+
+        visible: devices.length > 0
+        title: "When a device connects"
+
+        // Their names come from their properties, which PipeWire fills in only for tracked nodes.
+        PwObjectTracker {
+            objects: takeover.devices
+        }
+
+        Repeater {
+            model: takeover.devices
+
+            SettingRow {
+                id: takeoverRow
+
+                required property PwNode modelData
+                readonly property string key: AudioDevices.deviceKey(modelData.name)
+
+                title: Audio.deviceName(modelData)
+                subtitle: "Takes the sound when it's plugged in or connects"
+
+                Switch {
+                    label: takeoverRow.title + " takes the sound when it connects"
+                    checked: AudioDevices.mayTakeOver(takeoverRow.modelData.name, Settings.values.audioTakeover)
+                    onToggled: Settings.values.audioTakeover = Object.assign({}, Settings.values.audioTakeover,
+                                                                             { [takeoverRow.key]: !checked })
                 }
             }
         }

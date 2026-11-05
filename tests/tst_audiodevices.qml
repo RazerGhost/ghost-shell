@@ -102,10 +102,31 @@ TestCase {
         verify(AudioDevices.listed("alsa_output.usb-Elgato_Systems_Elgato_Wave_3_A011-00.analog-stereo", true, xlr));
         verify(AudioDevices.listed(out, true, xlr));
         verify(AudioDevices.listed(cam, false, xlr));
-        // A hidden microphone never takes over: the Wave:3 plugged in while openxlr runs gives
-        // its output, not its raw microphone.
+        // A hidden microphone never takes over: the Wave:3 plugged in while openxlr runs, with
+        // its jack allowed to, gives its output, not its raw microphone.
         const waveOut = "alsa_output.usb-Elgato_Systems_Elgato_Wave_3_A011-00.analog-stereo";
-        compare(AudioDevices.takeovers([waveOut, xlr[5]], [waveOut, ...xlr], {}), { sink: waveOut, source: "" });
+        const waveKey = "usb-Elgato_Systems_Elgato_Wave_3_A011-00";
+        compare(AudioDevices.takeovers([waveOut, xlr[5]], [waveOut, ...xlr], {}, { [waveKey]: true }), { sink: waveOut, source: "" });
+    }
+
+    function test_mayTakeOver() {
+        const waveOut = "alsa_output.usb-Elgato_Systems_Elgato_Wave_3_A011-00.analog-stereo";
+        const waveMic = "alsa_input.usb-Elgato_Systems_Elgato_Wave_3_A011-00.mono-fallback";
+        const iem = "alsa_output.usb-LE_XIAN_SIMGOT_EW300_DSP_2024-07-03-0000-0000-0000-00.analog-stereo";
+        compare(AudioDevices.deviceKey(waveOut), "usb-Elgato_Systems_Elgato_Wave_3_A011-00");
+        compare(AudioDevices.deviceKey("bluez_output.AC_80_0A_12_34_56.1"), "bluez-AC_80_0A_12_34_56");
+        compare(AudioDevices.deviceKey("alsa_output.pci-0000_00_1f.3.analog-stereo"), "");
+        // A microphone's monitoring jack doesn't take the sound by default; headphones do.
+        verify(!AudioDevices.mayTakeOver(waveOut, {}));
+        verify(AudioDevices.mayTakeOver(iem, {}));
+        compare(AudioDevices.takeovers([waveOut, waveMic], [waveOut, waveMic], {}, {}), { sink: "", source: "" });
+        compare(AudioDevices.takeovers([iem], [iem], {}, {}), { sink: iem, source: "" });
+        // Your choice wins either way.
+        compare(AudioDevices.takeovers([waveOut, waveMic], [waveOut, waveMic], {}, { "usb-Elgato_Systems_Elgato_Wave_3_A011-00": true }),
+                { sink: waveOut, source: waveMic });
+        compare(AudioDevices.takeovers([iem], [iem], {}, { "usb-LE_XIAN_SIMGOT_EW300_DSP_2024-07-03-0000-0000-0000-00": false }),
+                { sink: "", source: "" });
+        compare(AudioDevices.takeovers(["bluez_output.AC.1"], ["bluez_output.AC.1"], {}, { "bluez-AC": false }), { sink: "", source: "" });
     }
 
     function test_added() {

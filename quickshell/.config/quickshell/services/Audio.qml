@@ -100,7 +100,8 @@ Singleton {
 
     // Headphones take over when they're plugged in or connect, like on a phone (user's pick,
     // 2026-11-05): USB ones for the sound and their microphone (a microphone alone, a webcam's,
-    // doesn't), Bluetooth ones for the sound (AudioDevices.takeovers). WirePlumber keeps the output chosen last for as long as it exists, so a
+    // doesn't), Bluetooth ones for the sound (AudioDevices.takeovers); a microphone's monitoring
+    // jack (the Wave:3) doesn't, and Settings -> Sound switches each device either way. WirePlumber keeps the output chosen last for as long as it exists, so a
     // new one never took over by itself (the jack does: it switches the laptop's own card). The
     // devices there when PipeWire finishes its first sync count as there already, so a shell
     // start or reload switches nothing. Unplugging goes back by itself: WirePlumber remembers the
@@ -142,7 +143,8 @@ Singleton {
                     now[name] = wasInUse(name);
                 left = now;
             }
-            const pick = AudioDevices.takeovers(AudioDevices.added(knownNodes, nodeNames), nodeNames, left);
+            const pick = AudioDevices.takeovers(AudioDevices.added(knownNodes, nodeNames), nodeNames, left,
+                                                Settings.values.audioTakeover);
             const node = name => Pipewire.nodes.values.find(n => n.name === name && !n.isStream) ?? null;
             if (pick.sink !== "" && node(pick.sink))
                 Pipewire.preferredDefaultAudioSink = node(pick.sink);

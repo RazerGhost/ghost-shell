@@ -266,6 +266,9 @@ Singleton {
             property var notificationApps: ({})
             // Equalizer gains in dB per output, by PipeWire node name (services/Equalizer.qml).
             property var equalizer: ({})
+            // Whether a USB or Bluetooth device takes the sound when it connects, where you chose:
+            // { device key: bool } (AudioDevices.mayTakeOver; Settings -> Sound).
+            property var audioTakeover: ({})
             // Sound events (services/Sounds.qml): all of them, then each kind.
             property bool soundEvents: true
             property bool soundNotifications: true

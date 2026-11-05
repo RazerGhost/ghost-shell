@@ -262,7 +262,7 @@ recording (gpu-screen-recorder), draw on it (satty), folders and quality setting
 
 | Service | What |
 |---|---|
-| `Audio`, `Equalizer` | PipeWire volume, mic, recording apps; plugged-in headphones take over (USB: sound and mic; Bluetooth: sound; `AudioDevices.js`); 5-band filter-chain EQ per output, then an output's own profile (the laptop speakers', `Equalizer.js` `outputProfiles`) |
+| `Audio`, `Equalizer` | PipeWire volume, mic, recording apps; plugged-in headphones take over (USB: sound and mic; Bluetooth: sound; not a microphone's monitoring jack, the Wave:3; a switch per device in Settings -> Sound, `audioTakeover`; `AudioDevices.js`); 5-band filter-chain EQ per output, then an output's own profile (the laptop speakers', `Equalizer.js` `outputProfiles`) |
 | `Brightness`, `NightLight`, `KeepAwake`, `GameMode` | Backlight, hyprsunset, idle inhibitor, performance mode |
 | `NetworkStatus`, `NetworkExtras`, `BluetoothStatus` | Wi-Fi, VPN, hotspot, airplane, Bluetooth |
 | `Battery`, `BatteryAlerts`, `DiskAlerts`, `OomAlerts` | Power and resource alerts |

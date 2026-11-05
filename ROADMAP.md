@@ -2575,6 +2575,11 @@ User's question after the Settings work: what else assumes the laptop. Checked o
   (Hyprland's main keyboard; switching goes to all).
 - Not checked: the night light's tint on NVIDIA (hyprsunset runs without errors), a recording on
   the RTX's screens.
+- A microphone's monitoring jack took the sound: replugging the Wave:3 would have moved it off
+  the desktop's IEMs (USB outputs take over when plugged in). User's pick: not for now, as a
+  switch. Settings -> Sound, "When a device connects": a switch per USB or Bluetooth output,
+  saved per device (`audioTakeover`); without a choice every device takes over but the known
+  microphones with a jack (the Wave:3; `AudioDevices.mayTakeOver`, tested).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
