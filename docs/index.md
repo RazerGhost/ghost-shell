@@ -115,7 +115,8 @@ Recovery procedures (lock screen crash, a session that can't start) are in ROADM
 | Quick settings: tiles (Wi-Fi, Bluetooth, Sound, Power mode, Phone), round toggles (mic, DND, night light, keep awake, game mode, airplane, dark mode, record, screenshot, wallpaper, timer), volume/brightness sliders, battery, status rows; edit mode (wiggle, drag, add, large/small tiles) | `controlcenter/QuickSettings.qml`, `QuickSlot.qml`, `QuickItems.js`, `Tile.qml`, `RoundToggle.qml`, `StatusRow.qml` |
 | Wi-Fi page: scan, connect, forget, QR share, VPNs, hotspot, airplane mode, captive-portal sign-in | `controlcenter/WifiPage.qml`, `WifiShare.qml`, `WifiQr.js`, `services/NetworkExtras.qml` |
 | Bluetooth page: scan, pair, connect, device batteries | `controlcenter/BluetoothPage.qml` |
-| Sound page: output, microphone, per-app volume, equalizer preset | `controlcenter/SoundPage.qml` |
+| Sound page: output, microphone, per-app volume, equalizer preset | `controlcenter/SoundPage.qml`, `DeviceList.qml` |
+| The output chooser in the volume slider (outputs, and microphones when there are several) | `controlcenter/QuickSettings.qml` (`devicesOpen`), `widgets/LevelSlider.qml` (`actionIcon`), `DeviceList.qml` |
 | System page: CPU, memory, GPUs, disk, busiest apps with End task | `controlcenter/SystemPage.qml`, `services/SystemStats.qml`, `system-stats.sh` |
 | Phone page: ring, send files, clipboard, browse; files dropped on the island and Nautilus's "Send to phone" go through `phone.sh share` | `controlcenter/PhonePage.qml`, `services/Phone.qml`, `phone.sh` |
 | Background apps (tray), from quick settings' bottom row | `controlcenter/Tray.qml` |

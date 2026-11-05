@@ -24,6 +24,28 @@ TestCase {
         verify(!AudioDevices.takesOver(undefined, true));
     }
 
+    function test_label() {
+        // The laptop's card: its short profile name.
+        compare(AudioDevices.label("alsa_output.pci-0000_05_00.6.HiFi__Speaker__sink",
+            { "node.description": "Ryzen HD Audio Controller Speaker", "node.nick": "ALC245 Analog", "device.profile.description": "Speaker" }), "Speaker");
+        // USB: the product, not "Analog Stereo".
+        compare(AudioDevices.label("alsa_output.usb-LE_XIAN_SIMGOT_EW300_DSP-00.analog-stereo",
+            { "node.description": "SIMGOT EW300 DSP Analog Stereo", "node.nick": "SIMGOT EW300 DSP", "device.profile.description": "Analog Stereo" }), "SIMGOT EW300 DSP");
+        compare(AudioDevices.label("alsa_input.usb-X-00.mono-fallback", { "node.description": "X Mono" }), "X Mono");
+        // Bluetooth: its own name.
+        compare(AudioDevices.label("bluez_output.AC_80.1", { "node.description": "WH-1000XM4" }), "WH-1000XM4");
+        // Not tracked yet: the node name.
+        compare(AudioDevices.label("alsa_output.usb-X.analog-stereo", {}), "alsa_output.usb-X.analog-stereo");
+        compare(AudioDevices.label(undefined, undefined), "");
+    }
+
+    function test_headphones() {
+        verify(AudioDevices.headphones("alsa_output.usb-X.analog-stereo", "X"));
+        verify(AudioDevices.headphones("bluez_output.AC_80.1", "WH-1000XM4"));
+        verify(AudioDevices.headphones("alsa_output.pci-0000_05_00.6.HiFi__Headphones__sink", "Headphones"));
+        verify(!AudioDevices.headphones("alsa_output.pci-0000_05_00.6.HiFi__Speaker__sink", "Speaker"));
+    }
+
     function test_added() {
         compare(AudioDevices.added(["a", "b"], ["a", "b", "c"]), ["c"]);
         compare(AudioDevices.added(["a", "b"], ["b"]), []);   // one went away: nothing new

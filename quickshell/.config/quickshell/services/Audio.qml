@@ -46,20 +46,31 @@ Singleton {
         objects: micLinks.linkGroups.map(g => g?.target).filter(n => n)
     }
 
+    // Speakers and headphones (hardware outputs) and microphones (hardware inputs), for the
+    // Sound page and the chooser under quick settings' volume slider (DeviceList). The equalizer
+    // is neither: its input is a sink and its output a stream (ghost-equalizer,
+    // ghost-equalizer.output). By name: reading `properties` here is a binding loop (tracking a
+    // node fills them in).
+    readonly property list<PwNode> outputs: devices(true)
+    readonly property list<PwNode> inputs: devices(false)
+    function devices(sink: bool): list<PwNode> {
+        return (Pipewire.nodes?.values ?? [])
+            .filter(n => n.audio && !n.isStream && n.isSink === sink && !n.name.startsWith("ghost-equalizer"));
+    }
+
     readonly property string icon: muted || volume === 0 ? "volume_off"
                                  : volume < 0.5 ? "volume_down"
                                  : "volume_up"
 
-    // A short name for a speaker or microphone. Built-in sound cards have long names ("Ryzen HD
-    // Audio Controller Speaker") but a short profile name ("Speaker"); Bluetooth devices only
-    // have their own name, which is short already. The node must be tracked (PwObjectTracker).
+    // A short name for a speaker or microphone ("Speaker", "SIMGOT EW300 DSP", a Bluetooth
+    // headset's own name; AudioDevices.label). The node must be tracked (PwObjectTracker).
     function deviceName(node: PwNode): string {
-        return node?.properties["device.profile.description"] || node?.description || node?.nickname || node?.name || "";
+        return node ? AudioDevices.label(node.name, node.properties) : "";
     }
 
-    // Headphones and headsets by name ("Headphones", "WH-1000XM4 Headset"), anything else a speaker.
+    // Headphones for USB and Bluetooth outputs and the laptop's headphone jack, else a speaker.
     function deviceIcon(node: PwNode): string {
-        return deviceName(node).toLowerCase().includes("head") ? "headphones" : "speaker";
+        return node && AudioDevices.headphones(node.name, deviceName(node)) ? "headphones" : "speaker";
     }
 
     // Matches the cap in the volume keybinds (wpctl -l 1).

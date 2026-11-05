@@ -11,8 +11,13 @@ Rectangle {
     property real value // 0-1
     property string icon
     property string label
+    // An optional button inside the track's right end (the volume's output chooser), like
+    // Android's: its icon and screen reader name; none while `actionIcon` is empty.
+    property string actionIcon
+    property string actionLabel
 
     signal moved(real value)
+    signal actionClicked()
 
     function move(to: real): void {
         root.moved(Math.max(0, Math.min(1, to)));
@@ -64,5 +69,18 @@ Rectangle {
         onPressed: event => root.move(event.x / width)
         onPositionChanged: event => root.move(event.x / width)
         onWheel: event => root.move(root.value + event.angleDelta.y / 120 * 0.05)
+    }
+
+    // Over the drag area, so a click on it doesn't set the level. Its color follows what's under
+    // it: the filled part once the level reaches it, the empty track before.
+    IconButton {
+        visible: root.actionIcon !== ""
+        anchors.right: parent.right
+        anchors.rightMargin: (root.height - height) / 2
+        anchors.verticalCenter: parent.verticalCenter
+        icon: root.actionIcon
+        label: root.actionLabel
+        color: root.value * root.width >= root.width - root.height / 2 ? Colors.m3onPrimary : Colors.m3onSurfaceVariant
+        onClicked: root.actionClicked()
     }
 }

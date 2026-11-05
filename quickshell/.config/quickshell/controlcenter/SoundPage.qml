@@ -14,19 +14,10 @@ Column {
 
     signal back()
 
-    // Speakers and headphones (hardware outputs), microphones (hardware inputs), and the apps
-    // that are playing sound (output streams). The equalizer is neither: its input is a sink and
-    // its output a stream (ghost-equalizer, ghost-equalizer.output). By name: reading `properties`
-    // here is a binding loop (tracking a node fills them in).
-    readonly property list<PwNode> outputs: devices(true)
-    readonly property list<PwNode> inputs: devices(false)
+    // The apps that are playing sound (output streams; not the equalizer's own, see
+    // Audio.outputs). The outputs and microphones are Audio's.
     readonly property list<PwNode> apps: (Pipewire.nodes?.values ?? [])
         .filter(n => n.audio && n.isStream && !n.isSink && !n.name.startsWith("ghost-equalizer"))
-
-    function devices(sink: bool): list<PwNode> {
-        return (Pipewire.nodes?.values ?? [])
-            .filter(n => n.audio && !n.isStream && n.isSink === sink && !n.name.startsWith("ghost-equalizer"));
-    }
 
     // The app's own name from its .desktop file ("Vesktop") when one matches, else PipeWire's.
     function appName(node: PwNode): string {
@@ -38,7 +29,7 @@ Column {
 
     // PipeWire only fills in volume and app details for nodes something tracks.
     PwObjectTracker {
-        objects: [...root.apps, ...root.outputs, ...root.inputs]
+        objects: [...root.apps, ...Audio.outputs, ...Audio.inputs]
     }
 
     PageHeader {
@@ -58,24 +49,9 @@ Column {
         text: "Output"
     }
 
-    Repeater {
-        model: root.outputs
-
-        ListRow {
-            required property PwNode modelData
-            readonly property bool chosen: modelData === Audio.sink
-
-            width: root.width
-            icon: Audio.deviceIcon(modelData)
-            title: Audio.deviceName(modelData)
-            highlighted: chosen
-            trailingIcon: chosen ? "check" : ""
-            onActivated: Pipewire.preferredDefaultAudioSink = modelData
-
-            Accessible.role: Accessible.RadioButton
-            Accessible.checkable: true
-            Accessible.checked: chosen
-        }
+    DeviceList {
+        width: root.width
+        outputs: true
     }
 
     // The chosen output's preset; the bands themselves are in Settings -> Sound.
@@ -111,29 +87,15 @@ Column {
     }
 
     Heading {
-        visible: root.inputs.length > 1
+        visible: Audio.inputs.length > 1
         text: "Microphone"
     }
 
     // Only worth a choice when there's more than one.
-    Repeater {
-        model: root.inputs.length > 1 ? root.inputs : []
-
-        ListRow {
-            required property PwNode modelData
-            readonly property bool chosen: modelData === Audio.source
-
-            width: root.width
-            icon: "mic"
-            title: Audio.deviceName(modelData)
-            highlighted: chosen
-            trailingIcon: chosen ? "check" : ""
-            onActivated: Pipewire.preferredDefaultAudioSource = modelData
-
-            Accessible.role: Accessible.RadioButton
-            Accessible.checkable: true
-            Accessible.checked: chosen
-        }
+    DeviceList {
+        width: root.width
+        visible: Audio.inputs.length > 1
+        outputs: false
     }
 
     Heading {

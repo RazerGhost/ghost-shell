@@ -2171,6 +2171,16 @@ tested); unplugging goes back through WirePlumber's own memory of earlier choice
 pop-up names the new output. Checked with a silent sink named like a USB device: it became the
 default, and removing it brought the speakers back. Each output keeps its own equalizer; the
 speaker profile stays on the speakers.
+Then (user's request): the output chooser in quick settings, like a phone's. A button in the
+volume slider's right end (`LevelSlider.actionIcon`) shows the output (headphones or speaker,
+its name as the tooltip) and unfolds the outputs under the slider, and the microphones when
+there's more than one; the Sound page keeps the same lists (`controlcenter/DeviceList.qml`,
+`Audio.outputs` and `inputs`) with the equalizer and the apps. Names: a USB device goes by its
+product ("SIMGOT EW300 DSP", not its profile's "Analog Stereo"), the laptop's card by its
+profile ("Speaker"), Bluetooth by its own name; USB and Bluetooth outputs get the headphones
+icon (`AudioDevices.label`, `headphones`, tested). Checked on screen: the button in the slider,
+the names; the unfolding is the user's to try (a virtual click there met the user's own use of
+the laptop).
 
 ### The recording's notification beside the screenshots' (2026-11-04)
 User's pick from the ideas: the shell's notifications with buttons the same way. Looked at first:

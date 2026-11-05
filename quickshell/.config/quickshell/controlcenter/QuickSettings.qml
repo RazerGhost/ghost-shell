@@ -24,6 +24,8 @@ Item {
     // Your tiles and round buttons, in your order (Settings' quickTiles and quickToggles), and
     // edit mode, where they're added, removed and moved on the panel itself, like Android.
     property bool editing: false
+    // The sound outputs unfolded under the volume slider (folded each time quick settings opens).
+    property bool devicesOpen: false
     readonly property var tileList: QuickItems.shown(Settings.values.quickTiles, QuickItems.tiles, QuickItems.defaultTiles)
     readonly property var toggleList: QuickItems.shown(Settings.values.quickToggles, QuickItems.toggles, QuickItems.defaultToggles)
     // Each one's name, icon and control (a component below), for its slot, edit mode's labels and
@@ -579,13 +581,42 @@ Item {
             }
         }
 
+        // The volume, and beside it where the sound goes: the button unfolds the outputs (and the
+        // microphones, when there's more than one) under the slider, like a phone's output
+        // picker; the Sound page has the same lists with the equalizer and the apps.
         LevelSlider {
             width: parent.width
             visible: !root.editing
             value: Audio.volume
             icon: Audio.icon
             label: "Volume"
+            actionIcon: root.devicesOpen ? "expand_less" : Audio.deviceIcon(Audio.sink)
+            actionLabel: root.devicesOpen ? "Hide sound outputs" : "Sound output: " + Audio.deviceName(Audio.sink)
             onMoved: value => Audio.setVolume(value)
+            onActionClicked: root.devicesOpen = !root.devicesOpen
+        }
+
+        Column {
+            width: parent.width
+            visible: root.devicesOpen && !root.editing
+
+            DeviceList {
+                width: parent.width
+                outputs: true
+            }
+
+            SectionHeading {
+                visible: Audio.inputs.length > 1
+                leftPadding: Theme.spacing.m
+                topPadding: Theme.spacing.xs
+                text: "Microphone"
+            }
+
+            DeviceList {
+                width: parent.width
+                visible: Audio.inputs.length > 1
+                outputs: false
+            }
         }
 
         LevelSlider {

@@ -20,3 +20,27 @@ function added(before, now) {
     const known = new Set(Array.from(before ?? []));
     return Array.from(now ?? []).filter(name => !known.has(name));
 }
+
+// A short name for a sound device (the volume pop-up, the Sound page, the chooser under the
+// volume slider), from its node name and PipeWire properties (an object; the node must be
+// tracked for them to be there). The laptop's own card has long names ("Ryzen HD Audio
+// Controller Speaker") but short profile names ("Speaker"); a USB device's profile name is only
+// "Analog Stereo", its nickname the product ("SIMGOT EW300 DSP"); Bluetooth devices have their
+// own short name as their description.
+function label(name, props) {
+    const n = String(name ?? "");
+    const p = props ?? {};
+    if (/^alsa_(output|input)\.pci-/.test(n))
+        return p["device.profile.description"] || p["node.description"] || n;
+    if (/^alsa_(output|input)\.usb-/.test(n))
+        return p["node.nick"] || p["node.description"] || n;
+    return p["node.description"] || p["node.nick"] || n;
+}
+
+// Whether an output is headphones (or a headset) for its icon: USB and Bluetooth audio nearly
+// always is, and the laptop's card names its jack "Headphones".
+function headphones(name, shownName) {
+    const n = String(name ?? "");
+    return n.startsWith("alsa_output.usb-") || n.startsWith("bluez_output.")
+        || String(shownName ?? "").toLowerCase().includes("head");
+}
