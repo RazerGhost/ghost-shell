@@ -280,7 +280,7 @@ Scope {
             anchors.margins: Theme.spacing.l
             width: Theme.overview.minimized
             height: minimized.implicitHeight + Theme.spacing.m * 2
-            radius: Theme.radius.xl
+            radius: Theme.radius.l
             visible: root.open && Windows.minimized.length > 0
 
             MinimizedList {
@@ -299,7 +299,7 @@ Scope {
             anchors.bottomMargin: Theme.spacing.l
             width: strip.implicitWidth + Theme.spacing.m * 2
             height: strip.implicitHeight + Theme.spacing.m * 2
-            radius: Theme.radius.xl
+            radius: Theme.radius.l
 
             Accessible.role: Accessible.List
             Accessible.name: "Workspaces"

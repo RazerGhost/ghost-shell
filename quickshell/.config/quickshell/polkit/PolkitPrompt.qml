@@ -59,7 +59,7 @@ Scope {
             anchors.centerIn: parent
             width: Theme.polkit.field + Theme.spacing.l * 4
             height: content.implicitHeight + Theme.spacing.l * 2
-            radius: Theme.radius.xl
+            radius: Theme.radius.l
 
             Accessible.role: Accessible.Dialog
             Accessible.name: "Authentication required"

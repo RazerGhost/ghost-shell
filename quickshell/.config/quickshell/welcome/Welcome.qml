@@ -121,7 +121,7 @@ Scope {
             anchors.centerIn: parent
             width: Theme.welcome.width
             height: content.implicitHeight + Theme.spacing.l * 2
-            radius: Theme.radius.xl
+            radius: Theme.radius.l
 
             Accessible.role: Accessible.Dialog
             Accessible.name: root.current.title

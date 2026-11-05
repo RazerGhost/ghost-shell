@@ -102,7 +102,7 @@ Scope {
             property int selected: 0
 
             anchors.fill: parent
-            radius: Theme.radius.xl
+            radius: Theme.radius.l
             focus: true
 
             // Arrow keys move the selection, Enter puts it in the space, Escape skips.

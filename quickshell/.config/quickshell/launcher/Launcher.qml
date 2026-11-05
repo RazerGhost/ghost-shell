@@ -272,7 +272,7 @@ Scope {
             height: paged ? window.pageSize.height : column.implicitHeight + Theme.spacing.m * 2
             x: (window.screenWidth - width) / 2
             y: paged && LauncherState.size === "full" ? Theme.island.reserved + window.gap : (window.screenHeight - height) / 2
-            radius: Theme.radius.m * 2
+            radius: Theme.radius.l
             clip: true
 
             Behavior on width { enabled: window.visible; NumberAnimation { duration: Theme.anim.morph; easing.type: Theme.anim.easing } }

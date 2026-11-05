@@ -87,7 +87,7 @@ Scope {
             id: surface
 
             anchors.fill: parent
-            radius: Theme.radius.xl
+            radius: Theme.radius.l
             focus: true
 
             Keys.onReleased: event => {

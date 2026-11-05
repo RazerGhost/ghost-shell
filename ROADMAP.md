@@ -552,7 +552,9 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   screen's): Hyprland cuts its blur off in whole pixels, and over a window the island's corners
   showed the steps (user's find). Hyprland's blur stays for the island without a picture.
   Its open corners went from 32 to 20 (user's call: on a 1080p screen the large radius looked
-  stepped however smoothly it was drawn).
+  stepped however smoothly it was drawn), and then every other panel too: the launcher, overview,
+  switcher, window menu, Snap Assist, password prompt and welcome tour (28, the `xl` token, gone),
+  the dock's bar (22) and the desktop widgets (28) are all 20.
 
 ### Elgato Wave:3 (built 2026-10-29; reviewed by the user, untested: the microphone is on the desktop)
 - The opt-in `wave3` module (`modules/wave3/`, its README has the details): openxlr (AUR)

@@ -37,8 +37,7 @@ Singleton {
     readonly property QtObject radius: QtObject {
         readonly property int s:    root.round(8)
         readonly property int m:    root.round(12)
-        readonly property int l:    root.round(20)
-        readonly property int xl:   root.round(28)
+        readonly property int l:    root.round(20)  // panels and the island's menus (28 looked stepped at 1080p)
         readonly property int full: root.round(999) // clamped to half the height: a pill
     }
 
@@ -245,7 +244,7 @@ Singleton {
         // How large the widgets are against 100 %: their places zoom by it (DesktopWidgets.js).
         readonly property real zoom:   size / DesktopWidgetsJs.unit.size
         readonly property int padding: root.text(20)
-        readonly property int radius:  root.round(28)
+        readonly property int radius:  root.round(20)
         readonly property int margin:  root.px(32)  // from the screen's edges, when snapped
         readonly property int reach:   root.px(24)  // how close a drop snaps
         readonly property int clock:   root.text(64) // the big value: the time, the day, the temperature, the counts
@@ -266,7 +265,7 @@ Singleton {
         readonly property int icon:      root.px(ThemeScale.pick(Settings.values.dockIconSize, ThemeScale.dockIcons, 44))
         readonly property int height:    icon + root.px(16)
         readonly property int margin:    root.px(8)   // between the bar and the screen edge
-        readonly property int radius:    root.round(22)  // the bar's corners
+        readonly property int radius:    root.round(20)  // the bar's corners
         readonly property int trigger:   3   // the strip at the bottom edge that brings a hidden dock back
         readonly property int hideDelay: 500 // ms the dock stays after the pointer leaves
         readonly property int menuSpace: root.px(240) // room above the dock for tooltips and the menu

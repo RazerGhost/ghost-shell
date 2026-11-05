@@ -138,7 +138,7 @@ Scope {
 
             implicitWidth: menu.implicitWidth + Theme.spacing.l * 2
             implicitHeight: menu.implicitHeight + Theme.spacing.l * 2
-            radius: Theme.radius.xl
+            radius: Theme.radius.l
             focus: true
             Keys.onEscapePressed: root.open = false
 
