@@ -63,6 +63,40 @@ module_autostart() {
     ln -sfn "$PWD/modules/$1/autostart.lua" "$HOME/.config/hypr/autostart.d/$1.lua"
 }
 
+# Packages stow may link as whole folders (~/.config/quickshell -> the repo's folder): folders only
+# this repo writes into (and its own generated, gitignored files), where a file added by a git
+# pull must work at once (a new QML file the shell imports). Every other package is linked file
+# by file (--no-folding), into real folders: other programs write into those (installers into
+# ~/.local/bin, Zed its keymaps, fish and Nautilus their state), and with a whole folder linked
+# their files landed in the repo. A new file there needs `ghost install core` (or `ghost update`)
+# to be linked.
+folded_packages=(quickshell hypr matugen ghostty starship fastfetch)
+
+stow_flags() {
+    [[ " ${folded_packages[*]} " == *" $1 "* ]] || echo --no-folding
+}
+
+# Links a package into $HOME (run from the repo's root). A file-by-file package that an earlier
+# version linked as whole folders is unlinked first, and what other programs wrote into those
+# folders (in the repo now, untracked) moves back out to the real folders before it's linked again.
+stow_package() {
+    local pkg=$1 dir folded=false file
+    if [[ -n $(stow_flags "$pkg") ]]; then
+        while IFS= read -r -d '' dir; do
+            [[ -L $HOME/${dir#"$pkg"/} ]] && folded=true
+        done < <(find "$pkg" -mindepth 1 -type d -print0)
+    fi
+    if $folded; then
+        stow -D -t "$HOME" "$pkg"
+        while IFS= read -r -d '' file; do
+            mkdir -p "$HOME/$(dirname "${file#"$pkg"/}")"
+            mv -n "$file" "$HOME/${file#"$pkg"/}"
+        done < <(git ls-files --others -z -- "$pkg")
+    fi
+    # shellcheck disable=SC2046 # no flag or one
+    stow -R $(stow_flags "$pkg") -t "$HOME" "$pkg"
+}
+
 # The repo's Stow packages, one per line: every top-level folder but the ones that aren't
 # (system/ mirrors /, the rest are the setup, tests and docs). Run from the repo's root.
 stow_packages() {

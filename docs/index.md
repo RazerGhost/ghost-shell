@@ -21,7 +21,8 @@ the reasons and history are in [ROADMAP.md](../ROADMAP.md), verified API facts i
 
 | Rule | Where |
 |---|---|
-| Every top-level folder except `modules/`, `system/`, `tests/`, `docs/`, `machines/` is a GNU Stow package mirroring `$HOME` | `ghost install`, `stow_packages` in `modules/lib.sh` |
+| Every top-level folder except `modules/`, `system/`, `tests/`, `docs/`, `machines/`, `migrations/` is a GNU Stow package mirroring `$HOME` | `ghost install`, `stow_packages` in `modules/lib.sh` |
+| Whole folders linked only for the packages only this repo writes into (`folded_packages`: quickshell, hypr, matugen, ghostty, starship, fastfetch); the rest file by file (`--no-folding`), so installers, Zed, fish and Nautilus never write into the repo; a package an earlier version linked whole is unlinked and other programs' files move back out (`tests/stow_test.sh`) | `stow_package` in `modules/lib.sh` |
 | Never move or rename a Stow package while the desktop runs from it (links break; Hyprland once lost hyprland.lua) | |
 | One-time changes for machines set up by an earlier version (what an old setup installed and the current one doesn't): one script each, run once per machine by `ghost migrate`, recorded in `~/.local/state/ghost/migrations` (`tests/migrations_test.sh`) | `migrations/`, `bin/.local/bin/ghost` |
 | One module per part of the setup: `packages.txt` (pacman), `aur.txt` (paru), `packages.sh` (packages by hardware: `modules/system/packages.sh`, `nvidia-prime` on a hybrid laptop, `libva-nvidia-driver` where NVIDIA drives the display), re-runnable `setup.sh`; new ones go in `all_modules` and `about` | `modules/`, `bin/.local/bin/ghost` |

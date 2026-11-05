@@ -8,30 +8,19 @@ cd "$(dirname "$0")/../.."
 
 step "Linking configs with stow"
 # Every top-level directory is a Stow package, except system/ (the system module installs it),
-# tests/, modules/, docs/ and machines/.
+# tests/, modules/, docs/, machines/ and migrations/.
 # -R re-links, so files added to an already-stowed package get linked too.
 # If stow reports a conflict, move the existing file aside and re-run.
-# fish's folder exists first, so stow links the repo's files into it rather than the whole folder
-# into the repo: fish writes its own files there (fish_variables, and config.fish's greeting line
-# below), which would otherwise land in the repo.
-mkdir -p "$HOME/.config/fish"
-# The same for ~/.local/bin: installers put their programs there (Claude Code's `claude`). One
-# already linked whole into the repo is unlinked, and what others put in it moves back out.
-if [[ -L $HOME/.local/bin ]]; then
-    stow -D -t "$HOME" bin
-    mkdir -p "$HOME/.local/bin"
-    git ls-files --others -z bin/.local/bin | xargs -0 -r mv -t "$HOME/.local/bin"
-fi
-mkdir -p "$HOME/.local/bin"
 # zsh's .zshrc is the repo's: one written before (CachyOS's, which loads oh-my-zsh and
 # Powerlevel10k) is moved aside once, so stow can link it.
 if [[ -f $HOME/.zshrc && ! -L $HOME/.zshrc ]]; then
     mv "$HOME/.zshrc" "$HOME/.zshrc.pre-ghost"
     echo "Your earlier ~/.zshrc is now ~/.zshrc.pre-ghost (machine-local additions go in ~/.config/zsh/local.zsh)"
 fi
+# Folders other programs write into are linked file by file (stow_package in modules/lib.sh).
 for pkg in $(stow_packages); do
     echo "$pkg"
-    stow -R -t "$HOME" "$pkg"
+    stow_package "$pkg"
 done
 # Quickshell fills this in for the QML language server; it's gitignored.
 touch quickshell/.config/quickshell/.qmlls.ini

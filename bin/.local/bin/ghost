@@ -241,7 +241,8 @@ cmd_doctor() {
     step "Configs linked into your home folder"
     for pkg in $(stow_packages); do
         # In simulation, stow prints nothing but its notice when everything is linked already.
-        if stow -n -v -t "$HOME" "$pkg" 2>&1 | grep -qv "in simulation mode"; then
+        # shellcheck disable=SC2046 # no flag or one
+        if stow -n -v $(stow_flags "$pkg") -t "$HOME" "$pkg" 2>&1 | grep -qv "in simulation mode"; then
             bad "$pkg: not linked or in conflict (ghost install core links it)"
         else
             ok "$pkg"
