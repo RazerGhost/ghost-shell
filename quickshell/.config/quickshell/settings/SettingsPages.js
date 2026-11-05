@@ -9,7 +9,7 @@ const pages = [
     { id: "appearance", section: "Personalize", icon: "palette", title: "Appearance",
       words: "customize desktop editor wallpaper wallpapers find download wallhaven anime art slideshow folder rotate change every colors theme light dark mode sunset night accent style contrast vibrant monochrome matugen fonts font typeface icon theme colloid folder color glass blur style frost acrylic transparent see-through border corners rounding desktop widgets clock weather media glow turning spinning animation opening closing slide workspaces floating pinned" },
     { id: "display", section: "Personalize", icon: "brightness_6", title: "Display",
-      words: "night light warm blue light schedule screen monitor resolution refresh rate hz scale size bigger smaller zoom rotation rotate vrr adaptive sync" },
+      words: "night light warm blue light schedule screen monitor resolution refresh rate hz scale size shell text bigger smaller zoom rotation rotate vrr adaptive sync" },
     { id: "lock", section: "Personalize", icon: "lock", title: "Lock screen",
       words: "message if found grace period unlock touch password" },
     { id: "sound", section: "System", icon: "volume_up", title: "Sound",

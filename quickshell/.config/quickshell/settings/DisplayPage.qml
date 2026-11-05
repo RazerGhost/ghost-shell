@@ -6,9 +6,11 @@ import qs.theme
 import qs.widgets
 import "../services/Schedule.js" as Schedule
 import "DisplayModes.js" as DisplayModes
+import "../theme/ThemeScale.js" as ThemeScale
 
-// Display: each screen's resolution and refresh rate, scale, rotation and variable refresh rate;
-// night light (on/off, how warm, and an optional daily schedule).
+// Display: the shell's size and its text's (the same settings as the desktop editor's Size and
+// text tab), each screen's resolution and refresh rate, scale, rotation and variable refresh
+// rate; night light (on/off, how warm, and an optional daily schedule).
 //
 // A screen change is tried live (`hyprctl eval` of an `hl.monitor` call) and only saved when
 // "Keep" is clicked; otherwise it goes back after 15 s, so a mode the screen can't show undoes
@@ -88,6 +90,37 @@ Column {
             root.secondsLeft--;
             if (root.secondsLeft <= 0)
                 root.revert();
+        }
+    }
+
+    // How big the shell is, beside the screens' own scale (user's find, 2026-11-05: the size lived
+    // only in the desktop editor, apart from the scale here). The shell only, so it can go
+    // below 100 %: the same 1080p is about 1.5 times bigger on a 24" monitor than on a 16" laptop.
+    SettingGroup {
+        title: "Size"
+
+        Repeater {
+            model: [
+                { key: "uiScale", title: "Shell", subtitle: "The island, menus, launcher, dock and widgets", values: ThemeScale.sizes, current: Theme.scale },
+                { key: "textScale", title: "Text", subtitle: "The shell's text, on top of its size", values: ThemeScale.textSizes, current: Theme.textScale }
+            ]
+
+            SettingRow {
+                id: sizeRow
+
+                required property var modelData
+
+                title: modelData.title
+                subtitle: modelData.subtitle
+
+                Stepper {
+                    label: sizeRow.title + " size"
+                    values: sizeRow.modelData.values
+                    value: sizeRow.modelData.current
+                    format: v => Math.round(v * 100) + " %"
+                    onPicked: v => Settings.values[sizeRow.modelData.key] = v
+                }
+            }
         }
     }
 
@@ -234,7 +267,7 @@ Column {
 
             SettingRow {
                 title: "Scale"
-                subtitle: "Makes everything bigger, apps too. Only the shell, smaller too: Super+U, Desktop, Size and text"
+                subtitle: "Everything on this screen, apps too; Hyprland rounds to the nearest size that fits. For the shell alone, see Size above"
 
                 Stepper {
                     label: "Scale"
