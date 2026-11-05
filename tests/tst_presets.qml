@@ -65,8 +65,9 @@ TestCase {
                 if (!place)
                     continue;
                 const r = { n: kind.name, x: place.x * 1920, y: place.y * 1080, w: DesktopWidgets.box(kind.name).w, h: DesktopWidgets.box(kind.name).h };
-                verify(r.x >= 32 && r.x + r.w <= 1920 - 32, preset.name + " " + r.n);
-                verify(r.y >= 80 && r.y + r.h <= 1080 - 100, preset.name + " " + r.n);
+                // A hundredth of a pixel of slack: places are stored as rounded fractions.
+                verify(r.x >= 31.99 && r.x + r.w <= 1920 - 31.99, preset.name + " " + r.n);
+                verify(r.y >= 79.99 && r.y + r.h <= 1080 - 99.99, preset.name + " " + r.n);
                 rects.push(r);
             }
             for (const a of rects)
@@ -133,7 +134,8 @@ TestCase {
         const used = new Set();
         for (const [sw, sh] of [[1920, 1080], [2560, 1440], [1366, 768], [3840, 2160]]) {
             for (const quiet of ["", "left", "right"]) {
-                const presets = Presets.widgetPresets(sw, sh, quiet);
+            for (const cell of [0, 32, 48]) {
+                const presets = Presets.widgetPresets(sw, sh, quiet, cell);
                 verify(presets.length >= 3, sw + "x" + sh);
                 for (const preset of presets) {
                     const rects = [];
@@ -154,6 +156,7 @@ TestCase {
                                        preset.name + ": " + a.n + " over " + b.n);
                 }
             }
+            }
         }
         compare(used.size, DesktopWidgets.kinds.length);
         // Planner sits on the right; on a picture calmer on the left it moves there; Everything
@@ -163,5 +166,35 @@ TestCase {
         verify(x("left", "Planner", "clock") < 0.5);
         compare(x("right", "Planner", "clock"), x("", "Planner", "clock"));
         compare(x("left", "Everything", "clock"), x("", "Everything", "clock"));
+    }
+
+    // With the grid on, a preset's outer edges are on grid lines and mirrored layouts mirror.
+    function test_widgetLayoutsOnGrid() {
+        for (const [sw, sh] of [[1920, 1080], [2560, 1440]]) {
+            for (const cell of [32, 48]) {
+                const xs = DesktopWidgets.gridLines(sw, cell), ys = DesktopWidgets.gridLines(sh, cell);
+                const on = (lines, v) => lines.some(l => Math.abs(l - v) < 0.01);
+                const at = (quiet, name, w) => {
+                    const p = Presets.widgetPresets(sw, sh, quiet, cell).find(p => p.name === name).values.desktopWidgets[w];
+                    return { x: p.x * sw, y: p.y * sh, b: DesktopWidgets.box(w) };
+                };
+                // Glance, top left: the clock's left and top edges on lines.
+                const g = at("", "Glance", "clock");
+                verify(on(xs, g.x) && on(ys, g.y), "Glance " + sw + " " + cell);
+                // Planner, in the middle of the height on the right: its tasks' right edge on a line,
+                // the group centered on the middle line (clock on top, month and tasks below).
+                const t = at("", "Planner", "tasks"), c = at("", "Planner", "clock");
+                verify(on(xs, t.x + t.b.w), "Planner right " + sw);
+                fuzzyCompare((c.y + t.y + t.b.h) / 2, sh / 2, 0.02);
+                // Mirrored: Side on the left, and moved to the right for a picture calmer there.
+                const l = at("", "Side", "clock"), r = at("right", "Side", "clock");
+                fuzzyCompare(l.x, sw - (r.x + r.b.w), 0.02);
+                // Everything: its two top blocks mirror (the left one's left edge, the right one's
+                // right edge, the same distance from the screen's edges).
+                const e1 = at("", "Everything", "clock"), e2 = at("", "Everything", "tasks");
+                fuzzyCompare(e1.x, sw - (e2.x + e2.b.w), 0.02);
+                verify(on(ys, e1.y) && on(ys, e2.y));
+            }
+        }
     }
 }

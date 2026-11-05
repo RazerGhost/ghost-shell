@@ -52,8 +52,14 @@ const layoutEdges = [{ side: 80, top: 80, bottom: 120 }, { side: DesktopWidgets.
 
 // Where a layout's groups put their widgets on a sw x sh screen at 100 %, `mirror` swapping left
 // and right: { name: { x, y } } in px, or null when it doesn't fit (off the screen, or groups
-// overlapping).
-function layoutPlaces(groups, sw, sh, mirror) {
+// overlapping). With the desktop grid on (`cell`, its spacing at 100 %), each group's outer edges
+// go onto grid lines, the way a dropped widget lines up (DesktopWidgets.gridSnapped): a left
+// group's left edge on the first line past the margin and a right group's right edge on the
+// mirror of it, a top group's top edge on the first line below the island and a bottom group's
+// bottom edge on the last above the dock, and a group in the middle of the height centered on the
+// middle line. A preset then sits on the grid (a drag doesn't make it jump) and mirrored layouts
+// mirror exactly.
+function layoutPlaces(groups, sw, sh, mirror, cell) {
     const gap = DesktopWidgets.unit.gap;
     for (const edge of layoutEdges) {
         const places = {};
@@ -70,9 +76,24 @@ function layoutPlaces(groups, sw, sh, mirror) {
             });
             const gw = Math.max(...rows.map(r => r.w));
             const gh = rows.reduce((t, r) => t + r.h, 0) + gap * (rows.length - 1);
-            const gx = horizontal === "left" ? edge.side : horizontal === "right" ? sw - edge.side - gw : (sw - gw) / 2;
-            const gy = vertical === "top" ? edge.top : vertical === "bottom" ? sh - edge.bottom - gh
-                     : edge.top + (sh - edge.top - edge.bottom - gh) / 2;
+            let gx = horizontal === "left" ? edge.side : horizontal === "right" ? sw - edge.side - gw : (sw - gw) / 2;
+            let gy = vertical === "top" ? edge.top : vertical === "bottom" ? sh - edge.bottom - gh
+                   : edge.top + (sh - edge.top - edge.bottom - gh) / 2;
+            if (cell > 0) {
+                const xs = DesktopWidgets.gridLines(sw, cell), ys = DesktopWidgets.gridLines(sh, cell);
+                const from = (lines, v) => lines.find(l => l >= v - 0.001);             // first line at or past v
+                const upTo = (lines, v) => lines.slice().reverse().find(l => l <= v + 0.001); // last line at or before v
+                if (horizontal === "left")
+                    gx = from(xs, edge.side) ?? gx;
+                else if (horizontal === "right")
+                    gx = (upTo(xs, sw - edge.side) ?? gx + gw) - gw;
+                if (vertical === "top")
+                    gy = from(ys, edge.top) ?? gy;
+                else if (vertical === "bottom")
+                    gy = (upTo(ys, sh - edge.bottom) ?? gy + gh) - gh;
+                else if (sh / 2 - gh / 2 >= edge.top && sh / 2 + gh / 2 <= sh - edge.bottom)
+                    gy = sh / 2 - gh / 2;
+            }
             boxes.push({ x: gx, y: gy, w: gw, h: gh });
             let y = gy;
             for (const row of rows) {
@@ -107,8 +128,9 @@ function layoutValues(places, sw, sh) {
     for (const kind of DesktopWidgets.kinds) {
         values[kind.key] = kind.name in places;
         if (kind.name in places)
-            saved[kind.name] = { x: Math.round(places[kind.name].x / sw * 10000) / 10000,
-                                 y: Math.round(places[kind.name].y / sh * 10000) / 10000 };
+            // Six decimals: a thousandth of a pixel on a 4K screen, so a place on a grid line stays on it.
+            saved[kind.name] = { x: Math.round(places[kind.name].x / sw * 1e6) / 1e6,
+                                 y: Math.round(places[kind.name].y / sh * 1e6) / 1e6 };
     }
     values.desktopWidgets = saved;
     return values;
@@ -116,12 +138,13 @@ function layoutValues(places, sw, sh) {
 
 // The widget layouts for a sw x sh screen whose wallpaper is calmer on `quiet` ("left", "right"
 // or "": DesktopWidgets.quietSide): a layout on one side moves to the calmer side, so the
-// picture's subject stays clear. Layouts that don't fit the screen are left out.
-function widgetPresets(sw, sh, quiet) {
+// picture's subject stays clear. Layouts that don't fit the screen are left out. `cell`: the
+// desktop grid's spacing at 100 % while it's on (layoutPlaces), else 0 or left out.
+function widgetPresets(sw, sh, quiet, cell) {
     const presets = [];
     for (const layout of widgetLayouts) {
         const side = layoutSide(layout.groups);
-        const places = layoutPlaces(layout.groups, sw, sh, quiet !== "" && side !== "" && side !== quiet);
+        const places = layoutPlaces(layout.groups, sw, sh, quiet !== "" && side !== "" && side !== quiet, cell ?? 0);
         if (places)
             presets.push({ name: layout.name, values: layoutValues(places, sw, sh) });
     }

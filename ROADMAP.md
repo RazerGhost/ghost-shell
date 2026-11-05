@@ -2213,6 +2213,11 @@ scaled like the widgets) for the lines, drops and the editor's nudges, and a dro
 side (`DesktopWidgets.gridSnapped`, tested): across the middle it centers, left of it by its left
 edge, right of it by its right edge (and up and down), only on lines that keep it on the screen,
 so roughly mirrored drops land exactly mirrored at any size.
+Then the widget layouts (user's request): with the grid on, each group's outer edges go onto grid
+lines inside the safe area (past the side margin, below the island, above the dock), and a group
+in the middle of the height centers on the middle line (`Presets.layoutPlaces`' `cell`, tested at
+1920 x 1080 and 2560 x 1440 with 32 and 48 px grids: on the lines, mirrored layouts mirror). Places
+are kept to six decimals so they stay on the lines.
 
 ### Edge cases fixed (2026-11-05, user's request: all ten found)
 Twin monitors (same description) go by port (`DisplayModes.key`); a shell crash with noise

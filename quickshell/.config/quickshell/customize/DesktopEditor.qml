@@ -225,7 +225,8 @@ Scope {
                         // Laid out for the main screen (a layout is the main screen's widgets), on the
                         // calmer side of the wallpaper.
                         presets: Presets.widgetPresets(Screens.main?.width ?? 1920, Screens.main?.height ?? 1080,
-                                                       Wallpaper.quietSide)
+                                                       Wallpaper.quietSide,
+                                                       Settings.values.desktopGrid ? DesktopWidgetsJs.gridSize(Settings.values.desktopGridSize) : 0)
                         fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)
                         art: Component {
                             Item {
