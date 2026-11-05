@@ -5,6 +5,8 @@ hypr/.config/hypr/colors.lua
 
 # Written by Quickshell's settings window
 hypr/.config/hypr/shell-settings.lua
+# Linked by the modules on this machine (module_autostart in modules/lib.sh)
+hypr/.config/hypr/autostart.d/
 ghostty/.config/ghostty/themes/
 zed/.config/zed/themes/
 

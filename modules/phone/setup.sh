@@ -7,6 +7,9 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 . modules/lib.sh
 
+step "KDE Connect's tray at Hyprland's start"
+module_autostart phone
+
 step "KDE Connect and LocalSend through the firewall"
 if systemctl is-active --quiet ufw; then
     sudo ufw allow KDEConnect

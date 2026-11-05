@@ -54,6 +54,15 @@ js_with() {
     "
 }
 
+# Makes Hyprland start what a module starts: links modules/<module>/autostart.lua into
+# ~/.config/hypr/autostart.d/, whose files hypr/autostart.lua runs at Hyprland's start. Run from
+# the repo's root. Only the modules a machine installs are linked, so the shared config never
+# starts a program that isn't there.
+module_autostart() {
+    mkdir -p "$HOME/.config/hypr/autostart.d"
+    ln -sfn "$PWD/modules/$1/autostart.lua" "$HOME/.config/hypr/autostart.d/$1.lua"
+}
+
 # The repo's Stow packages, one per line: every top-level folder but the ones that aren't
 # (system/ mirrors /, the rest are the setup, tests and docs). Run from the repo's root.
 stow_packages() {

@@ -85,6 +85,7 @@ updated) · Boy Scout Rule within touched lines · end each change with a summar
 | Idle | Quickshell `IdleMonitor`s (`idle/Idle.qml`); hypridle only locks before suspend |
 | Crash recovery | `hypr/shell.sh` restarts qs after a crash; lock falls back to hyprlock |
 | Bluetooth pairing | `yes \| bt-agent -c NoInputNoOutput` from `autostart.lua` |
+| What a module starts with Hyprland | `modules/<name>/autostart.lua` (the phone module's KDE Connect tray), linked into `~/.config/hypr/autostart.d/` by its setup (`module_autostart`); `hypr/autostart.lua` runs those files at start |
 | JavaScript runtime | bun for scripts; node/pnpm only for Vencord |
 | Apps | Started in their own systemd scope (`hypr/run-app.sh`, `Apps.run`) so oomd kills the app, not the session |
 | Wallpapers | Art (anime, illustrations), your folder only; system collections not offered |
