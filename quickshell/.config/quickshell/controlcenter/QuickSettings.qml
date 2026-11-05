@@ -15,7 +15,7 @@ import "../widgets/OrderedList.js" as OrderedList
 Item {
     id: root
 
-    property string page: "main" // "main", "wifi", "bluetooth", "sound", "phone", "display", "system" or "apps"
+    property string page: "main" // "main", "wifi", "bluetooth", "sound", "phone", "display", "vpn", "system" or "apps"
 
     // A button here opens another island menu ("power"), or closes the island ("").
     signal openMenu(string menu)
@@ -37,6 +37,7 @@ Item {
         power: { icon: "balance", title: "Power mode", control: powerTile },
         phone: { icon: "smartphone", title: "Phone", control: phoneTile },
         display: { icon: "desktop_windows", title: "Display", control: displayTile },
+        vpn: { icon: "vpn_key", title: "VPN", control: vpnTile },
         mic: { icon: "mic", title: "Microphone", control: micToggle },
         dnd: { icon: "do_not_disturb_on", title: "Do Not Disturb", control: dndToggle },
         nightlight: { icon: "nightlight", title: "Night light", control: nightToggle },
@@ -53,7 +54,7 @@ Item {
 
     // The island grows and shrinks to fit the current page.
     implicitHeight: (page === "wifi" ? wifiPage : page === "bluetooth" ? bluetoothPage
-                     : page === "sound" ? soundPage : page === "phone" ? phonePage : page === "display" ? displayPage
+                     : page === "sound" ? soundPage : page === "phone" ? phonePage : page === "display" ? displayPage : page === "vpn" ? vpnPage
                      : page === "system" ? systemPage : page === "apps" ? appsPage : mainPage).implicitHeight
                     + padding
     clip: true // pages slide in from the side
@@ -155,6 +156,22 @@ Item {
             active: NightLight.on
             hasPage: true
             onClicked: root.page = "display"
+        }
+    }
+
+    Component {
+        id: vpnTile
+
+        // The connected VPN, or the one the switch would connect (services/NetworkExtras.qml).
+        Tile {
+            width: tileGrid.widthOf("vpn")
+            icon: "vpn_key"
+            title: "VPN"
+            subtitle: NetworkExtras.activeVpn ? NetworkExtras.activeVpn.name
+                    : NetworkExtras.lastVpn ? "Off · " + NetworkExtras.lastVpn.name : "None set up"
+            active: NetworkExtras.activeVpn !== null
+            hasPage: true
+            onClicked: root.page = "vpn"
         }
     }
 
@@ -828,6 +845,19 @@ Item {
     ScreenPage { // the Display page (settings/ has a DisplayPage of its own)
         id: displayPage
         x: root.page === "display" ? root.padding : root.width
+        width: root.width - root.padding * 2
+        visible: x < root.width
+        onBack: root.page = "main"
+        onDone: root.openMenu("")
+
+        Behavior on x {
+            NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }
+        }
+    }
+
+    VpnPage {
+        id: vpnPage
+        x: root.page === "vpn" ? root.padding : root.width
         width: root.width - root.padding * 2
         visible: x < root.width
         onBack: root.page = "main"

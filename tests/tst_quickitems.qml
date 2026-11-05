@@ -18,7 +18,7 @@ TestCase {
     }
 
     function test_available() {
-        compare(QuickItems.available(["wifi", "sound"], QuickItems.tiles), ["bluetooth", "power", "phone", "display"]);
+        compare(QuickItems.available(["wifi", "sound"], QuickItems.tiles), ["bluetooth", "power", "phone", "display", "vpn"]);
         compare(QuickItems.available(QuickItems.tiles, QuickItems.tiles), []);
     }
 

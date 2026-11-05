@@ -5,7 +5,7 @@
 
 // Every one there is, in the order they're offered; the defaults are what quick settings
 // showed before it could be edited.
-const tiles = ["wifi", "bluetooth", "sound", "power", "phone", "display"];
+const tiles = ["wifi", "bluetooth", "sound", "power", "phone", "display", "vpn"];
 const toggles = ["mic", "dnd", "nightlight", "awake", "game", "airplane", "dark", "record", "screenshot", "wallpaper",
                  "timer", "focus"];
 const defaultTiles = ["wifi", "bluetooth", "sound", "power"];

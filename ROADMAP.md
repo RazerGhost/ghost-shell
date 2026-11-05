@@ -2174,6 +2174,12 @@ settings' edit mode, so the panel only grows by what you add.
   shell-settings.lua the setups in effect (`DisplayModes.effective`, tested), so the battery's
   rate never overwrites the saved one. Checked on screen: the page, the reload. Untested: the
   second screen (none here), the rate switching on battery.
+- VPN tile and page (`controlcenter/VpnPage.qml`): the header's switch disconnects the
+  connected VPN or reconnects the one connected last (`lastVpn`, remembered from
+  `NetworkExtras.vpnSwitched`), and every saved VPN is listed (`VpnList.qml`, shared with the
+  Wi-Fi page). Proton VPN's app makes its NetworkManager connection while connected and removes
+  it after (none saved here), so the page also opens its app to pick a server. Checked on
+  screen: the page with no VPN saved and the Open Proton VPN row.
 
 ### Headphones take over when plugged in (2026-11-05)
 User's question with USB-C IEMs (a SIMGOT EW300 DSP): they connected, but the sound stayed on

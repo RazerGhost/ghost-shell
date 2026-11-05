@@ -243,6 +243,8 @@ Singleton {
             property var monitors: ({})
             // The laptop's screen at its lowest refresh rate while on battery (quick settings' Display page).
             property bool displayLowRefreshOnBattery: false
+            // The VPN connected last, by name: quick settings' VPN switch reconnects it.
+            property string lastVpn: ""
             // Per-app notifications, by app name: { mode } (services/NotificationRules.js).
             property var notificationApps: ({})
             // Equalizer gains in dB per output, by PipeWire node name (services/Equalizer.qml).

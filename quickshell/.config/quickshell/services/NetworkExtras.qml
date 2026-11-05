@@ -24,6 +24,21 @@ Singleton {
     // nmcli); the OSD shows it. Not for the VPN already up when the shell starts.
     signal vpnSwitched(name: string, connected: bool)
 
+    // The VPN quick settings' switch reconnects: the one connected last (Settings' lastVpn),
+    // else the first saved one.
+    readonly property var lastVpn: vpns.find(c => c.name === Settings.values.lastVpn) ?? vpns[0] ?? null
+    onVpnSwitched: (name, connected) => {
+        if (connected)
+            Settings.values.lastVpn = name;
+    }
+
+    // The switch: the connected one off, or the last one back on.
+    function switchVpn(): void {
+        const vpn = activeVpn ?? lastVpn;
+        if (vpn)
+            toggleVpn(vpn);
+    }
+
     function toggleVpn(vpn: var): void {
         run(["nmcli", "connection", vpn.active ? "down" : "up", "uuid", vpn.uuid],
             "Couldn't " + (vpn.active ? "disconnect " : "connect ") + vpn.name);

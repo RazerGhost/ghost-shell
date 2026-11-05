@@ -240,19 +240,8 @@ Column {
     }
 
     // The saved VPNs (click to connect or disconnect), the hotspot and airplane mode.
-    Repeater {
-        model: NetworkExtras.vpns
-
-        ListRow {
-            required property var modelData
-
-            width: root.width
-            icon: "vpn_key"
-            title: modelData.name
-            subtitle: modelData.active ? "Connected" : "VPN"
-            highlighted: modelData.active
-            onActivated: NetworkExtras.toggleVpn(modelData)
-        }
+    VpnList {
+        width: root.width
     }
 
     ListRow {
