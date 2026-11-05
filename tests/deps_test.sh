@@ -53,7 +53,7 @@ declare -A ignore=(
 # Programs of optional modules that the shared code uses only when the module is there (the
 # shell's phone page, calendar, capture tools...): the module whose packages bring them.
 declare -A optional=(
-    [kdeconnect-cli]=phone [kdeconnect-indicator]=phone [localsend]=phone
+    [kdeconnect-cli]=phone [kdeconnect-indicator]=phone [kdeconnect-app]=phone [localsend]=phone
     [khal]=calendar [vdirsyncer]=calendar
     [gpu-screen-recorder]=capture [tesseract]=capture [zbarimg]=capture [hyprpicker]=capture [satty]=capture
     [snapper]=snapshots [btrfs-assistant]=snapshots
@@ -62,9 +62,16 @@ declare -A optional=(
     [openxlr]=wave3
 )
 
+# Packages a module's setup installs itself rather than listing them (haunt: its release's
+# pacman package, downloaded by setup.sh).
+declare -A self_installed=(
+    [haunt]=haunt-bin
+)
+
 # A module's declared packages (all of packages.sh's, whatever this machine's hardware).
 declared_of() {
     {
+        [[ -n ${self_installed[$1]+set} ]] && echo "${self_installed[$1]}"
         cat "modules/$1/packages.txt" "modules/$1/aur.txt" 2>/dev/null | sed 's/#.*//; s/[[:space:]]//g'
         [[ -x modules/$1/packages.sh ]] && "modules/$1/packages.sh" --all
     } | grep -v '^$'

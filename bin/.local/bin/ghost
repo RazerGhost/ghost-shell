@@ -300,7 +300,9 @@ cmd_doctor() {
     step "Committing and pushing from this machine"
     if [[ -n $(git config user.name) && -n $(git config user.email) ]]; then ok "git knows your name and email"
     else bad "git has no name or email (git config --global user.name ...; user.email: GitHub's noreply address keeps yours private)"; fi
-    if git ls-remote --exit-code origin HEAD >/dev/null 2>&1 && GIT_TERMINAL_PROMPT=0 git push --dry-run --quiet origin HEAD >/dev/null 2>&1; then
+    # A dry run to a branch nobody uses: it checks the login and the right to push, not whether this
+    # checkout is behind (pushing HEAD to main is refused then, which read as a login problem).
+    if git ls-remote --exit-code origin HEAD >/dev/null 2>&1 && GIT_TERMINAL_PROMPT=0 git push --dry-run --quiet origin HEAD:refs/heads/ghost-doctor-check >/dev/null 2>&1; then
         ok "pushing to GitHub works"
     else
         bad "can't push to GitHub (gh auth login, then gh auth setup-git)"
