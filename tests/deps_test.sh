@@ -59,6 +59,7 @@ declare -A optional=(
     [snapper]=snapshots [btrfs-assistant]=snapshots
     [spicetify]=spotify [vesktop]=discord [spotify]=spotify
     [nautilus]=apps [micro]=apps [zeditor]=apps [yazi]=apps [zen-browser]=apps
+    [openxlr]=wave3
 )
 
 # A module's declared packages (all of packages.sh's, whatever this machine's hardware).
