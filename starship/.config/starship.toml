@@ -1,0 +1,34 @@
+# The prompt (Starship, starship.rs), for zsh, fish or bash alike.
+# Colors are the terminal's palette names, not hex: matugen sets Ghostty's palette from the
+# wallpaper (templates/ghostty: green = primary, blue = secondary, yellow = tertiary, red = error,
+# bright-black = outline), so the prompt follows the wallpaper without a template of its own.
+#
+#   ~/Projects/ghost-shell  main !2 ?1  took 3s
+#   ❯
+
+add_newline = true
+format = "$directory$git_branch$git_state$git_status$all$cmd_duration$line_break$character"
+
+[directory]
+style = "bold green"
+truncation_length = 4
+truncate_to_repo = false
+read_only = " 󰌾"
+
+[git_branch]
+format = "[$symbol$branch]($style) "
+symbol = " "
+style = "blue"
+
+[git_status]
+format = "([$all_status$ahead_behind]($style) )"
+style = "yellow"
+
+[cmd_duration]
+format = "took [$duration]($style) "
+style = "bright-black"
+min_time = 2000
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"

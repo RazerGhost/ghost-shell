@@ -65,7 +65,20 @@ gnome-keyring
 # Logs you in at boot and after a logout, straight into the locked session (system/etc/greetd)
 greetd
 
-# The login shell (the fish/ Stow package)
+# The login shell (the zsh/ Stow package) with its fish-like plugins, the prompt (starship/),
+# fzf's history and file search, and pkgfile's "which package has this command"
+zsh
+zsh-autosuggestions
+zsh-syntax-highlighting
+zsh-history-substring-search
+zsh-completions
+starship
+fzf
+pkgfile
+# CachyOS's listing (ls through eza) and man pages through bat, kept in .zshrc
+eza
+bat
+# The old login shell, kept as a fallback (the fish/ Stow package)
 fish
 # The terminal greeting's system summary (fastfetch/.config/fastfetch)
 fastfetch

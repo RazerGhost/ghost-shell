@@ -9,7 +9,7 @@ wallpaper with matugen. Work in phases; commit and push after each phase, then g
 test checklist and wait for their results before starting the next one. Ask before building anything
 ambiguous or with real trade-offs.
 
-**Laptop:** HP Omen 16, CachyOS, fish shell. Ryzen 7 7840HS (AMD 780M iGPU) + RTX 4070 Max-Q
+**Laptop:** HP Omen 16, CachyOS, zsh (fish until 2026-11-05). Ryzen 7 7840HS (AMD 780M iGPU) + RTX 4070 Max-Q
 (nvidia-open, `nvidia-prime`). Panel 1920x1080 @ 165 Hz. Hyprland 0.56 (Lua config), Quickshell 0.3.2,
 Qt 6.12. Quickshell owns the bar, notifications, launcher, OSD and lock screen; there is no other bar,
 notification daemon or launcher.
@@ -19,7 +19,7 @@ property and function against quickshell.org/docs (v0.3.x) and wiki.hypr.land (0
 not memory or old dotfiles. Facts already checked are in `NOTES.md` ("Verified API notes"). Say in
 the phase summary what couldn't be verified.
 
-**After each phase, report:** what was built; commands to run (fish-compatible); a test checklist;
+**After each phase, report:** what was built; commands to run (zsh; fish-compatible where easy); a test checklist;
 anything unverified. Update `packages.txt` / `aur.txt` for every new package, and `install.sh` for every
 new setup step.
 
@@ -2286,6 +2286,22 @@ the name and the network scrubbed from every version), "Ghosty" for the examples
 MIT licence. The install no longer needs `gh`: `bootstrap.sh` from raw.githubusercontent.com and
 a plain `git clone`. Published as a fresh public repo (GitHub keeps every commit it was ever sent, even
 after a force-push): the old one, renamed `ghost-shell-old`, stays private.
+
+### zsh with a Starship prompt (built 2026-11-05)
+User's choice over fish: bash-compatible (commands from guides paste as they are) and macOS's
+default shell. Our own `.zshrc` (`zsh/` Stow package) rather than CachyOS's config, which loads
+oh-my-zsh and Powerlevel10k (no longer developed; it would also fight Starship over the prompt):
+the same plugins straight from their packages (suggestions as you type, highlighting, Up / Down
+search history for what's typed, zsh-completions, fzf's Ctrl+R / Ctrl+T / Alt+C, pkgfile's
+"which package has this command"), a completion menu that ignores case like fish, history shared
+between terminals in `~/.local/state/zsh`, and CachyOS's eza listing aliases. The prompt is
+Starship (`extra`, ISC; user's pick after it was explained): `starship/.config/starship.toml` uses
+the terminal's palette names, which matugen sets from the wallpaper, so it needs no template. The
+terminal greeting is one script for both shells now (`bin/.local/bin/ghost-greeting`, tested by
+`tests/greeting_test.sh`). The core module moves an earlier `~/.zshrc` to `~/.zshrc.pre-ghost`
+and makes zsh the login shell (`sudo chsh`); fish stays installed as a fallback.
+Machine-local additions: `~/.config/zsh/local.zsh`. Checked: the config loads without errors in a
+terminal (about 0.2 s with fastfetch), the greeting's tests pass.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

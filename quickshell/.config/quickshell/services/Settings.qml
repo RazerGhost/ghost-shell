@@ -206,7 +206,7 @@ Singleton {
             property bool desktopTasks: false
             property bool desktopNote: false
             property bool desktopClipboard: false
-            // What a new terminal shows (fish/.config/fish/ghost-greeting.fish reads it from this
+            // What a new terminal shows (bin/.local/bin/ghost-greeting reads it from this
             // file): "ghost" (fastfetch with the Ghost look), "line" (one line) or "none".
             property string terminalGreeting: "ghost"
             property int focusMinutes: 25 // focus mode's length, the one picked last

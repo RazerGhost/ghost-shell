@@ -59,6 +59,9 @@ machine can take what it needs.
 - **Glass**: see-through panels with Hyprland's blur behind exactly their shape (or solid ones).
 - **One color scheme** from the wallpaper (matugen) for the shell, Hyprland, Ghostty, GTK apps,
   Zed, Yazi, Zen, Discord, Spotify, Steam and MangoHud.
+- **zsh** as the login shell, set up like fish (suggestions as you type, highlighting, history
+  search on Up and Down, fzf on Ctrl+R) with a [Starship](https://starship.rs) prompt in the
+  wallpaper's colors; fish stays installed.
 
 The full plan and every decision behind it: [ROADMAP.md](ROADMAP.md). Keybinds:
 [docs/keybinds.md](docs/keybinds.md). Every feature and rule with its files: [docs/index.md](docs/index.md).
@@ -66,7 +69,7 @@ The full plan and every decision behind it: [ROADMAP.md](ROADMAP.md). Keybinds:
 ## Install
 
 On Arch or CachyOS, one command (it installs git if needed, clones the repo to
-`~/Projects/ghost-shell` and runs the install; fish or bash):
+`~/Projects/ghost-shell` and runs the install; zsh, fish or bash):
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/RazerGhost/ghost-shell/main/bootstrap.sh -o /tmp/bootstrap.sh
@@ -109,7 +112,7 @@ its setup (`setup.sh`).
 
 | Module | |
 |---|---|
-| `core` | Hyprland, the shell, fonts and themes, the colors |
+| `core` | Hyprland, the shell, fonts and themes, the colors, zsh as the login shell |
 | `system` | the GPU rule, boot options (Limine), the Omen's bass speakers, logging in at boot (greetd) and services |
 | `snapshots` | Btrfs snapshots: the system's before and after every update (bootable), your home folder hourly |
 | `apps` | terminal, editor, files, pictures, video, music, browser, web apps |
@@ -148,7 +151,8 @@ loaded last and aren't in git, so `ghost update` never conflicts with them:
 |---|---|
 | `~/.config/hypr/local.lua` | Hyprland: your own binds, monitors, any option |
 | `~/.config/ghostty/local` | Ghostty settings |
-| `~/.config/fish/conf.d/local.fish` | fish: aliases, variables |
+| `~/.config/zsh/local.zsh` | zsh: aliases, variables, anything for `.zshrc` |
+| `~/.config/fish/conf.d/local.fish` | fish (the fallback shell): aliases, variables |
 
 ## If something breaks
 
@@ -168,7 +172,7 @@ loaded last and aren't in git, so `ghost update` never conflicts with them:
 
 | Folder | |
 |---|---|
-| `hypr/`, `quickshell/`, `ghostty/`, `fish/`, `fastfetch/`, `matugen/`, `zed/`, `spotify/`, `pipewire/`, `paru/`, `nautilus/`, `bin/` | configs, linked into `$HOME` by Stow (each mirrors the home folder) |
+| `hypr/`, `quickshell/`, `ghostty/`, `zsh/`, `starship/`, `fish/`, `fastfetch/`, `matugen/`, `zed/`, `spotify/`, `pipewire/`, `paru/`, `nautilus/`, `bin/` | configs, linked into `$HOME` by Stow (each mirrors the home folder) |
 | `modules/` | packages and setup per module, `lib.sh` shared by them |
 | `system/` | files for `/` (udev rule, greetd, mkinitcpio), installed by the `system` module |
 | `machines/` | each machine's module list (`ghost install --machine <name>`) |

@@ -15,6 +15,12 @@ step "Linking configs with stow"
 # into the repo: fish writes its own files there (fish_variables, and config.fish's greeting line
 # below), which would otherwise land in the repo.
 mkdir -p "$HOME/.config/fish"
+# zsh's .zshrc is the repo's: one written before (CachyOS's, which loads oh-my-zsh and
+# Powerlevel10k) is moved aside once, so stow can link it.
+if [[ -f $HOME/.zshrc && ! -L $HOME/.zshrc ]]; then
+    mv "$HOME/.zshrc" "$HOME/.zshrc.pre-ghost"
+    echo "Your earlier ~/.zshrc is now ~/.zshrc.pre-ghost (machine-local additions go in ~/.config/zsh/local.zsh)"
+fi
 for pkg in $(stow_packages); do
     echo "$pkg"
     stow -R -t "$HOME" "$pkg"
@@ -23,13 +29,21 @@ done
 touch quickshell/.config/quickshell/.qmlls.ini
 
 step "Terminal greeting"
-# fish's greeting (Settings -> Default apps) is ghost-greeting.fish, sourced from config.fish after
+# fish (the fallback shell): its greeting (Settings -> Default apps) is ghost-greeting.fish, sourced from config.fish after
 # CachyOS's config, which defines its own greeting (conf.d loads before config.fish, too early).
 # config.fish stays yours: only this line is added, once.
 greeting='source ~/.config/fish/ghost-greeting.fish'
 mkdir -p "$HOME/.config/fish"
 grep -qxF "$greeting" "$HOME/.config/fish/config.fish" 2>/dev/null \
     || printf '\n# Ghost Shell: the terminal greeting (Settings -> Default apps)\n%s\n' "$greeting" >>"$HOME/.config/fish/config.fish"
+
+step "Login shell: zsh"
+# User's choice (2026-11-05, was fish): bash-compatible, macOS's default. fish stays installed.
+zsh_path=$(command -v zsh)
+if [[ $(getent passwd "$USER" | cut -d: -f7) != "$zsh_path" ]]; then
+    sudo chsh -s "$zsh_path" "$USER"
+    echo "zsh is your login shell from the next login"
+fi
 
 step "GTK settings"
 # Light or dark, the GTK theme (adw-gtk3) and the Colloid icons (user's choice) are set with the

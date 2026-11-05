@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# A fresh machine in one command (Arch or CachyOS), in fish or bash:
+# A fresh machine in one command (Arch or CachyOS), in zsh, fish or bash:
 #   curl -fsSL https://raw.githubusercontent.com/RazerGhost/ghost-shell/main/bootstrap.sh -o /tmp/bootstrap.sh
 #   bash /tmp/bootstrap.sh desktop
 # Installs git if it's missing, clones the repo to ~/Projects/ghost-shell (or pulls it if it's

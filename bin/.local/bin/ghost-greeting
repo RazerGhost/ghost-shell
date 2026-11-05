@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# What a new terminal shows, for zsh (.zshrc) and fish (ghost-greeting.fish) alike: Settings ->
+# Default apps -> Terminal greeting, `terminalGreeting` in the shell's settings.json. "ghost":
+# fastfetch with the Ghost look (fastfetch/.config/fastfetch); "line": one line ("Good evening,
+# Ghosty · CachyOS Linux · up 12 min · 100%"); "none": nothing.
+settings=${XDG_STATE_HOME:-$HOME/.local/state}/quickshell/settings.json
+mode=ghost
+if [[ -r $settings ]]; then
+    found=$(grep -oP '"terminalGreeting":\s*"\K\w+' "$settings" | head -1)
+    [[ -n $found ]] && mode=$found
+fi
+
+case $mode in
+none) ;;
+line)
+    hour=$(date +%-H)
+    if ((hour < 12)); then part=morning; elif ((hour < 18)); then part=afternoon; else part=evening; fi
+    name=$(getent passwd "$USER" | cut -d: -f5 | cut -d, -f1 | cut -d' ' -f1)
+    [[ -n $name ]] || name=$USER
+    read -r up _ </proc/uptime
+    rest=("$(grep -oP '^NAME="\K[^"]+' /etc/os-release)" "up $((${up%.*} / 60)) min")
+    for battery in /sys/class/power_supply/BAT*; do
+        [[ -r $battery/capacity ]] && rest+=("$(<"$battery/capacity")%")
+        break
+    done
+    joined=$(printf ' · %s' "${rest[@]}")
+    printf '\e[1;34mGood %s, %s\e[0m%s\n' "$part" "$name" "$joined"
+    ;;
+*) command -v fastfetch >/dev/null && fastfetch ;;
+esac
+exit 0

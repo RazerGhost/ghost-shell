@@ -1,4 +1,4 @@
-// The terminal's system summary (fish's greeting when Settings says "System summary"): a small
+// The terminal's system summary (the terminal greeting when Settings says "System summary"): a small
 // ghost and the lines that matter. Colors are the terminal's palette, which matugen makes from
 // the wallpaper (Ghostty's theme), so it follows the wallpaper by itself.
 {

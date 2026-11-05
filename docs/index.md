@@ -30,7 +30,7 @@ the reasons and history are in [ROADMAP.md](../ROADMAP.md), verified API facts i
 | `ghost update` refuses with uncommitted changes; never stash with the live config | `cmd_update` |
 | Wallpaper and colors always go through `wallpaper.sh`; matugen hooks only deliver colors, app setup belongs in its module | `matugen/.config/matugen/wallpaper.sh` |
 | No login screen: greetd logs in at boot and after a logout, and the session locks at once | `system/etc/greetd/config.toml`, `lock/Lock.qml`, `hypr/hyprland.lua` |
-| Machine-local overrides, gitignored, loaded last | `hypr/local.lua`, `ghostty/local`, `fish/conf.d/local.fish` |
+| Machine-local overrides, gitignored, loaded last | `hypr/local.lua`, `ghostty/local`, `~/.config/zsh/local.zsh`, `fish/conf.d/local.fish` |
 | `system/` mirrors `/`, copied with `sudo install` by the system module | `modules/system/setup.sh` |
 | Browser is Zen (`zen-browser-bin`), never Firefox | |
 | Commit and push after each phase or fix | |
@@ -260,9 +260,12 @@ recording (gpu-screen-recorder), draw on it (satty), folders and quality setting
 
 ### Other
 
-The terminal greeting (a system summary, one line or nothing; Settings -> Default apps,
-`terminalGreeting`: `fish/.config/fish/ghost-greeting.fish`, sourced from config.fish by the core
-module, and `fastfetch/.config/fastfetch/`). Welcome tour (`welcome/Welcome.qml`), web apps (`ghost webapp`, Chromium `--app`), snapshots
+The login shell: zsh (`zsh/.zshrc`; the core module moves an earlier `~/.zshrc` to
+`~/.zshrc.pre-ghost` and runs `chsh`), the prompt `starship/.config/starship.toml` (the terminal's
+palette colors); fish stays as a fallback (`fish/`). The terminal greeting (a system summary, one
+line or nothing; Settings -> Default apps, `terminalGreeting`): `bin/.local/bin/ghost-greeting`
+(tested by `tests/greeting_test.sh`), run by `.zshrc` and by `fish/.config/fish/ghost-greeting.fish`
+(sourced from config.fish by the core module), and `fastfetch/.config/fastfetch/`. Welcome tour (`welcome/Welcome.qml`), web apps (`ghost webapp`, Chromium `--app`), snapshots
 (snapper, Settings page), Nautilus "Send to phone" script (`nautilus/`), Proton apps, Wave:3
 voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 
