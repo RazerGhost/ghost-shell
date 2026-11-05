@@ -74,9 +74,11 @@ On Arch or CachyOS, one command (it installs git if needed, clones the repo to
 `~/Projects/ghost-shell` and runs the install; zsh, fish or bash):
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/RazerGhost/ghost-shell/main/bootstrap.sh -o /tmp/bootstrap.sh
-bash /tmp/bootstrap.sh desktop
+curl -fsSL https://raw.githubusercontent.com/RazerGhost/ghost-shell/main/bootstrap.sh -o /tmp/bootstrap.sh && bash /tmp/bootstrap.sh desktop
 ```
+
+One line on purpose: pasted as two lines that lost their break, curl took `bash` and `desktop`
+for URLs.
 
 `desktop` or `laptop` picks the machine's modules from `machines/` (they become
 `~/.config/ghost/modules`, which you can edit); leave it out for all of them but the opt-in ones.
