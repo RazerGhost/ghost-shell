@@ -31,10 +31,17 @@ SheetTile {
     property string savedKey: ""
     property var savedKeys: Object.keys(presets[0]?.values ?? {})
     property string savedPrefix: "My look"
+    // How your settings become a saved look, and a saved look the settings it stands for (to
+    // match, apply and draw it). As they are by default; the desktop's widget layouts keep one
+    // screen's widgets and put them on the screen the editor is on (Presets.screenLayout,
+    // forScreen), like its presets.
+    property var toLook: values => values
+    property var fromLook: look => look
 
     readonly property var saved: savedKey !== "" ? SavedLooks.valid(Settings.values[savedKey], savedKeys) : []
+    readonly property var savedShown: saved.map(l => tile.fromLook(l))
     // Yours first, so an edited look of yours that happens to match a preset stays yours.
-    readonly property var looks: saved.concat(presets)
+    readonly property var looks: savedShown.concat(presets)
     readonly property string chosen: Presets.current(Settings.values, looks)
     readonly property bool chosenIsYours: saved.some(l => l.name === chosen)
     // The look of yours being edited: picked or just saved; none after picking a preset.
@@ -57,7 +64,7 @@ SheetTile {
     Component.onCompleted: editing = chosenIsYours ? chosen : ""
 
     function save(): void {
-        const look = SavedLooks.made(looks.map(l => l.name), Settings.values, savedKeys, savedPrefix);
+        const look = SavedLooks.made(looks.map(l => l.name), toLook(Settings.values), savedKeys, savedPrefix);
         write(saved.concat([look]));
         editing = look.name;
     }
@@ -73,7 +80,7 @@ SheetTile {
         id: follow
         interval: 0
         onTriggered: {
-            const next = tile.live ? SavedLooks.followed(tile.saved, tile.editing, tile.chosen, Settings.values, tile.savedKeys) : null;
+            const next = tile.live ? SavedLooks.followed(tile.saved, tile.editing, tile.chosen, tile.toLook(Settings.values), tile.savedKeys) : null;
             if (next)
                 tile.write(next);
         }
@@ -130,7 +137,7 @@ SheetTile {
         scrolls: true
         fadeColor: tile.fadeColor
         options: (tile.savedKey !== "" ? [{ value: "", label: "New look", action: true, values: {} }] : [])
-            .concat(tile.saved.map(l => ({ value: l.name, label: l.name, values: l.values })))
+            .concat(tile.savedShown.map(l => ({ value: l.name, label: l.name, values: l.values })))
             .concat(tile.presets.map(p => ({ value: p.name, label: p.name, values: p.values })))
         current: tile.chosen
         onPicked: v => {

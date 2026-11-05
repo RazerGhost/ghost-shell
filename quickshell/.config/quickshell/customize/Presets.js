@@ -164,9 +164,11 @@ function forScreen(presets, values, here, main, screens) {
         const out = {};
         const places = {};
         for (const kind of DesktopWidgets.kinds) {
-            const inLayout = p.values.desktopWidgets?.[kind.name] !== undefined;
+            // In the layout: on in it, with a place (a saved layout from before keeps the places
+            // of widgets that were off too).
+            const inLayout = p.values[kind.key] === true && p.values.desktopWidgets?.[kind.name] !== undefined;
             if (inLayout) {
-                const own = Object.assign({}, p.values.desktopWidgets[kind.name]);
+                const own = { x: p.values.desktopWidgets[kind.name].x, y: p.values.desktopWidgets[kind.name].y };
                 if (here !== main)
                     own.screen = here;
                 places[kind.name] = own;
@@ -180,6 +182,23 @@ function forScreen(presets, values, here, main, screens) {
         out.desktopWidgets = places;
         return { name: p.name, values: out };
     });
+}
+
+// One screen's widgets as a layout (what a saved layout keeps, so it can go on any screen like a
+// preset, through forScreen): which widgets are on there, and their places without the screen.
+function screenLayout(values, here, main, screens) {
+    const saved = values?.desktopWidgets ?? {};
+    const out = {};
+    const places = {};
+    for (const kind of DesktopWidgets.kinds) {
+        const there = values?.[kind.key] === true && saved[kind.name] !== undefined
+            && DesktopWidgets.screenOf(saved, kind.name, screens, main) === here;
+        out[kind.key] = there;
+        if (there)
+            places[kind.name] = { x: saved[kind.name].x, y: saved[kind.name].y };
+    }
+    out.desktopWidgets = places;
+    return out;
 }
 
 // On the laptop's 1920 x 1080 screen, as they read without a wallpaper to go around (the tests).

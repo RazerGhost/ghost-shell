@@ -226,4 +226,26 @@ TestCase {
         Presets.apply(applied, list, "Glance");
         compare(Presets.current(applied, Presets.forScreen(base, applied, "DP-2", "eDP-1", screens)), "Glance");
     }
+
+    // Saved layouts per screen: kept as one screen's widgets, applied on any screen.
+    function test_savedLayoutPerScreen() {
+        const screens = ["eDP-1", "DP-2"];
+        const values = { desktopClock: true, desktopWeather: true, desktopNote: false,
+                         desktopWidgets: { clock: { x: 0.1, y: 0.1, screen: "DP-2" }, weather: { x: 0.2, y: 0.2 }, note: { x: 0.5, y: 0.5 } } };
+        // Saved on DP-2: only its clock, without the screen.
+        const look = Presets.screenLayout(values, "DP-2", "eDP-1", screens);
+        compare(look.desktopClock, true);
+        compare(look.desktopWeather, false);
+        compare(look.desktopWidgets, { clock: { x: 0.1, y: 0.1 } });
+        // Applied on the laptop: the clock moves there, the weather (on the laptop, not in it) goes off.
+        const onLaptop = Presets.forScreen([{ name: "Mine", values: look }], values, "eDP-1", "eDP-1", screens)[0].values;
+        compare(onLaptop.desktopClock, true);
+        compare(onLaptop.desktopWidgets.clock, { x: 0.1, y: 0.1 });
+        compare(onLaptop.desktopWeather, false);
+        // A saved layout from before (every widget's place, off ones too): only the ones on count.
+        const old = { desktopClock: true, desktopNote: false, desktopWidgets: { clock: { x: 0.3, y: 0.3, screen: "DP-2" }, note: { x: 0.6, y: 0.6 } } };
+        const fromOld = Presets.forScreen([{ name: "Old", values: old }], values, "eDP-1", "eDP-1", screens)[0].values;
+        compare(fromOld.desktopNote, false);
+        compare(fromOld.desktopWidgets.clock, { x: 0.3, y: 0.3 });
+    }
 }

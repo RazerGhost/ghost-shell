@@ -2207,8 +2207,11 @@ screens (`hyprctl output create headless`, removed after each test).
 - Widget layouts are per screen (`Presets.forScreen`, tested): in the desktop editor on a screen,
   a layout puts its widgets on that screen (laid out at its size) and turns off the others there;
   widgets on other screens stay on and in place; the gallery marks a layout by this screen's
-  widgets only, and its cards draw only them. Your own saved layouts still keep the whole
-  arrangement, every screen.
+  widgets only, and its cards draw only them. Your own saved layouts too (user's request): one
+  keeps the widgets of the screen it's saved on, without the screen (`Presets.screenLayout`), and
+  goes on whichever screen the editor is on like a preset (`LooksTile`'s `toLook` / `fromLook`;
+  the other galleries keep theirs as they are). Layouts saved before count their widgets that
+  were on (tested).
 - Presets are laid out on the grid's size whether it shows or not, so switching the grid doesn't
   move them; a group pushed back onto the screen at another size moves by whole cells and stays
   on the grid (`DesktopWidgets.arrange`'s `cell`, tested).

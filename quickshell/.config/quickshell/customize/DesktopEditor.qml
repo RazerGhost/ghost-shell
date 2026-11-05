@@ -221,6 +221,12 @@ Scope {
                         title: "Widget layouts"
                         savedKey: "widgetLooks"
                         savedPrefix: "My layout"
+                        // Your layouts per screen too: one keeps this screen's widgets, and goes on
+                        // whichever screen the editor is on.
+                        toLook: values => Presets.screenLayout(values, root.editScreen?.name ?? "", Screens.main?.name ?? "",
+                                                               Quickshell.screens.map(s => s.name))
+                        fromLook: look => Presets.forScreen([look], Settings.values, root.editScreen?.name ?? "",
+                                                            Screens.main?.name ?? "", Quickshell.screens.map(s => s.name))[0]
                         subtitle: "Which widgets, and where"
                         // For the screen the editor is on (Presets.forScreen: the layout's widgets there,
                         // other screens' left as they are), laid out at its size, on the calmer side of
