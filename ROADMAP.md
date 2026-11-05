@@ -2158,6 +2158,23 @@ the profile's headroom (1.65x in) with peaks held under -1 dB, so they're as lou
 profile without clipping. Found on the way: after a shell reload the equalizer sent nothing (the
 filter was already running, no change to react to); it applies once at start now.
 
+### Quick settings additions (2026-11-05)
+User's picks from the ideas (all of them), each optional: offered under "Available" in quick
+settings' edit mode, so the panel only grows by what you add.
+- Display tile and page (`controlcenter/ScreenPage.qml`; Settings has its own `DisplayPage`, and
+  quick settings imports both folders, so the name clashed: "Cannot assign to non-existent
+  property onDone"): brightness, the laptop screen's refresh rate (165 or 60 Hz here, saved like a
+  mode kept in Settings -> Display), "Lower on battery" (`displayLowRefreshOnBattery`: the lowest
+  rate while unplugged, the choice kept for when it's plugged in), night light and its warmth,
+  and with a second screen what goes where, like Win+P: extend, duplicate (`mirror`), second
+  screen only or laptop screen only (`disabled`; both checked in Hyprland 0.57's `hl.monitor`
+  stubs). The projection is only in memory and needs a second screen: a saved "laptop screen
+  off" with the other one unplugged would leave no screen. `services/Display.qml` reads `hyprctl
+  monitors all -j` (again when a screen comes or goes, and after a reload) and gives
+  shell-settings.lua the setups in effect (`DisplayModes.effective`, tested), so the battery's
+  rate never overwrites the saved one. Checked on screen: the page, the reload. Untested: the
+  second screen (none here), the rate switching on battery.
+
 ### Headphones take over when plugged in (2026-11-05)
 User's question with USB-C IEMs (a SIMGOT EW300 DSP): they connected, but the sound stayed on
 the speakers. WirePlumber keeps the output chosen last for as long as it exists, so a new device

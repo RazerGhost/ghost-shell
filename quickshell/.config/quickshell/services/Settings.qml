@@ -241,6 +241,8 @@ Singleton {
             // Screens set up in Settings -> Display, by output name: { mode, scale, transform, vrr }
             // (settings/DisplayModes.js); the others use monitors.lua's "preferred".
             property var monitors: ({})
+            // The laptop's screen at its lowest refresh rate while on battery (quick settings' Display page).
+            property bool displayLowRefreshOnBattery: false
             // Per-app notifications, by app name: { mode } (services/NotificationRules.js).
             property var notificationApps: ({})
             // Equalizer gains in dB per output, by PipeWire node name (services/Equalizer.qml).

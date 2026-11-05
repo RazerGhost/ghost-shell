@@ -15,7 +15,7 @@ import "../widgets/OrderedList.js" as OrderedList
 Item {
     id: root
 
-    property string page: "main" // "main", "wifi", "bluetooth", "sound", "phone", "system" or "apps"
+    property string page: "main" // "main", "wifi", "bluetooth", "sound", "phone", "display", "system" or "apps"
 
     // A button here opens another island menu ("power"), or closes the island ("").
     signal openMenu(string menu)
@@ -36,6 +36,7 @@ Item {
         sound: { icon: "volume_up", title: "Sound", control: soundTile },
         power: { icon: "balance", title: "Power mode", control: powerTile },
         phone: { icon: "smartphone", title: "Phone", control: phoneTile },
+        display: { icon: "desktop_windows", title: "Display", control: displayTile },
         mic: { icon: "mic", title: "Microphone", control: micToggle },
         dnd: { icon: "do_not_disturb_on", title: "Do Not Disturb", control: dndToggle },
         nightlight: { icon: "nightlight", title: "Night light", control: nightToggle },
@@ -52,7 +53,7 @@ Item {
 
     // The island grows and shrinks to fit the current page.
     implicitHeight: (page === "wifi" ? wifiPage : page === "bluetooth" ? bluetoothPage
-                     : page === "sound" ? soundPage : page === "phone" ? phonePage
+                     : page === "sound" ? soundPage : page === "phone" ? phonePage : page === "display" ? displayPage
                      : page === "system" ? systemPage : page === "apps" ? appsPage : mainPage).implicitHeight
                     + padding
     clip: true // pages slide in from the side
@@ -138,6 +139,22 @@ Item {
             active: Phone.phone !== null
             hasPage: true
             onClicked: root.page = "phone"
+        }
+    }
+
+    Component {
+        id: displayTile
+
+        // The screen: its refresh rate, and night light while it's on (services/Display.qml).
+        Tile {
+            width: tileGrid.widthOf("display")
+            icon: "desktop_windows"
+            title: "Display"
+            subtitle: [Display.lowered ? Display.lowest + " Hz on battery" : Display.chosenRate > 0 ? Display.chosenRate + " Hz" : "",
+                       NightLight.on ? "Night light" : ""].filter(s => s).join(" · ")
+            active: NightLight.on
+            hasPage: true
+            onClicked: root.page = "display"
         }
     }
 
@@ -802,6 +819,19 @@ Item {
             property: "active"
             value: root.visible && (root.page === "phone" || root.tileList.includes("phone"))
         }
+
+        Behavior on x {
+            NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }
+        }
+    }
+
+    ScreenPage { // the Display page (settings/ has a DisplayPage of its own)
+        id: displayPage
+        x: root.page === "display" ? root.padding : root.width
+        width: root.width - root.padding * 2
+        visible: x < root.width
+        onBack: root.page = "main"
+        onDone: root.openMenu("")
 
         Behavior on x {
             NumberAnimation { duration: Theme.anim.normal; easing.type: Theme.anim.easing }

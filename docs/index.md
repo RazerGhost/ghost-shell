@@ -116,6 +116,7 @@ Recovery procedures (lock screen crash, a session that can't start) are in ROADM
 | Wi-Fi page: scan, connect, forget, QR share, VPNs, hotspot, airplane mode, captive-portal sign-in | `controlcenter/WifiPage.qml`, `WifiShare.qml`, `WifiQr.js`, `services/NetworkExtras.qml` |
 | Bluetooth page: scan, pair, connect, device batteries | `controlcenter/BluetoothPage.qml` |
 | Sound page: output, microphone, per-app volume, equalizer preset | `controlcenter/SoundPage.qml`, `DeviceList.qml` |
+| Quick settings' Display tile and page: brightness, refresh rate (lower on battery), night light warmth, a second screen (extend, duplicate, one only; not saved) | `controlcenter/ScreenPage.qml`, `services/Display.qml`, `settings/DisplayModes.js` (`effective`) |
 | The output chooser in the volume slider (outputs, and microphones when there are several) | `controlcenter/QuickSettings.qml` (`devicesOpen`), `widgets/LevelSlider.qml` (`actionIcon`), `DeviceList.qml` |
 | System page: CPU, memory, GPUs, disk, busiest apps with End task | `controlcenter/SystemPage.qml`, `services/SystemStats.qml`, `system-stats.sh` |
 | Phone page: ring, send files, clipboard, browse; files dropped on the island and Nautilus's "Send to phone" go through `phone.sh share` | `controlcenter/PhonePage.qml`, `services/Phone.qml`, `phone.sh` |

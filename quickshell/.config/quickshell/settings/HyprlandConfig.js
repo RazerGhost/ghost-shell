@@ -129,7 +129,7 @@ function bellLua(bell) {
 
 // The Lua file Hyprland loads last (hyprland.lua), from the settings' values, whether game mode
 // is on, whether a wallpaper is chosen and whether the bell may ring (bellLua).
-function lua(v, gameMode, wallpaperChosen, bell) {
+function lua(v, gameMode, wallpaperChosen, bell, monitors) {
     return [
         "-- Written by Quickshell's Settings (settings/HyprlandSettings.qml); don't edit:",
         "-- it's overwritten. Loaded last by hyprland.lua, so it overrides input.lua and look.lua.",
@@ -162,7 +162,9 @@ function lua(v, gameMode, wallpaperChosen, bell) {
         ...bellLua(bell),
         // Screens set up in the Display page, by output name (the rest keep monitors.lua's
         // "preferred"); one that isn't safe to write is left out.
-        ...Object.entries(v.monitors || {}).map(([output, setup]) => DisplayModes.lua(output, setup)).filter(l => l !== ""),
+        // `monitors`, when given, is what's in effect now (DisplayModes.effective: the battery's
+        // lower rate, a second screen's projection) in place of the saved ones.
+        ...Object.entries(monitors ?? v.monitors ?? {}).map(([output, setup]) => DisplayModes.lua(output, setup)).filter(l => l !== ""),
         "",
         "-- Read by positions.lua.",
         `ShellSettings = { remember_positions = ${v.rememberPositions !== false} }`,
