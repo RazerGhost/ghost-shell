@@ -197,4 +197,33 @@ TestCase {
             }
         }
     }
+
+    // Layouts per screen: applied on one screen, the widgets on another stay.
+    function test_forScreen() {
+        const base = Presets.widgetPresets(2560, 1440, "", 48);
+        const values = { desktopClock: true, desktopWeather: true, desktopNote: true,
+                         desktopWidgets: { clock: { x: 0.1, y: 0.1, screen: "DP-2" }, weather: { x: 0.2, y: 0.2 }, note: { x: 0.5, y: 0.5 } } };
+        const screens = ["eDP-1", "DP-2"];
+        // On DP-2: Glance (clock and weather) there; the note on the laptop stays on and put.
+        const onDp2 = Presets.forScreen(base, values, "DP-2", "eDP-1", screens).find(p => p.name === "Glance").values;
+        compare(onDp2.desktopClock, true);
+        compare(onDp2.desktopWeather, true);
+        compare(onDp2.desktopWidgets.weather.screen, "DP-2");   // moved over from the laptop
+        compare(onDp2.desktopNote, true);
+        compare(onDp2.desktopWidgets.note, { x: 0.5, y: 0.5 });
+        // Clean on the laptop: its widgets off, DP-2's clock still on.
+        const clean = Presets.forScreen(base, values, "eDP-1", "eDP-1", screens).find(p => p.name === "Clean").values;
+        compare(clean.desktopClock, true);
+        compare(clean.desktopWeather, false);
+        compare(clean.desktopNote, false);
+        // The main screen's layout widgets carry no screen (they follow a new main one).
+        const glance = Presets.forScreen(base, values, "eDP-1", "eDP-1", screens).find(p => p.name === "Glance").values;
+        compare(glance.desktopWidgets.weather.screen, undefined);
+        compare(glance.desktopWidgets.clock.screen, undefined);
+        // Applied, a layout matches itself (the gallery marks it).
+        const applied = JSON.parse(JSON.stringify(values));
+        const list = Presets.forScreen(base, values, "DP-2", "eDP-1", screens);
+        Presets.apply(applied, list, "Glance");
+        compare(Presets.current(applied, Presets.forScreen(base, applied, "DP-2", "eDP-1", screens)), "Glance");
+    }
 }

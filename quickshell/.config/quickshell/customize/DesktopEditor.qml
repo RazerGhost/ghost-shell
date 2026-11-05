@@ -222,13 +222,16 @@ Scope {
                         savedKey: "widgetLooks"
                         savedPrefix: "My layout"
                         subtitle: "Which widgets, and where"
-                        // Laid out for the main screen (a layout is the main screen's widgets), on the
-                        // calmer side of the wallpaper.
-                        presets: Presets.widgetPresets(Screens.main?.width ?? 1920, Screens.main?.height ?? 1080,
-                                                       Wallpaper.quietSide,
-                                                       // On the grid's lines whether it shows or not, so switching it on or off
-                                                       // doesn't move them (and a layout you have stays chosen).
-                                                       DesktopWidgetsJs.gridSize(Settings.values.desktopGridSize))
+                        // For the screen the editor is on (Presets.forScreen: the layout's widgets there,
+                        // other screens' left as they are), laid out at its size, on the calmer side of
+                        // the main screen's wallpaper, and on the grid's lines whether it shows or not
+                        // (switching it on or off doesn't move them or lose the match).
+                        presets: Presets.forScreen(
+                            Presets.widgetPresets(root.editScreen?.width ?? 1920, root.editScreen?.height ?? 1080,
+                                                  root.onMain ? Wallpaper.quietSide : "",
+                                                  DesktopWidgetsJs.gridSize(Settings.values.desktopGridSize)),
+                            Settings.values, root.editScreen?.name ?? "", Screens.main?.name ?? "",
+                            Quickshell.screens.map(s => s.name))
                         fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)
                         art: Component {
                             Item {
@@ -236,9 +239,11 @@ Scope {
                                 readonly property var values: parent.option.values
 
 
-                                // Each widget that's on, at its place and size on the screen, shrunk.
+                                // Each widget that's on this screen, at its place and size, shrunk.
                                 Repeater {
-                                    model: DesktopWidgetsJs.kinds.filter(k => layout.values[k.key])
+                                    model: DesktopWidgetsJs.kinds.filter(k => layout.values[k.key]
+                                        && DesktopWidgetsJs.screenOf(layout.values.desktopWidgets, k.name, Quickshell.screens.map(s => s.name),
+                                                                     Screens.main?.name ?? "") === (root.editScreen?.name ?? ""))
 
                                     Rectangle {
                                         required property var modelData

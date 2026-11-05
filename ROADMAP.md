@@ -2203,6 +2203,19 @@ screens (`hyprctl output create headless`, removed after each test).
   100 % screen's edges); `DesktopWidgets.dropped` keeps them on the screen as shown. And per-screen
   parts no longer throw while a screen is unplugged.
 
+### Widgets and layouts per screen; workspaces you move stay (2026-11-05, user's picks)
+- Widget layouts are per screen (`Presets.forScreen`, tested): in the desktop editor on a screen,
+  a layout puts its widgets on that screen (laid out at its size) and turns off the others there;
+  widgets on other screens stay on and in place; the gallery marks a layout by this screen's
+  widgets only, and its cards draw only them. Your own saved layouts still keep the whole
+  arrangement, every screen.
+- Presets are laid out on the grid's size whether it shows or not, so switching the grid doesn't
+  move them; a group pushed back onto the screen at another size moves by whole cells and stays
+  on the grid (`DesktopWidgets.arrange`'s `cell`, tested).
+- Workspaces per screen move open workspaces only when their homes change, kept across a shell
+  reload (they moved at every config reload, undoing one you'd moved). Checked on a virtual
+  screen: a workspace moved there by hand stayed through a reload.
+
 ### A grid that lines up (2026-11-05, user's find)
 Placing widgets symmetrically on the grid was hard: the grid's spacing was scaled by the shell
 size only while the widgets and their places also follow the text size (at 85 % and 90 % they

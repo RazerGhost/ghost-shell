@@ -151,6 +151,37 @@ function widgetPresets(sw, sh, quiet, cell) {
     return presets;
 }
 
+// Widget layouts for one screen (the desktop editor's): each layout's widgets go on `here` (with
+// it in their place, except on the main screen, whose widgets carry none and follow a new main
+// one), the widgets on other screens keep their places and stay on, and the others on this
+// screen go off. As whole settings, so matching a layout and applying one (Presets.current,
+// apply) only ever concern this screen. `values` the settings now, `screens` the connected
+// output names.
+function forScreen(presets, values, here, main, screens) {
+    const saved = values?.desktopWidgets ?? {};
+    const elsewhere = name => DesktopWidgets.screenOf(saved, name, screens, main) !== here;
+    return presets.map(p => {
+        const out = {};
+        const places = {};
+        for (const kind of DesktopWidgets.kinds) {
+            const inLayout = p.values.desktopWidgets?.[kind.name] !== undefined;
+            if (inLayout) {
+                const own = Object.assign({}, p.values.desktopWidgets[kind.name]);
+                if (here !== main)
+                    own.screen = here;
+                places[kind.name] = own;
+                out[kind.key] = true;
+            } else {
+                if (saved[kind.name] !== undefined)
+                    places[kind.name] = JSON.parse(JSON.stringify(saved[kind.name]));
+                out[kind.key] = values?.[kind.key] === true && elsewhere(kind.name);
+            }
+        }
+        out.desktopWidgets = places;
+        return { name: p.name, values: out };
+    });
+}
+
 // On the laptop's 1920 x 1080 screen, as they read without a wallpaper to go around (the tests).
 const desktopWidgets = widgetPresets(1920, 1080, "");
 
