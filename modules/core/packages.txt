@@ -75,6 +75,8 @@ zsh-completions
 starship
 fzf
 pkgfile
+# `z` jumps to a folder you use by part of its name (zsh/.zshrc)
+zoxide
 # CachyOS's listing (ls through eza) and man pages through bat, kept in .zshrc
 eza
 bat

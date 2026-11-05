@@ -18,5 +18,9 @@ window-decoration = client
 # See-through, like the shell's glass panels: Hyprland blurs what's behind (look.lua).
 background-opacity = 0.85
 
+# A short trail in the accent color when the cursor jumps (shaders/cursor-trail.glsl). Ghostty
+# redraws a focused window continuously while a shader is set; measured in the commit adding it.
+custom-shader = shaders/cursor-trail.glsl
+
 # Your own settings for this machine, not in git (the ? makes it optional).
 config-file = ?local

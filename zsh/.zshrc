@@ -24,15 +24,27 @@ setopt share_history hist_ignore_all_dups hist_ignore_space hist_reduce_blanks e
 # Typing a folder's name goes into it; no beep
 setopt auto_cd interactive_comments no_beep
 
-# Completion (zsh-completions adds its files to the default path): a menu to move through with the
-# arrow keys, case and - / _ ignored like fish, colors from ls
+# Completion (zsh-completions adds its files to the default path): case and - / _ ignored like
+# fish, colors from ls
 autoload -Uz compinit
 compinit -d ~/.cache/zsh/zcompdump
-zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z-_}={A-Za-z_-}' 'r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' cache-path ~/.cache/zsh/completion
 zstyle ':completion:*' use-cache on
+zstyle ':completion:*:descriptions' format '[%d]' # group names, which fzf-tab switches between
+
+# Tab opens the completions in fzf (fzf-tab): type to filter, arrows to move, Enter to take one,
+# < and > for the groups; a folder shows what's in it beside the list. Loaded after compinit and
+# before the plugins below, which wrap the same keys. Without it, zsh's own menu with arrow keys.
+if [[ -r /usr/share/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh ]]; then
+    zstyle ':completion:*' menu no
+    zstyle ':fzf-tab:*' switch-group '<' '>'
+    zstyle ':fzf-tab:complete:(cd|z|ls|eza):*' fzf-preview 'eza -1 --color=always --icons=always $realpath'
+    source /usr/share/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh
+else
+    zstyle ':completion:*' menu select
+fi
 
 # Keys: emacs-style line editing; Home, End, Delete, Ctrl+arrows by word, Ctrl+Backspace a word
 bindkey -e
@@ -65,8 +77,39 @@ alias ..='cd ..' ...='cd ../..' ....='cd ../../..'
 
 (( $+commands[starship] )) && eval "$(starship init zsh)"
 
+# Old prompts collapse to a plain ❯ once a command is entered, so the pills only show on the line
+# you're typing in and the scrollback stays clean. zsh has no transient prompt of its own: the
+# line editor runs inside a nested edit, and when it ends (Enter, Ctrl+C) the prompt is redrawn
+# short before the command runs. Ctrl+D on an empty line still exits.
+_ghost_collapse_prompt() {
+    emulate -L zsh
+    [[ $CONTEXT == start ]] || return 0
+    local -i ret
+    while true; do
+        zle .recursive-edit
+        ret=$?
+        [[ $ret == 0 && $KEYS == $'\4' ]] || break
+        [[ -o ignore_eof ]] || exit 0
+    done
+    local saved=$PROMPT saved_right=$RPROMPT
+    PROMPT='%B%F{green}❯%f%b ' RPROMPT=''
+    zle .reset-prompt
+    PROMPT=$saved RPROMPT=$saved_right
+    if (( ret )); then
+        zle .send-break
+    else
+        zle .accept-line
+    fi
+    return ret
+}
+zle -N zle-line-init _ghost_collapse_prompt
+
 # What a new terminal shows (Settings -> Default apps -> Terminal greeting)
 [[ -o interactive && -x ~/.local/bin/ghost-greeting ]] && ~/.local/bin/ghost-greeting
+
+# zoxide: `z proj` jumps to the folder you use most that matches (it learns from every cd),
+# `zi` picks one in fzf. Last, as zoxide asks, so it sees every folder change.
+(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
 
 [[ -r ~/.config/zsh/local.zsh ]] && source ~/.config/zsh/local.zsh
 true

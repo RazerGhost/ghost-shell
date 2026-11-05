@@ -2310,6 +2310,16 @@ terminal greeting is one script for both shells now (`bin/.local/bin/ghost-greet
 `tests/greeting_test.sh`). The core module moves an earlier `~/.zshrc` to `~/.zshrc.pre-ghost`
 and makes zsh the login shell (`sudo chsh`); fish stays installed as a fallback.
 fish's history (198 commands) was merged into zsh's, so the suggestions as you type know it.
+Then (user's picks from what else the shell could do): earlier prompts collapse to a plain `❯`
+once a command is entered (zsh has no transient prompt: the line editor runs in a nested edit
+and the prompt is redrawn short when it ends; checked in a pseudo-terminal), Tab opens the
+completions in fzf (fzf-tab, AUR, MIT; a folder's contents beside them), `z` jumps to a folder by
+part of its name (zoxide, extra, MIT), and Ghostty draws a short trail in the cursor's color (the
+accent) when the cursor jumps (`ghostty/.config/ghostty/shaders/cursor-trail.glsl`, our own
+shader: it compiles with glslang against Ghostty 1.4's documented uniforms; Ghostty logs nothing,
+so the look is the user's to check). Ghostty redraws a focused window continuously while a shader
+is set: measured 0 ticks of CPU in 10 s before, 1 after. Starship can't animate (a prompt is
+printed once); Ghostty's shaders are where motion can live.
 Machine-local additions: `~/.config/zsh/local.zsh`. Checked: the config loads without errors in a
 terminal (about 0.2 s with fastfetch), the greeting's tests pass.
 

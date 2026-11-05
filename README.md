@@ -61,7 +61,8 @@ machine can take what it needs.
   Zed, Yazi, Zen, Discord, Spotify, Steam and MangoHud.
 - **zsh** as the login shell, set up like fish (suggestions as you type, highlighting, history
   search on Up and Down, fzf on Ctrl+R) with a [Starship](https://starship.rs) prompt of rounded pills in the
-  wallpaper's colors; fish stays installed.
+  wallpaper's colors (earlier prompts collapse to `❯`), Tab completions in fzf (fzf-tab), `z` to
+  jump to folders (zoxide), and a cursor trail in the accent color in Ghostty; fish stays installed.
 
 The full plan and every decision behind it: [ROADMAP.md](ROADMAP.md). Keybinds:
 [docs/keybinds.md](docs/keybinds.md). Every feature and rule with its files: [docs/index.md](docs/index.md).

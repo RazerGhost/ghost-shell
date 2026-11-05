@@ -5,3 +5,6 @@ colloid-icon-theme-git
 # The pointer: Bibata Modern (Ice, Classic, Amber; user's choice 2026-10-30), picked in
 # Settings -> Keyboard and mouse -> Pointer
 bibata-cursor-theme-bin
+# zsh's Tab completions in fzf, with a folder's contents beside them (zsh/.zshrc); MIT, upstream
+# Aloxaf/fzf-tab, this package follows its releases
+fzf-tab
