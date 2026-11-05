@@ -23,6 +23,7 @@ the reasons and history are in [ROADMAP.md](../ROADMAP.md), verified API facts i
 |---|---|
 | Every top-level folder except `modules/`, `system/`, `tests/`, `docs/`, `machines/` is a GNU Stow package mirroring `$HOME` | `ghost install`, `stow_packages` in `modules/lib.sh` |
 | Never move or rename a Stow package while the desktop runs from it (links break; Hyprland once lost hyprland.lua) | |
+| One-time changes for machines set up by an earlier version (what an old setup installed and the current one doesn't): one script each, run once per machine by `ghost migrate`, recorded in `~/.local/state/ghost/migrations` (`tests/migrations_test.sh`) | `migrations/`, `bin/.local/bin/ghost` |
 | One module per part of the setup: `packages.txt` (pacman), `aur.txt` (paru), `packages.sh` (packages by hardware: `modules/system/packages.sh`, `nvidia-prime` on a hybrid laptop, `libva-nvidia-driver` where NVIDIA drives the display), re-runnable `setup.sh`; new ones go in `all_modules` and `about` | `modules/`, `bin/.local/bin/ghost` |
 | Opt-in modules (`llm`, `wave3`) only install where `~/.config/ghost/modules` lists them | `opt_in` in `ghost` |
 | A machine picks its modules in `~/.config/ghost/modules` (not in git); without it, all | |

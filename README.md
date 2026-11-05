@@ -105,6 +105,7 @@ After the first install, `ghost` (in `~/.local/bin`) does everything:
 | `ghost looks export` / `import` | your themes and looks into the repo's `looks.json`, or from it on another machine |
 | `ghost wallpapers get [words] [--style S]` | anime art from wallhaven.cc into your wallpaper folder (safe for work only) |
 | `ghost webapp add <name> <url> [icon]` | a site in its own window, in the launcher and the dock (`remove <name>`, `list`) |
+| `ghost migrate` | the one-time changes for a machine set up by an earlier version (also run by every install and update) |
 | `ghost doctor` | check that everything is set up (and show what hardware `ghost-hw` found); each problem says what fixes it |
 | `ghost-hw facts` | this machine's hardware as the setup sees it: laptop or not, battery, lid, which GPU drives the screens (`ghost-hw <question>` for one) |
 | `ghost modules` | list the modules and which ones this machine uses |

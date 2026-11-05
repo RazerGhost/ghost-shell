@@ -23,6 +23,8 @@
 #   ghost looks export | import
 #                     your themes and looks into the repo's looks.json, or from it into this
 #                     machine's (modules/core/looks.sh)
+#   ghost migrate     the one-time changes for machines set up by an earlier version (migrations/;
+#                     also run at the end of every install and update)
 #   ghost doctor      check that everything is set up
 #   ghost modules     list the modules, and which this machine uses
 #   ghost keybinds    Hyprland's keybinds as a Markdown table (docs/keybinds.md is made with it)
@@ -174,6 +176,7 @@ cmd_install() {
     if [[ ${#theme[@]} -gt 0 && ! " ${modules[*]} " =~ " core " ]]; then
         cmd_theme "${theme[@]}"
     fi
+    cmd_migrate
 
     step "Done"
     echo "Log out and back in if this was the first run or env.lua changed (GPU settings apply at Hyprland start)."
@@ -189,6 +192,22 @@ cmd_update() {
     git pull --rebase
     # The new version of this script does the rest.
     exec "$repo/bin/.local/bin/ghost" install "$@"
+}
+
+# Runs the migrations this machine hasn't run yet (migrations/README.md), in name order, each
+# recorded once it succeeds; a failing one stops the run and stays for next time.
+cmd_migrate() {
+    local done_list=${XDG_STATE_HOME:-$HOME/.local/state}/ghost/migrations migration name
+    mkdir -p "$(dirname "$done_list")"
+    touch "$done_list"
+    for migration in migrations/*.sh; do
+        name=$(basename "$migration" .sh)
+        grep -qx "$name" "$done_list" && continue
+        step "Migration: $name"
+        bash -c 'set -euo pipefail; . modules/lib.sh; . "$1"' migration "$migration" \
+            || fail "migration $name failed; fix it and run ghost migrate again"
+        echo "$name" >>"$done_list"
+    done
 }
 
 cmd_theme() {
@@ -294,6 +313,7 @@ case ${1:-help} in
     calendar) shift; modules/calendar/calendar.sh "$@" ;;
     looks) shift; modules/core/looks.sh "$@" ;;
     wallpapers) shift; modules/core/wallpapers.sh "$@" ;;
+    migrate) keep_sudo; cmd_migrate ;;
     doctor) cmd_doctor ;;
     modules) cmd_modules ;;
     keybinds) cmd_keybinds ;;

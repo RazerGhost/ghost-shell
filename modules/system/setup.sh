@@ -73,18 +73,8 @@ if [[ -n $plymouth ]]; then
     rebuild_boot=true
 fi
 
-# `splash` is Plymouth's, which is gone: the kernel only logs it as an unknown option. The line
-# the 2026-11-04 try added goes whole; a `splash` in CachyOS's own line is cut out of it.
-if $limine && grep -qxF 'KERNEL_CMDLINE[default]+=" splash"' /etc/default/limine; then
-    sudo sed -i '/^KERNEL_CMDLINE\[default\]+=" splash"$/d' /etc/default/limine
-    rebuild_boot=true
-fi
-# That try's Plymouth drop-in (it kept the logo on screen and crashed Hyprland's first start).
-if [[ -e /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf ]]; then
-    sudo rm /etc/systemd/system/plymouth-quit.service.d/retain-splash.conf
-    sudo rmdir --ignore-fail-on-non-empty /etc/systemd/system/plymouth-quit.service.d
-    sudo systemctl daemon-reload
-fi
+# `splash` is Plymouth's, which is gone: the kernel only logs it as an unknown option, so it's cut
+# out of CachyOS's own kernel line.
 if $limine && grep -Eq '^KERNEL_CMDLINE.* splash( |")' /etc/default/limine; then
     sudo sed -i -E '/^KERNEL_CMDLINE/ s/ splash( |")/\1/' /etc/default/limine
     rebuild_boot=true
@@ -139,27 +129,10 @@ step "Logging in (greetd)"
 sed "s/@USER@/$USER/" system/etc/greetd/config.toml >"${TMPDIR:-/tmp}/ghost-greetd.toml"
 sudo install -Dm644 "${TMPDIR:-/tmp}/ghost-greetd.toml" /etc/greetd/config.toml
 rm -f "${TMPDIR:-/tmp}/ghost-greetd.toml"
-# Its ordering after Plymouth (installed until 2026-11-04) is greetd's own unit's already, and
-# there's no Plymouth: the copy goes.
-if [[ -e /etc/systemd/system/greetd.service.d/after-plymouth.conf ]]; then
-    sudo rm /etc/systemd/system/greetd.service.d/after-plymouth.conf
-    sudo rmdir --ignore-fail-on-non-empty /etc/systemd/system/greetd.service.d
-fi
 sudo systemctl daemon-reload
 # Enable only, don't start: starting it now would take over tty1 under the running session.
 # It takes effect on the next boot.
 sudo systemctl enable greetd.service
-# The login screen that ran after a logout until 2026-11-04 (Quickshell as the greeter user):
-# its copy of the shell, its Hyprland config and its home folder.
-sudo rm -rf /etc/greetd/quickshell /etc/greetd/hypr /var/lib/qs-greeter
-
-# The service that woke the RTX at shutdown (2026-11-04) didn't help, and pointed the wrong way
-# (ROADMAP: "The RTX missing after a shutdown"): taken out where it was installed.
-if [[ -e /etc/systemd/system/ghost-wake-dgpu.service ]]; then
-    sudo systemctl disable --now ghost-wake-dgpu.service 2>/dev/null || true
-    sudo rm /etc/systemd/system/ghost-wake-dgpu.service
-    sudo systemctl daemon-reload
-fi
 
 step "Name lookup: one mDNS service (Avahi)"
 mdns=system/etc/systemd/resolved.conf.d/50-no-mdns.conf
