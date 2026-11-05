@@ -569,6 +569,8 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   openxlr runs, the Wave:3's raw microphone, which would skip the Voice chain; Chat and Stream are
   the microphones. A left-out node never takes over when plugged in (`AudioDevices.listed`,
   tested). The device lists scroll past six rows and the page below its header past the island.
+  Its Apps list shows only streams that play (`PwNodeType.AudioOutStream`; `isSink` let in
+  openxlr's 15 `parec` level meters) and none of openxlr's own (`AudioDevices.openxlr`).
 
 ### Proton apps (built 2026-10-29)
 - The `proton` module (user's request): Proton VPN (`proton-vpn-gtk-app`, extra), Proton Mail

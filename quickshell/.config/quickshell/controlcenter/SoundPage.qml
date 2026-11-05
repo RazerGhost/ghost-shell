@@ -5,6 +5,7 @@ import Quickshell.Widgets
 import qs.services
 import qs.theme
 import qs.widgets
+import "../services/AudioDevices.js" as AudioDevices
 
 // Sound page of quick settings: the switch mutes the speakers; below it, where sound goes
 // (speakers, headphones), the equalizer's preset for it, which microphone records, and a volume
@@ -19,9 +20,12 @@ Column {
     signal back()
 
     // The apps that are playing sound (output streams; not the equalizer's own, see
-    // Audio.outputs). The outputs and microphones are Audio's.
+    // Audio.outputs, or openxlr's own between its channels). By type: `isSink` let recording
+    // streams in too (openxlr's 15 level meters, each a `parec`). The outputs and microphones
+    // are Audio's.
     readonly property list<PwNode> apps: (Pipewire.nodes?.values ?? [])
-        .filter(n => n.audio && n.isStream && !n.isSink && !n.name.startsWith("ghost-equalizer"))
+        .filter(n => n.type === PwNodeType.AudioOutStream && !n.name.startsWith("ghost-equalizer")
+                     && !AudioDevices.openxlr(n.name))
 
     // The app's own name from its .desktop file ("Vesktop") when one matches, else PipeWire's.
     function appName(node: PwNode): string {

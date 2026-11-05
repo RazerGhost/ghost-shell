@@ -73,6 +73,15 @@ TestCase {
                 { sink: "bluez_output.AC.1", source: "" });
     }
 
+    function test_openxlr() {
+        verify(AudioDevices.openxlr("OpenXLR_ch_system"));
+        verify(AudioDevices.openxlr("output.OpenXLR_ch_game_OpenXLR_mix_monitor"));
+        verify(AudioDevices.openxlr("input.OpenXLR_chat"));
+        verify(!AudioDevices.openxlr("Firefox"));
+        verify(!AudioDevices.openxlr("alsa_output.usb-Elgato_Systems_Elgato_Wave_3_A011-00.analog-stereo"));
+        verify(!AudioDevices.openxlr(undefined));
+    }
+
     function test_listed() {
         const xlr = ["OpenXLR_ch_system", "OpenXLR_ch_game", "OpenXLR_mix_monitor", "OpenXLR_chat", "OpenXLR_stream",
                      "alsa_input.usb-Elgato_Systems_Elgato_Wave_3_A011-00.mono-fallback"];

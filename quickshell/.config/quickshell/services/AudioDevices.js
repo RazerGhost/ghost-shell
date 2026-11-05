@@ -21,9 +21,16 @@ function takesOver(name, sink) {
 // openxlr); its microphones are the processed Chat and Stream. While openxlr runs, the Wave:3's
 // own microphone is left out: picking it would skip the Voice chain (noise removal, EQ,
 // compressor).
+// Whether a node is openxlr's own plumbing: its channels and mixes, the streams between them
+// ("output.OpenXLR_ch_game_OpenXLR_mix_monitor"), its filters. Apps playing into its channels
+// keep their own names.
+function openxlr(name) {
+    return /(^|\.)OpenXLR_/.test(String(name ?? ""));
+}
+
 function listed(name, sink, all) {
     const n = String(name ?? "");
-    if (n.startsWith("OpenXLR_"))
+    if (openxlr(n))
         return sink ? n === "OpenXLR_ch_system" : n === "OpenXLR_chat" || n === "OpenXLR_stream";
     if (!sink && n.startsWith("alsa_input.usb-Elgato_Systems_Elgato_Wave_3"))
         return !Array.from(all ?? []).includes("OpenXLR_chat");
