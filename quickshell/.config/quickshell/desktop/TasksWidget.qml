@@ -2,7 +2,6 @@ import QtQuick
 import qs.services
 import qs.theme
 import qs.widgets
-import "ListPick.js" as ListPick
 
 // The to-do widgets, a to-do list of their own (the medium "To-do" and the large "To-do list",
 // `large`): the open tasks (services/Planner.qml), a list that scrolls with the wheel or
@@ -13,13 +12,6 @@ import "ListPick.js" as ListPick
 WidgetSurface {
     id: widget
 
-    // For screen readers in keyboard mode (WidgetStage): what it shows, in words.
-    function describe(): string {
-        return open.length === 0 ? (done > 0 ? "All done" : "Nothing to do")
-            : (open.length === 1 ? "1 task" : open.length + " tasks") + ": " + open.map(t => t.text).join(", ")
-              + ". Down picks one, Enter adds a task";
-    }
-
     medium: true
     property bool hidesTitles: false
     // Typing into the field: the desktop's layer has the keyboard meanwhile (WidgetStage.qml).
@@ -28,49 +20,9 @@ WidgetSurface {
     readonly property var open: Planner.todos.map((t, i) => ({ text: t.text, done: t.done, index: i })).filter(t => !t.done)
     readonly property int done: Planner.todos.length - open.length
 
-    // Keyboard mode: the task the keys are on, -1 for none (Enter then types a new one).
-    property int pick: -1
-    onChosenChanged: pick = -1
-    // Tasks ticked or added elsewhere (the other to-do widget): the pick stays on the list.
-    onOpenChanged: pick = ListPick.kept(pick, open.length)
-    // Screen readers hear the task the keys are on.
-    onPickChanged: {
-        if (chosen)
-            Accessible.announce(pick >= 0 ? open[pick].text + ". Enter ticks it off." : "Add a task. Enter to type.");
-    }
-
     function startTyping(): void {
         keyboard.start();
         field.focusInput();
-    }
-
-    // Up and Down through the tasks (on past the ends to the next widget), Enter ticks the one
-    // picked off, or with none picked types a new one.
-    function key(event: var): bool {
-        if (hidesTitles)
-            return false;
-        if (event.key === Qt.Key_Down || event.key === Qt.Key_Up) {
-            const next = ListPick.step(pick, open.length, event.key === Qt.Key_Down);
-            if (next === null)
-                return false;
-            pick = next;
-            if (pick >= 0)
-                list.positionViewAtIndex(pick, ListView.Contain);
-            return true;
-        }
-        if (!activates(event))
-            return false;
-        if (pick < 0) {
-            startTyping();
-        } else {
-            const task = open[pick];
-            if (!task)
-                return true;
-            const left = open.length - 1;
-            list.keepingPlace(() => Planner.toggle(task.index));
-            pick = Math.min(pick, left - 1);
-        }
-        return true;
     }
 
     WidgetKeyboard {
@@ -149,7 +101,7 @@ WidgetSurface {
             required property var modelData
             required property int index
             // Under the pointer, or picked in keyboard mode: what a click or Enter will do.
-            readonly property bool lit: containsMouse || (widget.chosen && widget.pick === index)
+            readonly property bool lit: containsMouse
 
             width: ListView.view.width
             height: list.row

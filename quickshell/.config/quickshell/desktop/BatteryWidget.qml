@@ -9,11 +9,6 @@ import qs.widgets
 WidgetSurface {
     id: widget
 
-    // For screen readers in keyboard mode (WidgetStage): what it shows, in words.
-    function describe(): string {
-        return Math.round(Battery.level * 100) + "%" + (Battery.timeLabel ? ", " + Battery.timeLabel : Battery.charging ? ", charging" : "");
-    }
-
     readonly property color tone: Battery.low ? Colors.m3error : Colors.m3primary
 
     ProgressRing {

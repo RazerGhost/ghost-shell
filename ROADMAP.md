@@ -1985,7 +1985,10 @@ User's picks.
   typing and isn't dragged (a drag selects text); the clipboard lists its whole history.
   Verified by the user (scrolling, a clip copied and pasted, a long note typed into).
 
-### The desktop widgets by keyboard (built 2026-11-04; verified by the user)
+### The desktop widgets by keyboard (built 2026-11-04; removed 2026-11-05, user's call)
+Removed: with widgets on several screens, a keyboard-taking layer per screen would compete for
+the keyboard, and the user judged the mode not worth it. Super+D is free again; typing in the note
+and to-do widgets after a click stays (`WidgetKeyboard.qml`). As it was:
 User's pick (a gap the review found: the note, to-do and clipboard widgets took no keyboard
 without a click first). Super+D (`qs ipc call widgets browse`), like Windows' "show desktop":
 from a workspace with windows it goes to an empty one (`Editing`'s trip), and the widgets'
@@ -2192,9 +2195,9 @@ screens (`hyprctl output create headless`, removed after each test).
   screen's video plays by the same rules, its thumbnail the still frame (`Wallpaper.stillFor`).
   Checked: a per-screen picture again; untested: a video on a second screen (no video here), the
   editor on a second screen (it moves you to an empty workspace).
-- Kept on purpose (user's call): the widgets' keyboard mode (Super+D) is only the main screen's.
-  One keyboard-taking layer per screen would compete for the keyboard across screens; without a
-  clean split it's not worth the risk.
+- The widgets' keyboard mode (Super+D) is gone (user's call): one keyboard-taking layer per
+  screen would compete for the keyboard across screens, and without a clean split it wasn't worth
+  it.
 - Fixed on the way (user's find): widgets stopped about 7 % in from the screen's edges at a shell
   size under 100 % (places are kept at 100 % and zoom toward the middle; a drop capped them at the
   100 % screen's edges); `DesktopWidgets.dropped` keeps them on the screen as shown. And per-screen

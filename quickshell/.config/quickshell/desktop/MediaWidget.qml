@@ -14,14 +14,6 @@ import qs.widgets
 WidgetSurface {
     id: widget
 
-    // For screen readers in keyboard mode (WidgetStage): what it shows, in words.
-    function describe(): string {
-        if (!player)
-            return app ? "Nothing playing. Enter opens " + app.name : "Nothing playing";
-        return (player.isPlaying ? "Playing " : "Paused: ") + (Media.title(player) || player.identity || "")
-            + (Media.artist(player) ? " by " + Media.artist(player) : "") + ". Enter " + (player.isPlaying ? "pauses" : "plays");
-    }
-
     readonly property MprisPlayer player: Media.player
     readonly property DesktopEntry app: player ? null : Media.lastApp
     // The cover is the card: everything over it turns light.
@@ -33,19 +25,6 @@ WidgetSurface {
     // Opening the music app or bringing the player's window forward would act on the desktop
     // behind the lock.
     property bool locked: false
-
-    // Keyboard mode: Enter or Space plays or pauses (with nothing playing, opens the music app).
-    function key(event: var): bool {
-        if (!activates(event))
-            return false;
-        if (player) {
-            player.togglePlaying();
-        } else {
-            handOff();
-            open();
-        }
-        return true;
-    }
 
     function open(): void {
         if (app && !locked)

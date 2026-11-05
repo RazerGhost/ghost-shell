@@ -10,14 +10,6 @@ import "../services/Weather.js" as WeatherJs
 WidgetSurface {
     id: widget
 
-    // For screen readers in keyboard mode (WidgetStage): what it shows, in words.
-    function describe(): string {
-        if (!now)
-            return "No weather yet";
-        const hours = Weather.hours.slice(0, 3).map(h => WeatherJs.hourLabel(h.hour, Settings.values.clock24Hour) + " " + h.temperature + "°");
-        return `${now.temperature}°, ${now.label}, high ${now.high}°, low ${now.low}°` + (hours.length ? ". Next: " + hours.join(", ") : "");
-    }
-
     readonly property var now: Weather.current
 
     medium: true

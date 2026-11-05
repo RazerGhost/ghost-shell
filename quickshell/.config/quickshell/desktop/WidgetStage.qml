@@ -3,7 +3,6 @@ import qs.services
 import qs.theme
 import qs.widgets
 import "DesktopWidgets.js" as DesktopWidgetsJs
-import "../widgets/ArrowNavigation.js" as ArrowNavigationJs
 
 // The desktop widgets at their places (the desktop editor's Widgets tab), drawn by the desktop
 // (DesktopWidgets.qml) and the lock screen (lock/LockContent.qml), which shows the desktop
@@ -34,7 +33,7 @@ Item {
                                   notificationsCard, forecastCard, monthCard, tasksCard, noteCard, clipboardCard]
     // A to-do widget's field or the note is being typed in: the desktop's layer takes the keyboard meanwhile
     // ("take" until it has it, then "keep"; DesktopWidgets.qml), else "none".
-    readonly property var typists: [todoWidget.keyboard, tasksWidget.keyboard, noteWidget.keyboard, browser]
+    readonly property var typists: [todoWidget.keyboard, tasksWidget.keyboard, noteWidget.keyboard]
     readonly property var typing: typists.find(k => k.wantsKeyboard) ?? null
     // One field at a time: starting in one ends the others' typing.
     function only(keyboard: var): void {
@@ -49,9 +48,6 @@ Item {
             if (todoWidget.keyboard.wantsKeyboard)
                 stage.only(todoWidget.keyboard);
         }
-        function onStopped(): void {
-            stage.typed(todoWidget.keyboard);
-        }
     }
 
     Connections {
@@ -59,9 +55,6 @@ Item {
         function onWantsKeyboardChanged(): void {
             if (tasksWidget.keyboard.wantsKeyboard)
                 stage.only(tasksWidget.keyboard);
-        }
-        function onStopped(): void {
-            stage.typed(tasksWidget.keyboard);
         }
     }
 
@@ -71,152 +64,8 @@ Item {
             if (noteWidget.keyboard.wantsKeyboard)
                 stage.only(noteWidget.keyboard);
         }
-        function onStopped(): void {
-            stage.typed(noteWidget.keyboard);
-        }
     }
 
-    // The keyboard mode (Super+D, DesktopWidgets.qml): the widgets take the keyboard, the arrow
-    // keys move between them (to the nearest that way, ArrowNavigation.js), Tab in reading
-    // order, and the chosen one gets the keys first (WidgetSurface.key: rows in the to-do and
-    // clipboard widgets, Enter to type, copy, play or start). Typing in a field from here comes
-    // back here after Escape; Escape here, or a click outside the widgets, ends it (`leave`).
-    property bool browsing: false
-    // `goBack`: return to your workspace (false when a widget handed the keyboard on).
-    signal leave(goBack: bool)
-    property Item chosenCard: null
-    readonly property var shownCards: cards.filter(c => c.shown && c.widget)
-
-    onBrowsingChanged: applyBrowsing()
-    // Built with it already on (the layer coming back): start as if it had just turned on.
-    Component.onCompleted: {
-        if (browsing)
-            applyBrowsing();
-    }
-
-    function applyBrowsing(): void {
-        if (browsing) {
-            if (!chosenCard || !chosenCard.shown)
-                chosenCard = shownCards[ArrowNavigationJs.nearest(null, shownCards.map(rectOf), "down")] ?? null;
-            browser.start();
-            navigator.Accessible.announce("Desktop widgets. Arrow keys move, Enter uses, Escape goes back. "
-                                          + (chosenCard ? spoken(chosenCard) : ""));
-        } else {
-            if (browser.wantsKeyboard)
-                browser.stop();
-            chosenCard = null;
-        }
-        markChosen();
-    }
-    // Screen readers hear each widget as the keys reach it (focus stays on the navigator).
-    onChosenCardChanged: {
-        markChosen();
-        if (browsing && chosenCard)
-            navigator.Accessible.announce(spoken(chosenCard));
-    }
-
-    // A widget for screen readers: its name, then what it shows.
-    function spoken(card: Item): string {
-        const what = card.widget?.describe() ?? "";
-        return DesktopWidgetsJs.title(card.name) + (what ? ": " + what : "");
-    }
-
-    function markChosen(): void {
-        for (const card of cards)
-            card.chosen = browsing && card === chosenCard;
-    }
-
-    function rectOf(card: Item): var {
-        const at = card.mapToItem(stage, 0, 0);
-        return { x: at.x, y: at.y, width: card.width, height: card.height };
-    }
-
-    // A field's typing ended: back to the keyboard mode after Escape or Enter, out of it after
-    // a click elsewhere.
-    function typed(keyboard: var): void {
-        if (!browsing || typing)
-            return;
-        if (keyboard.released)
-            leave(true);
-        else
-            Qt.callLater(() => {
-                if (browsing && !typing)
-                    browser.start();
-            });
-    }
-
-    function press(event: var): void {
-        const widget = chosenCard?.widget ?? null;
-        if (widget) {
-            let handed = false;
-            const onHand = () => handed = true;
-            widget.handOff.connect(onHand);
-            const used = widget.key(event);
-            widget.handOff.disconnect(onHand);
-            if (handed)
-                leave(false);
-            if (used) {
-                event.accepted = true;
-                return;
-            }
-        }
-        const directions = { [Qt.Key_Left]: "left", [Qt.Key_Right]: "right", [Qt.Key_Up]: "up", [Qt.Key_Down]: "down" };
-        const rects = shownCards.map(rectOf);
-        if (event.key in directions) {
-            const next = ArrowNavigationJs.nearest(chosenCard ? rectOf(chosenCard) : null, rects, directions[event.key]);
-            if (next >= 0)
-                chosenCard = shownCards[next];
-        } else if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab) {
-            const order = shownCards.slice().sort((a, b) => rectOf(a).y - rectOf(b).y || rectOf(a).x - rectOf(b).x);
-            const at = order.indexOf(chosenCard);
-            const step = event.key === Qt.Key_Tab ? 1 : order.length - 1;
-            chosenCard = order[at < 0 ? 0 : (at + step) % order.length] ?? null;
-        } else if (event.key === Qt.Key_Escape) {
-            leave(true);
-        } else {
-            return;
-        }
-        event.accepted = true;
-    }
-
-    WidgetKeyboard {
-        id: browser
-        onHasKeyboardChanged: {
-            if (hasKeyboard)
-                navigator.forceActiveFocus();
-        }
-        onStopped: {
-            if (released)
-                stage.leave(true);
-        }
-    }
-
-    Item {
-        id: navigator
-        Keys.onPressed: event => stage.press(event)
-        Accessible.role: Accessible.Pane
-        Accessible.name: "Desktop widgets" + (stage.chosenCard ? ": " + DesktopWidgetsJs.title(stage.chosenCard.name) : "")
-    }
-
-    // What the keys do, at the foot of the screen while the keyboard mode is on.
-    WidgetSurface {
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: Theme.desktop.margin
-        width: hints.implicitWidth + Theme.desktop.padding * 2
-        height: hints.implicitHeight + Theme.desktop.padding * 2
-        visible: stage.browsing && !stage.locked
-
-        KeyHints {
-            id: hints
-            anchors.centerIn: parent
-            hints: [
-                { keys: ["←", "→", "↑", "↓"], label: "Move" },
-                { keys: ["Enter"], label: "Use" },
-                { keys: ["Esc"], label: "Done" }
-            ]
-        }
-    }
     readonly property string keyboard: !typing ? "none" : typing.hasKeyboard ? "keep" : "take"
 
     // Where each widget showing goes at the shell's size, groups kept together

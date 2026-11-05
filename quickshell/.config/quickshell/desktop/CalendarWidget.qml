@@ -10,22 +10,6 @@ import qs.theme
 WidgetSurface {
     id: widget
 
-    // For screen readers in keyboard mode (WidgetStage): what it shows, in words.
-    function describe(): string {
-        if (events.length === 0)
-            return Qt.locale(Qt.uiLanguage).toString(clock.date, "dddd d MMMM") + ". " + (Agenda.enabled ? "Nothing coming up" : "No calendar yet");
-        return "Next: " + events.map(e => e.title + ", " + Agenda.when(e)).join("; ") + ". Enter opens the today menu";
-    }
-
-    // Keyboard mode: Enter opens the today menu, like a click.
-    function key(event: var): bool {
-        if (!enabled || !activates(event))
-            return false;
-        handOff();
-        openToday();
-        return true;
-    }
-
     medium: true
     property bool hidesTitles: false
 

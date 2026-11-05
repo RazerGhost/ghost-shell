@@ -9,25 +9,10 @@ import qs.widgets
 WidgetSurface {
     id: widget
 
-    // For screen readers in keyboard mode (WidgetStage): what it shows, in words.
-    function describe(): string {
-        return count === 0 ? "No notifications" : (count === 1 ? "1 notification" : count + " notifications")
-            + (apps > 1 ? " from " + apps + " apps" : "") + ". Enter opens the today menu";
-    }
-
     // On the lock screen: plain text, no action (the card takes no clicks there).
     property bool hidesTitles: false
     readonly property int count: Notifications.history.length
     readonly property int apps: new Set(Notifications.history.map(n => Notifications.appOf(n))).size
-
-    // Keyboard mode: Enter opens the today menu, like a click.
-    function key(event: var): bool {
-        if (!enabled || !activates(event))
-            return false;
-        handOff();
-        openToday();
-        return true;
-    }
 
     MouseArea {
         anchors.fill: parent

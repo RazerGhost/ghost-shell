@@ -213,8 +213,7 @@ the hourly weather (`ForecastWidget`, `Weather.hours`), and two large ones: the 
 tasks are added, the note (`NoteWidget`) is written on the desktop, and the clipboard
 (`ClipboardWidget`) lists your pins and last copies, a click copying one again; the layer takes the keyboard
 while a field is typed in, one at a time (`WidgetKeyboard.qml`). Small, medium and large (`DesktopWidgets.js` `kinds`, `box`;
-`Theme.desktop.box`); Super+D gives them the keyboard (`WidgetStage.browsing`, spoken to screen readers: arrows between
-them, `WidgetSurface.key` for each one's own keys, a ring on the chosen one); glass cards on a `Bottom` layer, dragged by a handle shown only in the
+`Theme.desktop.box`); glass cards on a `Bottom` layer, dragged by a handle shown only in the
 desktop editor, snapping or a grid, keyboard nudges, zoom with the shell's size. The lock screen
 draws the same stage, locked. `desktop/DesktopWidgets.qml/.js`, `WidgetStage.qml`, `*Widget.qml`,
 `WidgetSurface.qml`, `WidgetRegion.qml`.
@@ -309,7 +308,6 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 | `updates` | `check`, `summary` |
 | `welcome` | `open` |
 | `focus` | `toggle` (focus mode), `takeBreak`, `again` (its end notification's buttons) |
-| `widgets` | `browse` (the desktop widgets' keyboard mode, Super+D) |
 
 ---
 

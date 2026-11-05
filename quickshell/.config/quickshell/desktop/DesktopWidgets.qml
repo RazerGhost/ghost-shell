@@ -1,7 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
-import Quickshell.Io
 import Quickshell.Wayland
 import qs.services
 import qs.theme
@@ -20,53 +18,8 @@ Scope {
 
     readonly property bool any: DesktopWidgetsJs.keys.some(key => Settings.values[key])
 
-    // The keyboard mode (Super+D, `qs ipc call widgets browse`; WidgetStage.browsing): like
-    // Windows' "show desktop", from a workspace with windows it goes to an empty one first
-    // (Editing's trip, which the editors use), and back when it ends.
-    property bool browsing: false
-    property bool tripped: false
-
-    function browse(): void {
-        if (browsing) {
-            stopBrowsing(true);
-            return;
-        }
-        // Not while locked, in focus mode (no widgets), or while an editor is away from your
-        // workspace: the trip would take over its way home.
-        if (!shown || Session.locked || Editing.desktop || Editing.awayFrom !== 0 || Editing.backPending)
-            return;
-        tripped = (Hyprland.focusedWorkspace?.toplevels.values.length ?? 0) > 0;
-        if (tripped)
-            Editing.toEmptyWorkspace();
-        browsing = true;
-    }
-
-    // `goBack`: false when a widget handed you to something else on this workspace (the music
-    // app it opened, the today menu).
-    function stopBrowsing(goBack: bool): void {
-        if (!browsing)
-            return;
-        browsing = false;
-        if (tripped && goBack)
-            Editing.back();
-        tripped = false;
-    }
-
     // Shown: some widget is on, and not hidden by focus mode (except in the desktop editor).
     readonly property bool shown: any && (!Focus.on || Editing.desktop)
-    // The layer going away (focus mode starting) ends the keyboard mode with it.
-    onShownChanged: {
-        if (!shown)
-            stopBrowsing(true);
-    }
-
-    IpcHandler {
-        target: "widgets"
-
-        function browse(): void {
-            root.browse();
-        }
-    }
 
     // The screens with widgets: the main one, any a widget was dropped onto, and the one the
     // desktop editor is open on (its card shows that screen's widgets).
@@ -138,9 +91,6 @@ Scope {
                     id: widgetStage
 
                     screenName: window.modelData?.name ?? ""
-                    // The keyboard mode (Super+D) is the main screen's widgets.
-                    browsing: root.browsing && window.main
-                    onLeave: goBack => root.stopBrowsing(goBack)
 
                     readonly property bool carded: Editing.cardScreen === (window.screen?.name ?? "")
 

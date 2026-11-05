@@ -48,8 +48,7 @@ machine can take what it needs.
 - **Desktop widgets**: a clock, the weather (now or by the hour), the media player, the
   calendar's next events or the whole month, the battery, a to-do list you add to, a note, your
   clipboard, a timer and the notification count on the wallpaper, picked from a gallery and
-  dragged into place; the lock screen shows them too (their content hidden). Super+D shows the
-  desktop and gives them the keyboard.
+  dragged into place, on any screen; the lock screen shows them too (their content hidden).
 - **Accessible**: every menu and widget has names and roles for screen readers (Orca is in the
   core module), the keyboard reaches everything, and the widgets say what they show.
 - **Sound**: a five-band equalizer per output, and for the HP Omen 16's speakers their bass

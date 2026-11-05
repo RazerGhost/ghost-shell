@@ -10,11 +10,6 @@ import qs.widgets
 WidgetSurface {
     id: widget
 
-    // For screen readers in keyboard mode (WidgetStage): what it shows, in words.
-    function describe(): string {
-        return (Planner.note.trim() === "" ? "Empty" : Planner.note) + ". Enter to write";
-    }
-
     medium: true
     property bool hidesTitles: false
     readonly property alias keyboard: keyboard
@@ -23,14 +18,6 @@ WidgetSurface {
         keyboard.start();
         note.forceActiveFocus();
         note.cursorPosition = note.text.length;
-    }
-
-    // Keyboard mode: Enter (or Space) starts typing.
-    function key(event: var): bool {
-        if (hidesTitles || !activates(event))
-            return false;
-        startTyping();
-        return true;
     }
 
     WidgetKeyboard {
