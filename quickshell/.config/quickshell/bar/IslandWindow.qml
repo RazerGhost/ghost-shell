@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Services.Notifications
@@ -182,7 +183,15 @@ PanelWindow {
     implicitHeight: Theme.island.maxHeight
     color: "transparent"
     mask: Region { item: pill }
-    BackgroundEffect.blurRegion: pill.blur
+    // The glass is drawn here (backdrop below) while there's a wallpaper picture; Hyprland's blur
+    // only without one. One pixel in the transparent corner then: an empty region made Hyprland
+    // 0.57 blur the whole window (NOTES).
+    BackgroundEffect.blurRegion: backdrop.drawn ? corner : pill.blur
+    Region {
+        id: corner
+        width: 1
+        height: 1
+    }
 
     // Reserve only the closed island's band; open menus float over windows.
     exclusionMode: ExclusionMode.Normal
@@ -261,6 +270,55 @@ PanelWindow {
                 return;
             root.island.offerSend(paths, root.modelData.name);
             drop.accept(Qt.CopyAction);
+        }
+    }
+
+    // The glass behind the island: the wallpaper, blurred and masked to the island's shape, like
+    // the lock screen's (LockContent). Hyprland's blur cuts off in whole pixels, unsmoothed, and
+    // the island blurs only the wallpaper (rules.lua's xray), so over a window its corners showed
+    // stair-steps (user's find, 2026-11-05); the mask here is the shape as drawn, smoothed. The
+    // window's top-left is the screen's, so the picture lines up with the wallpaper under it.
+    Image {
+        id: backdrop
+        // Shown at all: a picture, and panels that aren't solid.
+        readonly property bool drawn: status === Image.Ready && Colors.panelAlpha < 1
+        width: root.modelData.width
+        height: root.modelData.height
+        visible: false
+        source: Wallpaper.stillPath !== "" ? FileUrl.of(Wallpaper.stillPath) : ""
+        fillMode: Image.PreserveAspectCrop
+        sourceSize: Qt.size(width, height)
+        cache: false // a live wallpaper's still frame always has the same name
+    }
+
+    MultiEffect {
+        width: backdrop.width
+        height: backdrop.height
+        visible: backdrop.drawn
+        source: backdrop
+        blurEnabled: true
+        blur: 1
+        blurMax: Theme.lock.blur
+        autoPaddingEnabled: false // padded, the mask was stretched and sat off the shape
+        maskEnabled: true
+        maskSource: backdropMask
+    }
+
+    Item {
+        id: backdropMask
+        width: backdrop.width
+        height: backdrop.height
+        visible: false
+        layer.enabled: true
+
+        PillShape {
+            x: pill.x + pill.outline.x
+            y: pill.y + pill.outline.y
+            attached: pill.outline.attached
+            bodyWidth: pill.outline.bodyWidth
+            bodyHeight: pill.outline.bodyHeight
+            radius: pill.outline.radius
+            color: "white"
         }
     }
 

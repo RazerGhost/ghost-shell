@@ -547,7 +547,10 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
 - The island blurs only the wallpaper (layer rule `xray`, 2026-11-04; user's find): its blur
   reached the window just below it, and a white one (Discord reloading) showed through as light
   streaks. Its menus over a window blur the wallpaper too, not the window (user's choice after
-  comparing both over a white window: dark and readable over any app).
+  comparing both over a white window: dark and readable over any app). Since 2026-11-05 the
+  island draws that glass itself (the wallpaper blurred by Qt, masked to its shape, like the lock
+  screen's): Hyprland cuts its blur off in whole pixels, and over a window the island's corners
+  showed the steps (user's find). Hyprland's blur stays for the island without a picture.
 
 ### Elgato Wave:3 (built 2026-10-29; reviewed by the user, untested: the microphone is on the desktop)
 - The opt-in `wave3` module (`modules/wave3/`, its README has the details): openxlr (AUR)

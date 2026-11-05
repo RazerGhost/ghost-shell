@@ -59,7 +59,10 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   Hyprland clips the blur to the region in whole pixels, unsmoothed (Quickshell's rounded
   corners are exact quarter circles, so the steps are Hyprland's): where the blur differs from
   what's right outside (the island blurs only the wallpaper, `xray`, over a window), the corners
-  showed stair-steps. The island keeps its blur 1 px inside its drawn edge (`IslandPill.inset`).
+  showed stair-steps. Keeping the blur 1 px inside the edge only swapped them for a dark line
+  (the edge's pixels over the sharp window). The island draws its own glass instead, like the
+  lock screen: the wallpaper through `MultiEffect`, masked by a copy of its `PillShape`, which Qt
+  smooths (`bar/IslandWindow.qml`, `backdrop`); Hyprland's blur only without a picture.
 - Window groups (tabs) in 0.57: `hl.dsp.group.toggle/next/prev/active({ index })/lock/
   move_window({ forward })`; into or out of a group is `hl.dsp.window.move({ into_group = "l"|"r"|"u"|"d" })`
   (`into_or_create_group`, `out_of_group = true`); `group.move_window` only reorders tabs. A
