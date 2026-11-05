@@ -254,6 +254,9 @@ Singleton {
             property bool dockEverywhere: false
             // With several screens, each its own workspaces: the main one 1-5, the next 6-10 (Display.qml).
             property bool workspacesPerScreen: true
+            // Where the screens sit, per set of connected screens: { setKey: { key: "XxY" } }
+            // (settings/DisplayModes.js `setKey`, `key`, `arranged`; Settings -> Display).
+            property var screenLayouts: ({})
             // The VPN connected last, by name: quick settings' VPN switch reconnects it.
             property string lastVpn: ""
             // Per-app notifications, by app name: { mode } (services/NotificationRules.js).

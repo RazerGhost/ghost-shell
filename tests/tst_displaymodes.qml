@@ -46,6 +46,48 @@ TestCase {
         compare(DisplayModes.laptop([external]), null);
     }
 
+    function test_keys() {
+        const dell = { name: "DP-2", description: "Dell Inc. DELL U2723QE 7XYZ123", width: 3840, height: 2160, scale: 1.5, transform: 0 };
+        compare(DisplayModes.key(dell), "desc:Dell Inc. DELL U2723QE 7XYZ123");
+        compare(DisplayModes.key(laptopScreen), "eDP-1");                  // the laptop's: by name
+        compare(DisplayModes.key({ name: "HEADLESS-2", description: "" }), "HEADLESS-2");
+        compare(DisplayModes.key({ name: "DP-1", description: 'x" })' }), "DP-1"); // unsafe: by name
+        compare(DisplayModes.setKey([dell, laptopScreen]), DisplayModes.setKey([laptopScreen, dell]));
+        compare(DisplayModes.logicalSize(dell), { w: 2560, h: 1440 });
+        compare(DisplayModes.logicalSize(Object.assign({}, dell, { transform: 1 })), { w: 1440, h: 2560 });
+        // A description key and a position make a rule Hyprland matches by monitor.
+        compare(DisplayModes.lua("desc:Dell Inc. DELL U2723QE 7XYZ123", { mode: "3840x2160@60", scale: 1.5, transform: 0, vrr: 0, position: "1920x0" }),
+                'hl.monitor({ output = "desc:Dell Inc. DELL U2723QE 7XYZ123", mode = "3840x2160@60", position = "1920x0", scale = 1.5, transform = 0, vrr = 0 })');
+        compare(DisplayModes.lua("eDP-1", { mode: "1920x1080@165", scale: 1, transform: 0, vrr: 0, position: "1x2; os.exit()" }), "");
+    }
+
+    function test_arranged() {
+        const main = { key: "eDP-1", x: 0, y: 0, w: 1920, h: 1080 };
+        const other = { key: "desc:Dell", x: 1920, y: 0, w: 2560, h: 1440 };
+        // Dragged to the left of the laptop, a little low: against its left side, tops lined up.
+        compare(DisplayModes.arranged([main, other], "desc:Dell", -2500, 30, 64), { "eDP-1": "0x0", "desc:Dell": "-2560x0" });
+        // Dragged above it, roughly centred: centred over it.
+        compare(DisplayModes.arranged([main, other], "desc:Dell", -300, -1500, 64), { "eDP-1": "0x0", "desc:Dell": "-320x-1440" });
+        // Dragged far down the right: it still shares a stretch of an edge with the laptop (below
+        // it, a quarter of the laptop's width over), never just a corner.
+        compare(DisplayModes.arranged([main, other], "desc:Dell", 1950, 5000, 64)["desc:Dell"], "1440x1080");
+        // Moving the main one keeps it at 0, 0: the other moves the other way.
+        compare(DisplayModes.arranged([main, other], "eDP-1", 4480, 0, 64), { "eDP-1": "0x0", "desc:Dell": "-2560x0" });
+    }
+
+    function test_effectiveLayouts() {
+        const dell = { name: "DP-2", description: "Dell U2723QE", width: 2560, height: 1440, refreshRate: 60, scale: 1, transform: 0,
+                       availableModes: ["2560x1440@60.00Hz"] };
+        const layouts = { [DisplayModes.setKey([laptopScreen, dell])]: { "eDP-1": "0x0", "desc:Dell U2723QE": "-2560x0" } };
+        const out = DisplayModes.effective({ "desc:Dell U2723QE": { mode: "2560x1440@60", scale: 1, transform: 0, vrr: 0 } },
+                                           [laptopScreen, dell], { layouts: layouts });
+        // Saved by description, applied to whatever port it's on, with this set's position.
+        compare(out["DP-2"], { mode: "2560x1440@60", scale: 1, transform: 0, vrr: 0, position: "-2560x0" });
+        compare(out["eDP-1"].position, "0x0");
+        // The laptop alone: no arrangement.
+        compare(DisplayModes.effective({}, [laptopScreen], { layouts: layouts }), {});
+    }
+
     function test_workspaceRules() {
         // One screen: nothing.
         compare(DisplayModes.workspaceRules("eDP-1", [laptopScreen]), []);

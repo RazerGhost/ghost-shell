@@ -34,7 +34,8 @@ PanelWindow {
     required property var island // Island.qml: panel, screenName, toggle()
     screen: modelData
 
-    readonly property string panel: island.screenName === modelData.name ? island.panel : ""
+    // modelData is null for a moment while its screen goes away (unplugged).
+    readonly property string panel: island.screenName === modelData?.name ? island.panel : ""
     readonly property bool open: panel !== ""
 
     // A small view opened by hovering: "media" (the player, over the live activity). Unlike a
@@ -44,7 +45,7 @@ PanelWindow {
     // The notification pop-up, on the focused monitor (the first one until Hyprland says which)
     // while no menu is open and the screen isn't locked (they wait, and show once it's unlocked),
     // then a window asking for attention.
-    readonly property bool focusedScreen: (Hyprland.focusedMonitor?.name ?? Quickshell.screens[0]?.name) === modelData.name
+    readonly property bool focusedScreen: (Hyprland.focusedMonitor?.name ?? Quickshell.screens[0]?.name) === modelData?.name
     // Not while locked, greeting, or logging out / shutting down (under its dimmed screen a pop-up
     // would use up its time unseen).
     readonly property bool canPop: !open && focusedScreen && !Session.locked && !island.welcomeShown && Session.ending === ""
@@ -282,8 +283,8 @@ PanelWindow {
         id: backdrop
         // Shown at all: a picture, and panels that aren't solid.
         readonly property bool drawn: status === Image.Ready && Colors.panelAlpha < 1
-        width: root.modelData.width
-        height: root.modelData.height
+        width: root.modelData?.width ?? 0
+        height: root.modelData?.height ?? 0
         visible: false
         source: Wallpaper.stillPath !== "" ? FileUrl.of(Wallpaper.stillPath) : ""
         fillMode: Image.PreserveAspectCrop

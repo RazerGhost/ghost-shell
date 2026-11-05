@@ -36,7 +36,8 @@ Singleton {
     readonly property var setups: DisplayModes.effective(Settings.values.monitors, monitors, {
         onBattery: UPower.onBattery,
         lowOnBattery: Settings.values.displayLowRefreshOnBattery === true,
-        project: project
+        project: project,
+        layouts: Settings.values.screenLayouts
     })
 
     // Workspaces per screen (Settings -> Display): Hyprland's rules for them while there are

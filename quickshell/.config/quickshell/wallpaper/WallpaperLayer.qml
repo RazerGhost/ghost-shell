@@ -24,7 +24,7 @@ Variants {
         readonly property bool playing: Wallpaper.isVideo && !GameMode.on && !UPower.onBattery && !Session.locked
                                         && (monitor?.activeWorkspace?.toplevels.values.length ?? 1) === 0
         // Drawn as a card while the desktop editor is open on this screen (customize/Editing.qml).
-        readonly property bool carded: Editing.cardScreen === modelData.name
+        readonly property bool carded: Editing.cardScreen === modelData?.name // null while it's unplugged
 
         screen: modelData
         // Until a wallpaper is chosen, Hyprland's default shows instead (but an editor's card

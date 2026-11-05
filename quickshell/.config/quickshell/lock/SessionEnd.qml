@@ -134,7 +134,7 @@ Scope {
             id: window
 
             required property ShellScreen modelData
-            readonly property bool focused: (Hyprland.focusedMonitor?.name ?? Quickshell.screens[0]?.name) === modelData.name
+            readonly property bool focused: (Hyprland.focusedMonitor?.name ?? Quickshell.screens[0]?.name) === modelData?.name
 
             screen: modelData
             visible: root.active || shade.opacity > 0

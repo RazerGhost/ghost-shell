@@ -38,7 +38,10 @@ Column {
 
     function keep(): void {
         countdown.stop();
-        Settings.values.monitors = Object.assign({}, Settings.values.monitors, { [trial.output]: trial.setup });
+        // Under the monitor's own key (its description), so it gets this back on any port.
+        const monitor = monitors.find(m => m.name === trial.output);
+        const key = monitor ? DisplayModes.key(monitor) : trial.output;
+        Settings.values.monitors = Object.assign({}, Settings.values.monitors, { [key]: trial.setup });
         trial = null;
         read.running = true;
     }
@@ -56,6 +59,13 @@ Column {
             read.running = true;
     }
     Component.onCompleted: read.running = true
+    // A screen plugged in or out while the page is kept (the launcher keeps it): read again.
+    Connections {
+        target: Quickshell
+        function onScreensChanged(): void {
+            read.running = true;
+        }
+    }
     // Closing the settings window mid-try goes back rather than keeping an unconfirmed mode.
     Component.onDestruction: {
         if (trial)
@@ -123,6 +133,30 @@ Column {
         }
     }
 
+    // The arrangement, with several screens: drag them where they sit on your desk.
+    SettingGroup {
+        visible: root.monitors.length > 1
+        title: "Arrangement"
+
+        ScreenArrangement {
+            width: parent.width
+            monitors: root.monitors
+            nameOf: output => root.screenName(output)
+            onArranged: positions => {
+                const layouts = Object.assign({}, Settings.values.screenLayouts);
+                layouts[DisplayModes.setKey(root.monitors)] = positions;
+                Settings.values.screenLayouts = layouts;
+                rereadSoon.restart();
+            }
+        }
+    }
+
+    Timer {
+        id: rereadSoon
+        interval: 800 // after Hyprland has the new places
+        onTriggered: read.running = true
+    }
+
     // "Built-in screen", or the monitor's own name ("Dell U2723QE"), for an output.
     function screenName(output: string): string {
         if (/^(eDP|LVDS)/.test(output))
@@ -167,7 +201,7 @@ Column {
             readonly property bool trying: root.trial?.output === output
             // What the steppers show: the change being tried, else what the screen runs now.
             readonly property var setup: trying ? root.trial.setup
-                : DisplayModes.current(modelData, Settings.values.monitors[output]?.vrr)
+                : DisplayModes.current(modelData, DisplayModes.savedFor(Settings.values.monitors, modelData)?.vrr)
             readonly property var modes: DisplayModes.modes(modelData.availableModes).reverse()
 
             title: output.startsWith("eDP") ? "Built-in screen" : (modelData.description || output)

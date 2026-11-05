@@ -34,25 +34,29 @@ function current(monitor, savedVrr) {
 }
 
 // The `hl.monitor` call for one screen, or "" when anything in it isn't safe to put in Lua (a
-// hand-edited settings file): names are letters, digits and -_. ; modes WxH@Hz; scale 0.5-3;
-// transform 0-7 (rotations and flips); vrr 0-3. A screen turned off (quick settings' Display
-// page, a second screen only) is { disabled: true }; one showing another (duplicate) has
-// `mirror`, that screen's name.
+// hand-edited settings file): outputs are names (letters, digits and -_.) or a monitor's
+// description (`desc:` and letters, digits, spaces and .,()/+-_ : Hyprland matches the physical
+// monitor by it, whichever port it's on); modes WxH@Hz; scale 0.5-3; transform 0-7 (rotations
+// and flips); vrr 0-3; position "auto" or XxY. A screen turned off (quick settings' Display page,
+// a second screen only) is { disabled: true }; one showing another (duplicate) has `mirror`,
+// that screen's name.
 function lua(output, setup) {
     const name = /^[A-Za-z0-9_.-]+$/;
-    if (!name.test(output))
+    if (!name.test(output) && !/^desc:[A-Za-z0-9 _.,()\/+-]+$/.test(output))
         return "";
     if (setup.disabled === true)
         return `hl.monitor({ output = "${output}", disabled = true })`;
     if (setup.mirror !== undefined && !name.test(String(setup.mirror)))
         return "";
+    const position = setup.position ?? "auto";
     const ok = /^\d+x\d+@\d+(\.\d+)?$/.test(setup.mode)
+        && (position === "auto" || /^-?\d+x-?\d+$/.test(position))
         && typeof setup.scale === "number" && setup.scale >= 0.5 && setup.scale <= 3
         && Number.isInteger(setup.transform) && setup.transform >= 0 && setup.transform <= 7
         && Number.isInteger(setup.vrr) && setup.vrr >= 0 && setup.vrr <= 3;
     if (!ok)
         return "";
-    return `hl.monitor({ output = "${output}", mode = "${setup.mode}", position = "auto", `
+    return `hl.monitor({ output = "${output}", mode = "${setup.mode}", position = "${position}", `
         + `scale = ${setup.scale}, transform = ${setup.transform}, vrr = ${setup.vrr}`
         + (setup.mirror !== undefined ? `, mirror = "${setup.mirror}"` : "") + " })";
 }
@@ -97,6 +101,15 @@ function effective(saved, monitors, opts) {
     const list = Array.from(monitors ?? []);
     const own = laptop(list);
     const o = opts ?? {};
+    // The connected screens' saved setups by output name (saved under a monitor's description
+    // too), with this set of screens' arrangement (`opts.layouts`, screenLayouts).
+    const layout = list.length > 1 ? (o.layouts ?? {})[setKey(list)] : undefined;
+    for (const m of list) {
+        const setup = savedFor(saved, m);
+        const position = layout?.[key(m)];
+        if (setup || position)
+            out[m.name] = Object.assign({}, setup ?? current(m, undefined), position ? { position: position } : {});
+    }
     if (own && o.onBattery === true && o.lowOnBattery === true) {
         const lowest = rates(own).slice(-1)[0];
         if (lowest !== undefined)
@@ -134,4 +147,76 @@ function workspaceRules(main, monitors) {
         }
     });
     return lines;
+}
+
+// The key a screen's setup is saved under: the monitor's description (make, model, serial) when
+// it has one, so a monitor gets its setup back on any port, else its output name (the laptop's
+// own screen, a virtual one).
+function key(monitor) {
+    const d = String(monitor?.description ?? "").trim();
+    return d !== "" && /^[A-Za-z0-9 _.,()\/+-]+$/.test(d) && !/^(eDP|LVDS)/.test(monitor.name) ? "desc:" + d : String(monitor?.name ?? "");
+}
+
+// The saved setup for a connected screen: under its key, else under its output name (saved
+// before keys).
+function savedFor(saved, monitor) {
+    return saved?.[key(monitor)] ?? saved?.[monitor.name];
+}
+
+// Which screens are connected, as one key for their arrangement (sorted, so the order they
+// were found in doesn't matter): each set of screens keeps its own (screenLayouts).
+function setKey(monitors) {
+    return Array.from(monitors ?? []).map(key).sort().join(" | ");
+}
+
+// A screen's size on the desktop, in Hyprland's layout pixels: its mode over its scale, turned
+// a quarter for rotations 1, 3, 5 and 7.
+function logicalSize(monitor) {
+    const s = monitor.scale > 0 ? monitor.scale : 1;
+    const w = Math.round(monitor.width / s), h = Math.round(monitor.height / s);
+    return monitor.transform % 2 === 1 ? { w: h, h: w } : { w: w, h: h };
+}
+
+// A screen dragged to (x, y) in the arrangement lines up beside another: rects
+// [{ key, x, y, w, h }] (layout pixels), `moved` the dragged one's key. It goes against the
+// nearest side of the nearest other screen (its left, right, top or bottom), its other edge
+// lined up with that screen's start, middle or end when within `reach`, and always sharing at
+// least a quarter of the shorter side (a corner alone, the pointer can't cross); the first screen (the main one) stays at 0, 0 and the others are given relative to it.
+// { key: "XxY" }.
+function arranged(rects, moved, x, y, reach) {
+    const list = Array.from(rects);
+    const me = list.find(r => r.key === moved);
+    if (!me)
+        return {};
+    let best = null;
+    for (const o of list.filter(r => r !== me)) {
+        const candidates = [
+            { x: o.x - me.w, y: y, side: "y" },      // left of it
+            { x: o.x + o.w, y: y, side: "y" },       // right of it
+            { x: x, y: o.y - me.h, side: "x" },      // above it
+            { x: x, y: o.y + o.h, side: "x" }        // below it
+        ];
+        for (const c of candidates) {
+            if (c.side === "y") {
+                const lines = [o.y, o.y + (o.h - me.h) / 2, o.y + o.h - me.h];
+                const near = lines.find(l => Math.abs(l - c.y) <= reach);
+                const share = Math.min(me.h, o.h) / 4; // the pointer crosses where they meet
+                c.y = Math.round(Math.min(Math.max(near ?? c.y, o.y - me.h + share), o.y + o.h - share));
+            } else {
+                const lines = [o.x, o.x + (o.w - me.w) / 2, o.x + o.w - me.w];
+                const near = lines.find(l => Math.abs(l - c.x) <= reach);
+                const share = Math.min(me.w, o.w) / 4;
+                c.x = Math.round(Math.min(Math.max(near ?? c.x, o.x - me.w + share), o.x + o.w - share));
+            }
+            const d = Math.hypot(c.x - x, c.y - y);
+            if (!best || d < best.d)
+                best = { x: c.x, y: c.y, d: d };
+        }
+    }
+    const placed = list.map(r => r === me ? Object.assign({}, r, { x: best ? best.x : x, y: best ? best.y : y }) : r);
+    const origin = placed[0];
+    const out = {};
+    for (const r of placed)
+        out[r.key] = `${Math.round(r.x - origin.x)}x${Math.round(r.y - origin.y)}`;
+    return out;
 }
