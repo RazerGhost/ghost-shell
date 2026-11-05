@@ -3,6 +3,7 @@ pragma Singleton
 import Quickshell
 import Quickshell.Hyprland
 import "WorkspaceSlots.js" as WorkspaceSlots
+import "../settings/DisplayModes.js" as DisplayModes
 
 // Which on-screen editor is open, for what it edits to show itself for editing: the desktop
 // widgets show their handles while the desktop editor is open, the dock stays shown while the
@@ -76,7 +77,10 @@ Singleton {
         }
         awayFrom = WorkspaceSlots.idOf(Hyprland.focusedWorkspace) ?? 1;
         const used = Hyprland.workspaces.values.map(WorkspaceSlots.idOf).filter(id => id > 0);
-        emptyWorkspace = Math.max(0, ...used) + 1;
+        // One that opens on the focused screen, where the editor is: with workspaces per screen,
+        // "the next number" could belong to another screen, which then switched instead (the
+        // desktop's two monitors, 2026-11-05).
+        emptyWorkspace = DisplayModes.emptyWorkspaceOn(Display.workspaceHomes, used, Hyprland.focusedMonitor?.name ?? "");
         Hyprland.dispatch(`hl.dsp.focus({ workspace = ${emptyWorkspace} })`);
     }
 

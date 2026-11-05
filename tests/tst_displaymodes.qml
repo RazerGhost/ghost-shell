@@ -82,6 +82,20 @@ TestCase {
                 { "eDP-1": "0x0", "desc:Dell": "-2560x0" });
     }
 
+    function test_emptyWorkspaceOn() {
+        const homes = DisplayModes.workspaceHomes("DP-5", [{ name: "DP-5", x: 1920, y: 0 }, { name: "HDMI-A-3", x: 0, y: 0 }]);
+        // The desktop: DP-5 has 1-5, HDMI-A-3 6-10; workspace 2 and 6 in use.
+        compare(DisplayModes.emptyWorkspaceOn(homes, [2, 6], "DP-5"), 1);
+        compare(DisplayModes.emptyWorkspaceOn(homes, [1, 2, 6], "DP-5"), 3);
+        compare(DisplayModes.emptyWorkspaceOn(homes, [2, 6], "HDMI-A-3"), 7);
+        // All of a screen's own in use: past every home, where no rule sends it elsewhere.
+        compare(DisplayModes.emptyWorkspaceOn(homes, [1, 2, 3, 4, 5, 6], "DP-5"), 11);
+        compare(DisplayModes.emptyWorkspaceOn(homes, [1, 2, 3, 4, 5, 12], "DP-5"), 13);
+        // One screen: the next one past the used ones.
+        compare(DisplayModes.emptyWorkspaceOn({}, [1, 2, 4], "eDP-1"), 5);
+        compare(DisplayModes.emptyWorkspaceOn({}, [], "eDP-1"), 1);
+    }
+
     function test_workspaceMoves() {
         const homes = DisplayModes.workspaceHomes("DP-2", [{ name: "eDP-1", x: 0, y: 0 }, { name: "DP-2", x: 1920, y: 0 }]);
         compare(homes["1"], "DP-2");

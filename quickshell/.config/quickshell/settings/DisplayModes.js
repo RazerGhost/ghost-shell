@@ -261,6 +261,19 @@ function workspaceHomes(main, monitors) {
     return homes;
 }
 
+// An empty workspace that opens on `monitor` (the editors' trip to an empty desktop): the lowest
+// id not in `used` whose home (`homes`, workspaceHomes) is that screen, else the first id past
+// every home and every used one, which no rule sends elsewhere. With no homes (one screen,
+// workspaces per screen off), the first id past the used ones, as before.
+function emptyWorkspaceOn(homes, used, monitor) {
+    const taken = new Set(Array.from(used ?? []).map(Number));
+    const own = Object.keys(homes ?? {}).filter(ws => homes[ws] === monitor).map(Number).sort((a, b) => a - b);
+    const free = own.find(id => !taken.has(id));
+    if (free !== undefined)
+        return free;
+    return Math.max(0, ...taken, ...Object.keys(homes ?? {}).map(Number)) + 1;
+}
+
 // The workspaces open now ([{ id, monitor }], monitor its screen's name) that aren't on their
 // screen: [{ workspace, monitor }] to move (a new main screen, workspaces per screen turned on, a
 // screen plugged in). Rules only place new workspaces; these were open before.
