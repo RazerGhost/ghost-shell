@@ -6,7 +6,7 @@ import qs.widgets
 
 // Power: the low battery warning's power saver, and after how long without input the screen dims,
 // locks, turns off and the laptop suspends; separately on battery and plugged in (idle/Idle.qml
-// does it).
+// does it). Without a battery (the desktop) only the plugged-in times show.
 Column {
     id: root
 
@@ -54,8 +54,8 @@ Column {
     Text {
         width: parent.width
         leftPadding: Theme.spacing.l
-        text: "After how long without input. Apps that keep the screen awake, like a playing video, hold these off. "
-              + (UPower.onBattery ? "You're on battery now." : "You're plugged in now.")
+        text: "After how long without input. Apps that keep the screen awake, like a playing video, hold these off."
+              + (Battery.present ? (UPower.onBattery ? " You're on battery now." : " You're plugged in now.") : "")
         color: Colors.m3onSurfaceVariant
         font.family: Theme.font.sans
         font.pixelSize: Theme.font.small
@@ -65,15 +65,17 @@ Column {
     Steps {
         title: "On battery"
         power: "Battery"
+        visible: Battery.present
     }
 
     Steps {
-        title: "Plugged in"
+        title: Battery.present ? "Plugged in" : "When idle"
         power: "Ac"
     }
 
     SettingGroup {
         title: "Low battery"
+        visible: Battery.present
 
         SettingRow {
             title: "Power saver when the battery is low"

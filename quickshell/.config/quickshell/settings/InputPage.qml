@@ -80,10 +80,11 @@ Column {
     }
 
     SettingGroup {
-        title: "Touchpad and mouse"
+        title: Touchpad.present ? "Touchpad and mouse" : "Mouse"
 
         SettingRow {
             title: "Natural scrolling"
+            visible: Touchpad.present
             subtitle: "Content moves with your fingers, like a phone (touchpad)"
 
             Switch {
@@ -95,6 +96,7 @@ Column {
 
         SettingRow {
             title: "Tap to click"
+            visible: Touchpad.present
             subtitle: "A tap on the touchpad clicks"
 
             Switch {
@@ -106,6 +108,7 @@ Column {
 
         SettingRow {
             title: "Touchpad off while a mouse is connected"
+            visible: Touchpad.present
             subtitle: "Back on by itself when the mouse is gone"
 
             Switch {
@@ -117,7 +120,7 @@ Column {
 
         SettingRow {
             title: "Pointer speed"
-            subtitle: "Mouse and touchpad"
+            subtitle: Touchpad.present ? "Mouse and touchpad" : ""
 
             Stepper {
                 label: "Pointer speed"

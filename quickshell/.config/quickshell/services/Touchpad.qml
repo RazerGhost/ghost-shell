@@ -1,5 +1,5 @@
 // Turns the touchpad off while a mouse is connected (Settings -> Keyboard and mouse; off by
-// default), and on again when it's gone. Hyprland sends no event when a mouse is plugged in, so
+// default), and on again when it's gone; and says whether there is a touchpad (`present`). Hyprland sends no event when a mouse is plugged in, so
 // udev's input events are watched while the setting is on (USB and Bluetooth mice both show up
 // there), and Hyprland's devices are read a second after one (TouchpadDevices.js, tested); it
 // polled every 3 s before (review 2026-10-29). The touchpads are switched with `hl.device`
@@ -16,6 +16,10 @@ Singleton {
     id: root
 
     readonly property bool enabled: Settings.values.touchpadOffWithMouse
+    // Whether Hyprland lists a touchpad: Settings shows the touchpad's options only then (none on
+    // the desktop). Read at start and after every config reload; true until the first read, so a
+    // laptop's options don't flash away.
+    property bool present: true
     // What the touchpads were last set to; null before the first time.
     property var applied: null
 
@@ -37,19 +41,17 @@ Singleton {
         target: Hyprland
 
         function onRawEvent(event): void {
-            if (event.name !== "configreloaded" || !root.enabled)
+            if (event.name !== "configreloaded")
                 return;
-            root.applied = null;
+            if (root.enabled)
+                root.applied = null;
             checkSoon.restart();
         }
     }
 
     // Switched on: look now. Switched off: the touchpad back on.
     onEnabledChanged: check.start()
-    Component.onCompleted: {
-        if (enabled)
-            checkSoon.restart();
-    }
+    Component.onCompleted: checkSoon.restart()
 
     // A device plugged in or out: Hyprland takes a moment to list it, and one device sends
     // several events, so look once, a second after the last.
@@ -80,7 +82,10 @@ Singleton {
                     return;
                 }
                 const found = TouchpadDevices.classify(mice);
-                root.apply(found.touchpads, !(root.enabled && found.mouse));
+                root.present = found.touchpads.length > 0;
+                // Only while the setting is on, or to switch the touchpads back on after it.
+                if (root.enabled || root.applied === false)
+                    root.apply(found.touchpads, !(root.enabled && found.mouse));
             }
         }
     }

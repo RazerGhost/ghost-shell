@@ -2515,6 +2515,10 @@ fix, not one for this case"), with Omarchy's hardware layer as the model (user's
   "no match"es (doctor's services check never ran); replaced everywhere.
 - `ghost doctor` checks the machine can commit and push (a fresh install had no git name or
   GitHub login).
+- Settings shows only what the machine has: without a battery (`Battery.present`) Power keeps the
+  idle times ("When idle") and Sound drops the charger and low battery sounds; without a
+  touchpad (`Touchpad.present`, from Hyprland's devices) Keyboard and mouse keeps pointer speed.
+  Quick settings already hid the battery and brightness. Checked on the desktop.
 To check on the laptop: `ghost update`, `ghost-hw facts` (laptop yes, display GPU amd), the
 `gpu-pci-*` links, Hyprland on the AMD chip after a re-login, KDE Connect's tray still starting.
 

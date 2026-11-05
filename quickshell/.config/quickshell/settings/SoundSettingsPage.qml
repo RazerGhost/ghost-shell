@@ -78,12 +78,13 @@ Column {
         }
 
         Repeater {
+            // The charger and the battery warnings only where there's a battery.
             model: [
                 { key: "soundNotifications", title: "Notifications", subtitle: "Not while Do Not Disturb is on" },
-                { key: "soundDevices", title: "Charger and USB", subtitle: "Plugging in and out" },
+                { key: "soundDevices", title: Battery.present ? "Charger and USB" : "USB devices", subtitle: "Plugging in and out" },
                 { key: "soundFeedback", title: "Volume and screenshots", subtitle: "A tick for the volume keys, a shutter for screenshots" },
                 { key: "soundBattery", title: "Low battery", subtitle: "With the battery warnings" }
-            ]
+            ].filter(kind => kind.key !== "soundBattery" || Battery.present)
 
             SettingRow {
                 id: eventRow
