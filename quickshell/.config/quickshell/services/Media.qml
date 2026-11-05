@@ -30,7 +30,10 @@ Singleton {
                     root.lastPlaying = root.player;
             });
     }
-    onPlayerChanged: rememberPlaying()
+    onPlayerChanged: {
+        rememberPlaying();
+        Qt.callLater(checkDetails); // not inside `player`'s change (the binding loop above)
+    }
 
     // The music app last heard (Settings' lastMediaApp), for the desktop's media widget to open
     // while no player is running; before one has been heard, the first installed music app
@@ -55,10 +58,66 @@ Singleton {
     // has none (a browser tab plays in the browser's window, which this can't tell apart).
     readonly property HyprlandToplevel window: Windows.forApp(player?.desktopEntry ?? "")
 
+    // The playing track's details, for the views to show (title(), artist(), album(), artUrl).
+    // Spotify doesn't announce the first track after it starts: it's on the bus before the track
+    // has loaded, and Quickshell only learns of changes, so that track showed with no title,
+    // artist or cover until the next one (user's find, 2026-11-05; a fresh Quickshell read it
+    // fine). While the followed player plays without a title, the shell reads the details itself
+    // with playerctl, a few times a second apart in case the track is still loading; the
+    // player's own take over as soon as it has them.
+    readonly property bool missingDetails: (player?.isPlaying ?? false) && !player.trackTitle
+    property var readDetails: null // MediaPlayers.parseMetadata's result, for `player`
+    property int readTries: 0
+    onMissingDetailsChanged: Qt.callLater(checkDetails) // it changes while `player` is still being set
+    function checkDetails(): void {
+        readDetails = null;
+        readTries = 0;
+        detailsRetry.stop();
+        if (missingDetails)
+            readMetadata();
+    }
+    readonly property string playerName: (player?.dbusName ?? "").replace("org.mpris.MediaPlayer2.", "")
+    function readMetadata(): void {
+        if (playerName !== "")
+            metadataRead.start(["playerctl", "-p", playerName, "metadata", "--format",
+                                "{{xesam:title}}\t{{xesam:artist}}\t{{xesam:album}}\t{{mpris:artUrl}}"]);
+    }
+    LatestProcess {
+        id: metadataRead
+        stdout: StdioCollector {
+            onStreamFinished: {
+                // Only for the player still followed, while it still has no details of its own.
+                if (!root.missingDetails || metadataRead.command[2] !== root.playerName)
+                    return;
+                const details = MediaPlayers.parseMetadata(text);
+                if (details)
+                    root.readDetails = details;
+                else if (++root.readTries < 5)
+                    detailsRetry.restart();
+            }
+        }
+    }
+    Timer {
+        id: detailsRetry
+        interval: 1000
+        onTriggered: root.readMetadata()
+    }
+
+    // A track detail of `p`: for the followed player, its own or the ones read above.
+    function title(p: var): string {
+        return p === player ? MediaPlayers.detail(p?.trackTitle, readDetails, "title") : (p?.trackTitle ?? "");
+    }
+    function artist(p: var): string {
+        return p === player ? MediaPlayers.detail(p?.trackArtist, readDetails, "artist") : (p?.trackArtist ?? "");
+    }
+    function album(p: var): string {
+        return p === player ? MediaPlayers.detail(p?.trackAlbum, readDetails, "album") : (p?.trackAlbum ?? "");
+    }
+
     // The cover as a local file, for ColorQuantizer (the media menu's accent), which can't read
     // the web addresses players give (Spotify's are https). Downloaded once per track into
     // $XDG_RUNTIME_DIR; a local cover is used as it is.
-    readonly property string artUrl: player?.trackArtUrl ?? ""
+    readonly property string artUrl: MediaPlayers.detail(player?.trackArtUrl, readDetails, "artUrl")
     property string artFile: ""
     onArtUrlChanged: {
         if (artUrl.startsWith("file://")) {
@@ -82,6 +141,7 @@ Singleton {
             return "";
         if (player !== root.player)
             return player.trackArtUrl ?? "";
+        // (root.artUrl includes a cover read by readMetadata)
         if (artFile !== "")
             return "file://" + artFile;
         return artUrl.startsWith("http") ? "" : artUrl;

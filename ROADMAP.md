@@ -2449,7 +2449,13 @@ windows).
   lives in `services/Media.qml` (`MediaPlayers.js`, tested): the one playing, else the one that
   played last, else the music app heard last (`lastMediaApp`), else the first; KDE Connect's phone
   players come first in MPRIS's list, so "the first" took a paused Spotify's place. The media
-  keys (`qs ipc call media`) follow it. Spotify (1.3.4) reports a frozen MPRIS position (equal to the
+  keys (`qs ipc call media`) follow it. `playerctld` (a mirror of the active player, started on
+  demand) is never followed. Spotify doesn't announce the first track after it starts (it's on the
+  bus before the track loads), so that track showed without its title, artist or cover until the
+  next (user's find, 2026-11-05; a fresh Quickshell read it fine): while the followed player plays
+  without a title, `Media` reads the details itself with `playerctl metadata` (a few tries a second
+  apart) and the views take them from `Media.title()`, `artist()`, `album()` and `artUrl`
+  (`MediaPlayers.parseMetadata`, `detail`, tested). Spotify (1.3.4) reports a frozen MPRIS position (equal to the
   track length) while playing, so its seek bar reads full; other players are untested.
 - **Notifications from the island** (user's choice; for a day, 2026-11-03, cards in the top-right
   corner instead): one at a time on the focused screen, each for Settings' time with a full time

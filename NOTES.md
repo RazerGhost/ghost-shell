@@ -617,3 +617,12 @@ Checked against the docs or source in October 2026. Re-check anything not listed
 - Changes to `env.lua`, the initramfs, the kernel cmdline or greetd only apply after logging in again
   or rebooting. Say so in the checklist, and give a recovery path (Ctrl+Alt+F2, then
   `sudo systemctl disable greetd`) before changes that could stop the user getting to a desktop.
+- Quickshell's file watcher: `sed -i` (which writes a new file and renames it over the old one)
+  made the running shell stop reloading for that file, and rewriting a file with identical
+  content doesn't reload either. A real change to a file still watched (shell.qml) reloads
+  everything and watches the replaced file again. Edit in place.
+- MPRIS: Spotify 1.3.4 doesn't announce the first track after it starts; Quickshell, which only
+  follows changes, shows it without title, artist or cover until the next track, while a fresh
+  `qs -p` reading the player at start sees all of it (checked 2026-11-05). `playerctl -p spotify
+  metadata --format` reads it at any time. Asking busctl for `org.mpris.MediaPlayer2.playerctld`
+  starts playerctld (D-Bus activation), which then shows as a third, mirroring player.

@@ -34,7 +34,7 @@ Rectangle {
     }
 
     Accessible.role: Accessible.Button
-    Accessible.name: "Open media: " + (player?.trackTitle ?? "")
+    Accessible.name: "Open media: " + Media.title(player)
     Accessible.onPressAction: root.activated()
 
     // The keyboard (arrow keys or Tab, then Enter or Space), like a click.
@@ -68,7 +68,7 @@ Rectangle {
 
         Text {
             width: parent.width
-            text: root.player?.trackTitle || root.player?.identity || ""
+            text: Media.title(root.player) || root.player?.identity || ""
             color: Colors.m3onSurface
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.normal
@@ -79,7 +79,7 @@ Rectangle {
         Text {
             width: parent.width
             visible: text !== ""
-            text: root.player?.trackArtist ?? ""
+            text: Media.artist(root.player)
             color: Colors.m3onSurfaceVariant
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.small

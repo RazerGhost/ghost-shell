@@ -78,7 +78,7 @@ Column {
         Text {
             width: parent.width
             horizontalAlignment: Text.AlignHCenter
-            text: root.player?.trackTitle || root.player?.identity || "Nothing playing"
+            text: Media.title(root.player) || root.player?.identity || "Nothing playing"
             color: Colors.m3onSurface
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.large
@@ -90,7 +90,7 @@ Column {
             width: parent.width
             visible: text !== ""
             horizontalAlignment: Text.AlignHCenter
-            text: [root.player?.trackArtist, root.player?.trackAlbum].filter(s => s).join(" · ")
+            text: [Media.artist(root.player), Media.album(root.player)].filter(s => s).join(" · ")
             color: Colors.m3onSurfaceVariant
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.normal

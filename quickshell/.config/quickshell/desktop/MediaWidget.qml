@@ -18,8 +18,8 @@ WidgetSurface {
     function describe(): string {
         if (!player)
             return app ? "Nothing playing. Enter opens " + app.name : "Nothing playing";
-        return (player.isPlaying ? "Playing " : "Paused: ") + (player.trackTitle || player.identity || "")
-            + (player.trackArtist ? " by " + player.trackArtist : "") + ". Enter " + (player.isPlaying ? "pauses" : "plays");
+        return (player.isPlaying ? "Playing " : "Paused: ") + (Media.title(player) || player.identity || "")
+            + (Media.artist(player) ? " by " + Media.artist(player) : "") + ". Enter " + (player.isPlaying ? "pauses" : "plays");
     }
 
     readonly property MprisPlayer player: Media.player
@@ -112,7 +112,7 @@ WidgetSurface {
 
         Text {
             width: parent.width
-            text: widget.player ? (widget.player.trackTitle || widget.player.identity || "") : "Nothing playing"
+            text: widget.player ? (Media.title(widget.player) || widget.player.identity || "") : "Nothing playing"
             color: widget.text
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.title
@@ -122,7 +122,7 @@ WidgetSurface {
 
         Text {
             width: parent.width
-            text: widget.player ? (widget.player.trackArtist ?? "") : widget.app ? "Play opens " + widget.app.name : ""
+            text: widget.player ? Media.artist(widget.player) : widget.app ? "Play opens " + widget.app.name : ""
             color: widget.subtext
             font.family: Theme.font.sans
             font.pixelSize: Theme.font.normal
