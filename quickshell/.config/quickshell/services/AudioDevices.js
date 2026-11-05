@@ -15,6 +15,21 @@ function takesOver(name, sink) {
     return n.startsWith("alsa_input.usb-");
 }
 
+// Whether a node is offered as an output (`sink`) or a microphone, among the node names `all`.
+// openxlr (the wave3 module) adds a dozen sinks: its app channels, its mixes and the inputs it
+// mixes. Only its System channel is somewhere for sound to go (apps go to the other channels in
+// openxlr); its microphones are the processed Chat and Stream. While openxlr runs, the Wave:3's
+// own microphone is left out: picking it would skip the Voice chain (noise removal, EQ,
+// compressor).
+function listed(name, sink, all) {
+    const n = String(name ?? "");
+    if (n.startsWith("OpenXLR_"))
+        return sink ? n === "OpenXLR_ch_system" : n === "OpenXLR_chat" || n === "OpenXLR_stream";
+    if (!sink && n.startsWith("alsa_input.usb-Elgato_Systems_Elgato_Wave_3"))
+        return !Array.from(all ?? []).includes("OpenXLR_chat");
+    return true;
+}
+
 // The names in `now` that weren't in `before` (lists of node names).
 function added(before, now) {
     const known = new Set(Array.from(before ?? []));
@@ -58,10 +73,11 @@ function deviceOf(name) {
 // pick those in the Sound page, and WirePlumber brings them back by itself), and it comes along
 // when that output takes over even if it appeared first. A node seen before in this session
 // takes over again only if it was in use when it left (`left`: { name: wasDefault }), so waking
-// from sleep (USB devices reconnect) doesn't undo a choice of the speakers.
+// from sleep (USB devices reconnect) doesn't undo a choice of the speakers. A node the lists
+// leave out (listed) never takes over.
 function takeovers(added, all, left) {
     const names = Array.from(all ?? []);
-    const back = name => left?.[name] === false;
+    const back = name => left?.[name] === false || !listed(name, name.startsWith("alsa_output."), names);
     const outputs = Array.from(added ?? []).filter(n => takesOver(n, true) && !back(n));
     const sink = outputs[0] ?? "";
     const pairedInput = dev => dev !== "" ? names.find(n => n.startsWith("alsa_input.") && deviceOf(n) === dev) ?? "" : "";

@@ -73,6 +73,32 @@ TestCase {
                 { sink: "bluez_output.AC.1", source: "" });
     }
 
+    function test_listed() {
+        const xlr = ["OpenXLR_ch_system", "OpenXLR_ch_game", "OpenXLR_mix_monitor", "OpenXLR_chat", "OpenXLR_stream",
+                     "alsa_input.usb-Elgato_Systems_Elgato_Wave_3_A011-00.mono-fallback"];
+        // openxlr's outputs: only its System channel; its mixes, other channels and inputs aren't.
+        verify(AudioDevices.listed("OpenXLR_ch_system", true, xlr));
+        verify(!AudioDevices.listed("OpenXLR_ch_game", true, xlr));
+        verify(!AudioDevices.listed("OpenXLR_mix_monitor", true, xlr));
+        verify(!AudioDevices.listed("OpenXLR_post_chat", true, xlr));
+        verify(!AudioDevices.listed("OpenXLR_ch_xlr1", true, xlr));
+        // Its microphones: the processed Chat and Stream, not its filters.
+        verify(AudioDevices.listed("OpenXLR_chat", false, xlr));
+        verify(AudioDevices.listed("OpenXLR_stream", false, xlr));
+        verify(!AudioDevices.listed("OpenXLR_eq_xlr1_1", false, xlr));
+        // The Wave:3's raw microphone: hidden while openxlr runs, listed without it.
+        verify(!AudioDevices.listed(xlr[5], false, xlr));
+        verify(AudioDevices.listed(xlr[5], false, [xlr[5]]));
+        // Everything else stays: the Wave:3's headphone jack, other devices.
+        verify(AudioDevices.listed("alsa_output.usb-Elgato_Systems_Elgato_Wave_3_A011-00.analog-stereo", true, xlr));
+        verify(AudioDevices.listed(out, true, xlr));
+        verify(AudioDevices.listed(cam, false, xlr));
+        // A hidden microphone never takes over: the Wave:3 plugged in while openxlr runs gives
+        // its output, not its raw microphone.
+        const waveOut = "alsa_output.usb-Elgato_Systems_Elgato_Wave_3_A011-00.analog-stereo";
+        compare(AudioDevices.takeovers([waveOut, xlr[5]], [waveOut, ...xlr], {}), { sink: waveOut, source: "" });
+    }
+
     function test_added() {
         compare(AudioDevices.added(["a", "b"], ["a", "b", "c"]), ["c"]);
         compare(AudioDevices.added(["a", "b"], ["b"]), []);   // one went away: nothing new

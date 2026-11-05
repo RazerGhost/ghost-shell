@@ -563,6 +563,12 @@ so it finds the page for any setting; Enter opens the first match. The sidebar s
   optional de-esser (LSP compressor with a side-chain high-pass; Calf's de-esser is stereo only)
   and a limiter. Opt-in modules (`opt_in` in `ghost`) only install where
   `~/.config/ghost/modules` lists them, never as part of "all".
+- Quick settings with openxlr running (2026-11-05, user's picks): its 17 sinks filled the Sound
+  page past the island. The lists leave out its mixes, inputs and other app channels (only
+  "OpenXLR System" is an output to pick; apps go to Game, Music and so on in openxlr) and, while
+  openxlr runs, the Wave:3's raw microphone, which would skip the Voice chain; Chat and Stream are
+  the microphones. A left-out node never takes over when plugged in (`AudioDevices.listed`,
+  tested). The device lists scroll past six rows and the page below its header past the island.
 
 ### Proton apps (built 2026-10-29)
 - The `proton` module (user's request): Proton VPN (`proton-vpn-gtk-app`, extra), Proton Mail

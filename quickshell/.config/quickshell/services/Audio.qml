@@ -49,13 +49,16 @@ Singleton {
     // Speakers and headphones (hardware outputs) and microphones (hardware inputs), for the
     // Sound page and the chooser under quick settings' volume slider (DeviceList). The equalizer
     // is neither: its input is a sink and its output a stream (ghost-equalizer,
-    // ghost-equalizer.output). By name: reading `properties` here is a binding loop (tracking a
+    // ghost-equalizer.output). openxlr's internal nodes and the microphone it processes are left
+    // out (AudioDevices.listed). By name: reading `properties` here is a binding loop (tracking a
     // node fills them in).
     readonly property list<PwNode> outputs: devices(true)
     readonly property list<PwNode> inputs: devices(false)
     function devices(sink: bool): list<PwNode> {
-        return (Pipewire.nodes?.values ?? [])
-            .filter(n => n.audio && !n.isStream && n.isSink === sink && !n.name.startsWith("ghost-equalizer"));
+        const nodes = Pipewire.nodes?.values ?? [];
+        const names = nodes.map(n => n.name);
+        return nodes.filter(n => n.audio && !n.isStream && n.isSink === sink && !n.name.startsWith("ghost-equalizer")
+                            && AudioDevices.listed(n.name, sink, names));
     }
 
     readonly property string icon: muted || volume === 0 ? "volume_off"
