@@ -118,7 +118,7 @@ its setup (`setup.sh`).
 | Module | |
 |---|---|
 | `core` | Hyprland, the shell, fonts and themes, the colors, zsh as the login shell |
-| `system` | the GPU rule, boot options (Limine), the Omen's bass speakers, logging in at boot (greetd) and services |
+| `system` | the GPU links, boot options (Limine), hardware fixes for the machine it runs on (`modules/system/hardware/`: the Omen's bass speakers, ...), logging in at boot (greetd) and services |
 | `snapshots` | Btrfs snapshots: the system's before and after every update (bootable), your home folder hourly |
 | `apps` | terminal, editor, files, pictures, video, music, browser, web apps |
 | `dev` | languages, package managers and Docker |

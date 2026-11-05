@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# System setup (needs sudo): the GPU udev rule, early KMS and no Plymouth,
+# System setup (needs sudo): the GPU udev rule, the hardware fixes (hardware/), no Plymouth,
 # Limine's boot menu, greetd (logging in at boot, then locking), one mDNS service, and the
 # services the shell reads.
 # Run by `ghost install`; alone: `ghost install system`. Safe to re-run.
@@ -25,20 +25,20 @@ if [[ -n $no_driver ]]; then
     lsmod | grep -E '^nvidia' || echo "  (no nvidia kernel modules loaded)"
 fi
 
-step "Boot: early KMS, no Plymouth splash"
+step "Hardware fixes (modules/system/hardware/)"
+# One file per fix, each starting with the hardware it's for (ghost-hw) and doing nothing on other
+# machines; a new machine's quirk is a new file there. Sourced, so one that changes the initramfs
+# sets rebuild_boot for the boot step below.
 rebuild_boot=false
+for fix in modules/system/hardware/*.sh; do
+    . "$fix"
+done
+
+step "Boot: no Plymouth splash, a quiet console"
 # The kernel line and the boot menu are set for Limine (CachyOS's default); with another boot
 # loader those parts are skipped and say so.
 limine=false
 [[ -f /etc/default/limine ]] && command -v limine-mkinitcpio >/dev/null && limine=true
-
-# Early KMS: load the AMD driver before any services start where it drives the display. CachyOS's
-# chwd removes the kms hook on NVIDIA laptops (10-chwd-kms.conf), so without this amdgpu loads late.
-kms=system/etc/mkinitcpio.conf.d/20-early-amdgpu.conf
-if [[ $(hw display-gpu) == amd ]] && ! cmp -s "$kms" "/etc/mkinitcpio.conf.d/$(basename "$kms")"; then
-    sudo install -Dm644 "$kms" "/etc/mkinitcpio.conf.d/$(basename "$kms")"
-    rebuild_boot=true
-fi
 
 # No boot splash (user's choice; tried again on 2026-11-04 with the HP logo theme and dropped:
 # not worth it for the second of logo it kept). The session (straight to its lock screen) is
@@ -113,7 +113,7 @@ if $limine; then
     ! grep -vqF 'plymouth.enable=0' <<<"$cmdlines" \
         || fail "a kernel entry in $esp/limine.conf has no plymouth.enable=0; check /etc/default/limine and run sudo limine-mkinitcpio"
 
-    step "Boot menu: the HP logo stays, the menu only on a key"
+    step "Boot menu: the firmware's logo stays, the menu only on a key"
     # Limine's own options, at the top of its config (limine-entry-tool, which rewrites the boot
     # entries, keeps them): firmware_logo puts the firmware's logo back when Limine hands over; quiet hides the menu unless a key is pressed during
     # the timeout (to pick Windows or a snapshot). $esp is read in the step above.
@@ -166,24 +166,6 @@ mdns=system/etc/systemd/resolved.conf.d/50-no-mdns.conf
 if ! cmp -s "$mdns" "/etc/systemd/resolved.conf.d/$(basename "$mdns")"; then
     sudo install -Dm644 "$mdns" "/etc/systemd/resolved.conf.d/$(basename "$mdns")"
     sudo systemctl try-restart systemd-resolved.service
-fi
-
-step "HP Omen 16-xf0: its bass speakers, and the RTX after a power-off"
-# Only on that laptop (board 8BCA): the kernel leaves its bass speakers off (the patch file says
-# why; it takes effect when the sound driver loads next, at the next boot), and powered off with
-# the RTX on, the next boot often had none (ghost-hp-8bca-rtx-off.sh says why; from the next
-# power-off on).
-if [[ $(cat /sys/class/dmi/id/board_name 2>/dev/null) == 8BCA ]]; then
-    for file in system/usr/lib/firmware/ghost-hp-8bca-speakers.fw system/etc/modprobe.d/ghost-hp-8bca-speakers.conf \
-                system/etc/systemd/system/ghost-hp-8bca-rtx-off.service; do
-        sudo install -Dm644 "$file" "/${file#system/}"
-    done
-    sudo install -Dm755 system/usr/local/lib/ghost-hp-8bca-rtx-off.sh /usr/local/lib/ghost-hp-8bca-rtx-off.sh
-    sudo systemctl daemon-reload
-    # Started now too: it does nothing at start, and its stop step needs it running at shutdown.
-    sudo systemctl enable --now ghost-hp-8bca-rtx-off.service
-else
-    echo "Not an HP Omen 16-xf0 (board 8BCA): skipped"
 fi
 
 step "Services the Quickshell bar reads"
