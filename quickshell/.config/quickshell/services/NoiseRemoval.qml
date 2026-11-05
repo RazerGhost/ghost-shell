@@ -37,6 +37,16 @@ Singleton {
         filter.running = true;
     }
 
+    // Another microphone made the default while it's on (a headset plugged in, one picked in the
+    // Sound page): that one stays when it goes off, rather than the one it started from.
+    Connections {
+        target: Audio
+        function onSourceNameChanged(): void {
+            if (root.on && root.cleaned && Audio.sourceName !== "" && Audio.sourceName !== NoiseRemovalJs.sourceName)
+                root.previous = "";
+        }
+    }
+
     // Once the cleaned microphone is there, it's the default; when it goes, yours is again.
     onCleanedChanged: {
         if (cleaned) {

@@ -150,10 +150,14 @@ Item {
                     ? DesktopWidgets.screenAt(Display.monitors, own.x + x + root.width / 2, own.y + y + root.height / 2) : null;
                 const moved = middle !== null && middle.name !== here;
                 const target = moved ? middle : { name: here, w: area.width, h: area.height };
-                const local = moved
-                    ? DesktopWidgets.snapped(middle.x - root.width / 2, middle.y - root.height / 2, root.width, root.height,
-                                             target.w, target.h, [], Theme.desktop.margin, Theme.desktop.gap, Theme.desktop.reach)
-                    : at;
+                // On the other screen it lines up like a drop there: on the grid while it's on, else
+                // with that screen's edges.
+                const local = !moved ? at
+                    : Settings.values.desktopGrid
+                    ? DesktopWidgets.gridSnapped(middle.x - root.width / 2, middle.y - root.height / 2, root.width, root.height,
+                                                 target.w, target.h, Theme.desktop.cell)
+                    : DesktopWidgets.snapped(middle.x - root.width / 2, middle.y - root.height / 2, root.width, root.height,
+                                             target.w, target.h, [], Theme.desktop.margin, Theme.desktop.gap, Theme.desktop.reach);
                 const place = DesktopWidgets.dropped(local.x, local.y, root.width, root.height, target.w, target.h,
                                                      Theme.desktop.zoom);
                 // The screen goes with the place, except the main one's, so those follow a new main.

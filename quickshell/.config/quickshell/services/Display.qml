@@ -58,6 +58,7 @@ Singleton {
             Quickshell.execDetached(["hyprctl", "eval", lua]);
     }
     onLoweredChanged: applyRate()
+    property bool rateApplied: false
 
     IpcHandler {
         target: "display"
@@ -117,6 +118,13 @@ Singleton {
                     root.monitors = JSON.parse(text);
                 } catch (e) {
                     console.warn("Display: hyprctl monitors gave no JSON");
+                    return;
+                }
+                // Started on battery (a boot or a shell restart unplugged): `lowered` was already
+                // true, so its change never comes; the screens are known now.
+                if (root.lowered && !root.rateApplied) {
+                    root.rateApplied = true;
+                    root.applyRate();
                 }
             }
         }
