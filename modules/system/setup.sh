@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# System setup for this laptop (needs sudo): the GPU udev rule, early KMS and no Plymouth,
+# System setup (needs sudo): the GPU udev rule, early KMS and no Plymouth,
 # Limine's boot menu, greetd (logging in at boot, then locking), one mDNS service, and the
 # services the shell reads.
 # Run by `ghost install`; alone: `ghost install system`. Safe to re-run.
@@ -15,8 +15,9 @@ if ! cmp -s "$rule" "/etc/udev/rules.d/$(basename "$rule")"; then
     sudo udevadm trigger --subsystem-match=drm
     udevadm settle
 fi
-# Hyprland's env.lua lists whichever of the two exist (the laptop: both, the AMD chip first; the
-# desktop: the NVIDIA card alone). Only the same card under both names is wrong.
+# Hyprland's env.lua lists whichever of the two exist: on a laptop the AMD chip first, on a
+# desktop the NVIDIA card first (the desktop's Ryzen has a small iGPU too). Only the same card
+# under both names is wrong.
 for gpu in amd-igpu nvidia-dgpu; do
     [[ -e /dev/dri/$gpu ]] && printf '%-11s -> %s\n' "$gpu" "$(readlink -f /dev/dri/$gpu)"
 done

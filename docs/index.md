@@ -67,7 +67,7 @@ updated) · Boy Scout Rule within touched lines · end each change with a summar
 
 | Area | Decision |
 |---|---|
-| GPU | iGPU first, RTX second in `AQ_DRM_DEVICES`; no global NVIDIA env vars, `prime-run` per app (`env.lua`, udev rule `61-gpu-symlinks.rules`) |
+| GPU | by chassis type: a laptop the iGPU first, the RTX second in `AQ_DRM_DEVICES`, no global NVIDIA env vars, `prime-run` per app; a desktop the NVIDIA card first with its env vars (`env.lua`, udev rule `61-gpu-symlinks.rules`) |
 | Boot | No Plymouth (`plymouth.enable=0`); early KMS adds `amdgpu`; quiet kernel line; Hyprland output to the journal |
 | Windows | Own tiling layout (`layout.lua`, `tiling.lua`); dialogs float; floating stays above tiled |
 | Focus | Click to focus, raise on focus (`input.follow_mouse = 2`, `windows.lua`); apps can't steal focus, urgent shows an `AttentionCard` |
