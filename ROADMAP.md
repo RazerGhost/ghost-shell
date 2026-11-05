@@ -2192,8 +2192,10 @@ settings' edit mode, so the panel only grows by what you add.
   (`pipewire -c`): RNNoise between that microphone and a new "Noise-cancelled microphone", which
   becomes the default; off (or the filter stopping, a shell restart) gives the microphone back.
   Not one config always loaded: a filter fed by the default microphone that becomes the default
-  would feed itself. Checked: PipeWire reads the config up to the missing plugin (not installed
-  yet); the sound itself is the user's to try once it is.
+  would feed itself. Checked with the package installed: the config run on its own loads the
+  plugin (`noise_suppressor_mono` and its controls), makes "Noise-cancelled microphone" an
+  Audio/Source and links its input to the microphone named; how it sounds in a call is the
+  user's to try.
 
 ### Headphones take over when plugged in (2026-11-05)
 User's question with USB-C IEMs (a SIMGOT EW300 DSP): they connected, but the sound stayed on
