@@ -49,6 +49,12 @@ Singleton {
     }
     onPlayingChanged: {
         rememberPlaying();
+        Qt.callLater(rememberApp);
+    }
+    // A moment later too: `playing` changes while `player` is being set, and `player` reads
+    // lastMediaApp, so writing it there re-evaluated `player` mid-way (the binding loop above,
+    // on most shell starts: the settings file loads after).
+    function rememberApp(): void {
         const entry = playing ? DesktopEntries.heuristicLookup(player.desktopEntry || player.identity || "") : null;
         if (entry && isMusic(entry) && Settings.values.lastMediaApp !== entry.id)
             Settings.values.lastMediaApp = entry.id;
