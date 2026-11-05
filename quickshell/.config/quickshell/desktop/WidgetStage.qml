@@ -79,7 +79,7 @@ Item {
     Item {
         id: grid
 
-        readonly property real cell: Theme.px(DesktopWidgetsJs.gridSize(Settings.values.desktopGridSize))
+        readonly property real cell: Theme.desktop.cell
         readonly property bool placing: !stage.locked && (Editing.desktop || stage.cards.some(c => c.moving))
 
         anchors.fill: parent

@@ -741,7 +741,7 @@ Scope {
                                         return;
                                     const kind = DesktopWidgetsJs.kinds.find(k => k.key === modelData.key);
                                     const screen = root.editScreen;
-                                    const grid = Settings.values.desktopGrid ? Theme.px(DesktopWidgetsJs.gridSize(Settings.values.desktopGridSize)) : 0;
+                                    const grid = Settings.values.desktopGrid ? Theme.desktop.cell : 0;
                                     const { dx, dy } = DesktopWidgetsJs.keyStep(direction, grid, Theme.spacing.l * 2);
                                     const box = Theme.desktop.box(kind.name);
                                     const place = DesktopWidgetsJs.nudged(DesktopWidgetsJs.place(Settings.values.desktopWidgets, kind.name), dx, dy,

@@ -139,8 +139,7 @@ Item {
                 const x = root.at.x + root.dragged.x;
                 const y = root.at.y + root.dragged.y;
                 const at = Settings.values.desktopGrid
-                    ? DesktopWidgets.gridSnapped(x, y, root.width, root.height, area.width, area.height,
-                                                 Theme.px(DesktopWidgets.gridSize(Settings.values.desktopGridSize)))
+                    ? DesktopWidgets.gridSnapped(x, y, root.width, root.height, area.width, area.height, Theme.desktop.cell)
                     : DesktopWidgets.snapped(x, y, root.width, root.height, area.width, area.height, others,
                                              Theme.desktop.margin, Theme.desktop.gap, Theme.desktop.reach);
                 // Let go past this screen's edge onto another (its middle there): it moves to that

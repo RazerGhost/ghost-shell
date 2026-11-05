@@ -243,6 +243,9 @@ Singleton {
         }
         // How large the widgets are against 100 %: their places zoom by it (DesktopWidgets.js).
         readonly property real zoom:   size / DesktopWidgetsJs.unit.size
+        // The desktop grid's spacing (Settings' desktopGridSize, at 100 %), scaled like the widgets
+        // and their places, so a layout lined up on it stays lined up at any shell and text size.
+        readonly property real cell:   DesktopWidgetsJs.gridSize(Settings.values.desktopGridSize) * zoom
         readonly property int padding: root.text(20)
         readonly property int radius:  root.round(20)
         readonly property int margin:  root.px(32)  // from the screen's edges, when snapped

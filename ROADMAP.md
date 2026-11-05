@@ -2203,6 +2203,17 @@ screens (`hyprctl output create headless`, removed after each test).
   100 % screen's edges); `DesktopWidgets.dropped` keeps them on the screen as shown. And per-screen
   parts no longer throw while a screen is unplugged.
 
+### A grid that lines up (2026-11-05, user's find)
+Placing widgets symmetrically on the grid was hard: the grid's spacing was scaled by the shell
+size only while the widgets and their places also follow the text size (at 85 % and 90 % they
+drifted apart), each drop snapped whichever of a widget's start, middle or end was nearest (two
+widgets dropped a little differently lined up by different parts), and near an edge a widget was
+pushed back off the grid. Now the grid's spacing is `Theme.desktop.cell` (the setting at 100 %,
+scaled like the widgets) for the lines, drops and the editor's nudges, and a drop lines up by
+side (`DesktopWidgets.gridSnapped`, tested): across the middle it centers, left of it by its left
+edge, right of it by its right edge (and up and down), only on lines that keep it on the screen,
+so roughly mirrored drops land exactly mirrored at any size.
+
 ### Edge cases fixed (2026-11-05, user's request: all ten found)
 Twin monitors (same description) go by port (`DisplayModes.key`); a shell crash with noise
 removal on leaves no filter behind (cleared at start and before each start); a USB device back

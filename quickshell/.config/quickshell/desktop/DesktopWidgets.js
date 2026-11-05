@@ -281,21 +281,31 @@ function gridLines(size, cell) {
     return lines.sort((a, b) => a - b);
 }
 
-// A widget dropped at (x, y), w x h px, on a sw x sh screen, lined up with the grid: on each axis
-// whichever of its start, middle or end is nearest a line moves onto it (so a medium widget can
-// center on the middle line and a small one sit beside it), then it's kept on the screen.
+// A widget dropped at (x, y), w x h px, on a sw x sh screen, lined up with the grid by the side
+// it's on, so a widget and its mirror image land mirrored even when dropped only roughly so:
+// across the middle (its center within half a cell of it) it centers on the middle line; left of
+// it its left edge goes onto the nearest line, right of it its right edge; the same up and down.
+// Only lines that keep it wholly on the screen count, so near an edge it stays on the grid
+// rather than being pushed off it. (The nearest of start, middle or end, as before, picked
+// different ones for two widgets dropped a little differently, and they didn't line up.)
 function gridSnapped(x, y, w, h, sw, sh, cell) {
     const axis = (start, length, size) => {
-        let best = start, distance = Infinity;
-        for (const line of gridLines(size, cell))
-            for (const offset of [0, length / 2, length]) {
-                const d = Math.abs(start + offset - line);
-                if (d < distance) {
-                    distance = d;
-                    best = line - offset;
-                }
+        const lines = gridLines(size, cell);
+        const middle = size / 2;
+        const center = start + length / 2;
+        const offset = Math.abs(center - middle) <= cell / 2 ? length / 2 : center < middle ? 0 : length;
+        let best = null, distance = Infinity;
+        for (const line of lines) {
+            const at = line - offset;
+            if (at < -0.001 || at + length > size + 0.001)
+                continue;
+            const d = Math.abs(start + offset - line);
+            if (d < distance) {
+                distance = d;
+                best = at;
             }
-        return Math.min(Math.max(best, 0), Math.max(size - length, 0));
+        }
+        return best ?? Math.min(Math.max(start, 0), Math.max(size - length, 0));
     };
     return { x: axis(x, w, sw), y: axis(y, h, sh) };
 }

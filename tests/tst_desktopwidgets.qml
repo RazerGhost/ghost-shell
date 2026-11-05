@@ -112,17 +112,31 @@ TestCase {
     function test_gridSnapped() {
         // A medium widget (352 wide) dropped near the middle centers on it.
         compare(DesktopWidgets.gridSnapped(790, 500, 352, 168, 1920, 1080, 32).x, 960 - 176);
-        // A small one dropped 5 px off a line: its start moves onto it.
-        compare(DesktopWidgets.gridSnapped(965, 500, 168, 168, 1920, 1080, 32).x, 960);
+        // A small one right of the middle: its right edge goes onto the nearest line (1120).
+        compare(DesktopWidgets.gridSnapped(965, 500, 168, 168, 1920, 1080, 32).x, 1120 - 168);
+        // ...and its mirror image, left of the middle, by its left edge: exactly mirrored.
+        compare(DesktopWidgets.gridSnapped(1920 - 965 - 168, 500, 168, 168, 1920, 1080, 32).x, 800);
+        // Dropped only roughly mirrored (10 px apart): still exactly mirrored.
+        const a = DesktopWidgets.gridSnapped(300, 200, 168, 168, 1920, 1080, 48);
+        const b = DesktopWidgets.gridSnapped(1920 - 300 - 168 + 10, 200, 168, 168, 1920, 1080, 48);
+        compare(a.x, 1920 - (b.x + 168));
         // A widget and its mirror image land mirrored, at any drop along the side.
         for (const x of [70, 150, 333, 610]) {
             const left = DesktopWidgets.gridSnapped(x, 100, 352, 168, 1920, 1080, 32);
             const right = DesktopWidgets.gridSnapped(1920 - x - 352, 100, 352, 168, 1920, 1080, 32);
             compare(left.x, 1920 - (right.x + 352), x);
         }
-        // Never off the screen.
+        // Never off the screen, and still on a line there (its right and bottom edges).
         const edge = DesktopWidgets.gridSnapped(1900, 1070, 168, 168, 1920, 1080, 48);
         verify(edge.x + 168 <= 1920 && edge.y + 168 <= 1080);
+        const lines = DesktopWidgets.gridLines(1920, 48);
+        verify(lines.some(l => Math.abs(l - (edge.x + 168)) < 0.001));
+        // At another size the cell scales with the widgets (Theme.desktop.cell): the same
+        // arrangement, zoomed, still mirrors.
+        const k = 0.765;
+        const c = DesktopWidgets.gridSnapped(300, 200, 168 * k, 168 * k, 1920, 1080, 48 * k);
+        const d = DesktopWidgets.gridSnapped(1920 - 300 - 168 * k, 200, 168 * k, 168 * k, 1920, 1080, 48 * k);
+        fuzzyCompare(c.x, 1920 - (d.x + 168 * k), 0.001);
     }
 
     function test_keyStep() {
@@ -179,12 +193,15 @@ TestCase {
         // No grid: by the step, kept on the screen.
         compare(DesktopWidgets.nudged({ x: 0.5, y: 0.5 }, 48, 0, 168, 168, 1920, 1080, 0), { x: (960 + 48) / 1920, y: 0.5 });
         compare(DesktopWidgets.nudged({ x: 0, y: 0 }, -48, -48, 168, 168, 1920, 1080, 0), { x: 0, y: 0 });
-        // On the grid: a step of one cell from a line lands on the next line.
+        // On the grid: a step moves it on, its edge on that side landing on a line (right of the
+        // middle its right edge, below it its bottom edge: gridSnapped).
         const start = { x: 960 / 1920, y: 540 / 1080 };
         const right = DesktopWidgets.nudged(start, 32, 0, 168, 168, 1920, 1080, 32);
-        compare(right.x * 1920, 992);
+        verify(right.x * 1920 > 960);
+        verify(DesktopWidgets.gridLines(1920, 32).some(l => Math.abs(l - (right.x * 1920 + 168)) < 0.001));
         const down = DesktopWidgets.nudged(start, 0, 32, 168, 168, 1920, 1080, 32);
-        compare(down.y * 1080, 572);
+        verify(down.y * 1080 > 540);
+        verify(DesktopWidgets.gridLines(1080, 32).some(l => Math.abs(l - (down.y * 1080 + 168)) < 0.001));
     }
 
     // A widget turned on next to a row goes at the row's end, not under it (the most compact spot).
