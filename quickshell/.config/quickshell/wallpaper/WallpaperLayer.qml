@@ -21,12 +21,14 @@ Variants {
 
         required property ShellScreen modelData
         readonly property HyprlandMonitor monitor: Hyprland.monitorFor(modelData)
-        readonly property bool playing: Wallpaper.isVideo && own === "" && !GameMode.on && !UPower.onBattery && !Session.locked
+        readonly property bool playing: video !== "" && !GameMode.on && !UPower.onBattery && !Session.locked
                                         && (monitor?.activeWorkspace?.toplevels.values.length ?? 1) === 0
         // This screen's own picture, with one per screen ("" when it shows the main wallpaper,
         // which may be a live one).
         readonly property string own: { const p = Wallpaper.pathFor(modelData?.name ?? ""); return p !== Wallpaper.path ? p : ""; }
-        readonly property string still: own !== "" ? own : Wallpaper.stillPath
+        readonly property string still: own !== "" ? Wallpaper.stillFor(own) : Wallpaper.stillPath
+        // What plays here: its own video, else the main one's.
+        readonly property string video: own !== "" ? (Wallpaper.isVideoPath(own) ? own : "") : (Wallpaper.isVideo ? Wallpaper.path : "")
         // Drawn as a card while the desktop editor is open on this screen (customize/Editing.qml).
         readonly property bool carded: Editing.cardScreen === modelData?.name // null while it's unplugged
 
@@ -122,11 +124,11 @@ Variants {
             // The live wallpaper, only built while one is chosen.
             Loader {
                 anchors.fill: parent
-                active: Wallpaper.isVideo && window.own === ""
+                active: window.video !== ""
 
                 sourceComponent: Video {
                     id: video
-                    source: FileUrl.of(Wallpaper.path)
+                    source: FileUrl.of(window.video)
                     fillMode: VideoOutput.PreserveAspectCrop
                     loops: MediaPlayer.Infinite
                     muted: true

@@ -67,18 +67,24 @@ Singleton {
     // A wallpaper per screen (Settings -> Display, with several screens: `wallpaperPerScreen`):
     // the main screen's is `path`, which makes the colors; another screen shows its own picture
     // from `screenWallpapers` (by output name) or, until one is picked for it, the main one's.
-    // Pictures only there: a live wallpaper plays on the screens showing the main one.
+    // A live one plays there by the same rules; its thumbnail is its still frame (stillFor).
     readonly property bool perScreen: Settings.values.wallpaperPerScreen === true && Screens.several
     function pathFor(screenName: string): string {
         if (!perScreen || screenName === (Screens.main?.name ?? ""))
             return path;
         const own = Settings.values.screenWallpapers?.[screenName];
-        return typeof own === "string" && own !== "" && !WallpapersJs.isVideo(own) ? own : path;
+        return typeof own === "string" && own !== "" ? own : path;
     }
+    // The still picture for another screen's own wallpaper: a video's thumbnail (made when the
+    // folder is scanned), a picture itself.
+    function stillFor(file: string): string {
+        return WallpapersJs.isVideo(file) ? (pictures.find(p => p.filePath === file)?.thumb ?? "") : file;
+    }
+
     // Picking a wallpaper on a screen (the island's strip opens on the screen you're on): the
     // main screen's, or with one per screen another's.
     function setFor(screenName: string, picture: string): void {
-        if (!perScreen || screenName === (Screens.main?.name ?? "") || WallpapersJs.isVideo(picture)) {
+        if (!perScreen || screenName === (Screens.main?.name ?? "")) {
             set(picture);
             return;
         }

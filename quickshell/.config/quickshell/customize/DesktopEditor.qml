@@ -29,6 +29,19 @@ Scope {
     property var saved: ({})
     // The screen it opened on, kept while it's open (the focused one could change under it).
     property string screenName: ""
+    // The screen it's open on: its wallpaper and widgets are the card; widgets turned on here go
+    // on it (the main screen's places carry no screen, so they follow a new main one).
+    readonly property ShellScreen editScreen: Quickshell.screens.find(s => s.name === screenName) ?? Screens.main
+    readonly property bool onMain: editScreen === Screens.main
+    // `places` (desktopWidgets) with `name` put on this screen.
+    function onThisScreen(places: var, name: string): var {
+        const own = Object.assign({}, places[name] ?? {});
+        if (onMain)
+            delete own.screen;
+        else
+            own.screen = editScreen.name;
+        return Object.assign({}, places, { [name]: own });
+    }
     property string savedWallpaper: ""
 
     function open(): void {
@@ -209,8 +222,9 @@ Scope {
                         savedKey: "widgetLooks"
                         savedPrefix: "My layout"
                         subtitle: "Which widgets, and where"
-                        // Laid out for the widgets' screen, on the calmer side of the wallpaper.
-                        presets: Presets.widgetPresets(Quickshell.screens[0]?.width ?? 1920, Quickshell.screens[0]?.height ?? 1080,
+                        // Laid out for the main screen (a layout is the main screen's widgets), on the
+                        // calmer side of the wallpaper.
+                        presets: Presets.widgetPresets(Screens.main?.width ?? 1920, Screens.main?.height ?? 1080,
                                                        Wallpaper.quietSide)
                         fadeColor: Qt.tint(Colors.surfaceTranslucent, Colors.tint)
                         art: Component {
@@ -481,7 +495,7 @@ Scope {
                             cardWidth: Theme.editor.pictureCard
                             options: Wallpaper.pictures.map(p => ({ value: p.filePath, label: p.fileName, thumb: p.video ? p.thumb : p.filePath }))
                             current: Wallpaper.target
-                            onPicked: v => Wallpaper.set(v)
+                            onPicked: v => Wallpaper.setFor(root.editScreen?.name ?? "", v) // with one per screen, this screen's
                             art: Component {
                                 Image {
                                     source: FileUrl.of(parent.option.thumb)
@@ -692,13 +706,17 @@ Scope {
                                 function toggle(): void {
                                     if (!on) {
                                         const name = DesktopWidgetsJs.kinds.find(k => k.key === modelData.key).name;
+                                        // The widgets already on this screen.
+                                        const here = root.editScreen?.name ?? "";
+                                        const names = Quickshell.screens.map(s => s.name);
                                         const others = DesktopWidgetsJs.kinds
-                                            .filter(k => k.name !== name && Settings.values[k.key] && (k.name !== "battery" || Battery.present))
+                                            .filter(k => k.name !== name && Settings.values[k.key] && (k.name !== "battery" || Battery.present)
+                                                    && DesktopWidgetsJs.screenOf(Settings.values.desktopWidgets, k.name, names, Screens.main?.name ?? "") === here)
                                             .map(k => k.name);
-                                        const screen = Quickshell.screens[0];
+                                        const screen = root.editScreen;
                                         if (screen)
-                                            Settings.values.desktopWidgets = DesktopWidgetsJs.freePlace(
-                                                Settings.values.desktopWidgets, name, others, screen.width, screen.height);
+                                            Settings.values.desktopWidgets = root.onThisScreen(DesktopWidgetsJs.freePlace(
+                                                Settings.values.desktopWidgets, name, others, screen.width, screen.height), name);
                                     }
                                     Settings.values[modelData.key] = !on;
                                 }
@@ -722,7 +740,7 @@ Scope {
                                     if (!(event.modifiers & Qt.ShiftModifier) || !direction || !on)
                                         return;
                                     const kind = DesktopWidgetsJs.kinds.find(k => k.key === modelData.key);
-                                    const screen = Quickshell.screens[0];
+                                    const screen = root.editScreen;
                                     const grid = Settings.values.desktopGrid ? Theme.px(DesktopWidgetsJs.gridSize(Settings.values.desktopGridSize)) : 0;
                                     const { dx, dy } = DesktopWidgetsJs.keyStep(direction, grid, Theme.spacing.l * 2);
                                     const box = Theme.desktop.box(kind.name);
@@ -730,6 +748,10 @@ Scope {
                                                                           box.w, box.h,
                                                                           screen?.width ?? 1920, screen?.height ?? 1080, grid,
                                                                           Theme.desktop.zoom);
+                                    // Its screen stays with it (a widget on another screen).
+                                    const screenName = Settings.values.desktopWidgets?.[kind.name]?.screen;
+                                    if (screenName)
+                                        place.screen = screenName;
                                     Settings.values.desktopWidgets = DesktopWidgetsJs.withPlace(Settings.values.desktopWidgets, kind.name, place);
                                     event.accepted = true;
                                 }

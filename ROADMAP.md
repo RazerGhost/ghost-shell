@@ -2183,9 +2183,18 @@ screens (`hyprctl output create headless`, removed after each test).
 - Desktop widgets on any screen (the user's question): a widget dropped past its screen's edge
   moves to the screen under its middle, placed there (`DesktopWidgets.screenAt`, `screenOf`,
   tested); each screen with widgets has its own layer and stage (`WidgetStage.screenName`), on the
-  lock screen too; a widget whose screen is unplugged shows on the main screen. The keyboard mode
-  (Super+D) is the main screen's widgets; the desktop editor shows the main screen's. Checked: the
-  clock moved to the virtual screen and back.
+  lock screen too; a widget whose screen is unplugged shows on the main screen. Checked: the clock
+  moved to the virtual screen and back.
+- Then (user's request, the limits fixed): the desktop editor works on the screen it opens on (its
+  card is that screen's wallpaper and widgets; a widget turned on goes there, Shift+arrows keep a
+  widget's screen, a wallpaper picked there is that screen's with one per screen); widget layouts
+  stay the main screen's (a layout is a whole desktop). Live wallpapers per screen too: another
+  screen's video plays by the same rules, its thumbnail the still frame (`Wallpaper.stillFor`).
+  Checked: a per-screen picture again; untested: a video on a second screen (no video here), the
+  editor on a second screen (it moves you to an empty workspace).
+- Kept on purpose (user's call): the widgets' keyboard mode (Super+D) is only the main screen's.
+  One keyboard-taking layer per screen would compete for the keyboard across screens; without a
+  clean split it's not worth the risk.
 - Fixed on the way (user's find): widgets stopped about 7 % in from the screen's edges at a shell
   size under 100 % (places are kept at 100 % and zoom toward the middle; a drop capped them at the
   100 % screen's edges); `DesktopWidgets.dropped` keeps them on the screen as shown. And per-screen

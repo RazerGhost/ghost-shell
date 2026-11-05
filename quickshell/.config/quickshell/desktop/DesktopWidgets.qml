@@ -68,8 +68,9 @@ Scope {
         }
     }
 
-    // The screens with widgets: the main one, and any a widget was dropped onto.
-    readonly property var screens: Quickshell.screens.filter(s => s === Screens.main
+    // The screens with widgets: the main one, any a widget was dropped onto, and the one the
+    // desktop editor is open on (its card shows that screen's widgets).
+    readonly property var screens: Quickshell.screens.filter(s => s === Screens.main || s.name === Editing.cardScreen
         || Object.values(Settings.values.desktopWidgets ?? {}).some(p => p?.screen === s.name))
 
     LazyLoader {
