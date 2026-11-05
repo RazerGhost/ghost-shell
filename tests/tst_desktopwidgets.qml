@@ -47,6 +47,19 @@ TestCase {
         // Past the right and bottom edges: pulled back so the whole widget shows.
         compare(DesktopWidgets.dropped(1900, 1070, 192, 108, 1920, 1080), { x: 0.9, y: 0.9 });
         compare(DesktopWidgets.dropped(-50, -10, 100, 100, 1000, 1000), { x: 0, y: 0 });
+        // At 85 % the arrangement zooms toward the middle: a widget against the left and top
+        // edges is stored past them, and shows against them again (it stopped 7 % in before).
+        const k = 0.85;
+        const edge = DesktopWidgets.dropped(0, 0, 300, 150, 1920, 1080, k);
+        verify(edge.x < 0 && edge.y < 0);
+        compare(DesktopWidgets.shown(edge, 300, 150, 1920, 1080, k), { x: 0, y: 0 });
+        // ...and the right and bottom edges.
+        const far = DesktopWidgets.dropped(1920 - 300, 1080 - 150, 300, 150, 1920, 1080, k);
+        const back = DesktopWidgets.shown(far, 300, 150, 1920, 1080, k);
+        fuzzyCompare(back.x, 1620, 0.001);
+        fuzzyCompare(back.y, 930, 0.001);
+        // Such a place read back from settings isn't thrown away.
+        compare(DesktopWidgets.place({ clock: edge }, "clock"), edge);
     }
 
     function test_withPlace() {

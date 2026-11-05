@@ -48,8 +48,10 @@ const defaults = {
     clipboard: { x: 0.68, y: 0.62 }
 };
 
+// A saved fraction may run a little past 0 and 1: at a smaller size the arrangement zooms toward
+// the middle, so a widget against the edge there is stored past it (dropped()).
 function fraction(value, fallback) {
-    return typeof value === "number" && value >= 0 && value <= 1 ? value : fallback;
+    return typeof value === "number" && value >= -0.5 && value <= 1.5 ? value : fallback;
 }
 
 // The saved place of `name` from settings' desktopWidgets, else its default. A hand-edited
@@ -116,10 +118,12 @@ function arrange(items, sw, sh, zoom, near) {
 }
 
 // A widget dropped at (x, y) px, w x h px, on a screen sw x sh px at `zoom` (1 when left out):
-// its place as fractions, as it would be at 100 %; kept wholly on the screen.
+// its place as fractions, as it would be at 100 %. Kept wholly on the screen as it shows now,
+// not at 100 %: at 85 % the edge of the screen is past the 100 % screen's edge, and capping the
+// fraction at 0 and 1 kept widgets about 7 % in from every edge (user's find, 2026-11-05).
 function dropped(x, y, w, h, sw, sh, zoom) {
     const k = zoom > 0 ? zoom : 1;
-    const at = (v, max, size) => Math.min(Math.max((size / 2 + (clamp(v, max) - size / 2) / k) / size, 0), 1);
+    const at = (v, max, size) => (size / 2 + (clamp(v, max) - size / 2) / k) / size;
     return { x: at(x, sw - w, sw), y: at(y, sh - h, sh) };
 }
 
