@@ -315,10 +315,9 @@ Item {
         RoundToggle {
             icon: "wallpaper"
             title: "Wallpaper"
-            onClicked: {
-                Wallpaper.pickerOpen = true;
-                root.openMenu("");
-            }
+            // The strip is an island menu: switch to it (setting Wallpaper.pickerOpen and then
+            // closing this menu closed the strip again at once, so nothing showed).
+            onClicked: root.openMenu("wallpaper")
         }
     }
 
@@ -739,10 +738,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     icon: "wallpaper"
                     label: "Wallpaper"
-                    onClicked: {
-                        Wallpaper.pickerOpen = true;
-                        root.openMenu("");
-                    }
+                    onClicked: root.openMenu("wallpaper") // see the round wallpaper button
                 }
 
                 IconButton {
