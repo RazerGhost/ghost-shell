@@ -83,6 +83,39 @@ cp ~/.config/openxlr/profiles/0fd9-0070/Voice.json ~/Projects/ghost-shell/module
 Check the diff before committing: a profile saved from the UI also holds the hardware settings
 (gain, headphone volume) and the whole mixer scene.
 
+## On Windows (Wave Link)
+
+The same desktop boots Windows with Wave Link 3.4 and Elgato's own effects (Noise Removal, De-Esser,
+EQ, Compressor, from `C:\Program Files\Common Files\VST3\Elgato`). Their settings, read from
+Wave Link's `Settings.json` on 2026-11-05 (the plugins' states are JUCE data inside it), next to
+the chain here:
+
+| | Windows (as found) | Linux (above) |
+|---|---|---|
+| Noise | VoiceFocus, then Elgato Noise Removal (an RNNoise gate: VAD threshold 0.8, release 110 ms) | DeepFilterNet, the expander |
+| EQ | low cut 61 Hz; +2.8 dB low shelf at 125 Hz; −2.2 dB at 240 Hz; −1.8 dB at 763 Hz; −1.4 dB at 3 kHz; +2.2 dB high shelf at 7.2 kHz; high cut 18 kHz | high-pass 70 Hz; +4 dB low shelf at 150 Hz; −1 dB at 275 Hz; +1 dB at 4 kHz |
+| Compressor | 2:1 from −37 dB, attack 20 ms, release 150 ms, automatic makeup | 3:1 from −34 dB, attack 10 ms, release 100 ms, +12 dB makeup |
+| De-esser | two bands, 2.5 and 8 kHz, 4:1 at −60 dB; before the EQ | above 5 kHz, 6:1; after the compressor |
+
+To match the Linux chain, by hand in Wave Link (the plugins show dB and Hz; writing
+`Settings.json` from Linux would mean re-encoding the plugins' states on a read-write NTFS mount,
+and Wave Link may overwrite or refuse it). The values are a mapping between different plugins,
+so compare the two by ear afterwards:
+
+1. Order: the De-Esser below the Compressor.
+2. Elgato EQ: band 1 (low cut) 70 Hz; band 3 (low shelf) 150 Hz, +4 dB; band 4 275 Hz, −1 dB,
+   Q 0.7; band 6 4 kHz, +1 dB, Q 0.8; band 2 (763 Hz) and band 5 (the high shelf, which lifted
+   the "s" sounds) to 0 dB; the high cut stays.
+3. Elgato Compressor: threshold −34 dB, ratio 3, attack 10 ms, release 100 ms; automatic makeup
+   stays on (it stands in for the fixed +12 dB).
+4. Elgato De-Esser: band two at 6 kHz, ratio 6; band one's ratio down to 2 (at 2.5 kHz it dulls
+   the voice more than it catches "s").
+5. Noise: VoiceFocus and Noise Removal stay; raise Noise Removal's VAD threshold a little if the
+   pauses still carry noise.
+6. Gain: Wave Link keeps its own (gain lock on; 0.475 on its 0-1 scale, whose dB mapping isn't
+   known), so set it by the meter: loud speech about two-thirds up, never in the red. The
+   thresholds above assume the input level here (peaks around −13 to −18 dBFS).
+
 ## Left to do by hand
 
 - Pick openxlr's virtual microphone as the input in Discord (Vesktop), OBS and other apps.
