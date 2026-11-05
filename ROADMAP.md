@@ -2547,6 +2547,8 @@ then (user: "all of it"):
   names the group for screen readers. Folders are a row with the folder in use and Choose…
   (zenity, now in core: only Steam had brought it) and Default, not a text field with its
   instructions inside.
+- The night light's and Do Not Disturb's schedules are one `settings/ScheduleGroup.qml` (they were
+  the same 45 lines twice).
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own

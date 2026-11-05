@@ -4,7 +4,6 @@ import Quickshell.Io
 import qs.services
 import qs.theme
 import qs.widgets
-import "../services/Schedule.js" as Schedule
 import "DisplayModes.js" as DisplayModes
 import "../theme/ThemeScale.js" as ThemeScale
 
@@ -354,46 +353,8 @@ Column {
         }
     }
 
-    SettingGroup {
-        title: "Schedule"
-
-        SettingRow {
-            title: "Turn on automatically"
-            subtitle: "Switching it by hand lasts until the next start or end time"
-
-            Switch {
-                label: "Night light schedule"
-                checked: Settings.values.nightLightScheduled
-                onToggled: Settings.values.nightLightScheduled = !checked
-            }
-        }
-
-        SettingRow {
-            title: "From"
-            enabled: Settings.values.nightLightScheduled
-
-            Stepper {
-                label: "Night light from"
-                values: Schedule.quarterHours
-                wrap: true
-                value: Settings.values.nightLightStart
-                format: Schedule.format
-                onPicked: v => Settings.values.nightLightStart = v
-            }
-        }
-
-        SettingRow {
-            title: "Until"
-            enabled: Settings.values.nightLightScheduled
-
-            Stepper {
-                label: "Night light until"
-                values: Schedule.quarterHours
-                wrap: true
-                value: Settings.values.nightLightEnd
-                format: Schedule.format
-                onPicked: v => Settings.values.nightLightEnd = v
-            }
-        }
+    ScheduleGroup {
+        prefix: "nightLight"
+        what: "Night light"
     }
 }
