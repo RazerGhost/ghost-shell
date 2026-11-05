@@ -11,6 +11,9 @@ hypridle
 hyprlock
 hyprsunset
 
+# The terminal: every machine has one (Super+Enter falls back to it while the shell is down)
+ghostty
+
 # The Quickshell shell, and what it runs or reads
 quickshell
 # QtMultimedia, which the wallpaper layer imports for live wallpapers (the shell won't load
@@ -49,6 +52,8 @@ wtype
 libnotify
 # Folder and file pickers: Settings' folders, sending files to the phone
 zenity
+# Quick settings' Wi-Fi page shares the network as a QR code
+qrencode
 xdg-utils
 matugen
 unicode-emoji

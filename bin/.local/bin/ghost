@@ -45,10 +45,10 @@ all_modules=(core system snapshots apps dev gaming discord spotify zen haunt cap
 # that's plugged into one machine.
 opt_in=(llm claude wave3)
 declare -A about=(
-    [core]="Hyprland, the shell, fonts and themes, the colors"
+    [core]="Hyprland, the shell, the terminal, fonts and themes, the colors"
     [system]="GPU links, hardware fixes for this machine, boot options, logging in at boot (greetd) and services (sudo)"
     [snapshots]="Btrfs snapshots: the system's at every update, your home hourly (sudo)"
-    [apps]="terminal, editor, files, pictures, video, music, browser, web apps"
+    [apps]="editor, files, pictures, video, music, browser, web apps"
     [dev]="languages, package managers and Docker"
     [gaming]="Steam, Proton, Lutris, Heroic, MangoHud; Millennium's theme"
     [discord]="Vesktop with Vencord and the Ghost plugin"

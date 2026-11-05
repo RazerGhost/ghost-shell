@@ -1,7 +1,7 @@
-# Everyday apps: terminal, editor, files, pictures, video and music, and the browser.
+# Everyday apps: editor, files, pictures, video and music, and the browser.
+# (The terminal, Ghostty, is core's: every machine has one.)
 # pacman packages; # lines and blank lines are skipped.
 
-ghostty
 zed
 nautilus
 gvfs

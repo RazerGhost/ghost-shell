@@ -118,10 +118,10 @@ its setup (`setup.sh`).
 
 | Module | |
 |---|---|
-| `core` | Hyprland, the shell, fonts and themes, the colors, zsh as the login shell |
+| `core` | Hyprland, the shell, the terminal (Ghostty), fonts and themes, the colors, zsh as the login shell |
 | `system` | the GPU links, boot options (Limine), hardware fixes for the machine it runs on (`modules/system/hardware/`: the Omen's bass speakers, ...), logging in at boot (greetd) and services |
 | `snapshots` | Btrfs snapshots: the system's before and after every update (bootable), your home folder hourly |
-| `apps` | terminal, editor, files, pictures, video, music, browser, web apps |
+| `apps` | editor, files, pictures, video, music, browser, web apps |
 | `dev` | languages, package managers and Docker |
 | `gaming` | Steam, Proton, Lutris, Heroic, MangoHud; Steam's theme |
 | `discord`, `spotify`, `zen` | those apps in the wallpaper's colors |

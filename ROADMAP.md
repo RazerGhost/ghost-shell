@@ -2549,6 +2549,11 @@ then (user: "all of it"):
   instructions inside.
 - The night light's and Do Not Disturb's schedules are one `settings/ScheduleGroup.qml` (they were
   the same 45 lines twice).
+- The dependency check counts per module now: code every machine runs (the shell, Hyprland's
+  config, bin/, core, system) may only use core's and system's packages, a module's scripts also
+  its own, and the shell's guarded uses of optional modules' programs are listed with their
+  module. It found zenity (only Steam brought it) and qrencode (only the capture module), now in
+  core, and Ghostty moved to core: it's the terminal every machine falls back to.
 
 ### Not doing (user's call, 2026-10-28)
 Hibernation, fingerprint login and dictation (from the Omarchy/Ryoku research): skipped. Letting games take Super (Quickshell's ShortcutInhibitor only covers the shell's own
