@@ -131,11 +131,12 @@ its setup (`setup.sh`).
 | `proton` | Proton Mail, Pass and VPN |
 | `calendar` | calendar events in the today menu, from a calendar's iCal link (`ghost calendar add`) |
 | `llm` | local coding LLM on the NVIDIA GPU: Ollama, OpenCode, Aider (setup and decisions in the ghost-llm repo) |
+| `claude` | Claude Code, Anthropic's coding agent in the terminal (opt-in) |
 | `wave3` | the Elgato Wave:3 microphone with openxlr and a voice chain ([its README](modules/wave3/README.md)) |
 
-Every module except `llm` and `wave3` is installed unless `~/.config/ghost/modules` lists the ones this
-machine wants, one per line (`llm` and `wave3` only ever come from that list: they're for the machine
-with the NVIDIA GPU and the one the microphone is plugged into). That file isn't in the repo, so each
+Every module except `llm`, `claude` and `wave3` is installed unless `~/.config/ghost/modules` lists the ones this
+machine wants, one per line (`llm`, `claude` and `wave3` only ever come from that list: they're for the machine
+with the NVIDIA GPU, the ones you code on with Claude, and the one the microphone is plugged into). That file isn't in the repo, so each
 machine keeps its own; `machines/` has the laptop's and the desktop's to start from
 (`ghost install --machine desktop`), or write one:
 

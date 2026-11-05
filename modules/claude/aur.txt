@@ -1,0 +1,6 @@
+# Claude Code, Anthropic's coding agent in the terminal. Opt-in: only where
+# ~/.config/ghost/modules lists `claude`.
+# Through paru: CachyOS's own repository has it, a plain Arch install gets it from the AUR. Its
+# updates come with the system's (Anthropic's own installer, which puts it in ~/.local/bin and
+# updates itself, isn't needed then: `claude` would find that copy first).
+claude-code

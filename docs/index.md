@@ -28,7 +28,7 @@ the reasons and history are in [ROADMAP.md](../ROADMAP.md), verified API facts i
 | Everything used is declared: the shell's QML imports and every program named in the code come from a module's packages or their dependencies, not what another package or CachyOS brought (`tests/deps_test.sh`, run by `ghost doctor`; exceptions listed with their reason) | `tests/deps_test.sh` |
 | `ghost doctor` also checks this machine can commit and push (git name and email, GitHub login) | `bin/.local/bin/ghost` |
 | One module per part of the setup: `packages.txt` (pacman), `aur.txt` (paru), `packages.sh` (packages by hardware: `modules/system/packages.sh`, `nvidia-prime` on a hybrid laptop, `libva-nvidia-driver` where NVIDIA drives the display), re-runnable `setup.sh`; new ones go in `all_modules` and `about` | `modules/`, `bin/.local/bin/ghost` |
-| Opt-in modules (`llm`, `wave3`) only install where `~/.config/ghost/modules` lists them | `opt_in` in `ghost` |
+| Opt-in modules (`llm`, `claude`, `wave3`) only install where `~/.config/ghost/modules` lists them | `opt_in` in `ghost` |
 | A machine picks its modules in `~/.config/ghost/modules` (not in git); without it, all | |
 | `install.sh` only bootstraps `ghost install` (`[machine] [wallpaper] [--yes]`); `bootstrap.sh` clones and runs it in one command; machine profiles (module lists) | `install.sh`, `bootstrap.sh`, `machines/` |
 | `ghost update` refuses with uncommitted changes; never stash with the live config | `cmd_update` |
@@ -338,6 +338,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 | proton | Proton Mail, Pass, VPN |
 | calendar | Calendar events from an iCal link (Google's secret address) |
 | llm (opt-in) | Ollama, OpenCode, Aider on the NVIDIA GPU |
+| claude (opt-in) | Claude Code (`claude-code`: CachyOS's repository, else the AUR) |
 | wave3 (opt-in) | Elgato Wave:3 with openxlr and a voice chain |
 
 ---

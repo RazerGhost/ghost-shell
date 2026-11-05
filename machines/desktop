@@ -1,6 +1,6 @@
 # The desktop with the RTX 3070 and the Elgato Wave:3 (NVIDIA-only: env.lua sets NVIDIA's
 # variables there). `ghost install --machine desktop` (or `./install.sh desktop`) writes this to
-# ~/.config/ghost/modules. Add snapshots, proton, calendar or llm here if wanted.
+# ~/.config/ghost/modules. Add snapshots, proton, calendar, llm or claude here if wanted.
 core
 system
 apps
