@@ -67,7 +67,8 @@ updated) · Boy Scout Rule within touched lines · end each change with a summar
 
 | Area | Decision |
 |---|---|
-| GPU | by chassis type: a laptop the iGPU first, the RTX second in `AQ_DRM_DEVICES`, no global NVIDIA env vars, `prime-run` per app; a desktop the NVIDIA card first with its env vars (`env.lua`, udev rule `61-gpu-symlinks.rules`) |
+| GPU | the display GPU (firmware's `boot_vga`, `ghost-hw`) first in `AQ_DRM_DEVICES`, the others after; NVIDIA's env vars only where NVIDIA drives the display, `prime-run` per app on a hybrid laptop (`env.lua`, udev rule `61-gpu-symlinks.rules`: a link per PCI slot) |
+| Hardware | Only `bin/.local/bin/ghost-hw` tests hardware (laptop, battery, lid, GPUs, model); everything else asks it (sysfs only, never `lspci`, which wakes a sleeping RTX; `tests/hw_test.sh`) |
 | Boot | No Plymouth (`plymouth.enable=0`); early KMS adds `amdgpu`; quiet kernel line; Hyprland output to the journal |
 | Windows | Own tiling layout (`layout.lua`, `tiling.lua`); dialogs float; floating stays above tiled |
 | Focus | Click to focus, raise on focus (`input.follow_mouse = 2`, `windows.lua`); apps can't steal focus, urgent shows an `AttentionCard` |

@@ -3,6 +3,10 @@
 step() { printf '\n\033[1;34m==> %s\033[0m\n' "$*"; }
 fail() { printf '\033[1;31merror:\033[0m %s\n' "$*" >&2; exit 1; }
 
+# This machine's hardware (bin/.local/bin/ghost-hw: `hw laptop`, `hw nvidia-display`, `hw match
+# <model>`...), from the repo, so it works before stow has linked it.
+hw() { "$(dirname "${BASH_SOURCE[0]}")/../bin/.local/bin/ghost-hw" "$@"; }
+
 # Clone a repo, or fast-forward it if it's already there.
 clone_or_pull() {
     if [[ -d $2/.git ]]; then

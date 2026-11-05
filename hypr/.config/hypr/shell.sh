@@ -6,10 +6,10 @@
 
 # The shell draws on the AMD iGPU: give it Mesa's EGL only, so it doesn't also load NVIDIA's
 # (about 57 MB less resident, measured 2026-10-29). Apps the shell starts would inherit it, so
-# services/Apps.qml removes it for them: they keep both, and prime-run picks NVIDIA. Only where
-# the AMD chip draws, which env.lua decides (it's first in AQ_DRM_DEVICES, inherited from
-# Hyprland): where NVIDIA draws (the desktop) the shell belongs on NVIDIA too.
-if [ "${AQ_DRM_DEVICES%%:*}" = /dev/dri/amd-igpu ]; then
+# services/Apps.qml removes it for them: they keep both, and prime-run picks NVIDIA. Not where
+# NVIDIA drives the display (ghost-hw, the same answer env.lua uses): the shell belongs on
+# NVIDIA there (the desktop).
+if ! "$HOME/.local/bin/ghost-hw" nvidia-display; then
     export __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/50_mesa.json
 fi
 

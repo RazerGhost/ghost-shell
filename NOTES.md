@@ -88,6 +88,9 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   `Networking.wifiHardwareEnabled` is rfkill's hard block.
 - Hyprland runs Lua 5.5. `hyprctl eval '<lua>'` runs code in the config's state; `hyprctl repl
   'return x'` prints a value, but prints "unknown request" for an empty string.
+- Hyprland's Lua has `io.popen` and `os.execute`, and a pipe's output reads fine, but `close()`
+  can't report the command's exit code: it returns `nil, "No child processes", 10` (Hyprland reaps
+  its children itself). Echo `$?` into the output instead (env.lua's `ask`). Checked 2026-11-05.
 - `hyprctl eval 'hl.monitor({ output = "eDP-1", mode = "1920x1080@60", position = "auto", scale = 1,
   transform = 0, vrr = 2 })'` changes the screen at once (verified 165 -> 60 -> 165 Hz on the
   laptop); a `hyprctl reload` goes back to what the config files say.

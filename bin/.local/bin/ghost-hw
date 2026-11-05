@@ -1,0 +1,183 @@
+#!/usr/bin/env bash
+# ghost-hw: what this machine's hardware is, the one place that answers it. Everything that
+# differs between machines asks this instead of testing hardware itself: Hyprland's env.lua (which
+# GPU draws), hypr/shell.sh, the system module and its hardware/ fixes, `ghost doctor`.
+#
+#   ghost-hw laptop          a portable chassis (the firmware's chassis type)
+#   ghost-hw battery         a battery that powers the machine (not a mouse's)
+#   ghost-hw lid             a lid switch
+#   ghost-hw nvidia          an NVIDIA graphics card
+#   ghost-hw nvidia-display  NVIDIA drives the display (see display_gpu)
+#   ghost-hw nvidia-offload  an NVIDIA card next to another one that drives the display: a hybrid
+#                            laptop, where apps go to NVIDIA with prime-run
+#   ghost-hw match <text>    the firmware's vendor, product or board name contains <text>
+#                            (case-insensitive), for fixes that belong to one model
+#   ghost-hw board <name>    the firmware's board name is exactly <name>
+#   ghost-hw display-gpu     prints the display GPU's vendor: amd, nvidia, intel or other
+#   ghost-hw drm-devices     prints AQ_DRM_DEVICES: every GPU's /dev/dri/gpu-<PCI slot> link (from
+#                            system/etc/udev/rules.d/61-gpu-symlinks.rules), the display GPU first;
+#                            no (exit 1) when there are none
+#   ghost-hw facts           all of the above as key=value lines (`ghost doctor` shows them),
+#                            and the graphics cards with no driver (no_driver)
+#
+# Questions exit 0 for yes, 1 for no. Only cached sysfs values are read, never lspci: reading a
+# card's PCI config space wakes a sleeping NVIDIA card, and env.lua asks at every config reload.
+# GHOST_SYSFS, GHOST_PROCFS and GHOST_DEVFS point it at a stand-in tree (tests/hw_test.sh).
+set -uo pipefail
+sys=${GHOST_SYSFS:-/sys}
+proc=${GHOST_PROCFS:-/proc}
+dev=${GHOST_DEVFS:-/dev}
+
+# Every graphics card (PCI class 03xx) with a driver bound (a drm/ folder), one PCI address a line.
+gpus() {
+    local device class
+    for device in "$sys"/bus/pci/devices/*; do
+        [[ -r $device/class ]] || continue
+        read -r class <"$device/class"
+        [[ $class == 0x03* && -d $device/drm ]] && echo "${device##*/}"
+    done
+}
+
+# Graphics cards without a driver bound (no drm/ folder): their screens won't work.
+unbound() {
+    local device class
+    for device in "$sys"/bus/pci/devices/*; do
+        [[ -r $device/class ]] || continue
+        read -r class <"$device/class"
+        [[ $class == 0x03* && ! -d $device/drm ]] && echo "$(vendor_of "${device##*/}") ${device##*/}"
+    done
+}
+
+vendor_of() {
+    local id
+    read -r id <"$sys/bus/pci/devices/$1/vendor"
+    case $id in
+        0x1002) echo amd ;;
+        0x10de) echo nvidia ;;
+        0x8086) echo intel ;;
+        *) echo other ;;
+    esac
+}
+
+# The GPU the firmware showed the boot screen on (boot_vga): the one the screens are wired to, the
+# built-in panel's on a laptop. The rule Omarchy uses too. When none claims it, an NVIDIA card is
+# taken for the display GPU if there is one, else the first.
+display_gpu() {
+    local gpu flag first="" nvidia=""
+    for gpu in $(gpus); do
+        flag=0
+        [[ -r $sys/bus/pci/devices/$gpu/boot_vga ]] && read -r flag <"$sys/bus/pci/devices/$gpu/boot_vga"
+        if [[ $flag == 1 ]]; then
+            echo "$gpu"
+            return
+        fi
+        [[ -z $first ]] && first=$gpu
+        [[ -z $nvidia && $(vendor_of "$gpu") == nvidia ]] && nvidia=$gpu
+    done
+    [[ -n ${nvidia:-$first} ]] && echo "${nvidia:-$first}"
+}
+
+# The udev rule's link for a PCI address: udev's ID_PATH_TAG (pci-0000_01_00_0), which has no
+# colons, so the links can go into colon-separated AQ_DRM_DEVICES.
+link_of() {
+    local tag=${1//[:.]/_}
+    echo "$dev/dri/gpu-pci-$tag"
+}
+
+dmi() {
+    cat "$sys/class/dmi/id/$1" 2>/dev/null
+}
+
+is_laptop() {
+    # SMBIOS chassis types: portable, laptop, notebook, sub notebook, convertible, detachable.
+    case $(dmi chassis_type) in
+        8 | 9 | 10 | 14 | 31 | 32) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+has_battery() {
+    local supply type scope
+    for supply in "$sys"/class/power_supply/*; do
+        [[ -r $supply/type ]] || continue
+        read -r type <"$supply/type"
+        scope=System
+        [[ -r $supply/scope ]] && read -r scope <"$supply/scope"
+        [[ $type == Battery && $scope != Device ]] && return 0
+    done
+    return 1
+}
+
+has_lid() {
+    compgen -G "$proc/acpi/button/lid/*" >/dev/null
+}
+
+has_nvidia() {
+    local gpu
+    for gpu in $(gpus); do
+        [[ $(vendor_of "$gpu") == nvidia ]] && return 0
+    done
+    return 1
+}
+
+nvidia_display() {
+    local gpu
+    gpu=$(display_gpu)
+    [[ -n $gpu && $(vendor_of "$gpu") == nvidia ]]
+}
+
+drm_devices() {
+    local display gpu link list=()
+    display=$(display_gpu)
+    [[ -n $display ]] || return 1
+    for gpu in "$display" $(gpus | grep -vx "$display"); do
+        link=$(link_of "$gpu")
+        [[ -e $link ]] && list+=("$link")
+    done
+    ((${#list[@]})) || return 1
+    local IFS=:
+    echo "${list[*]}"
+}
+
+yes_no() {
+    "$@" && echo yes || echo no
+}
+
+case ${1:-} in
+    laptop) is_laptop ;;
+    battery) has_battery ;;
+    lid) has_lid ;;
+    nvidia) has_nvidia ;;
+    nvidia-display) nvidia_display ;;
+    nvidia-offload) has_nvidia && ! nvidia_display ;;
+    match)
+        [[ -n ${2:-} ]] || { echo "ghost-hw match needs a text" >&2; exit 2; }
+        printf '%s\n' "$(dmi sys_vendor)" "$(dmi product_name)" "$(dmi board_name)" | grep -qiF -- "$2"
+        ;;
+    board)
+        [[ -n ${2:-} ]] || { echo "ghost-hw board needs a name" >&2; exit 2; }
+        [[ $(dmi board_name) == "$2" ]]
+        ;;
+    display-gpu)
+        gpu=$(display_gpu)
+        [[ -n $gpu ]] || exit 1
+        vendor_of "$gpu"
+        ;;
+    drm-devices) drm_devices ;;
+    facts)
+        echo "model=$(dmi sys_vendor) $(dmi product_name) ($(dmi board_name))"
+        echo "laptop=$(yes_no is_laptop)"
+        echo "battery=$(yes_no has_battery)"
+        echo "lid=$(yes_no has_lid)"
+        gpu=$(display_gpu)
+        echo "display_gpu=${gpu:+$(vendor_of "$gpu") $gpu}"
+        echo "gpus=$(for g in $(gpus); do printf '%s %s, ' "$(vendor_of "$g")" "$g"; done | sed 's/, $//')"
+        echo "nvidia_offload=$(yes_no eval 'has_nvidia && ! nvidia_display')"
+        echo "drm_devices=$(drm_devices)"
+        echo "no_driver=$(unbound | tr '\n' ' ' | sed 's/ $//')"
+        ;;
+    *)
+        sed -n '2,/^set -uo/p' "$0" | sed '$d; s/^# \{0,1\}//' >&2
+        exit 2
+        ;;
+esac

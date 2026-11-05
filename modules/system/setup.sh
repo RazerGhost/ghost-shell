@@ -7,7 +7,7 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 . modules/lib.sh
 
-step "GPU udev rule (stable /dev/dri/amd-igpu and /dev/dri/nvidia-dgpu)"
+step "GPUs: a stable link for each (/dev/dri/gpu-pci-<slot>)"
 rule=system/etc/udev/rules.d/61-gpu-symlinks.rules
 if ! cmp -s "$rule" "/etc/udev/rules.d/$(basename "$rule")"; then
     sudo install -Dm644 "$rule" "/etc/udev/rules.d/$(basename "$rule")"
@@ -15,24 +15,15 @@ if ! cmp -s "$rule" "/etc/udev/rules.d/$(basename "$rule")"; then
     sudo udevadm trigger --subsystem-match=drm
     udevadm settle
 fi
-# Hyprland's env.lua lists whichever of the two exist: on a laptop the AMD chip first, on a
-# desktop the NVIDIA card first (the desktop's Ryzen has a small iGPU too). Only the same card
-# under both names is wrong.
-for gpu in amd-igpu nvidia-dgpu; do
-    [[ -e /dev/dri/$gpu ]] && printf '%-11s -> %s\n' "$gpu" "$(readlink -f /dev/dri/$gpu)"
-done
-if [[ -e /dev/dri/amd-igpu && -e /dev/dri/nvidia-dgpu ]]; then
-    [[ $(readlink -f /dev/dri/nvidia-dgpu) != $(readlink -f /dev/dri/amd-igpu) ]] \
-        || fail "both GPU symlinks point at $(readlink -f /dev/dri/amd-igpu)"
-elif [[ -e /dev/dri/amd-igpu && -n $(lspci -d 10de::03xx) ]]; then
-    # A hybrid laptop whose RTX has no DRM card: outputs wired to it (HDMI / USB-C) won't work.
-    printf '\033[1;33mwarning:\033[0m /dev/dri/nvidia-dgpu is missing; external monitors on the RTX will not work.\n' >&2
-    lspci -k -d 10de::03xx
+# What ghost-hw found: the display GPU goes first in Hyprland's AQ_DRM_DEVICES (env.lua).
+hw facts
+hw drm-devices >/dev/null || fail "no /dev/dri/gpu-pci-* links; check $rule against udevadm info /dev/dri/card*"
+no_driver=$(hw facts | sed -n 's/^no_driver=//p')
+if [[ -n $no_driver ]]; then
+    # A card without a driver: screens wired to it won't work (an RTX whose NVIDIA module didn't load).
+    printf '\033[1;33mwarning:\033[0m no driver for %s; screens on it will not work.\n' "$no_driver" >&2
     lsmod | grep -E '^nvidia' || echo "  (no nvidia kernel modules loaded)"
 fi
-echo "Compare with the PCI addresses below (1002 = AMD, 10de = NVIDIA):"
-lspci -nn -d ::03xx
-ls -l /dev/dri/by-path/ | grep -- '-card'
 
 step "Boot: early KMS, no Plymouth splash"
 rebuild_boot=false
@@ -41,10 +32,10 @@ rebuild_boot=false
 limine=false
 [[ -f /etc/default/limine ]] && command -v limine-mkinitcpio >/dev/null && limine=true
 
-# Early KMS: load the AMD driver before any services start. CachyOS's chwd removes the kms
-# hook on NVIDIA laptops (10-chwd-kms.conf), so without this amdgpu loads late.
+# Early KMS: load the AMD driver before any services start where it drives the display. CachyOS's
+# chwd removes the kms hook on NVIDIA laptops (10-chwd-kms.conf), so without this amdgpu loads late.
 kms=system/etc/mkinitcpio.conf.d/20-early-amdgpu.conf
-if [[ -e /dev/dri/amd-igpu ]] && ! cmp -s "$kms" "/etc/mkinitcpio.conf.d/$(basename "$kms")"; then
+if [[ $(hw display-gpu) == amd ]] && ! cmp -s "$kms" "/etc/mkinitcpio.conf.d/$(basename "$kms")"; then
     sudo install -Dm644 "$kms" "/etc/mkinitcpio.conf.d/$(basename "$kms")"
     rebuild_boot=true
 fi
