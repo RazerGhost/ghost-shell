@@ -344,7 +344,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 | proton | Proton Mail, Pass, VPN |
 | calendar | Calendar events from an iCal link (Google's secret address) |
 | llm (opt-in) | Ollama, OpenCode, Aider on the NVIDIA GPU |
-| claude (opt-in) | Claude Code (`claude-code`: CachyOS's repository, else the AUR) |
+| claude (opt-in) | Claude Code (`claude-code`: CachyOS's repository, else the AUR); personal rules for every project (`modules/claude/CLAUDE.md`) and the `/brief`, `/bug` and `/review-diff` skills (`modules/claude/skills/`), linked into `~/.claude` by its `setup.sh`. On Windows, `~/.claude/CLAUDE.md` imports the rules with an `@` line and the skills are directory junctions |
 | wave3 (opt-in) | Elgato Wave:3 with openxlr and a voice chain |
 
 ---
