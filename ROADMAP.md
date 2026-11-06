@@ -157,6 +157,11 @@ How things are, and why. The story of each (what was tried first) is in `docs/hi
 - **Apps start in their own scopes** (`hypr/run-app.sh`), so systemd-oomd ends the app, not the
   session.
 - **JavaScript runtime: bun** (user's choice). Node and pnpm only for Vencord's build.
+- **Compositor: Hyprland, not Umbriel** (looked at 2026-11-07, github.com/noctalia-dev/umbriel,
+  MIT, 0.1.0, no tagged releases, Arch only as `umbriel-git`). Its scope fixes the layouts at
+  scrolling, dwindle, master and floating, with no scripting, so our Lua layout couldn't move;
+  everything on `Quickshell.Hyprland` would need rewriting over its JSON socket. Look again once
+  it has tagged releases; try it first as a second session from a TTY on the desktop.
 
 ## Open issues
 
