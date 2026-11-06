@@ -131,7 +131,7 @@ its setup (`setup.sh`).
 | `phone` | KDE Connect and LocalSend |
 | `proton` | Proton Mail, Pass and VPN |
 | `calendar` | calendar events in the today menu, from a calendar's iCal link (`ghost calendar add`) |
-| `llm` | local coding LLM on the NVIDIA GPU: Ollama, OpenCode, Aider (setup and decisions in the ghost-llm repo) |
+| `llm` | local coding LLM on the NVIDIA GPU: Ollama, OpenCode, Aider |
 | `claude` | Claude Code, Anthropic's coding agent in the terminal (opt-in) |
 | `wave3` | the Elgato Wave:3 microphone with openxlr and a voice chain ([its README](modules/wave3/README.md)) |
 
