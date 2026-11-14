@@ -570,6 +570,11 @@ Checked against the docs or source in October 2026. Re-check anything not listed
   (`Presets.same`), never by `JSON.stringify` (verified 2026-10-30 with a throwaway `qs -p`;
   the presets kept falling back to "Yours").
 
+- pacman hooks (pacman 7.1) run in a fresh network namespace with only loopback unless the hook's
+  `[Action]` has `NetworkAccess = allowed` (alpm-hooks(5)); they do get the caller's environment,
+  so `SUDO_USER` is there when run through sudo or paru (seen 2026-11-14 with
+  `ghost-spicetify.hook`: patched as the user, but GitHub unreachable).
+
 ## Testing on the laptop
 
 - README screenshots: an empty workspace up to 5 (higher ones add workspace dots), `grim -s 0.75`

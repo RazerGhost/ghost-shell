@@ -2591,6 +2591,9 @@ Spotify"), and the setup only made a backup when there was none at all.
 - `ghost doctor` says when the patch isn't for the installed Spotify.
 - Tests: `tests/modules_test.sh` (undo on failure, remove, the machine list, packages kept for
   other modules), `tests/spotify_test.sh` (stand-in Spicetify that refuses like the real one).
-- Unverified: that pacman passes `SUDO_USER` through to hooks (it runs them with its own
-  environment; the hook says what to do when it's missing), and that `ufw delete allow
+- Tried on the laptop: the setup's reinstall fired the hook, `SUDO_USER` came through and it
+  patched Spotify, but without network: pacman 7.1 runs hooks in a fresh network namespace unless
+  the hook has `NetworkAccess = allowed` (alpm-hooks(5)), and Spicetify's backup fetches its CSS
+  map from GitHub. The hook allows it now.
+- Unverified: that `ufw delete allow
   53317/tcp` matches the rule the setup added with a comment.

@@ -8,4 +8,7 @@ Target = spotify
 [Action]
 Description = Patching Spotify again with Spicetify (the spotify module)...
 When = PostTransaction
+# pacman 7.1 runs hooks without network unless allowed; Spicetify's backup fetches its CSS map
+# from GitHub (without it, some of the theme's styles miss Spotify's class names).
+NetworkAccess = allowed
 Exec = /usr/local/lib/ghost-spicetify-after-update
