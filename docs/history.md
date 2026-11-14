@@ -2558,3 +2558,39 @@ password prompt). The system module no longer forces the menu's options; it only
 where there are none. Option names and behaviour checked in Limine's CONFIG.md. Needs
 `ghost install system`; the row shows once the helper is there.
 
+
+## Undoing modules, and Spicetify after Spotify updates (2026-11-14)
+User's question: `ghost` installs custom things but never takes them out when something goes
+wrong, as with Spotify then. Spotify had been updated to 1.3.8 by paru while Spicetify's backup
+was of 1.3.4; a `spicetify apply` (Ghost's installer) got halfway and deleted Spotify's own
+`xpui.spa` and `login.spa`, so `spicetify apply` and `spicetify clear` both refused ("re-install
+Spotify"), and the setup only made a backup when there was none at all.
+- **`remove.sh` per module** where the setup changes an app or links things in: spotify
+  (`spicetify restore`, the hook out, `/opt/spotify` root's again), discord (Vesktop back on its
+  own Vencord, the matugen theme off; the clones stay), gaming (Millennium's `libXtst` links out
+  of Steam's folders), zen (the `@import` out of userChrome.css; the pref stays), phone (the
+  autostart link and ufw rules out), claude (only the links into the module). The others leave
+  nothing that breaks an app; their packages are the whole of them.
+- **A failed setup is undone at once** by `ghost install`, packages kept (removing Spotify because
+  a theme download failed loses more than it saves); the install still fails at the end naming
+  it, and says when undoing failed too.
+- **`ghost remove <module...> [--yes]`:** `remove.sh`, then `pacman -Rnsu` of the module's
+  installed packages that no remaining module lists (`-u` leaves out any another package needs),
+  then off `~/.config/ghost/modules` (written out from "all" first when there was none). core and
+  system are refused. haunt's `haunt-bin` (installed from its release, in no list) stays.
+- **Spicetify in step with Spotify** (`modules/spotify/spicetify.sh`): "current" is Spicetify's
+  backup version (`1.3.8.620.g…`) matching pacman's (`1:1.3.8.620-1`). Patching when it isn't:
+  Spotify's own files back (reinstalled with paru only when `pacman -Qk` finds a `.spa` missing;
+  extracted folders beside a `.spa` deleted), then `spicetify clear` and `backup apply`.
+- **pacman's hook** (`ghost-spicetify.hook`, Upgrade of `spotify`, installed by the spotify
+  module from `system/`) runs `/usr/local/lib/ghost-spicetify-after-update` as root: it takes the
+  user from `SUDO_USER` (sudo and paru set it), finds their repo through `~/.local/bin/ghost`,
+  chowns `/opt/spotify` to them and runs `spicetify.sh after-update` as them (never reinstalling:
+  pacman holds its lock). It never fails the update; it says to run `ghost install spotify`.
+  It also fires on the setup's own reinstall, so `patch` checks again after reinstalling.
+- `ghost doctor` says when the patch isn't for the installed Spotify.
+- Tests: `tests/modules_test.sh` (undo on failure, remove, the machine list, packages kept for
+  other modules), `tests/spotify_test.sh` (stand-in Spicetify that refuses like the real one).
+- Unverified: that pacman passes `SUDO_USER` through to hooks (it runs them with its own
+  environment; the hook says what to do when it's missing), and that `ufw delete allow
+  53317/tcp` matches the rule the setup added with a comment.

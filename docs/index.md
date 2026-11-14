@@ -28,7 +28,9 @@ the standing decisions are in [ROADMAP.md](../ROADMAP.md), the history of each f
 | One-time changes for machines set up by an earlier version (what an old setup installed and the current one doesn't): one script each, run once per machine by `ghost migrate`, recorded in `~/.local/state/ghost/migrations` (`tests/migrations_test.sh`) | `migrations/`, `bin/.local/bin/ghost` |
 | Everything used is declared: the shell's QML imports and every program named in the code come from a module's packages or their dependencies, not what another package or CachyOS brought (`tests/deps_test.sh`, run by `ghost doctor`; exceptions listed with their reason) | `tests/deps_test.sh` |
 | `ghost doctor` also checks this machine can commit and push (git name and email, GitHub login) | `bin/.local/bin/ghost` |
-| One module per part of the setup: `packages.txt` (pacman), `aur.txt` (paru), `packages.sh` (packages by hardware: `modules/system/packages.sh`, `nvidia-prime` on a hybrid laptop, `libva-nvidia-driver` where NVIDIA drives the display), re-runnable `setup.sh`; new ones go in `all_modules` and `about` | `modules/`, `bin/.local/bin/ghost` |
+| One module per part of the setup: `packages.txt` (pacman), `aur.txt` (paru), `packages.sh` (packages by hardware: `modules/system/packages.sh`, `nvidia-prime` on a hybrid laptop, `libva-nvidia-driver` where NVIDIA drives the display), re-runnable `setup.sh`, and `remove.sh` where the setup changes an app or links things in (spotify, discord, gaming, zen, phone, claude): it undoes the setup and leaves the app working without it; new ones go in `all_modules` and `about` | `modules/`, `bin/.local/bin/ghost` |
+| A module whose setup fails is undone at once (its `remove.sh`), keeping its packages; the install goes on and fails at the end naming it (`tests/modules_test.sh`) | `cmd_install` in `ghost` |
+| `ghost remove <module...>`: its `remove.sh`, then `pacman -Rnsu` of its installed packages no remaining module lists, then off `~/.config/ghost/modules` (written out first when missing); core and system refused (`tests/modules_test.sh`) | `cmd_remove` in `ghost` |
 | Opt-in modules (`llm`, `claude`, `wave3`) only install where `~/.config/ghost/modules` lists them | `opt_in` in `ghost` |
 | A machine picks its modules in `~/.config/ghost/modules` (not in git); without it, all | |
 | `install.sh` only bootstraps `ghost install` (`[machine] [wallpaper] [--yes]`); `bootstrap.sh` clones and runs it in one command; machine profiles (module lists) | `install.sh`, `bootstrap.sh`, `machines/` |
@@ -294,7 +296,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 
 ### `ghost`
 
-`install [module...] [--machine laptop|desktop] [--theme X] [--yes]` · `update` · `theme <wallpaper|#rrggbb>` ·
+`install [module...] [--machine laptop|desktop] [--theme X] [--yes]` · `remove <module...> [--yes]` · `update` · `theme <wallpaper|#rrggbb>` ·
 `webapp add|remove|list` · `calendar add|remove|list|sync` · `looks export|import` ·
 `wallpapers get [words] [--count N] [--general] [--style S]` / `fetch <id>` · `doctor` ·
 `modules` · `keybinds`
@@ -336,7 +338,7 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 | dev | Languages, package managers, Docker |
 | gaming | Steam, Proton, Lutris, Heroic, MangoHud; Millennium's theme |
 | discord | Vesktop with Vencord and the Ghost plugin |
-| spotify | Spotify with Spicetify and the Ghost theme |
+| spotify | Spotify with Spicetify and the Ghost theme. `modules/spotify/spicetify.sh` keeps Spicetify's backup and patch in step with Spotify's version (reinstalling Spotify when Spicetify took its own files out); pacman's hook (`/etc/pacman.d/hooks/ghost-spicetify.hook`, `/usr/local/lib/ghost-spicetify-after-update`) patches again after a Spotify update, as the user who updated; `ghost doctor` checks it (`tests/spotify_test.sh`) |
 | zen | Zen in the wallpaper's colors |
 | haunt | The Haunt Git client |
 | capture | Recording, color picker, OCR and QR |
@@ -354,4 +356,6 @@ voice chain (`modules/wave3/README.md`), local LLM (`llm` module).
 - QML: `QT_QPA_PLATFORM=offscreen /usr/lib/qt6/bin/qmltestrunner -input tests` (one
   `tests/tst_<name>.qml` per `.js` library).
 - Tiling: `lua tests/tiling_test.lua`.
+- `ghost install`'s undo and `ghost remove`: `bash tests/modules_test.sh`; Spicetify kept in step
+  with Spotify: `bash tests/spotify_test.sh` (both with stand-in tools, a scratch home).
 - Live checks on the laptop: see NOTES.md "Testing on the laptop".

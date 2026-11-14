@@ -1,0 +1,27 @@
+#!/bin/bash
+# Run by pacman (as root) after it updates Spotify (/etc/pacman.d/hooks/ghost-spicetify.hook):
+# patches the new Spotify with Spicetify again, as the user who ran the update (sudo and paru set
+# SUDO_USER), through their Ghost Shell repo's modules/spotify/spicetify.sh (found from their
+# ~/.local/bin/ghost link, so it follows the repo when it moves). Never fails the update: what
+# goes wrong is printed, and `ghost install spotify` patches it then.
+set -u
+say() { echo "Spicetify: $*"; }
+
+user=${SUDO_USER:-}
+if [[ -z $user || $user == root ]]; then
+    say "not updated through sudo, so not patched; run \`ghost install spotify\` as yourself."
+    exit 0
+fi
+home=$(getent passwd "$user" | cut -d: -f6)
+ghost=$(readlink -f "$home/.local/bin/ghost" 2>/dev/null || true)
+script=${ghost%/bin/.local/bin/ghost}/modules/spotify/spicetify.sh
+if [[ -z $ghost || ! -f $script ]]; then
+    say "no Ghost Shell repo found through $home/.local/bin/ghost; Spotify isn't patched."
+    exit 0
+fi
+# Spicetify writes into Spotify's files, which pacman just put back as root's (the spotify
+# module's setup does the same).
+chown -R "$user" /opt/spotify
+runuser -u "$user" -- env HOME="$home" bash "$script" after-update \
+    || say "patching failed (above); run \`ghost install spotify\`."
+exit 0

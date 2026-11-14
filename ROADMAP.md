@@ -59,6 +59,8 @@ Built but not yet tried for real (details in the history's sections of the same 
 - The lock screen's quiet side and the presets placed around the art.
 - The 60 Hz refresh rate switching on battery; the quick settings output chooser unfolding.
 - Out of memory closing the whole session (the alert at the next login).
+- pacman's Spicetify hook after a real Spotify update (`paru` from the island's updates), `ghost
+  remove` on a real module, and phone's `ufw delete` of the rules its setup added with a comment.
 
 ## Not doing (user's call)
 
@@ -146,6 +148,10 @@ How things are, and why. The story of each (what was tried first) is in `docs/hi
 
 ### System and tooling
 
+- **A module's setup that fails is undone** (its `remove.sh`), so no app is left half-patched;
+  its packages stay. `ghost remove` undoes a module on purpose, packages included.
+- **Spicetify follows Spotify's version:** pacman's hook patches again after an update, as the
+  user who updated (`SUDO_USER`), through the repo found from `~/.local/bin/ghost`.
 - **Bluetooth pairing:** Quickshell can't register a BlueZ agent, so `yes | bt-agent -c
   NoInputNoOutput` runs (stdin answers; `--daemon` rejects confirmations). The adapter is pairable
   only while the Bluetooth page pairs.

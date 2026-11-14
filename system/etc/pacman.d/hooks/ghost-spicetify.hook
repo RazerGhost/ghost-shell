@@ -1,0 +1,11 @@
+# After pacman updates Spotify, Spicetify's patch is gone and its backup is of the old version:
+# patch the new one (/usr/local/lib/ghost-spicetify-after-update). Installed by the spotify module.
+[Trigger]
+Operation = Upgrade
+Type = Package
+Target = spotify
+
+[Action]
+Description = Patching Spotify again with Spicetify (the spotify module)...
+When = PostTransaction
+Exec = /usr/local/lib/ghost-spicetify-after-update

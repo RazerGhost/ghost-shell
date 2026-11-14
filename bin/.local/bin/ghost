@@ -7,6 +7,10 @@
 #                     --machine: a profile from machines/ (laptop, desktop) becomes this machine's
 #                     module list first. --yes: no questions from pacman and paru (paru then skips
 #                     showing the PKGBUILDs). sudo's password is asked once and kept for the run.
+#                     A module whose setup fails is undone (its remove.sh) and listed at the end.
+#   ghost remove <module...> [--yes]
+#                     undo the modules' setup (their remove.sh), uninstall the packages no other
+#                     module of this machine lists, and take them off this machine's list
 #   ghost update      pull the repo, then install again
 #   ghost theme <wallpaper | "#rrggbb">
 #                     the wallpaper and the colors from it (the same as the shell's picker)
@@ -30,7 +34,8 @@
 #   ghost keybinds    Hyprland's keybinds as a Markdown table (docs/keybinds.md is made with it)
 #
 # Modules are the folders in modules/: their packages (packages.txt, aur.txt; packages.sh prints
-# the ones that depend on the hardware) and setup (setup.sh). Which ones this machine gets: ~/.config/ghost/modules, one name per line (not in
+# the ones that depend on the hardware), setup (setup.sh) and its undoing (remove.sh, in the
+# modules that change an app or link things in: it leaves the app working without them). Which ones this machine gets: ~/.config/ghost/modules, one name per line (not in
 # the repo, so each machine has its own; machines/ has the profiles to start from); without that
 # file, all of them but the opt-in ones (hardware plugged into one machine, like wave3).
 set -euo pipefail
@@ -141,6 +146,8 @@ cmd_install() {
     if ((yes)); then
         confirm=(--noconfirm)
         confirm_aur=(--noconfirm --skipreview)
+        # For the setups that run paru themselves (the spotify module reinstalling Spotify).
+        export GHOST_YES=1
     fi
 
     step "Packages"
@@ -169,26 +176,83 @@ cmd_install() {
     # Every module's setup, through bash (a setup.sh committed without its executable bit was
     # skipped without a word: the dev module's, until 2026-11-05). One that fails doesn't stop the
     # others: they're listed at the end and the install fails then (a missing Wave:3 used to end
-    # the desktop's first install before its last steps).
-    local failed_modules=()
+    # the desktop's first install before its last steps). A failed one is undone (its remove.sh),
+    # so the app isn't left half-patched: a failed Spicetify patch left Spotify without its own
+    # files (2026-11-14). Its packages stay.
+    local failed_modules=() undo_failed=() args
     for m in "${modules[@]}"; do
         [[ -f modules/$m/setup.sh ]] || continue
-        if [[ $m == core ]]; then
-            bash "modules/$m/setup.sh" "${theme[@]}" || failed_modules+=("$m")
-        else
-            bash "modules/$m/setup.sh" || failed_modules+=("$m")
+        args=()
+        [[ $m == core ]] && args=("${theme[@]}")
+        bash "modules/$m/setup.sh" "${args[@]}" && continue
+        failed_modules+=("$m")
+        if [[ -f modules/$m/remove.sh ]]; then
+            step "$m: its setup failed, undoing it (modules/$m/remove.sh)"
+            bash "modules/$m/remove.sh" || undo_failed+=("$m")
         fi
     done
     if [[ ${#theme[@]} -gt 0 && ! " ${modules[*]} " =~ " core " ]]; then
         cmd_theme "${theme[@]}"
     fi
     cmd_migrate
+    if ((${#undo_failed[@]})); then
+        printf '\033[1;31merror:\033[0m undoing these failed too, so they may be half set up: %s\n' "${undo_failed[*]}" >&2
+    fi
     if ((${#failed_modules[@]})); then
         fail "these modules' setup failed (their messages are above): ${failed_modules[*]}; fix it and run ghost install ${failed_modules[*]}"
     fi
 
     step "Done"
     echo "Log out and back in if this was the first run or env.lua changed (GPU settings apply at Hyprland start)."
+}
+
+# Undoes modules: their remove.sh, then the packages only they list (on this machine), then off
+# this machine's list. core and system aren't removable: the desktop and logging in run on them.
+cmd_remove() {
+    local yes=0 m modules=() pkgs=() keep confirm=()
+    while (($#)); do
+        case $1 in
+            --yes) yes=1; confirm=(--noconfirm); shift ;;
+            core | system) fail "the $1 module can't be removed: the desktop needs it" ;;
+            *) is_module "$1" || fail "no module \"$1\" (ghost modules lists them)"; modules+=("$1"); shift ;;
+        esac
+    done
+    ((${#modules[@]})) || fail "ghost remove needs a module (ghost modules lists them)"
+    keep_sudo
+
+    for m in "${modules[@]}"; do
+        if [[ -f modules/$m/remove.sh ]]; then
+            bash "modules/$m/remove.sh" || fail "undoing $m failed (above); fix it and run ghost remove $m again"
+        fi
+    done
+
+    # This machine's list without them (written out first when the machine had no list: all).
+    local remaining
+    remaining=$(machine | grep -vxF "$(printf '%s\n' "${modules[@]}")" || true)
+    if [[ ! -f $machine_modules ]]; then
+        mkdir -p "$(dirname "$machine_modules")"
+        echo "# This machine's modules (ghost remove wrote it; edit freely)." >"$machine_modules"
+        printf '%s\n' $remaining >>"$machine_modules"
+    else
+        for m in "${modules[@]}"; do
+            sed -i "/^[[:space:]]*$m[[:space:]]*\$/d" "$machine_modules"
+        done
+    fi
+    echo "This machine's modules: $(echo $remaining)"
+
+    step "Packages"
+    keep=$(for m in $remaining; do module_packages "$m"; entries "modules/$m/aur.txt"; done | sort -u)
+    for m in "${modules[@]}"; do
+        mapfile -t -O "${#pkgs[@]}" pkgs < <({ module_packages "$m"; entries "modules/$m/aur.txt"; } | sort -u | grep -vxF "$keep")
+    done
+    # Only the installed ones; -u leaves out any another package needs, -s their dependencies
+    # nothing else needs, -n their changed config files.
+    mapfile -t pkgs < <(printf '%s\n' "${pkgs[@]}" | sort -u | xargs -r pacman -Qq 2>/dev/null || true)
+    if ((${#pkgs[@]})); then
+        sudo pacman -Rnsu "${confirm[@]}" "${pkgs[@]}"
+    else
+        echo "No packages only these modules use are installed."
+    fi
 }
 
 cmd_update() {
@@ -292,6 +356,12 @@ cmd_doctor() {
         if systemctl is-enabled docker.socket >/dev/null 2>&1; then ok "docker.socket"; else bad "docker.socket isn't enabled (ghost install dev)"; fi
     fi
 
+    if machine | grep -x spotify >/dev/null && [[ -f $HOME/.config/spotify/prefs ]]; then
+        step "Spotify"
+        if bash modules/spotify/spicetify.sh current 2>/dev/null; then ok "Spicetify's patch is for the installed Spotify"
+        else bad "Spicetify's patch isn't for the installed Spotify (ghost install spotify)"; fi
+    fi
+
     step "Everything the repo uses is declared (tests/deps_test.sh)"
     local deps
     if deps=$(bash tests/deps_test.sh 2>&1); then ok "${deps##*$'\n'}"
@@ -333,6 +403,7 @@ cmd_keybinds() {
 
 case ${1:-help} in
     install) shift; cmd_install "$@" ;;
+    remove) shift; cmd_remove "$@" ;;
     update) shift; cmd_update "$@" ;;
     theme) shift; cmd_theme "$@" ;;
     webapp) shift; modules/apps/webapp.sh "$@" ;;

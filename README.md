@@ -101,6 +101,7 @@ After the first install, `ghost` (in `~/.local/bin`) does everything:
 |---|---|
 | `ghost update` | pull the repo, then install again (new packages, new setup steps) |
 | `ghost install [module...]` | packages and setup for some or all modules (`--machine laptop\|desktop` picks this machine's from `machines/`, `--yes` answers pacman's and paru's questions) |
+| `ghost remove <module...>` | undo modules: their setup (an app back as it came, like Spotify without Spicetify), the packages no other module of this machine uses, and off this machine's list |
 | `ghost theme <wallpaper \| "#rrggbb">` | a new wallpaper and the colors from it |
 | `ghost calendar add [name]` | subscribe to a calendar (copy the link first: Google Calendar's secret iCal address or any .ics address; `remove <name>`, `list`, `sync`) |
 | `ghost looks export` / `import` | your themes and looks into the repo's `looks.json`, or from it on another machine |
